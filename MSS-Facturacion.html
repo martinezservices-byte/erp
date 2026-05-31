@@ -83,10 +83,48 @@ tfoot td{border-top:2px solid rgba(56,189,248,0.25);font-weight:800;}
 </style>
 </head>
 <body>
+<div id="nav-bar" style="background:#030609;border-bottom:1px solid rgba(201,168,76,0.1);padding:0 16px;display:flex;align-items:center;gap:4px;overflow-x:auto;flex-shrink:0;height:42px;position:sticky;top:0;z-index:200;">
+<a href="index.html" style="display:flex;align-items:center;padding:5px 10px;border-radius:6px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">&#127968; Hub</a>
+<div style="width:1px;height:20px;background:rgba(201,168,76,0.15);margin:0 2px;flex-shrink:0"></div>
+<a href="MSS-Finanzas.html" style="padding:5px 9px;border-radius:6px;color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Finanzas</a>
+<a href="MSS-Remuneraciones.html" style="padding:5px 9px;border-radius:6px;color:#22C55E;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Remuner.</a>
+<a href="MSS-Contabilidad.html" style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Contab.</a>
+<a href="MSS-Facturacion.html" style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Factur.</a>
+<a href="MSS-Cotizacion.html" style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Cotiz.</a>
+<a href="MSS-Tesoreria.html" style="padding:5px 9px;border-radius:6px;color:#FBBF24;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Tesor.</a>
+<a href="MSS-Contratos.html" style="padding:5px 9px;border-radius:6px;color:#A78BFA;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Contratos</a>
+<a href="MSS-Proyectos.html" style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Proyectos</a>
+<a href="MSS-Ventas-CRM.html" style="padding:5px 9px;border-radius:6px;color:#FB923C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Ventas</a>
+<a href="MSS-RRHH.html" style="padding:5px 9px;border-radius:6px;color:#A78BFA;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">RRHH</a>
+<a href="MSS-Estrategia.html" style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Estrategia</a>
+<a href="MSS-Logos.html" style="padding:5px 9px;border-radius:6px;color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Logos</a>
+<a href="MSS-Respaldo.html" style="padding:5px 9px;border-radius:6px;color:#64748B;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Respaldo</a>
+<div id="nav-emp" style="margin-left:auto;padding:3px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;font-size:9px;color:#C9A84C;font-family:monospace;white-space:nowrap;flex-shrink:0;display:none"></div>
+</div>
+<script>
+(function(){
+try{
+  var emp=JSON.parse(localStorage.getItem("mss_empresa_actual")||"{}");
+  if(emp&&emp.nombre){
+    var nd=document.getElementById("nav-emp");
+    if(nd){nd.textContent="Empresa: "+emp.nombre;nd.style.display="block";}
+    var cur=window.location.pathname.split("/").pop();
+    document.querySelectorAll("#nav-bar a").forEach(function(a){
+      if(a.getAttribute("href")===cur){
+        a.style.background="rgba(201,168,76,0.25)";
+        a.style.border="1px solid rgba(201,168,76,0.5)";
+        a.style.color="#E8C97A";
+      }
+    });
+  }
+}catch(ex){}
+})();
+</script>
+
 <div id="header">
   <div class="logo">
     <div class="logo-icon">M</div>
-    <div><div class="logo-name">Martinez Services Spa</div><div class="logo-mod">MÓDULO FACTURACIÓN</div></div>
+    <div><div class="logo-name" id="facHeaderEmp">Martinez Services Spa</div><div class="logo-mod">MÓDULO FACTURACIÓN</div></div>
   </div>
   <div style="display:flex;gap:10px;align-items:center;">
     <span style="font-size:11px;color:var(--muted);font-family:var(--mono)" id="hInfo">Cargando...</span>
@@ -503,36 +541,34 @@ function previewDocumento(docData){
   <div style="margin-top:20px">
     <div style="font-size:12px;color:var(--acc);font-family:var(--mono);margin-bottom:10px">VISTA PREVIA DEL DOCUMENTO</div>
     <div class="factura-preview">
-      <div class="fac-header">
-        <div style="display:flex;align-items:flex-start;gap:14px">
-          ${(()=>{
-            try{
-              const logos=JSON.parse(localStorage.getItem('mss_logos_v1')||'{}');
-              // Buscar cualquier logo disponible — primero el de MSS
-              const keys=Object.keys(logos);
-              if(keys.length>0&&logos[keys[0]]){
-                return `<img src="${logos[keys[0]]}" style="width:80px;height:65px;object-fit:contain;border-radius:6px;border:1px solid #e5e7eb;padding:6px;background:white"/>`;
-              }
-            }catch(e){}
-            return '';
-          })()}
+      ${(()=>{
+        // Leer empresa actual del Hub
+        let emp={nombre:'Martinez Services Spa',rut:'76.999.888-1',rubro:'Consultoría / Auditoría',tel:'+569 74889039',email:'aybserviciosg@gmail.com',direccion:'Av. Calle Nueva 2 3345, Oficina 2.204, Alto Hospicio'};
+        try{const e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}');if(e&&e.nombre)emp={...emp,...e};}catch(ex){}
+        // Leer logo
+        let logoHTML='';
+        try{const logos=JSON.parse(localStorage.getItem('mss_logos_v1')||'{}');const empId=emp.id?String(emp.id):'';const k=empId&&logos[empId]?empId:Object.keys(logos)[0];if(k&&logos[k])logoHTML=`<img src="${logos[k]}" style="width:80px;height:65px;object-fit:contain;border-radius:6px;border:1px solid #e5e7eb;padding:6px;background:white"/>`;}catch(ex){}
+        return `<div class="fac-header">
+          <div style="display:flex;align-items:flex-start;gap:14px">
+            ${logoHTML}
+            <div>
+              <div class="fac-empresa">${emp.nombre}</div>
+              <div style="font-size:11px;color:#666;margin-top:4px">RUT: ${emp.rut}</div>
+              <div style="font-size:11px;color:#666">Giro: ${emp.rubro||'Consultoría y Gestión Empresarial'}</div>
+              ${emp.direccion?`<div style="font-size:11px;color:#666">${emp.direccion}</div>`:''}
+              ${emp.tel?`<div style="font-size:11px;color:#666">Tel: ${emp.tel}</div>`:''}
+            </div>
+          </div>
           <div>
-            <div class="fac-empresa">Martinez Services Spa</div>
-            <div style="font-size:11px;color:#666;margin-top:4px">RUT: 76.123.456-7</div>
-            <div style="font-size:11px;color:#666">Giro: Consultoría y Gestión Empresarial</div>
-            <div style="font-size:11px;color:#666">Av. Providencia 123, Santiago</div>
-            <div style="font-size:11px;color:#666">Tel: +56 9 1234 5678</div>
+            <div class="fac-doc-box">
+              <div class="fac-doc-tipo">${tipo==='Cotización'?'COTIZACIÓN':tipo.toUpperCase()}</div>
+              <div class="fac-doc-num">Nº ${String(folio).padStart(6,'0')}</div>
+              <div style="font-size:10px;margin-top:4px">Fecha: ${dateF(fecha)}</div>
+              ${tipo==='Cotización'?`<div style="font-size:9px;margin-top:3px;opacity:0.8">Válida: 30 días</div>`:''}
+            </div>
           </div>
-        </div>
-        <div>
-          <div class="fac-doc-box">
-            <div class="fac-doc-tipo">${tipo==='Cotización'?'COTIZACIÓN':tipo.toUpperCase()}</div>
-            <div class="fac-doc-num">Nº ${String(folio).padStart(6,'0')}</div>
-            <div style="font-size:10px;margin-top:4px">Fecha: ${dateF(fecha)}</div>
-            ${tipo==='Cotización'?`<div style="font-size:9px;margin-top:3px;opacity:0.8">Válida: 30 días</div>`:''}
-          </div>
-        </div>
-      </div>
+        </div>`;
+      })()}
       <div class="fac-cliente">
         <div style="font-size:11px;font-weight:700;color:#1a3a5c;margin-bottom:6px">${tipo==='Cotización'?'DATOS DEL CLIENTE':'DATOS DEL RECEPTOR'}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">
@@ -567,7 +603,7 @@ function previewDocumento(docData){
       <div style="display:flex;justify-content:space-between;margin-top:30px;padding-top:20px;border-top:1px solid #e5e7eb">
         <div style="text-align:center;min-width:180px">
           <div style="border-top:1px solid #1a3a5c;padding-top:8px;margin-top:30px">
-            <div style="font-size:11px;font-weight:700;color:#1a3a5c">Martinez Services Spa</div>
+            <div style="font-size:11px;font-weight:700;color:#1a3a5c">${(()=>{try{const e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}');return e&&e.nombre?e.nombre:'Martinez Services Spa';}catch(ex){return 'Martinez Services Spa';}})()}</div>
             <div style="font-size:10px;color:#666">Prestador de Servicios</div>
           </div>
         </div>
@@ -579,7 +615,7 @@ function previewDocumento(docData){
         </div>
       </div>`:''}
       <div class="fac-footer" style="margin-top:16px">
-        <span>Martinez Services Spa · RUT 76.123.456-7</span>
+        ${(()=>{let emp={nombre:'Martinez Services Spa',rut:'76.999.888-1'};try{const e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}');if(e&&e.nombre)emp={...emp,...e};}catch(ex){}return `<span>${emp.nombre} · RUT ${emp.rut}</span>`;})()}
         <span>${tipo==='Cotización'?'Cotización Profesional':'Documento Tributario'}</span>
       </div>
     </div>
@@ -714,6 +750,8 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
 
 loadAll();
+// Leer empresa actual del Hub
+try{const e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}');if(e&&e.nombre){const el=document.getElementById('facHeaderEmp');if(el)el.textContent=e.nombre;}}catch(ex){}
 const today=new Date().toISOString().split('T')[0];
 document.getElementById('newFecha').value=today;
 const vcto=new Date();vcto.setDate(vcto.getDate()+30);

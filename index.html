@@ -357,7 +357,7 @@ function renderEmpresas(){
         <div class="emp-mod-label">Acceso Directo a Módulos</div>
         <div class="emp-mod-grid">
           ${MODULES.map(m=>`
-            <a href="${m.file}" class="mod-chip" style="background:${m.color}15;color:${m.color};border-color:${m.color}25;" title="${m.desc}">
+            <a href="javascript:void(0)" onclick="abrirModulo('${m.file}',${emp.id})" class="mod-chip" style="background:${m.color}15;color:${m.color};border-color:${m.color}25;" title="${m.desc}">
               <div style="font-size:14px;margin-bottom:2px">${m.icon}</div>
               <div style="font-size:8px;line-height:1.2">${m.label}</div>
             </a>`).join('')}
@@ -388,6 +388,14 @@ function renderEmpresas(){
 // ════════════════════════════════════════
 //  ENTRAR A EMPRESA — guarda empresa actual
 // ════════════════════════════════════════
+function abrirModulo(archivo, empId){
+  const emp=EMPRESAS.find(e=>e.id===empId);
+  if(!emp)return;
+  // Guardar empresa actual ANTES de abrir el módulo
+  try{localStorage.setItem('mss_empresa_actual',JSON.stringify(emp));}catch(e){}
+  window.location.href=archivo;
+}
+
 function enterEmpresa(id){
   const emp=EMPRESAS.find(e=>e.id===id);
   if(!emp)return;
