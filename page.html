@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Page</title>
+  <style>
+    .card {
+      max-width: 380px;
+      margin: 40px auto;
+      padding: 32px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 1.5rem;
+      color: #1e293b;
+    }
+    
+    .card p {
+      margin: 0 0 20px;
+      color: #64748b;
+      line-height: 1.6;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 10px 24px;
+      background: #4361ee;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .btn:hover {
+      background: #3651d4;
+    }
+  </style>
+</head>
+<body>
+  <!DOCTYPE html>
+  <html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP Condominio Pioneros 2</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      :root{
+        --bg:#071017;
+        --panel:#0d1620;
+        --panel2:#101b27;
+        --line:#1b2a36;
+        --text:#e7f0f6;
+        --muted:#87a2b0;
+        --green:#11c59c;
+        --green2:#0f8f73;
+        --red:#ff5f5f;
+        --yellow:#ffb020;
+        --blue:#6fb7ff;
+        --purple:#b17cff;
+      }
+      *{box-sizing:border-box}
+      body{
+        margin:0;
+        font-family:Inter,Arial,sans-serif;
+        background:var(--bg);
+        color:var(--text);
+      }
+      .topbar{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:16px;
+        padding:18px 24px;
+        border-bottom:1px solid var(--line);
+        background:rgba(13,22,32,.96);
+        position:sticky;
+        top:0;
+        z-index:10;
+        backdrop-filter:blur(8px);
+      }
+      .brand{display:flex;align-items:center;gap:14px}
+      .logo{
+        width:52px;height:52px;border-radius:16px;
+        display:grid;place-items:center;
+        background:linear-gradient(135deg,var(--green),var(--green2));
+        font-size:24px;
+      }
+      .brand h1{margin:0;font-size:20px;font-weight:800}
+      .brand p{margin:2px 0 0;color:#7bc8b6;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+      .actions{display:flex;gap:10px;flex-wrap:wrap}
+      .btn{
+        border:1px solid #28414d;
+        background:#0f1b24;
+        color:#b8efe0;
+        padding:10px 14px;
+        border-radius:12px;
+        font-weight:700;
+      }
+      .btn.primary{background:var(--green);border-color:var(--green);color:#041f19}
+      .container{padding:24px;max-width:1600px;margin:auto}
+      .hero{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:16px;
+        margin-bottom:18px;
+      }
+      .hero h2{margin:0;font-size:28px}
+      .hero p{margin:6px 0 0;color:var(--muted)}
+      .kpis{
+        display:grid;
+        grid-template-columns:repeat(6,minmax(0,1fr));
+        gap:16px;
+        margin-bottom:18px;
+      }
+      .card,.panel{
+        background:linear-gradient(180deg,var(--panel),var(--panel2));
+        border:1px solid var(--line);
+        border-radius:18px;
+        padding:18px;
+      }
+      .card span{
+        display:block;
+        color:var(--muted);
+        font-size:12px;
+        text-transform:uppercase;
+        letter-spacing:.08em;
+      }
+      .card strong{
+        display:block;
+        margin-top:10px;
+        font-size:28px;
+        font-weight:800;
+      }
+      .red strong{color:var(--red)}
+      .green strong{color:var(--green)}
+      .blue strong{color:var(--blue)}
+      .yellow strong{color:var(--yellow)}
+      .purple strong{color:var(--purple)}
+      .grid2{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:16px;
+        margin-bottom:16px;
+      }
+      .grid3{
+        display:grid;
+        grid-template-columns:1.1fr .9fr .9fr;
+        gap:16px;
+        margin-bottom:16px;
+      }
+      .panel h3{
+        margin:0 0 14px;
+        font-size:16px;
+        color:#d8edf6;
+      }
+      table{
+        width:100%;
+        border-collapse:collapse;
+      }
+      th,td{
+        text-align:left;
+        padding:12px 10px;
+        border-bottom:1px solid #1b2732;
+        font-size:14px;
+        vertical-align:top;
+      }
+      th{
+        font-size:12px;
+        text-transform:uppercase;
+        letter-spacing:.08em;
+        color:#81cfc0;
+      }
+      .badge{
+        display:inline-flex;
+        align-items:center;
+        gap:6px;
+        padding:6px 10px;
+        border-radius:999px;
+        font-size:12px;
+        font-weight:700;
+        white-space:nowrap;
+      }
+      .ok{background:rgba(17,197,156,.12);color:#75f2d8}
+      .bad{background:rgba(255,95,95,.12);color:#ff8d8d}
+      .warn{background:rgba(255,176,32,.12);color:#ffd37d}
+      .info{background:rgba(111,183,255,.12);color:#a7d2ff}
+      .mini{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        color:var(--muted);
+        font-size:13px;
+      }
+      canvas{max-height:280px}
+      .small{
+        font-size:13px;
+        color:var(--muted);
+        margin-top:8px;
+      }
+      @media (max-width: 1200px){
+        .kpis{grid-template-columns:repeat(3,1fr)}
+        .grid2,.grid3{grid-template-columns:1fr}
+      }
+      @media (max-width: 700px){
+        .kpis{grid-template-columns:1fr}
+        .hero,.topbar{flex-direction:column;align-items:flex-start}
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">🏢</div>
+        <div>
+          <h1>Condominio Pioneros 2</h1>
+          <p>Administración de Condominio · Ley 21.442</p>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn primary">+ Cobro GC</button>
+        <button class="btn">+ Egreso</button>
+        <button class="btn">+ Pago</button>
+        <button class="btn">Descargar Estado de Cuenta</button>
+      </div>
+    </header>
+  
+    <main class="container">
+      <section class="hero">
+        <div>
+          <h2>Dashboard Ejecutivo</h2>
+          <p>Resumen financiero, morosidad, recaudación y estado de cuenta por unidad.</p>
+        </div>
+        <div class="mini">
+          <span>Actualizado hoy</span>
+          <strong id="fechaHoy"></strong>
+        </div>
+      </section>
+  
+      <section class="kpis">
+        <article class="card green"><span>Cargos vigentes</span><strong id="vigentes">$85.000</strong></article>
+        <article class="card yellow"><span>Cargos vencidos</span><strong id="vencidos">$92.000</strong></article>
+        <article class="card red"><span>Unidades morosas</span><strong id="morosas">1</strong></article>
+        <article class="card blue"><span>Total ingresos</span><strong id="ingresos">$85.000</strong></article>
+        <article class="card red"><span>Total egresos</span><strong id="egresos">$120.000</strong></article>
+        <article class="card purple"><span>Saldo actual</span><strong id="saldo">-$35.000</strong></article>
+      </section>
+  
+      <section class="grid2">
+        <div class="panel">
+          <h3>Ingresos vs Egresos</h3>
+          <canvas id="chartFinanzas"></canvas>
+        </div>
+        <div class="panel">
+          <h3>Saldo Acumulado</h3>
+          <canvas id="chartSaldo"></canvas>
+        </div>
+      </section>
+  
+      <section class="grid3">
+        <div class="panel">
+          <h3>Unidades</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Unidad</th>
+                <th>Residente</th>
+                <th>Cargos vencidos</th>
+                <th>Saldo actual</th>
+                <th>Balance</th>
+              </tr>
+            </thead>
+            <tbody id="tablaUnidades"></tbody>
+          </table>
+          <div class="small">Balance = cargos vencidos + saldo actual.</div>
+        </div>
+  
+        <div class="panel">
+          <h3>Pagos no reconocidos</h3>
+          <table>
+            <thead>
+              <tr><th>Fecha</th><th>Monto</th><th>Referencia</th><th>Acción</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2026-05-04</td>
+                <td>$85.000</td>
+                <td>Transferencia sin unidad</td>
+                <td><span class="badge info">Asignar</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+  
+        <div class="panel">
+          <h3>Pagos no notificados</h3>
+          <table>
+            <thead>
+              <tr><th>Fecha</th><th>Unidad</th><th>Monto</th><th>Acción</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2026-05-01</td>
+                <td>1-101</td>
+                <td>$85.000</td>
+                <td><span class="badge warn">Notificar</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+  
+      <section class="grid2">
+        <div class="panel">
+          <h3>Historial de transacciones</h3>
+          <table>
+            <thead>
+              <tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Monto</th></tr>
+            </thead>
+            <tbody id="tablaTransacciones"></tbody>
+          </table>
+        </div>
+  
+        <div class="panel">
+          <h3>Estado de cuenta por unidad</h3>
+          <table>
+            <thead>
+              <tr><th>Unidad</th><th>Estado cuenta</th><th>Último pago</th><th>Acciones</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1-101 · Juan Perez</td>
+                <td><span class="badge ok">Al día</span></td>
+                <td>2026-05-01</td>
+                <td><span class="badge info">Ver detalle</span> <span class="badge info">Descargar</span></td>
+              </tr>
+              <tr>
+                <td>2-102 · Maria Soto</td>
+                <td><span class="badge bad">Moroso</span></td>
+                <td>2026-04-01</td>
+                <td><span class="badge info">Ver detalle</span> <span class="badge info">Descargar</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+  
+      <section class="grid2">
+        <div class="panel">
+          <h3>Residentes</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Block</th>
+                <th>Depto</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tablaResidentes"></tbody>
+          </table>
+        </div>
+  
+        <div class="panel">
+          <h3>Morosidad</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Unidad</th>
+                <th>Mes</th>
+                <th>Deuda</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tablaMorosos"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        const money = n => "$" + n.toLocaleString("es-CL");
+  
+        const residentes = [
+          { block: 1, depto: 101, nombre: "Juan Perez", telefono: "999999999", estado: "Activo" },
+          { block: 2, depto: 102, nombre: "Maria Soto", telefono: "888888888", estado: "Moroso" }
+        ];
+  
+        const transacciones = [
+          { fecha: "2026-05-01", tipo: "Ingreso", descripcion: "Pago residente", monto: 85000 },
+          { fecha: "2026-05-05", tipo: "Egreso", descripcion: "Mantencion", monto: 120000 }
+        ];
+  
+        const morosos = [
+          { unidad: "2-102", mes: "Mayo", deuda: 92000, estado: "Moroso" }
+        ];
+  
+        const unidades = [
+          { unidad: "1-101", residente: "Juan Perez", vencidos: 0, saldo: 85000, balance: 85000 },
+          { unidad: "2-102", residente: "Maria Soto", vencidos: 92000, saldo: 0, balance: 92000 }
+        ];
+  
+        document.getElementById("fechaHoy").textContent = new Date().toLocaleDateString("es-CL");
+        document.getElementById("vigentes").textContent = money(85000);
+        document.getElementById("vencidos").textContent = money(92000);
+        document.getElementById("morosas").textContent = morosos.length;
+        document.getElementById("ingresos").textContent = money(85000);
+        document.getElementById("egresos").textContent = money(120000);
+        document.getElementById("saldo").textContent = money(-35000);
+  
+        document.getElementById("tablaResidentes").innerHTML = residentes.map(r => `
+          <tr>
+            <td>${r.block}</td>
+            <td>${r.depto}</td>
+            <td>${r.nombre}</td>
+            <td>${r.telefono}</td>
+            <td><span class="badge ${r.estado === "Activo" ? "ok" : "bad"}">${r.estado}</span></td>
+          </tr>
+        `).join("");
+  
+        document.getElementById("tablaMorosos").innerHTML = morosos.map(m => `
+          <tr>
+            <td>${m.unidad}</td>
+            <td>${m.mes}</td>
+            <td>${money(m.deuda)}</td>
+            <td><span class="badge bad">${m.estado}</span></td>
+          </tr>
+        `).join("");
+  
+        document.getElementById("tablaUnidades").innerHTML = unidades.map(u => `
+          <tr>
+            <td>${u.unidad}</td>
+            <td>${u.residente}</td>
+            <td>${money(u.vencidos)}</td>
+            <td>${money(u.saldo)}</td>
+            <td>${money(u.balance)}</td>
+          </tr>
+        `).join("");
+  
+        document.getElementById("tablaTransacciones").innerHTML = transacciones.map(t => `
+          <tr>
+            <td>${t.fecha}</td>
+            <td>${t.tipo}</td>
+            <td>${t.descripcion}</td>
+            <td>${money(t.monto)}</td>
+          </tr>
+        `).join("");
+  
+        const ingresos = [1500000,1700000,2100000,2400000,2800000];
+        const egresos = [900000,1000000,1300000,1500000,1800000];
+        const saldo = ingresos.map((v,i)=>
+          ingresos.slice(0,i+1).reduce((a,b)=>a+b,0) -
+          egresos.slice(0,i+1).reduce((a,b)=>a+b,0)
+        );
+  
+        new Chart(document.getElementById("chartFinanzas"), {
+          type: "bar",
+          data: {
+            labels: ["Enero","Febrero","Marzo","Abril","Mayo"],
+            datasets: [
+              { label: "Ingresos", data: ingresos, backgroundColor: "#11c59c" },
+              { label: "Egresos", data: egresos, backgroundColor: "#ff5f5f" }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: "#d8edf6" } } },
+            scales: {
+              x: { ticks: { color: "#d8edf6" } },
+              y: { ticks: { color: "#d8edf6" } }
+            }
+          }
+        });
+  
+        new Chart(document.getElementById("chartSaldo"), {
+          type: "line",
+          data: {
+            labels: ["Enero","Febrero","Marzo","Abril","Mayo"],
+            datasets: [{
+              label: "Saldo acumulado",
+              data: saldo,
+              borderColor: "#6fb7ff",
+              backgroundColor: "rgba(111,183,255,.12)",
+              fill: true,
+              tension: .35
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: "#d8edf6" } } },
+            scales: {
+              x: { ticks: { color: "#d8edf6" } },
+              y: { ticks: { color: "#d8edf6" } }
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+  </html>
+  <script>
+    document.querySelector('.btn').addEventListener('click', () => {
+      alert('Button clicked!');
+    });
+  </script>
+</body>
+</html>
