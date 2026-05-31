@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Martinez Services Spa — ERP Empresarial</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#04080F;--surf:#08101C;--surf2:#0D1826;
+  --border:rgba(201,168,76,0.15);--border2:rgba(201,168,76,0.07);
+  --gold:#C9A84C;--goldHi:#E8C97A;
+  --white:#F2EFEA;--muted:#4A5568;--mutedHi:#718096;
+  --ok:#22C55E;--danger:#EF4444;--warn:#F59E0B;--info:#38BDF8;
+  --purple:#A78BFA;--teal:#10B981;--orange:#FB923C;
+}
+body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;min-height:100vh;overflow-x:hidden;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-thumb{background:rgba(201,168,76,0.2);border-radius:3px;}
+
+/* HEADER */
+#header{background:var(--surf);border-bottom:1px solid var(--border2);padding:0 36px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:14px;}
+.logo-icon{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--gold),var(--goldHi));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:var(--bg);font-family:'Playfair Display',serif;}
+.logo-name{font-size:17px;font-weight:900;font-family:'Playfair Display',serif;}
+.logo-sub{font-size:9px;color:var(--gold);letter-spacing:2px;font-family:'JetBrains Mono',monospace;}
+.header-right{display:flex;align-items:center;gap:16px;}
+.header-clock{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--mutedHi);}
+.header-ver{font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--surf2) 0%,var(--bg) 60%);border-bottom:1px solid var(--border2);padding:40px 36px 32px;}
+.hero-content{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:24px;}
+.hero-left h1{font-size:32px;font-weight:900;font-family:'Playfair Display',serif;margin-bottom:8px;}
+.hero-left h1 span{color:var(--gold);}
+.hero-left p{font-size:13px;color:var(--mutedHi);max-width:540px;line-height:1.7;}
+.hero-date{font-size:10px;color:var(--gold);font-family:'JetBrains Mono',monospace;letter-spacing:2px;margin-bottom:10px;}
+.hero-stats{display:flex;gap:16px;margin-top:20px;flex-wrap:wrap;}
+.hero-stat{background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:12px 18px;text-align:center;}
+.hero-stat-val{font-size:22px;font-weight:900;color:var(--gold);font-family:'Playfair Display',serif;}
+.hero-stat-lbl{font-size:9px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+
+/* EMPRESAS SECTION */
+.section{max-width:1200px;margin:0 auto;padding:28px 36px;}
+.section-title{font-size:14px;font-weight:800;color:var(--white);margin-bottom:6px;font-family:'Playfair Display',serif;display:flex;align-items:center;gap:10px;}
+.section-title::before{content:'';display:inline-block;width:4px;height:18px;background:var(--gold);border-radius:2px;}
+.section-sub{font-size:11px;color:var(--muted);margin-bottom:20px;margin-left:14px;font-family:'JetBrains Mono',monospace;}
+
+/* CONSOLIDADO */
+.consolidado{background:var(--surf);border-radius:14px;border:1px solid var(--border2);padding:22px 26px;margin-bottom:32px;}
+.kpi-row{display:flex;gap:12px;flex-wrap:wrap;}
+.kpi{flex:1;min-width:140px;background:var(--bg);border-radius:10px;padding:14px 16px;border:1px solid var(--border2);position:relative;overflow:hidden;}
+.kpi::before{content:'';position:absolute;top:0;right:0;width:50px;height:50px;background:radial-gradient(circle at top right,var(--kc,rgba(201,168,76,0.08)),transparent 70%);}
+.kpi-label{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;font-family:'JetBrains Mono',monospace;}
+.kpi-value{font-size:22px;font-weight:900;font-family:'Playfair Display',serif;}
+.kpi-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+
+/* EMPRESA CARDS */
+.emp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-bottom:32px;}
+.emp-card{background:var(--surf);border-radius:16px;border:1px solid var(--border2);overflow:hidden;transition:all .22s;cursor:pointer;position:relative;}
+.emp-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ec,var(--gold));}
+.emp-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.4);border-color:var(--ec,var(--gold));}
+.emp-card-header{padding:20px 22px 14px;display:flex;align-items:flex-start;gap:14px;}
+.emp-avatar{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;font-family:'Playfair Display',serif;flex-shrink:0;}
+.emp-info{flex:1;}
+.emp-name{font-size:16px;font-weight:900;color:var(--white);font-family:'Playfair Display',serif;}
+.emp-meta{font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:3px;}
+.emp-badge-row{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
+.emp-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(201,168,76,0.08);border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);}
+.emp-stat{padding:12px 14px;background:var(--surf);text-align:center;}
+.emp-stat:not(:last-child){border-right:1px solid var(--border2);}
+.emp-stat-val{font-size:16px;font-weight:900;font-family:'Playfair Display',serif;}
+.emp-stat-lbl{font-size:8px;color:var(--muted);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+.emp-modules{padding:14px 22px;display:flex;flex-direction:column;gap:8px;}
+.emp-mod-label{font-size:9px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;}
+.emp-mod-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;}
+.mod-chip{padding:6px 4px;border-radius:6px;font-size:9px;font-family:'JetBrains Mono',monospace;font-weight:700;text-align:center;cursor:pointer;transition:all .15s;border:1px solid transparent;text-decoration:none;display:block;}
+.mod-chip:hover{transform:scale(1.05);}
+.emp-actions{padding:14px 22px;display:flex;gap:8px;border-top:1px solid var(--border2);}
+.btn-enter{flex:1;padding:11px;border-radius:9px;border:none;cursor:pointer;font-weight:700;font-size:13px;font-family:'JetBrains Mono',monospace;background:var(--gold);color:var(--bg);transition:all .15s;}
+.btn-enter:hover{background:var(--goldHi);}
+.btn-icon{width:38px;height:38px;border-radius:8px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--muted);font-size:14px;transition:all .15s;}
+.btn-icon:hover{color:var(--gold);border-color:var(--gold);}
+
+/* ADD CARD */
+.add-card{background:transparent;border:2px dashed rgba(201,168,76,0.2);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;transition:all .22s;min-height:280px;padding:30px;}
+.add-card:hover{border-color:var(--gold);background:rgba(201,168,76,0.03);}
+.add-icon{width:56px;height:56px;border-radius:14px;background:rgba(201,168,76,0.1);display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--gold);}
+.add-label{font-size:14px;font-weight:700;color:var(--mutedHi);}
+.add-sub{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;text-align:center;}
+
+/* BADGE */
+.badge{display:inline-flex;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surf);border-radius:18px;padding:30px;border:1px solid rgba(201,168,76,0.3);width:540px;max-height:92vh;overflow-y:auto;}
+.modal h3{font-size:20px;font-weight:900;color:var(--white);margin-bottom:22px;font-family:'Playfair Display',serif;}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fgrid .full{grid-column:1/3;}
+.field label{font-size:10px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;}
+.field input,.field select,.field textarea{width:100%;padding:10px 13px;background:var(--bg);border:1px solid var(--border2);border-radius:9px;color:var(--white);font-size:13px;font-family:'JetBrains Mono',monospace;outline:none;transition:border .15s;}
+.field input:focus,.field select:focus{border-color:var(--gold);}
+.btn-gold{padding:11px 24px;border-radius:9px;border:none;cursor:pointer;font-weight:700;font-size:13px;font-family:'JetBrains Mono',monospace;background:var(--gold);color:var(--bg);}
+.btn-ghost{padding:11px 24px;border-radius:9px;cursor:pointer;font-weight:700;font-size:13px;font-family:'JetBrains Mono',monospace;background:transparent;border:1px solid var(--border);color:var(--muted);}
+.color-picks{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+.cp{width:28px;height:28px;border-radius:7px;cursor:pointer;border:2px solid transparent;transition:all .15s;}
+.cp.sel{border-color:var(--white);transform:scale(1.2);}
+
+/* FOOTER */
+#footer{background:var(--surf);border-top:1px solid var(--border2);padding:16px 36px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+
+@media(max-width:700px){.section{padding:20px 16px;}.hero{padding:28px 16px 22px;}.emp-grid{grid-template-columns:1fr;}.kpi-row{flex-direction:column;}.hero-content{flex-direction:column;}}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="logo">
+    <div class="logo-icon">M</div>
+    <div>
+      <div class="logo-name">Martinez Services Spa</div>
+      <div class="logo-sub">PLATAFORMA ERP PROFESIONAL</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-clock" id="headerClock">--:--:--</div>
+    <div class="header-ver">v3.0 Multi-Empresa</div>
+    <div style="width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--goldHi));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--bg);font-family:'JetBrains Mono',monospace;">GM</div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-content">
+    <div class="hero-left">
+      <div class="hero-date" id="heroDate">CARGANDO...</div>
+      <h1>Selecciona una <span>Empresa</span></h1>
+      <p>Administra, audita y controla todas tus empresas desde un solo lugar. Cada empresa tiene sus propios datos completamente separados. Gestión profesional, auditoría y control en un solo lugar.</p>
+      <div class="hero-stats" id="heroStats"></div>
+    </div>
+    <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);border-radius:14px;padding:20px 24px;min-width:220px;">
+      <div style="font-size:10px;color:var(--gold);font-family:'JetBrains Mono',monospace;letter-spacing:1px;margin-bottom:12px;">AUDITOR / ADMINISTRADOR</div>
+      <div style="font-size:16px;font-weight:900;font-family:'Playfair Display',serif;margin-bottom:3px;">Gaudy Martínez</div>
+      <div style="font-size:11px;color:var(--muted);">Ing. Control y Gestión · Auditora</div>
+      <div style="font-size:11px;color:var(--muted);">Martinez Services Spa</div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border2);">
+        <div style="font-size:10px;color:var(--gold);font-family:'JetBrains Mono',monospace;margin-bottom:6px;">MÓDULOS DISPONIBLES</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;">
+          <span style="background:rgba(201,168,76,0.1);color:var(--gold);border:1px solid rgba(201,168,76,0.2);border-radius:4px;padding:2px 6px;font-size:9px;font-family:'JetBrains Mono',monospace;">Finanzas</span>
+          <span style="background:rgba(201,168,76,0.1);color:var(--gold);border:1px solid rgba(201,168,76,0.2);border-radius:4px;padding:2px 6px;font-size:9px;font-family:'JetBrains Mono',monospace;">Remuneraciones</span>
+          <span style="background:rgba(201,168,76,0.1);color:var(--gold);border:1px solid rgba(201,168,76,0.2);border-radius:4px;padding:2px 6px;font-size:9px;font-family:'JetBrains Mono',monospace;">Contabilidad</span>
+          <span style="background:rgba(201,168,76,0.1);color:var(--gold);border:1px solid rgba(201,168,76,0.2);border-radius:4px;padding:2px 6px;font-size:9px;font-family:'JetBrains Mono',monospace;">Facturación</span>
+          <span style="background:rgba(201,168,76,0.1);color:var(--gold);border:1px solid rgba(201,168,76,0.2);border-radius:4px;padding:2px 6px;font-size:9px;font-family:'JetBrains Mono',monospace;">Tesorería</span>
+          <span style="background:rgba(201,168,76,0.1);color:var(--gold);border:1px solid rgba(201,168,76,0.2);border-radius:4px;padding:2px 6px;font-size:9px;font-family:'JetBrains Mono',monospace;">Contratos</span>
+          <span style="background:rgba(201,168,76,0.1);color:var(--gold);border:1px solid rgba(201,168,76,0.2);border-radius:4px;padding:2px 6px;font-size:9px;font-family:'JetBrains Mono',monospace;">Proyectos</span>
+          <span style="background:rgba(201,168,76,0.1);color:var(--gold);border:1px solid rgba(201,168,76,0.2);border-radius:4px;padding:2px 6px;font-size:9px;font-family:'JetBrains Mono',monospace;">Ventas</span>
+          <span style="background:rgba(201,168,76,0.1);color:var(--gold);border:1px solid rgba(201,168,76,0.2);border-radius:4px;padding:2px 6px;font-size:9px;font-family:'JetBrains Mono',monospace;">RRHH</span>
+          <span style="background:rgba(201,168,76,0.1);color:var(--gold);border:1px solid rgba(201,168,76,0.2);border-radius:4px;padding:2px 6px;font-size:9px;font-family:'JetBrains Mono',monospace;">Estrategia</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <!-- CONSOLIDADO -->
+  <div class="consolidado">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div>
+        <div style="font-size:13px;font-weight:800;color:var(--white);font-family:'Playfair Display',serif;">Resumen Consolidado</div>
+        <div style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px;">Todas las empresas · Datos en tiempo real</div>
+      </div>
+      <span style="font-size:10px;color:var(--ok);font-family:'JetBrains Mono',monospace;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);border-radius:20px;padding:3px 10px;">● Sistema Activo</span>
+    </div>
+    <div class="kpi-row" id="kpiConsolidado"></div>
+  </div>
+
+  <!-- SECTION TITLE -->
+  <div class="section-title">Mis Empresas</div>
+  <div class="section-sub">Haz clic en una empresa para entrar a su ERP completo</div>
+
+  <!-- GRID EMPRESAS -->
+  <div class="emp-grid" id="empGrid"></div>
+</div>
+
+<div id="footer">
+  <span>Martinez Services Spa · ERP Profesional Multi-Empresa v3.0 · Ing. Control y Gestión · Auditora · Auditoría · Consultoría</span>
+  <span id="footerDate">2025</span>
+</div>
+
+<!-- MODAL EMPRESA -->
+<div class="modal-overlay" id="modalEmp">
+  <div class="modal">
+    <h3 id="empModalTitle">Nueva Empresa</h3>
+    <input type="hidden" id="eid"/>
+    <div class="fgrid">
+      <div class="field full"><label>Nombre / Razón Social</label><input id="eNombre" type="text" placeholder="Ej: Minera Atacama S.A."/></div>
+      <div class="field"><label>RUT</label><input id="eRut" type="text" placeholder="76.123.456-7"/></div>
+      <div class="field"><label>Rubro / Industria</label><input id="eRubro" type="text" placeholder="Minería, Comercio..."/></div>
+      <div class="field"><label>Contacto Principal</label><input id="eContacto" type="text"/></div>
+      <div class="field"><label>Email</label><input id="eEmail" type="email"/></div>
+      <div class="field"><label>Teléfono</label><input id="eTel" type="text"/></div>
+      <div class="field full"><label>Dirección</label><input id="eDireccion" type="text"/></div>
+      <div class="field full"><label>Color de Identificación</label>
+        <div class="color-picks" id="colorPicks"></div>
+      </div>
+      <div class="field full"><label>Notas / Descripción</label><textarea id="eNotas" rows="2" placeholder="Ej: Cliente auditoría Q1 2025, contrato vigente..."></textarea></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn-gold" style="flex:1" onclick="saveEmpresa()">Guardar Empresa</button>
+      <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+//  CONSTANTES
+// ════════════════════════════════════════
+const SK = 'mss_hub_v3';
+const COLORS = ['#C9A84C','#38BDF8','#10B981','#FB923C','#A78BFA','#EF4444','#F59E0B','#22C55E','#F472B6','#34D399','#60A5FA','#FCA5A5'];
+const MODULES = [
+  {id:'finanzas',     label:'Finanzas',       icon:'₲', color:'#C9A84C', file:'MSS-Finanzas.html',        desc:'Flujo de caja, ingresos, gastos, rentabilidad, proyección'},
+  {id:'remuneraciones',label:'Remuneraciones',icon:'👥',color:'#22C55E', file:'MSS-Remuneraciones.html',   desc:'Liquidaciones AFP, salud, impuesto 2ª cat., finiquitos, vacaciones'},
+  {id:'contabilidad', label:'Contabilidad',   icon:'📗', color:'#10B981', file:'MSS-Contabilidad.html',    desc:'Libro Diario, Mayor, Balance General, Estado de Resultados'},
+  {id:'facturacion',  label:'Facturación',    icon:'🧾', color:'#38BDF8', file:'MSS-Facturacion.html',     desc:'Facturas, boletas, notas de crédito, clientes, IVA'},
+  {id:'tesoreria',    label:'Tesorería',      icon:'🏦', color:'#FBBF24', file:'MSS-Tesoreria.html',       desc:'Cuentas bancarias, movimientos, conciliación, presupuesto'},
+  {id:'contratos',    label:'Contratos',      icon:'📄', color:'#A78BFA', file:'MSS-Contratos.html',       desc:'Contratos trabajo/servicios, anexos, finiquitos, alertas vencimiento'},
+  {id:'proyectos',    label:'Proyectos',      icon:'◈',  color:'#38BDF8', file:'MSS-Proyectos.html',       desc:'Gantt, Kanban, actividades, control presupuestario'},
+  {id:'ventas',       label:'Ventas & CRM',   icon:'◎',  color:'#FB923C', file:'MSS-Ventas-CRM.html',      desc:'Pipeline, CRM, plan de ventas, indicadores comerciales'},
+  {id:'rrhh',         label:'RRHH',           icon:'◉',  color:'#A78BFA', file:'MSS-RRHH.html',            desc:'Personas, DISC, clima organizacional, formación, evaluación'},
+  {id:'estrategia',   label:'Estrategia',     icon:'◆',  color:'#10B981', file:'MSS-Estrategia.html',      desc:'KPI, SMART, FODA, PESTEL, plan estratégico'},
+];
+
+let EMPRESAS = [], selColor = COLORS[0];
+
+// ════════════════════════════════════════
+//  DATOS DEFAULT
+// ════════════════════════════════════════
+const DEF_EMPS = [
+  {id:1, nombre:'Martinez Services Spa',  rut:'76.999.888-1', rubro:'Consultoría / Auditoría', contacto:'Gaudy Martínez', email:'contacto@mss.cl',   tel:'+56912345678', direccion:'Av. Providencia 123, Santiago', color:'#C9A84C', notas:'Empresa propia — Consultora y auditora', ingresos:73800000, proyectos:7,  trabajadores:12, clientes:10},
+  {id:2, nombre:'Minera Atacama S.A.',     rut:'76.123.456-7', rubro:'Minería',                 contacto:'Jorge Díaz',         email:'jdiaz@atacama.cl',  tel:'+56923456789', direccion:'Av. Los Carrera 500, Antofagasta', color:'#38BDF8', notas:'Cliente auditoría Q1-Q2 2025',          ingresos:128000000,proyectos:4,  trabajadores:45, clientes:8},
+  {id:3, nombre:'Agrícola Sur Verde S.A.', rut:'77.234.567-8', rubro:'Agricultura',             contacto:'Patricia Muñoz',     email:'pmunoz@surverde.cl',tel:'+56934567890', direccion:'Camino Rural km 5, Los Ángeles',   color:'#10B981', notas:'Plan estratégico en ejecución 2025',    ingresos:45200000, proyectos:3,  trabajadores:28, clientes:5},
+];
+
+// ════════════════════════════════════════
+//  PERSISTENCIA
+// ════════════════════════════════════════
+function save(){try{localStorage.setItem(SK,JSON.stringify(EMPRESAS));}catch(e){}}
+function load(){
+  try{
+    const raw=localStorage.getItem(SK);
+    EMPRESAS=raw?JSON.parse(raw):DEF_EMPS.map(x=>({...x}));
+    if(!raw)save();
+  }catch(e){EMPRESAS=DEF_EMPS.map(x=>({...x}));}
+}
+
+// ════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════
+const M=n=>'$'+(n/1e6).toFixed(2)+'M';
+const clp=n=>new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(n||0);
+function badge(l,c){return `<span class="badge" style="background:${c}20;color:${c};border:1px solid ${c}40">${l}</span>`;}
+
+// ════════════════════════════════════════
+//  RELOJ
+// ════════════════════════════════════════
+function updateClock(){
+  const now=new Date();
+  const el=document.getElementById('headerClock');
+  const he=document.getElementById('heroDate');
+  const fd=document.getElementById('footerDate');
+  if(el)el.textContent=now.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  if(he)he.textContent=now.toLocaleDateString('es-CL',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
+  if(fd)fd.textContent='Martinez Services Spa · '+now.getFullYear();
+}
+updateClock();setInterval(updateClock,1000);
+
+// ════════════════════════════════════════
+//  RENDER PRINCIPAL
+// ════════════════════════════════════════
+function render(){
+  renderConsolidado();
+  renderHeroStats();
+  renderEmpresas();
+}
+
+function renderConsolidado(){
+  const totI=EMPRESAS.reduce((s,e)=>s+(e.ingresos||0),0);
+  const totP=EMPRESAS.reduce((s,e)=>s+(e.proyectos||0),0);
+  const totT=EMPRESAS.reduce((s,e)=>s+(e.trabajadores||0),0);
+  const totC=EMPRESAS.reduce((s,e)=>s+(e.clientes||0),0);
+  document.getElementById('kpiConsolidado').innerHTML=`
+    <div class="kpi" style="--kc:rgba(201,168,76,0.1)"><div class="kpi-label">Empresas Activas</div><div class="kpi-value" style="color:var(--gold)">${EMPRESAS.length}</div><div class="kpi-sub">Bajo administración</div></div>
+    <div class="kpi" style="--kc:rgba(34,197,94,0.1)"><div class="kpi-label">Ingresos Consolidados</div><div class="kpi-value" style="color:var(--ok)">${M(totI)}</div><div class="kpi-sub">Suma todas las empresas</div></div>
+    <div class="kpi" style="--kc:rgba(56,189,248,0.1)"><div class="kpi-label">Proyectos Totales</div><div class="kpi-value" style="color:var(--info)">${totP}</div><div class="kpi-sub">Multi-empresa</div></div>
+    <div class="kpi" style="--kc:rgba(251,146,60,0.1)"><div class="kpi-label">Clientes / Leads</div><div class="kpi-value" style="color:var(--orange)">${totC}</div><div class="kpi-sub">CRM consolidado</div></div>
+    <div class="kpi" style="--kc:rgba(167,139,250,0.1)"><div class="kpi-label">Colaboradores</div><div class="kpi-value" style="color:var(--purple)">${totT}</div><div class="kpi-sub">Registrados</div></div>
+    <div class="kpi" style="--kc:rgba(16,185,129,0.1)"><div class="kpi-label">Módulos Activos</div><div class="kpi-value" style="color:var(--teal)">10</div><div class="kpi-sub">Por empresa</div></div>
+  `;
+}
+
+function renderHeroStats(){
+  document.getElementById('heroStats').innerHTML=`
+    <div class="hero-stat"><div class="hero-stat-val">${EMPRESAS.length}</div><div class="hero-stat-lbl">Empresas</div></div>
+    <div class="hero-stat"><div class="hero-stat-val">10</div><div class="hero-stat-lbl">Módulos</div></div>
+    <div class="hero-stat"><div class="hero-stat-val">${M(EMPRESAS.reduce((s,e)=>s+(e.ingresos||0),0))}</div><div class="hero-stat-lbl">Ingresos Total</div></div>
+  `;
+}
+
+function renderEmpresas(){
+  // Cargar logos desde MSS-Logos
+  let LOGOS={};
+  try{LOGOS=JSON.parse(localStorage.getItem('mss_logos_v1')||'{}');}catch(e){}
+
+  const grid=document.getElementById('empGrid');
+  grid.innerHTML='';
+  EMPRESAS.forEach(emp=>{
+    const logo=LOGOS[String(emp.id)];
+    const avatarHTML=logo
+      ?`<div class="emp-avatar" style="background:white;padding:4px"><img src="${logo}" style="width:100%;height:100%;object-fit:contain;border-radius:8px"/></div>`
+      :`<div class="emp-avatar" style="background:${emp.color}20;color:${emp.color}">${emp.nombre.charAt(0)}</div>`;
+    const card=document.createElement('div');
+    card.className='emp-card';
+    card.style.setProperty('--ec',emp.color);
+    card.innerHTML=`
+      <div class="emp-card-header">
+        ${avatarHTML}
+        <div class="emp-info">
+          <div class="emp-name">${emp.nombre}</div>
+          <div class="emp-meta">${emp.rut} · ${emp.rubro}</div>
+          <div class="emp-meta" style="margin-top:1px">👤 ${emp.contacto} · ${emp.email}</div>
+          <div class="emp-badge-row">
+            ${badge('Activa','#22C55E')}
+            ${badge(emp.rubro,emp.color)}
+          </div>
+        </div>
+      </div>
+      <div class="emp-stats">
+        <div class="emp-stat">
+          <div class="emp-stat-val" style="color:${emp.color}">${M(emp.ingresos||0)}</div>
+          <div class="emp-stat-lbl">Ingresos</div>
+        </div>
+        <div class="emp-stat">
+          <div class="emp-stat-val" style="color:var(--info)">${emp.proyectos||0}</div>
+          <div class="emp-stat-lbl">Proyectos</div>
+        </div>
+        <div class="emp-stat">
+          <div class="emp-stat-val" style="color:var(--purple)">${emp.trabajadores||0}</div>
+          <div class="emp-stat-lbl">Trabajadores</div>
+        </div>
+      </div>
+      <div class="emp-modules">
+        <div class="emp-mod-label">Acceso Directo a Módulos</div>
+        <div class="emp-mod-grid">
+          ${MODULES.map(m=>`
+            <a href="${m.file}" class="mod-chip" style="background:${m.color}15;color:${m.color};border-color:${m.color}25;" title="${m.desc}">
+              <div style="font-size:14px;margin-bottom:2px">${m.icon}</div>
+              <div style="font-size:8px;line-height:1.2">${m.label}</div>
+            </a>`).join('')}
+        </div>
+      </div>
+      <div class="emp-actions">
+        <button class="btn-enter" onclick="enterEmpresa(${emp.id})">▶ Entrar al ERP Completo</button>
+        <button class="btn-icon" onclick="editEmpresa(${emp.id})" title="Editar empresa">⚙</button>
+        <button class="btn-icon" onclick="deleteEmpresa(${emp.id})" title="Eliminar empresa" style="color:var(--danger)">✕</button>
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  // Tarjeta agregar
+  const addCard=document.createElement('div');
+  addCard.className='add-card';
+  addCard.onclick=()=>openEmpresaModal(null);
+  addCard.innerHTML=`
+    <div class="add-icon">+</div>
+    <div class="add-label">Agregar Nueva Empresa</div>
+    <div class="add-sub">Crea el perfil de una empresa cliente<br>para auditar o administrar</div>
+    <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center">
+      ${['Auditoría','Control Gestión','RRHH','Finanzas','Estrategia'].map(t=>`<span style="background:rgba(201,168,76,0.08);color:var(--gold);border:1px solid rgba(201,168,76,0.15);border-radius:4px;padding:2px 8px;font-size:9px;font-family:'JetBrains Mono',monospace;">${t}</span>`).join('')}
+    </div>`;
+  grid.appendChild(addCard);
+}
+
+// ════════════════════════════════════════
+//  ENTRAR A EMPRESA — guarda empresa actual
+// ════════════════════════════════════════
+function enterEmpresa(id){
+  const emp=EMPRESAS.find(e=>e.id===id);
+  if(!emp)return;
+  // Guarda empresa seleccionada para que los módulos la usen
+  try{localStorage.setItem('mss_empresa_actual',JSON.stringify(emp));}catch(e){}
+  // Abre dashboard interno o el primer módulo
+  window.location.href='MSS-Finanzas.html';
+}
+
+// ════════════════════════════════════════
+//  MODAL EMPRESA
+// ════════════════════════════════════════
+function openEmpresaModal(id){
+  selColor=COLORS[0];
+  document.getElementById('colorPicks').innerHTML=COLORS.map(c=>`<div class="cp ${c===selColor?'sel':''}" style="background:${c}" onclick="selColor='${c}';document.querySelectorAll('.cp').forEach(p=>p.classList.remove('sel'));this.classList.add('sel')"></div>`).join('');
+  const emp=id?EMPRESAS.find(e=>e.id===id):null;
+  document.getElementById('empModalTitle').textContent=emp?'Editar Empresa':'Nueva Empresa';
+  document.getElementById('eid').value=id||'';
+  document.getElementById('eNombre').value=emp?.nombre||'';
+  document.getElementById('eRut').value=emp?.rut||'';
+  document.getElementById('eRubro').value=emp?.rubro||'';
+  document.getElementById('eContacto').value=emp?.contacto||'';
+  document.getElementById('eEmail').value=emp?.email||'';
+  document.getElementById('eTel').value=emp?.tel||'';
+  document.getElementById('eDireccion').value=emp?.direccion||'';
+  document.getElementById('eNotas').value=emp?.notas||'';
+  if(emp){selColor=emp.color;}
+  document.getElementById('modalEmp').classList.add('open');
+}
+
+function editEmpresa(id){openEmpresaModal(id);}
+
+function deleteEmpresa(id){
+  const emp=EMPRESAS.find(e=>e.id===id);
+  if(!confirm(`¿Eliminar "${emp?.nombre}"?\n\nEsta acción no se puede deshacer.`))return;
+  EMPRESAS=EMPRESAS.filter(e=>e.id!==id);
+  save();render();
+}
+
+function saveEmpresa(){
+  const id=document.getElementById('eid').value;
+  const obj={
+    nombre:document.getElementById('eNombre').value.trim(),
+    rut:document.getElementById('eRut').value.trim(),
+    rubro:document.getElementById('eRubro').value.trim(),
+    contacto:document.getElementById('eContacto').value.trim(),
+    email:document.getElementById('eEmail').value.trim(),
+    tel:document.getElementById('eTel').value.trim(),
+    direccion:document.getElementById('eDireccion').value.trim(),
+    notas:document.getElementById('eNotas').value.trim(),
+    color:selColor,
+    ingresos:0, proyectos:0, trabajadores:0, clientes:0,
+  };
+  if(!obj.nombre){alert('Ingresa el nombre de la empresa');return;}
+  if(id){
+    const idx=EMPRESAS.findIndex(e=>e.id==id);
+    if(idx>=0)EMPRESAS[idx]={...EMPRESAS[idx],...obj,color:selColor};
+  } else {
+    EMPRESAS.push({id:Date.now(),...obj});
+  }
+  save();closeModal();render();
+}
+
+function closeModal(){document.getElementById('modalEmp').classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
+
+// ════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════
+load();
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Logos Empresas — Martinez Services Spa</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#04080F;--surf:#08101C;--surf2:#0D1826;--border:rgba(201,168,76,0.15);--border2:rgba(201,168,76,0.07);--gold:#C9A84C;--goldHi:#E8C97A;--white:#F2EFEA;--muted:#4A5568;--mutedHi:#718096;--ok:#22C55E;--danger:#EF4444;--warn:#F59E0B;--info:#38BDF8;}
+body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;min-height:100vh;}
+#header{background:var(--surf);border-bottom:1px solid var(--border2);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--goldHi));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--bg);}
+.content{max-width:900px;margin:0 auto;padding:28px 24px 60px;}
+.card{background:var(--surf);border-radius:14px;padding:22px;border:1px solid var(--border2);margin-bottom:16px;}
+.card-title{font-size:15px;font-weight:800;margin-bottom:6px;}
+.card-sub{font-size:11px;color:var(--muted);font-family:monospace;margin-bottom:18px;}
+.logos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:20px;}
+.logo-card{background:var(--bg);border-radius:12px;padding:18px;border:1px solid var(--border2);text-align:center;position:relative;}
+.logo-card.selected{border-color:var(--gold);background:rgba(201,168,76,0.05);}
+.logo-preview{width:100px;height:100px;border-radius:10px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.05);border:2px dashed rgba(201,168,76,0.2);overflow:hidden;}
+.logo-preview img{width:100%;height:100%;object-fit:contain;}
+.logo-empresa{font-size:12px;font-weight:700;margin-bottom:4px;}
+.logo-rut{font-size:10px;color:var(--muted);font-family:monospace;}
+.btn-gold{padding:10px 22px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:13px;font-family:monospace;background:var(--gold);color:var(--bg);}
+.btn-ghost{padding:10px 22px;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px;font-family:monospace;background:transparent;border:1px solid var(--border);color:var(--mutedHi);}
+.btn-sm{padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer;font-family:monospace;}
+.drop-zone{border:2px dashed rgba(201,168,76,0.3);border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:14px;}
+.drop-zone:hover{border-color:var(--gold);background:rgba(201,168,76,0.04);}
+.drop-zone.active{border-color:var(--ok);background:rgba(34,197,94,0.05);}
+.tip{background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.2);border-radius:9px;padding:11px 15px;display:flex;gap:10px;margin-bottom:12px;font-size:12px;color:var(--mutedHi);line-height:1.6;}
+.ok-box{background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.2);border-radius:9px;padding:11px 15px;display:flex;gap:10px;margin-bottom:12px;font-size:12px;color:var(--mutedHi);line-height:1.6;}
+/* PREVIEW DOCUMENTOS */
+.doc-prev{background:white;color:#1a1a1a;border-radius:12px;padding:24px;font-family:Arial,sans-serif;font-size:11px;box-shadow:0 4px 24px rgba(0,0,0,.4);}
+.doc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #1a3a5c;}
+.doc-logo-box{width:80px;height:60px;border:1px dashed #ccc;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.doc-logo-box img{max-width:100%;max-height:100%;object-fit:contain;}
+.doc-empresa{font-size:14px;font-weight:900;color:#1a3a5c;}
+.tabs{display:flex;gap:3px;background:var(--bg);padding:3px;border-radius:8px;margin-bottom:16px;flex-wrap:wrap;}
+.tab{padding:7px 14px;border-radius:6px;border:none;cursor:pointer;font-size:11px;font-weight:700;background:transparent;color:var(--muted);font-family:monospace;}
+.tab.on{background:var(--gold);color:var(--bg);}
+.sec{display:none;}.sec.on{display:block;}
+#footer{border-top:1px solid var(--border2);padding:13px 28px;font-size:10px;color:var(--muted);font-family:monospace;}
+@media(max-width:600px){.logos-grid{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+<div id="header">
+  <div style="display:flex;align-items:center;gap:14px">
+    <div class="logo-icon">M</div>
+    <div>
+      <div style="font-size:15px;font-weight:800;">Martinez Services Spa</div>
+      <div style="font-size:10px;color:var(--gold);font-family:monospace;letter-spacing:2px;">GESTIÓN DE LOGOS</div>
+    </div>
+  </div>
+  <button class="btn-gold" style="padding:7px 16px;font-size:12px" onclick="guardarTodo()">💾 Guardar Cambios</button>
+</div>
+
+<div class="content">
+
+  <div class="tabs">
+    <button class="tab on" onclick="showTab('logos',this)">🏢 Logos Empresas</button>
+    <button class="tab" onclick="showTab('preview',this)">👁 Vista Previa Documentos</button>
+    <button class="tab" onclick="showTab('guia',this)">📋 Guía de Uso</button>
+  </div>
+
+  <!-- LOGOS -->
+  <div class="sec on" id="sec-logos">
+    <div class="card">
+      <div class="card-title">🏢 Logos de Empresas</div>
+      <div class="card-sub">Sube el logo de cada empresa — aparecerá en liquidaciones, contratos y cotizaciones al imprimir</div>
+
+      <div class="tip"><div style="font-size:16px">💡</div><div>Los logos se guardan en tu navegador junto con tus datos. Recomendado: imágenes PNG con fondo transparente, tamaño mínimo 200x200px.</div></div>
+
+      <div class="logos-grid" id="logosGrid"></div>
+
+      <!-- SUBIR LOGO -->
+      <div id="subirSection" style="display:none">
+        <div style="font-size:13px;font-weight:800;margin-bottom:12px;color:var(--gold)" id="subirTitle">Subir Logo</div>
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileLogoInput').click()">
+          <div style="font-size:32px;margin-bottom:8px">🖼</div>
+          <div style="font-size:13px;color:var(--mutedHi)">Arrastra tu logo aquí o <span style="color:var(--gold)">haz clic para seleccionar</span></div>
+          <div style="font-size:10px;color:var(--muted);font-family:monospace;margin-top:6px">PNG, JPG o SVG · Máximo 2MB · Fondo transparente recomendado</div>
+        </div>
+        <input type="file" id="fileLogoInput" accept="image/*" style="display:none" onchange="procesarLogo(this)"/>
+        <div id="logoPreviewNew" style="display:none;margin-bottom:14px">
+          <div style="font-size:11px;color:var(--ok);margin-bottom:8px">✓ Logo cargado correctamente</div>
+          <img id="logoImgNew" style="max-width:150px;max-height:100px;border-radius:8px;border:1px solid var(--border2);padding:8px;background:white"/>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-gold" onclick="asignarLogo()">✓ Asignar este Logo</button>
+          <button class="btn-ghost" onclick="cancelarSubir()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="sec" id="sec-preview">
+    <div class="card">
+      <div class="card-title">👁 Vista Previa — Documentos con Logo</div>
+      <div class="card-sub">Así se verán tus documentos al imprimir</div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:10px;color:var(--muted);font-family:monospace;display:block;margin-bottom:4px">SELECCIONAR EMPRESA</label>
+        <select id="selEmpresaPreview" onchange="renderPreview()" style="padding:8px 12px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-family:monospace;font-size:12px;outline:none"></select>
+      </div>
+      <div class="tabs" style="margin-bottom:12px">
+        <button class="tab on" onclick="showPreviewType('liquidacion',this)" id="prevTabLiq">Liquidación</button>
+        <button class="tab" onclick="showPreviewType('contrato',this)" id="prevTabCtr">Contrato</button>
+        <button class="tab" onclick="showPreviewType('cotizacion',this)" id="prevTabCot">Cotización</button>
+      </div>
+      <div id="docPreviewContainer"></div>
+    </div>
+  </div>
+
+  <!-- GUIA -->
+  <div class="sec" id="sec-guia">
+    <div class="card">
+      <div class="card-title">📋 Guía — Cómo aparecen los logos en tus documentos</div>
+      <div style="line-height:1.9;font-size:12px;color:var(--mutedHi)">
+
+        <div style="background:var(--surf2);border-radius:10px;padding:16px;border:1px solid var(--border2);margin-bottom:14px">
+          <div style="font-size:13px;font-weight:800;color:var(--white);margin-bottom:8px">📄 En Liquidaciones de Sueldo</div>
+          <div>1. Sube el logo de <strong style="color:var(--gold)">Martinez Services Spa</strong> (tu empresa empleadora)</div>
+          <div>2. Abre <strong>MSS-Remuneraciones.html</strong></div>
+          <div>3. Al generar la liquidación, el logo aparece automáticamente en el encabezado</div>
+          <div>4. Presiona <strong>🖨 Imprimir</strong> → Guardar como PDF</div>
+        </div>
+
+        <div style="background:var(--surf2);border-radius:10px;padding:16px;border:1px solid var(--border2);margin-bottom:14px">
+          <div style="font-size:13px;font-weight:800;color:var(--white);margin-bottom:8px">📄 En Contratos</div>
+          <div>1. Sube el logo de la empresa empleadora y de la empresa cliente</div>
+          <div>2. Abre <strong>MSS-Contratos.html</strong> → Generador de Documentos</div>
+          <div>3. El logo del empleador aparece en el encabezado del contrato</div>
+          <div>4. Imprime como PDF para enviar firmado</div>
+        </div>
+
+        <div style="background:var(--surf2);border-radius:10px;padding:16px;border:1px solid var(--border2);margin-bottom:14px">
+          <div style="font-size:13px;font-weight:800;color:var(--white);margin-bottom:8px">🧾 En Cotizaciones y Facturas</div>
+          <div>1. Sube el logo de <strong style="color:var(--gold)">Martinez Services Spa</strong></div>
+          <div>2. Abre <strong>MSS-Facturacion.html</strong></div>
+          <div>3. Al generar la vista previa del documento, el logo aparece arriba a la izquierda</div>
+          <div>4. Presiona 🖨 Imprimir → PDF para enviar al cliente</div>
+        </div>
+
+        <div class="ok-box"><div style="font-size:16px">✅</div><div><strong>Formato recomendado para logos:</strong> PNG con fondo transparente, resolución mínima 300x150px. Si tienes el logo en JPG también funciona pero puede aparecer con fondo blanco en el documento.</div></div>
+
+        <div class="tip"><div style="font-size:16px">💡</div><div><strong>¿No tienes el logo en digital?</strong> Toma una foto con tu celular sobre fondo blanco limpio, o pídele a quien diseñó tu logo que te mande el archivo PNG original.</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<div id="footer">
+  <span>Martinez Services Spa · Módulo Logos v1.0 · Gaudy Martínez · 2025</span>
+</div>
+
+<script>
+const SK_LOGOS = 'mss_logos_v1';
+let LOGOS = {}, selectedEmpId = null, newLogoData = null, previewType = 'liquidacion';
+
+const DEF_EMPRESAS = [
+  {id:'mss',  nombre:'Martinez Services Spa',  rut:'76.999.888-1'},
+  {id:'min',  nombre:'Minera Atacama S.A.',      rut:'76.123.456-7'},
+  {id:'agr',  nombre:'Agrícola Sur Verde S.A.',  rut:'77.234.567-8'},
+  {id:'con',  nombre:'Constructora Bío-Bío',     rut:'78.345.678-9'},
+];
+
+function loadLogos(){try{LOGOS=JSON.parse(localStorage.getItem(SK_LOGOS)||'{}');}catch(e){LOGOS={};}}
+function saveLogos(){try{localStorage.setItem(SK_LOGOS,JSON.stringify(LOGOS));}catch(e){alert('Error guardando — imagen muy grande, intenta con una más pequeña');}}
+
+function showTab(id,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.tabs .tab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('sec-'+id).classList.add('on');
+  btn.classList.add('on');
+  if(id==='preview')renderPreviewSetup();
+}
+
+function showPreviewType(type,btn){
+  previewType=type;
+  document.querySelectorAll('#sec-preview .tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderPreview();
+}
+
+function renderLogosGrid(){
+  // Intentar cargar empresas desde hub
+  let empresas=DEF_EMPRESAS;
+  try{
+    const hub=JSON.parse(localStorage.getItem('mss_hub_v3')||'[]');
+    if(hub.length)empresas=hub.map(e=>({id:String(e.id),nombre:e.nombre,rut:e.rut}));
+  }catch(e){}
+
+  document.getElementById('logosGrid').innerHTML=empresas.map(e=>{
+    const logo=LOGOS[e.id];
+    return `<div class="logo-card ${selectedEmpId===e.id?'selected':''}">
+      <div class="logo-preview">
+        ${logo?`<img src="${logo}" alt="${e.nombre}"/>`:`<span style="font-size:32px;color:var(--muted)">${e.nombre.charAt(0)}</span>`}
+      </div>
+      <div class="logo-empresa">${e.nombre}</div>
+      <div class="logo-rut">${e.rut}</div>
+      <div style="display:flex;gap:6px;justify-content:center;margin-top:10px">
+        <button class="btn-sm" style="background:var(--gold);color:var(--bg);border:none" onclick="abrirSubir('${e.id}','${e.nombre}')">
+          ${logo?'🔄 Cambiar':'⬆ Subir Logo'}
+        </button>
+        ${logo?`<button class="btn-sm" style="background:transparent;border:1px solid rgba(239,68,68,0.3);color:var(--danger)" onclick="quitarLogo('${e.id}')">✕</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function abrirSubir(empId, nombre){
+  selectedEmpId=empId;
+  newLogoData=null;
+  document.getElementById('subirTitle').textContent='Subir Logo — '+nombre;
+  document.getElementById('subirSection').style.display='block';
+  document.getElementById('logoPreviewNew').style.display='none';
+  document.getElementById('fileLogoInput').value='';
+  document.getElementById('dropZone').classList.remove('active');
+  document.getElementById('subirSection').scrollIntoView({behavior:'smooth'});
+}
+
+function procesarLogo(input){
+  const file=input.files[0];
+  if(!file)return;
+  if(file.size>2*1024*1024){alert('Imagen muy grande. Máximo 2MB.');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    newLogoData=e.target.result;
+    document.getElementById('logoImgNew').src=newLogoData;
+    document.getElementById('logoPreviewNew').style.display='block';
+    document.getElementById('dropZone').classList.add('active');
+  };
+  reader.readAsDataURL(file);
+}
+
+function asignarLogo(){
+  if(!newLogoData||!selectedEmpId){alert('Selecciona una imagen primero');return;}
+  LOGOS[selectedEmpId]=newLogoData;
+  saveLogos();
+  cancelarSubir();
+  renderLogosGrid();
+  alert('✓ Logo guardado correctamente');
+}
+
+function quitarLogo(empId){
+  if(!confirm('¿Quitar el logo de esta empresa?'))return;
+  delete LOGOS[empId];
+  saveLogos();
+  renderLogosGrid();
+}
+
+function cancelarSubir(){
+  selectedEmpId=null;
+  newLogoData=null;
+  document.getElementById('subirSection').style.display='none';
+}
+
+function guardarTodo(){saveLogos();alert('✓ Todos los cambios guardados');}
+
+// PREVIEW
+function renderPreviewSetup(){
+  let empresas=DEF_EMPRESAS;
+  try{
+    const hub=JSON.parse(localStorage.getItem('mss_hub_v3')||'[]');
+    if(hub.length)empresas=hub.map(e=>({id:String(e.id),nombre:e.nombre,rut:e.rut}));
+  }catch(e){}
+  const sel=document.getElementById('selEmpresaPreview');
+  sel.innerHTML=empresas.map(e=>`<option value="${e.id}">${e.nombre}</option>`).join('');
+  renderPreview();
+}
+
+function renderPreview(){
+  const empId=document.getElementById('selEmpresaPreview')?.value;
+  let empresas=DEF_EMPRESAS;
+  try{const hub=JSON.parse(localStorage.getItem('mss_hub_v3')||'[]');if(hub.length)empresas=hub.map(e=>({id:String(e.id),nombre:e.nombre,rut:e.rut}));}catch(e){}
+  const emp=empresas.find(e=>e.id===empId)||empresas[0];
+  const logo=LOGOS[empId||emp?.id];
+  const logoHTML=logo?`<img src="${logo}" style="max-width:120px;max-height:70px;object-fit:contain"/>`:`<div style="font-size:28px;font-weight:900;color:#1a3a5c">${emp?.nombre?.charAt(0)||'M'}</div>`;
+
+  let html='';
+  if(previewType==='liquidacion'){
+    html=`<div class="doc-prev">
+      <div class="doc-header">
+        <div>
+          <div class="doc-logo-box">${logoHTML}</div>
+          <div style="margin-top:8px">
+            <div class="doc-empresa">${emp?.nombre||'—'}</div>
+            <div style="font-size:10px;color:#666">RUT: ${emp?.rut||'—'}</div>
+            <div style="font-size:10px;color:#666">Giro: Consultoría y Gestión Empresarial</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="background:#1a3a5c;color:white;padding:10px 16px;border-radius:8px">
+            <div style="font-size:11px;font-weight:700">LIQUIDACIÓN DE SUELDO</div>
+            <div style="font-size:9px;margin-top:2px">Período: Mayo 2025</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:#f5f8ff;padding:10px;border-radius:6px;margin-bottom:12px">
+        <div style="font-weight:700;font-size:11px;color:#1a3a5c;margin-bottom:4px">DATOS DEL TRABAJADOR</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:10px">
+          <div><strong>Nombre:</strong> Juan Pérez González</div>
+          <div><strong>RUT:</strong> 12.345.678-9</div>
+          <div><strong>Cargo:</strong> Analista</div>
+          <div><strong>AFP:</strong> Hábitat</div>
+        </div>
+      </div>
+      <table style="width:100%;font-size:10px;border-collapse:collapse">
+        <tr style="background:#1a3a5c;color:white"><td colspan="2" style="padding:6px 10px;font-weight:700">HABERES</td></tr>
+        <tr><td style="padding:5px 10px;border-bottom:1px solid #eee">Sueldo Base</td><td style="text-align:right;padding:5px 10px;border-bottom:1px solid #eee">$850.000</td></tr>
+        <tr><td style="padding:5px 10px;border-bottom:1px solid #eee">Gratificación Legal</td><td style="text-align:right;padding:5px 10px;border-bottom:1px solid #eee">$182.438</td></tr>
+        <tr style="background:#1a3a5c;color:white"><td colspan="2" style="padding:6px 10px;font-weight:700">DESCUENTOS</td></tr>
+        <tr><td style="padding:5px 10px;border-bottom:1px solid #eee">AFP Hábitat 10.27%</td><td style="text-align:right;padding:5px 10px;border-bottom:1px solid #eee">-$105.540</td></tr>
+        <tr><td style="padding:5px 10px;border-bottom:1px solid #eee">Salud Fonasa 7%</td><td style="text-align:right;padding:5px 10px;border-bottom:1px solid #eee">-$71.921</td></tr>
+        <tr style="background:#1a3a5c;color:white;font-weight:900"><td style="padding:8px 10px">LÍQUIDO A PAGAR</td><td style="text-align:right;padding:8px 10px">$854.977</td></tr>
+      </table>
+    </div>`;
+  } else if(previewType==='contrato'){
+    html=`<div class="doc-prev">
+      <div class="doc-header">
+        <div class="doc-logo-box">${logoHTML}</div>
+        <div style="text-align:center;flex:1">
+          <div style="font-size:13px;font-weight:900;color:#1a3a5c;text-transform:uppercase;letter-spacing:1px">Contrato de Trabajo</div>
+          <div style="font-size:10px;color:#666;margin-top:2px">Duración Indefinida</div>
+          <div style="font-size:10px;color:#666">Santiago, ${new Date().toLocaleDateString('es-CL')}</div>
+        </div>
+      </div>
+      <div style="font-size:10px;line-height:1.8;color:#333;margin-top:10px">
+        <div style="margin-bottom:8px"><strong>PRIMERA: PARTES.</strong> Entre <strong>${emp?.nombre}</strong>, RUT ${emp?.rut}, en adelante "el Empleador", y don/doña <strong>[NOMBRE TRABAJADOR]</strong>, RUT [RUT], en adelante "el Trabajador".</div>
+        <div style="margin-bottom:8px"><strong>SEGUNDA: FUNCIONES.</strong> El Trabajador se compromete a desempeñar el cargo de [CARGO] en el área de [ÁREA].</div>
+        <div style="margin-bottom:8px"><strong>TERCERA: REMUNERACIÓN.</strong> El Empleador pagará la suma de $[MONTO] mensuales brutos.</div>
+      </div>
+      <div style="display:flex;justify-content:space-around;margin-top:30px">
+        <div style="text-align:center;border-top:1px solid #1a3a5c;padding-top:8px;min-width:160px">
+          <div style="font-size:10px;font-weight:700">${emp?.nombre}</div>
+          <div style="font-size:9px;color:#666">El Empleador</div>
+        </div>
+        <div style="text-align:center;border-top:1px solid #1a3a5c;padding-top:8px;min-width:160px">
+          <div style="font-size:10px;font-weight:700">[NOMBRE TRABAJADOR]</div>
+          <div style="font-size:9px;color:#666">El Trabajador</div>
+        </div>
+      </div>
+    </div>`;
+  } else {
+    html=`<div class="doc-prev">
+      <div class="doc-header">
+        <div>
+          <div class="doc-logo-box">${logoHTML}</div>
+          <div style="margin-top:8px">
+            <div class="doc-empresa">${emp?.nombre}</div>
+            <div style="font-size:10px;color:#666">RUT: ${emp?.rut}</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="background:#1a3a5c;color:white;padding:10px 16px;border-radius:8px">
+            <div style="font-size:11px;font-weight:700">COTIZACIÓN</div>
+            <div style="font-size:18px;font-weight:900">N° 0001</div>
+            <div style="font-size:9px">${new Date().toLocaleDateString('es-CL')}</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:#f5f8ff;padding:10px;border-radius:6px;margin-bottom:12px;font-size:10px">
+        <div style="font-weight:700;color:#1a3a5c;margin-bottom:4px">CLIENTE</div>
+        <div>[Nombre del Cliente]</div>
+        <div>RUT: [RUT Cliente]</div>
+      </div>
+      <table style="width:100%;font-size:10px;border-collapse:collapse">
+        <thead><tr style="background:#1a3a5c;color:white"><th style="padding:6px 10px;text-align:left">Descripción</th><th style="padding:6px 10px;text-align:right">Valor Neto</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:6px 10px;border-bottom:1px solid #eee">Servicio de Auditoría Empresarial</td><td style="text-align:right;padding:6px 10px;border-bottom:1px solid #eee">$3.500.000</td></tr>
+          <tr><td style="padding:6px 10px;border-bottom:1px solid #eee">IVA 19%</td><td style="text-align:right;padding:6px 10px;border-bottom:1px solid #eee">$665.000</td></tr>
+          <tr style="background:#1a3a5c;color:white;font-weight:900"><td style="padding:8px 10px">TOTAL</td><td style="text-align:right;padding:8px 10px">$4.165.000</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px;font-size:9px;color:#666">Cotización válida por 30 días · Condiciones de pago: 30 días</div>
+    </div>`;
+  }
+  document.getElementById('docPreviewContainer').innerHTML=html;
+}
+
+loadLogos();
+renderLogosGrid();
+
+// Drag and drop
+const dz=document.getElementById('dropZone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('active');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('active'));
+dz.addEventListener('drop',e=>{
+  e.preventDefault();
+  const file=e.dataTransfer.files[0];
+  if(file&&file.type.startsWith('image/')){
+    const inp=document.getElementById('fileLogoInput');
+    const dt=new DataTransfer();dt.items.add(file);inp.files=dt.files;
+    procesarLogo(inp);
+  }
+});
+</script>
+</body>
+</html>
