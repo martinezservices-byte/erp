@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Martinez Services Spa — Facturación</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#050A12;--surf:#091424;--surf2:#0E1C30;--surf3:#132438;
+  --border:rgba(56,189,248,0.15);--border2:rgba(56,189,248,0.08);
+  --acc:#38BDF8;--accHi:#BAE6FD;
+  --white:#EFF8FF;--muted:#3D5A72;--mutedHi:#6B8FA8;
+  --ok:#22C55E;--danger:#EF4444;--warn:#F59E0B;--gold:#C9A84C;--purple:#A78BFA;
+  --font:'Playfair Display',serif;--mono:'JetBrains Mono',monospace;--body:'Segoe UI',system-ui,sans-serif;
+}
+body{background:var(--bg);color:var(--white);font-family:var(--body);min-height:100vh;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-thumb{background:rgba(56,189,248,0.2);border-radius:3px;}
+#header{background:var(--surf);border-bottom:1px solid var(--border2);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:14px;}
+.logo-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--acc),var(--accHi));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--bg);font-family:var(--font);}
+.logo-name{font-size:15px;font-weight:800;font-family:var(--font);}
+.logo-mod{font-size:10px;color:var(--acc);font-weight:700;letter-spacing:2px;font-family:var(--mono);}
+#tabbar{display:flex;gap:3px;background:var(--bg);padding:4px;border-radius:10px;width:fit-content;margin:22px 24px 0;flex-wrap:wrap;}
+.tab{padding:7px 15px;border-radius:7px;border:none;cursor:pointer;font-size:11px;font-weight:700;transition:all .18s;background:transparent;color:var(--muted);font-family:var(--mono);}
+.tab.active{background:var(--acc);color:var(--bg);}
+#content{max-width:1280px;margin:0 auto;padding:20px 24px 40px;}
+.section{display:none;}.section.active{display:block;}
+.kpi-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
+.kpi{flex:1;min-width:145px;background:var(--surf);border-radius:12px;padding:16px 18px;border:1px solid var(--border2);position:relative;overflow:hidden;}
+.kpi::before{content:'';position:absolute;top:0;right:0;width:55px;height:55px;background:radial-gradient(circle at top right,var(--kc,rgba(56,189,248,0.08)),transparent 70%);}
+.kpi-label{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;font-family:var(--mono);}
+.kpi-value{font-size:22px;font-weight:900;font-family:var(--font);}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.card{background:var(--surf);border-radius:12px;padding:18px;border:1px solid var(--border2);}
+.card-title{font-size:13px;font-weight:700;color:var(--white);margin-bottom:14px;font-family:var(--font);}
+.badge{display:inline-flex;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;font-family:var(--mono);white-space:nowrap;}
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono);}
+th{padding:9px 11px;text-align:left;color:var(--acc);font-weight:700;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:8px 11px;border-bottom:1px solid rgba(56,189,248,0.05);}
+tr:nth-child(even) td{background:rgba(255,255,255,0.012);}
+tfoot td{border-top:2px solid rgba(56,189,248,0.25);font-weight:800;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surf);border-radius:16px;padding:28px;border:1px solid rgba(56,189,248,0.3);width:680px;max-height:92vh;overflow-y:auto;}
+.modal h3{font-size:18px;font-weight:900;color:var(--white);margin-bottom:20px;font-family:var(--font);}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.fgrid .full{grid-column:1/3;}
+.fgrid .third{grid-column:span 1;}
+.field label{font-size:10px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;font-family:var(--mono);}
+.field input,.field select,.field textarea{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-size:12px;font-family:var(--mono);outline:none;}
+.field input:focus{border-color:var(--acc);}
+.btn-acc{padding:10px 22px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:13px;font-family:var(--mono);background:var(--acc);color:var(--bg);}
+.btn-ghost{padding:10px 22px;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px;font-family:var(--mono);background:transparent;border:1px solid var(--border);color:var(--muted);}
+.btn-sm{padding:4px 10px;border-radius:5px;font-size:10px;cursor:pointer;font-family:var(--mono);}
+.btn-edit{background:transparent;border:1px solid rgba(56,189,248,0.3);color:var(--acc);}
+.btn-del{background:transparent;border:1px solid rgba(239,68,68,0.3);color:var(--danger);}
+/* FACTURA PREVIEW */
+.factura-preview{background:white;color:#1a1a1a;border-radius:12px;padding:32px;font-family:Arial,sans-serif;font-size:12px;max-width:800px;margin:0 auto;box-shadow:0 8px 40px rgba(0,0,0,0.4);}
+.fac-header{display:flex;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #1a3a5c;}
+.fac-empresa{font-size:18px;font-weight:900;color:#1a3a5c;}
+.fac-doc-box{background:#1a3a5c;color:white;padding:12px 20px;border-radius:8px;text-align:center;}
+.fac-doc-tipo{font-size:14px;font-weight:700;}
+.fac-doc-num{font-size:22px;font-weight:900;}
+.fac-cliente{background:#f5f8ff;padding:12px;border-radius:6px;margin-bottom:16px;}
+.fac-items table{border-collapse:collapse;width:100%;}
+.fac-items th{background:#1a3a5c;color:white;padding:8px 10px;text-align:left;font-size:11px;}
+.fac-items td{padding:7px 10px;border-bottom:1px solid #e5e7eb;font-size:11px;}
+.fac-totales{margin-top:12px;display:flex;justify-content:flex-end;}
+.fac-totales table{min-width:280px;}
+.fac-totales td{padding:5px 10px;}
+.fac-total-final{background:#1a3a5c;color:white;font-weight:900;font-size:14px;}
+.fac-footer{margin-top:20px;padding-top:12px;border-top:1px solid #e5e7eb;font-size:10px;color:#666;display:flex;justify-content:space-between;}
+/* ITEM ROW */
+.item-row{display:grid;grid-template-columns:3fr 1fr 1fr 1fr auto;gap:8px;align-items:center;margin-bottom:8px;}
+.item-row input{padding:7px 10px;background:var(--bg);border:1px solid var(--border2);border-radius:6px;color:var(--white);font-size:11px;font-family:var(--mono);outline:none;}
+#footer{border-top:1px solid var(--border2);padding:13px 28px;display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-family:var(--mono);}
+@media print{#header,#tabbar,.no-print{display:none!important;}body{background:white;}.factura-preview{box-shadow:none;}}
+@media(max-width:700px){.grid-2{grid-template-columns:1fr;}.fgrid{grid-template-columns:1fr;}.fgrid .full,.fgrid .third{grid-column:1;}.item-row{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div id="header">
+  <div class="logo">
+    <div class="logo-icon">M</div>
+    <div><div class="logo-name">Martinez Services Spa</div><div class="logo-mod">MÓDULO FACTURACIÓN</div></div>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <span style="font-size:11px;color:var(--muted);font-family:var(--mono)" id="hInfo">Cargando...</span>
+    <button class="btn-acc" style="padding:7px 16px;font-size:12px" onclick="openDocModal('factura')">+ Factura</button>
+    <button class="btn-ghost" style="padding:7px 14px;font-size:12px" onclick="openDocModal('boleta')">+ Boleta</button>
+  </div>
+</div>
+<div id="tabbar">
+  <button class="tab active" onclick="showTab('documentos',this)">📄 Documentos</button>
+  <button class="tab" onclick="showTab('nuevo',this)">✏ Emitir Doc.</button>
+  <button class="tab" onclick="showTab('clientes',this)">🏢 Clientes/Proveedores</button>
+  <button class="tab" onclick="showTab('productos',this)">📦 Productos/Servicios</button>
+  <button class="tab" onclick="showTab('resumen',this)">📊 Resumen</button>
+</div>
+<div id="content">
+
+  <!-- DOCUMENTOS -->
+  <div id="sec-documentos" class="section active">
+    <div class="kpi-row" id="kpiDocs"></div>
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center" class="no-print">
+      <div style="display:flex;gap:3px;background:var(--bg);padding:3px;border-radius:8px">
+        <button class="tab active" id="filtTodoBtn" onclick="filtrarDocs('',this)">Todos</button>
+        <button class="tab" onclick="filtrarDocs('Factura',this)">Facturas</button>
+        <button class="tab" onclick="filtrarDocs('Boleta',this)">Boletas</button>
+        <button class="tab" onclick="filtrarDocs('Nota Crédito',this)">N. Crédito</button>
+        <button class="tab" onclick="filtrarDocs('Nota Débito',this)">N. Débito</button>
+      </div>
+      <select id="filtEstado" onchange="filtrarDocs(currentFiltTipo,null)" style="padding:7px 12px;background:var(--surf);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-family:var(--mono);font-size:11px;outline:none">
+        <option value="">Todos los estados</option>
+        <option>Emitida</option><option>Pagada</option><option>Vencida</option><option>Anulada</option>
+      </select>
+    </div>
+    <div class="card tbl-wrap">
+      <table id="tblDocs">
+        <thead><tr><th>Nº</th><th>Tipo</th><th>Fecha</th><th>Cliente/Proveedor</th><th>Glosa</th><th>Neto</th><th>IVA</th><th>Total</th><th>Vcto.</th><th>Estado</th><th class="no-print">Acciones</th></tr></thead>
+        <tbody></tbody>
+        <tfoot></tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- EMITIR DOCUMENTO -->
+  <div id="sec-nuevo" class="section">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">Emitir Nuevo Documento</div>
+      <div class="fgrid" style="margin-bottom:16px">
+        <div class="field"><label>Tipo de Documento</label>
+          <select id="newTipo" onchange="updateDocForm()">
+            <option value="Factura">Factura de Venta</option>
+            <option value="Boleta">Boleta de Honorarios</option>
+            <option value="Nota Crédito">Nota de Crédito</option>
+            <option value="Nota Débito">Nota de Débito</option>
+            <option value="Presupuesto">Presupuesto / Cotización</option>
+          </select>
+        </div>
+        <div class="field"><label>Nº Folio</label><input id="newFolio" type="number" value="1"/></div>
+        <div class="field"><label>Fecha Emisión</label><input id="newFecha" type="date"/></div>
+        <div class="field"><label>Fecha Vencimiento</label><input id="newVcto" type="date"/></div>
+        <div class="field full"><label>Cliente / Receptor</label><select id="newClienteId"></select></div>
+        <div class="field full"><label>Glosa / Descripción General</label><input id="newGlosa" type="text" placeholder="Ej: Servicio de auditoría Junio 2025"/></div>
+        <div class="field"><label>Condición de Pago</label>
+          <select id="newCondPago"><option>Contado</option><option>30 días</option><option>60 días</option><option>90 días</option><option>Otra</option></select>
+        </div>
+        <div class="field"><label>Moneda</label>
+          <select id="newMoneda"><option value="CLP">Peso Chileno (CLP)</option><option value="UF">UF</option><option value="USD">Dólar (USD)</option></select>
+        </div>
+      </div>
+      <!-- ITEMS -->
+      <div style="font-size:11px;font-weight:700;color:var(--acc);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">DETALLE DE ITEMS</div>
+      <div style="display:grid;grid-template-columns:3fr 1fr 1fr 1fr auto;gap:8px;margin-bottom:6px">
+        <div style="font-size:9px;color:var(--muted);font-family:var(--mono);text-transform:uppercase">Descripción</div>
+        <div style="font-size:9px;color:var(--muted);font-family:var(--mono);text-transform:uppercase">Cantidad</div>
+        <div style="font-size:9px;color:var(--muted);font-family:var(--mono);text-transform:uppercase">Precio Unit.</div>
+        <div style="font-size:9px;color:var(--muted);font-family:var(--mono);text-transform:uppercase">Total</div>
+        <div></div>
+      </div>
+      <div id="itemsContainer"></div>
+      <button onclick="addItem()" style="margin-top:8px;padding:7px 14px;background:transparent;border:1px dashed rgba(56,189,248,0.3);border-radius:7px;color:var(--acc);cursor:pointer;font-size:11px;font-family:var(--mono)">+ Agregar Item</button>
+      <!-- TOTALES -->
+      <div style="margin-top:20px;display:flex;justify-content:flex-end">
+        <div style="min-width:300px;background:var(--surf2);border-radius:10px;padding:14px 18px;border:1px solid var(--border2)">
+          <div style="display:flex;justify-content:space-between;margin-bottom:7px;font-family:var(--mono);font-size:12px">
+            <span style="color:var(--muted)">Subtotal Neto</span>
+            <span id="totNeto" style="color:var(--white)">$0</span>
+          </div>
+          <div id="ivaRow" style="display:flex;justify-content:space-between;margin-bottom:7px;font-family:var(--mono);font-size:12px">
+            <span style="color:var(--muted)">IVA 19%</span>
+            <span id="totIVA" style="color:var(--warn)">$0</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border);font-family:var(--font);font-size:16px;font-weight:900">
+            <span>TOTAL</span>
+            <span id="totTotal" style="color:var(--acc)">$0</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+        <button class="btn-acc" onclick="emitirDocumento()">✓ Emitir Documento</button>
+        <button class="btn-ghost" onclick="previewDocumento()">👁 Vista Previa</button>
+        <button class="btn-ghost" onclick="limpiarForm()">🗑 Limpiar</button>
+      </div>
+    </div>
+    <div id="previewContainer"></div>
+  </div>
+
+  <!-- CLIENTES/PROVEEDORES -->
+  <div id="sec-clientes" class="section">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+      <button class="btn-acc" style="padding:8px 18px;font-size:12px" onclick="openClienteModal(null)">+ Nuevo</button>
+    </div>
+    <div class="card tbl-wrap">
+      <table id="tblClientes">
+        <thead><tr><th>Nombre / Razón Social</th><th>RUT</th><th>Tipo</th><th>Giro</th><th>Email</th><th>Teléfono</th><th>Ciudad</th><th class="no-print">Acciones</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PRODUCTOS/SERVICIOS -->
+  <div id="sec-productos" class="section">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+      <button class="btn-acc" style="padding:8px 18px;font-size:12px" onclick="openProdModal(null)">+ Nuevo</button>
+    </div>
+    <div class="card tbl-wrap">
+      <table id="tblProds">
+        <thead><tr><th>Código</th><th>Descripción</th><th>Tipo</th><th>Precio Neto</th><th>Afecto IVA</th><th>Unidad</th><th class="no-print">Acciones</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- RESUMEN -->
+  <div id="sec-resumen" class="section">
+    <div class="kpi-row" id="kpiResumen"></div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Ventas por Mes</div>
+        <div id="resVentas"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Estado de Cobro</div>
+        <div id="resEstado"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Top Clientes por Facturación</div>
+      <div id="resTopCli"></div>
+    </div>
+  </div>
+</div>
+<div id="footer">
+  <span>Martinez Services Spa · Módulo Facturación v1.0 · 2025</span>
+  <span>Documentos tributarios · Datos guardados automáticamente</span>
+</div>
+
+<!-- MODAL CLIENTE -->
+<div class="modal-overlay" id="modalCliente">
+  <div class="modal" style="width:500px">
+    <h3 id="cliTitle">Nuevo Cliente / Proveedor</h3>
+    <input type="hidden" id="cliId"/>
+    <div class="fgrid">
+      <div class="field full"><label>Nombre / Razón Social</label><input id="cliNombre" type="text"/></div>
+      <div class="field"><label>RUT</label><input id="cliRut" type="text" placeholder="76.123.456-7"/></div>
+      <div class="field"><label>Tipo</label><select id="cliTipo"><option>Cliente</option><option>Proveedor</option><option>Ambos</option></select></div>
+      <div class="field"><label>Giro Comercial</label><input id="cliGiro" type="text"/></div>
+      <div class="field"><label>Email</label><input id="cliEmail" type="email"/></div>
+      <div class="field"><label>Teléfono</label><input id="cliTel" type="text"/></div>
+      <div class="field"><label>Dirección</label><input id="cliDir" type="text"/></div>
+      <div class="field"><label>Ciudad</label><input id="cliCiudad" type="text"/></div>
+      <div class="field"><label>Condición Pago Default</label><select id="cliCondPago"><option>Contado</option><option>30 días</option><option>60 días</option></select></div>
+      <div class="field"><label>Límite Crédito ($)</label><input id="cliLimite" type="number" value="0"/></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn-acc" style="flex:1" onclick="saveCliente()">Guardar</button>
+      <button class="btn-ghost" onclick="closeModal('modalCliente')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PRODUCTO -->
+<div class="modal-overlay" id="modalProd">
+  <div class="modal" style="width:440px">
+    <h3 id="prodTitle">Nuevo Producto / Servicio</h3>
+    <input type="hidden" id="prodId"/>
+    <div class="fgrid">
+      <div class="field"><label>Código</label><input id="prodCod" type="text"/></div>
+      <div class="field"><label>Tipo</label><select id="prodTipo"><option>Servicio</option><option>Producto</option></select></div>
+      <div class="field full"><label>Descripción</label><input id="prodDesc" type="text"/></div>
+      <div class="field"><label>Precio Neto ($)</label><input id="prodPrecio" type="number"/></div>
+      <div class="field"><label>Unidad</label><input id="prodUnidad" type="text" value="Unidad"/></div>
+      <div class="field"><label>Afecto IVA</label><select id="prodIVA"><option value="si">Sí — 19%</option><option value="no">No — Exento</option></select></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn-acc" style="flex:1" onclick="saveProd()">Guardar</button>
+      <button class="btn-ghost" onclick="closeModal('modalProd')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SK_DOCS = 'mss_fact_docs_v1';
+const SK_CLIS = 'mss_fact_clis_v1';
+const SK_PRODS= 'mss_fact_prods_v1';
+let _id=4000; const uid=()=>++_id;
+let currentFiltTipo='';
+
+const DEF_CLIENTES=[
+  {id:uid(),nombre:'Minera Atacama S.A.',rut:'76.123.456-7',tipo:'Cliente',giro:'Minería',email:'contacto@atacama.cl',telefono:'+56912345678',direccion:'Av. Principal 100',ciudad:'Antofagasta',condPago:'30 días',limite:50000000},
+  {id:uid(),nombre:'Agrícola Sur Verde S.A.',rut:'77.234.567-8',tipo:'Cliente',giro:'Agricultura',email:'admin@surverde.cl',telefono:'+56923456789',direccion:'Camino Rural km 5',ciudad:'Los Ángeles',condPago:'Contado',limite:20000000},
+  {id:uid(),nombre:'Constructora Bío-Bío Ltda.',rut:'78.345.678-9',tipo:'Cliente',giro:'Construcción',email:'facturacion@biobio.cl',telefono:'+56934567890',direccion:'Calle Comercio 200',ciudad:'Concepción',condPago:'60 días',limite:30000000},
+];
+
+const DEF_PRODS=[
+  {id:uid(),codigo:'SRV-001',tipo:'Servicio',descripcion:'Servicio de Auditoría Empresarial',precio:3500000,unidad:'Proyecto',iva:'si'},
+  {id:uid(),codigo:'SRV-002',tipo:'Servicio',descripcion:'Consultoría Plan Estratégico',precio:2800000,unidad:'Proyecto',iva:'si'},
+  {id:uid(),codigo:'SRV-003',tipo:'Servicio',descripcion:'Control de Gestión Mensual',precio:1200000,unidad:'Mes',iva:'si'},
+  {id:uid(),codigo:'SRV-004',tipo:'Servicio',descripcion:'Diagnóstico Empresarial',precio:1800000,unidad:'Proyecto',iva:'si'},
+  {id:uid(),codigo:'SRV-005',tipo:'Servicio',descripcion:'Capacitación KPI y Gestión',precio:950000,unidad:'Sesión',iva:'si'},
+];
+
+const DEF_DOCS=[
+  {id:uid(),tipo:'Factura',folio:1,fecha:'2025-06-01',vcto:'2025-07-01',clienteId:null,clienteNombre:'Minera Atacama S.A.',clienteRut:'76.123.456-7',glosa:'Servicio auditoría Q2',items:[{desc:'Servicio de Auditoría Empresarial',qty:1,precio:3500000,total:3500000}],neto:3500000,iva:665000,total:4165000,condPago:'30 días',estado:'Pagada'},
+  {id:uid(),tipo:'Factura',folio:2,fecha:'2025-06-10',vcto:'2025-07-10',clienteId:null,clienteNombre:'Agrícola Sur Verde S.A.',clienteRut:'77.234.567-8',glosa:'Plan Estratégico 2025',items:[{desc:'Consultoría Plan Estratégico',qty:1,precio:2800000,total:2800000}],neto:2800000,iva:532000,total:3332000,condPago:'Contado',estado:'Pagada'},
+  {id:uid(),tipo:'Factura',folio:3,fecha:'2025-06-20',vcto:'2025-07-20',clienteId:null,clienteNombre:'Constructora Bío-Bío Ltda.',clienteRut:'78.345.678-9',glosa:'Auditoría procesos operativos',items:[{desc:'Servicio de Auditoría Empresarial',qty:1,precio:3500000,total:3500000},{desc:'Informe y recomendaciones',qty:1,precio:700000,total:700000}],neto:4200000,iva:798000,total:4998000,condPago:'60 días',estado:'Emitida'},
+];
+
+let DOCUMENTOS=[], CLIENTES_FAC=[], PRODUCTOS=[];
+let ITEMS_FORM=[{desc:'',qty:1,precio:0,total:0}];
+
+function saveAll(){try{localStorage.setItem(SK_DOCS,JSON.stringify(DOCUMENTOS));localStorage.setItem(SK_CLIS,JSON.stringify(CLIENTES_FAC));localStorage.setItem(SK_PRODS,JSON.stringify(PRODUCTOS));}catch(e){}}
+function loadAll(){
+  try{
+    DOCUMENTOS   =JSON.parse(localStorage.getItem(SK_DOCS)) ||DEF_DOCS.map(x=>({...x}));
+    CLIENTES_FAC =JSON.parse(localStorage.getItem(SK_CLIS)) ||DEF_CLIENTES.map(x=>({...x}));
+    PRODUCTOS    =JSON.parse(localStorage.getItem(SK_PRODS))||DEF_PRODS.map(x=>({...x}));
+  }catch(e){DOCUMENTOS=DEF_DOCS.map(x=>({...x}));CLIENTES_FAC=DEF_CLIENTES.map(x=>({...x}));PRODUCTOS=DEF_PRODS.map(x=>({...x}));}
+}
+
+const clp=n=>new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Math.round(n||0));
+const M=n=>'$'+(n/1e6).toFixed(2)+'M';
+const dateF=d=>{try{return new Date(d+'T00:00:00').toLocaleDateString('es-CL');}catch{return d||'—';}};
+function badge(l,c){return `<span class="badge" style="background:${c}20;color:${c};border:1px solid ${c}40">${l}</span>`;}
+const TIPO_COLOR={Factura:'#38BDF8','Boleta':'#22C55E','Nota Crédito':'#F59E0B','Nota Débito':'#A78BFA',Presupuesto:'#C9A84C'};
+const ESTADO_COLOR={Emitida:'#38BDF8',Pagada:'#22C55E',Vencida:'#EF4444',Anulada:'#5A7090'};
+
+function showTab(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='documentos'){renderKPIs();renderDocs();}
+  if(id==='nuevo'){populateClientesSelect();renderItems();updateTotales();}
+  if(id==='clientes')renderCliTable();
+  if(id==='productos')renderProdTable();
+  if(id==='resumen')renderResumen();
+}
+
+function filtrarDocs(tipo,btn){
+  currentFiltTipo=tipo;
+  document.querySelectorAll('#sec-documentos .tab').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  renderDocs();
+}
+
+function renderKPIs(){
+  const docs=DOCUMENTOS.filter(d=>d.estado!=='Anulada');
+  const totalFact=docs.filter(d=>d.tipo==='Factura').reduce((s,d)=>s+d.total,0);
+  const porCobrar=docs.filter(d=>['Emitida','Vencida'].includes(d.estado)).reduce((s,d)=>s+d.total,0);
+  const vencidas=docs.filter(d=>d.estado==='Vencida').length;
+  document.getElementById('kpiDocs').innerHTML=`
+    <div class="kpi" style="--kc:rgba(56,189,248,0.1)"><div class="kpi-label">Total Documentos</div><div class="kpi-value" style="color:var(--acc)">${DOCUMENTOS.length}</div></div>
+    <div class="kpi" style="--kc:rgba(34,197,94,0.1)"><div class="kpi-label">Facturado Total</div><div class="kpi-value" style="color:var(--ok)">${M(totalFact)}</div></div>
+    <div class="kpi" style="--kc:rgba(245,158,11,0.1)"><div class="kpi-label">Por Cobrar</div><div class="kpi-value" style="color:var(--warn)">${M(porCobrar)}</div></div>
+    <div class="kpi" style="--kc:rgba(239,68,68,0.1)"><div class="kpi-label">Vencidas</div><div class="kpi-value" style="color:${vencidas>0?'var(--danger)':'var(--ok)'}">${vencidas}</div></div>
+  `;
+}
+
+function renderDocs(){
+  const filtEstado=document.getElementById('filtEstado')?.value||'';
+  let docs=[...DOCUMENTOS].filter(d=>{
+    const mt=!currentFiltTipo||d.tipo===currentFiltTipo;
+    const me=!filtEstado||d.estado===filtEstado;
+    return mt&&me;
+  }).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const tbody=document.querySelector('#tblDocs tbody');
+  const tfoot=document.querySelector('#tblDocs tfoot');
+  tbody.innerHTML=docs.map(d=>`<tr>
+    <td style="color:var(--gold);font-weight:700">${d.folio}</td>
+    <td>${badge(d.tipo,TIPO_COLOR[d.tipo]||'#5A7090')}</td>
+    <td>${dateF(d.fecha)}</td>
+    <td style="color:var(--white);font-weight:600;max-width:160px;overflow:hidden;text-overflow:ellipsis">${d.clienteNombre}</td>
+    <td style="color:var(--mutedHi);max-width:180px;overflow:hidden;text-overflow:ellipsis">${d.glosa}</td>
+    <td style="text-align:right">${clp(d.neto)}</td>
+    <td style="text-align:right;color:var(--warn)">${clp(d.iva)}</td>
+    <td style="text-align:right;color:var(--acc);font-weight:800">${clp(d.total)}</td>
+    <td style="color:${d.estado==='Vencida'?'var(--danger)':'var(--muted)'}">${dateF(d.vcto)}</td>
+    <td>${badge(d.estado,ESTADO_COLOR[d.estado]||'#5A7090')}</td>
+    <td class="no-print"><div style="display:flex;gap:4px">
+      <button class="btn-sm btn-edit" onclick="verDoc(${d.id})">👁</button>
+      <button class="btn-sm" style="background:transparent;border:1px solid rgba(34,197,94,0.3);color:var(--ok)" onclick="marcarPagada(${d.id})">✓</button>
+      <button class="btn-sm btn-del" onclick="delDoc(${d.id})">✕</button>
+    </div></td>
+  </tr>`).join('');
+  const totN=docs.reduce((s,d)=>s+d.neto,0);
+  const totI=docs.reduce((s,d)=>s+d.iva,0);
+  const totT=docs.reduce((s,d)=>s+d.total,0);
+  tfoot.innerHTML=`<tr><td colspan="5" style="color:var(--acc)">TOTALES (${docs.length})</td><td style="text-align:right">${clp(totN)}</td><td style="text-align:right;color:var(--warn)">${clp(totI)}</td><td style="text-align:right;color:var(--acc)">${clp(totT)}</td><td colspan="3"></td></tr>`;
+}
+
+// ── FORMULARIO NUEVO DOCUMENTO ──
+function populateClientesSelect(){
+  const opts=CLIENTES_FAC.map(c=>`<option value="${c.id}">${c.nombre} (${c.rut})</option>`).join('');
+  const el=document.getElementById('newClienteId');
+  if(el)el.innerHTML=opts;
+}
+
+function addItem(){
+  ITEMS_FORM.push({desc:'',qty:1,precio:0,total:0});
+  renderItems();
+}
+
+function removeItem(i){
+  ITEMS_FORM.splice(i,1);
+  if(ITEMS_FORM.length===0)ITEMS_FORM=[{desc:'',qty:1,precio:0,total:0}];
+  renderItems();
+  updateTotales();
+}
+
+function renderItems(){
+  const prodOpts=PRODUCTOS.map(p=>`<option value="${p.precio}||${p.descripcion}">${p.descripcion} — ${clp(p.precio)}</option>`).join('');
+  document.getElementById('itemsContainer').innerHTML=ITEMS_FORM.map((item,i)=>`
+    <div class="item-row" id="itemRow${i}">
+      <input type="text" value="${item.desc}" placeholder="Descripción del servicio/producto"
+        oninput="ITEMS_FORM[${i}].desc=this.value"
+        list="prodList${i}"/>
+      <datalist id="prodList${i}">${PRODUCTOS.map(p=>`<option value="${p.descripcion}">`).join('')}</datalist>
+      <input type="number" value="${item.qty}" min="1" step="0.01"
+        oninput="ITEMS_FORM[${i}].qty=parseFloat(this.value)||1;calcItemTotal(${i})"/>
+      <input type="number" value="${item.precio}" min="0"
+        oninput="ITEMS_FORM[${i}].precio=parseFloat(this.value)||0;calcItemTotal(${i})"/>
+      <input type="number" value="${item.total}" readonly style="color:var(--acc);font-weight:700"/>
+      <button onclick="removeItem(${i})" style="padding:6px 10px;background:transparent;border:1px solid rgba(239,68,68,0.3);border-radius:6px;color:var(--danger);cursor:pointer;font-size:12px">✕</button>
+    </div>`).join('');
+}
+
+function calcItemTotal(i){
+  ITEMS_FORM[i].total=Math.round(ITEMS_FORM[i].qty*ITEMS_FORM[i].precio);
+  const row=document.getElementById('itemRow'+i);
+  if(row){const inputs=row.querySelectorAll('input');inputs[3].value=ITEMS_FORM[i].total;}
+  updateTotales();
+}
+
+function updateTotales(){
+  const neto=ITEMS_FORM.reduce((s,it)=>s+it.total,0);
+  const tipo=document.getElementById('newTipo')?.value||'Factura';
+  const iva=tipo==='Boleta'?0:Math.round(neto*0.19);
+  const total=neto+iva;
+  document.getElementById('totNeto').textContent=clp(neto);
+  document.getElementById('totIVA').textContent=clp(iva);
+  document.getElementById('totTotal').textContent=clp(total);
+  const ivaRow=document.getElementById('ivaRow');
+  if(ivaRow)ivaRow.style.display=tipo==='Boleta'?'none':'flex';
+}
+
+function updateDocForm(){updateTotales();}
+
+function limpiarForm(){
+  ITEMS_FORM=[{desc:'',qty:1,precio:0,total:0}];
+  renderItems();updateTotales();
+  document.getElementById('previewContainer').innerHTML='';
+  ['newGlosa','newFolio'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+}
+
+function emitirDocumento(){
+  const clienteId=parseInt(document.getElementById('newClienteId').value);
+  const cliente=CLIENTES_FAC.find(c=>c.id===clienteId)||{nombre:'Sin cliente',rut:'—'};
+  const neto=ITEMS_FORM.reduce((s,it)=>s+it.total,0);
+  if(neto<=0){alert('Agrega al menos un item con precio');return;}
+  const tipo=document.getElementById('newTipo').value;
+  const iva=tipo==='Boleta'?0:Math.round(neto*0.19);
+  const doc={
+    id:uid(),tipo,
+    folio:parseInt(document.getElementById('newFolio').value)||DOCUMENTOS.filter(d=>d.tipo===tipo).length+1,
+    fecha:document.getElementById('newFecha').value,
+    vcto:document.getElementById('newVcto').value,
+    clienteId,clienteNombre:cliente.nombre,clienteRut:cliente.rut,
+    glosa:document.getElementById('newGlosa').value,
+    items:ITEMS_FORM.filter(it=>it.total>0).map(it=>({...it})),
+    neto,iva,total:neto+iva,
+    condPago:document.getElementById('newCondPago').value,
+    estado:'Emitida',
+  };
+  DOCUMENTOS.push(doc);
+  saveAll();
+  document.getElementById('newFolio').value=parseInt(document.getElementById('newFolio').value)+1;
+  alert(`✓ ${tipo} Nº${doc.folio} emitida correctamente`);
+  previewDocumento(doc);
+  renderKPIs();
+  document.getElementById('hInfo').textContent=`${DOCUMENTOS.length} documentos`;
+}
+
+function previewDocumento(docData){
+  const clienteId=docData?docData.clienteId:parseInt(document.getElementById('newClienteId')?.value);
+  const cliente=CLIENTES_FAC.find(c=>c.id===clienteId)||{nombre:'Sin cliente',rut:'—',giro:'—',direccion:'—'};
+  const tipo=docData?docData.tipo:document.getElementById('newTipo').value;
+  const folio=docData?docData.folio:document.getElementById('newFolio').value;
+  const fecha=docData?docData.fecha:document.getElementById('newFecha').value;
+  const items=docData?docData.items:ITEMS_FORM.filter(it=>it.total>0);
+  const neto=items.reduce((s,it)=>s+it.total,0);
+  const iva=tipo==='Boleta'?0:Math.round(neto*0.19);
+  const total=neto+iva;
+  const glosa=docData?docData.glosa:document.getElementById('newGlosa')?.value||'';
+
+  document.getElementById('previewContainer').innerHTML=`
+  <div style="margin-top:20px">
+    <div style="font-size:12px;color:var(--acc);font-family:var(--mono);margin-bottom:10px">VISTA PREVIA DEL DOCUMENTO</div>
+    <div class="factura-preview">
+      <div class="fac-header">
+        <div>
+          <div class="fac-empresa">Martinez Services Spa</div>
+          <div style="font-size:11px;color:#666;margin-top:4px">RUT: 76.123.456-7</div>
+          <div style="font-size:11px;color:#666">Giro: Consultoría y Gestión Empresarial</div>
+          <div style="font-size:11px;color:#666">Av. Providencia 123, Santiago</div>
+          <div style="font-size:11px;color:#666">Tel: +56 9 1234 5678</div>
+        </div>
+        <div>
+          <div class="fac-doc-box">
+            <div class="fac-doc-tipo">${tipo.toUpperCase()}</div>
+            <div class="fac-doc-num">Nº ${String(folio).padStart(6,'0')}</div>
+            <div style="font-size:10px;margin-top:4px">Fecha: ${dateF(fecha)}</div>
+          </div>
+        </div>
+      </div>
+      <div class="fac-cliente">
+        <div style="font-size:11px;font-weight:700;color:#1a3a5c;margin-bottom:6px">DATOS DEL RECEPTOR</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">
+          <div><strong>Razón Social:</strong> ${cliente.nombre}</div>
+          <div><strong>RUT:</strong> ${cliente.rut}</div>
+          <div><strong>Giro:</strong> ${cliente.giro||'—'}</div>
+          <div><strong>Dirección:</strong> ${cliente.direccion||'—'}</div>
+        </div>
+        ${glosa?`<div style="margin-top:6px;font-size:11px"><strong>Ref.:</strong> ${glosa}</div>`:''}
+      </div>
+      <div class="fac-items">
+        <table>
+          <thead><tr><th>CANT.</th><th>DESCRIPCIÓN</th><th style="text-align:right">P. UNITARIO</th><th style="text-align:right">TOTAL</th></tr></thead>
+          <tbody>${items.map(it=>`<tr><td>${it.qty}</td><td>${it.desc}</td><td style="text-align:right">${clp(it.precio)}</td><td style="text-align:right;font-weight:700">${clp(it.total)}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>
+      <div class="fac-totales">
+        <table>
+          <tr><td>Neto</td><td style="text-align:right">${clp(neto)}</td></tr>
+          ${tipo!=='Boleta'?`<tr><td>IVA 19%</td><td style="text-align:right">${clp(iva)}</td></tr>`:''}
+          <tr class="fac-total-final"><td>TOTAL</td><td style="text-align:right">${clp(total)}</td></tr>
+        </table>
+      </div>
+      <div class="fac-footer">
+        <span>Martinez Services Spa · RUT 76.123.456-7 · Resolución SII</span>
+        <span>Original — Copia</span>
+      </div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px" class="no-print">
+      <button class="btn-ghost" onclick="window.print()">🖨 Imprimir</button>
+    </div>
+  </div>`;
+}
+
+function verDoc(id){
+  const d=DOCUMENTOS.find(x=>x.id===id);if(!d)return;
+  showTab('nuevo',document.querySelector('.tab[onclick*="nuevo"]'));
+  previewDocumento(d);
+}
+function marcarPagada(id){DOCUMENTOS=DOCUMENTOS.map(d=>d.id===id?{...d,estado:'Pagada'}:d);saveAll();renderDocs();renderKPIs();}
+function delDoc(id){if(!confirm('¿Eliminar este documento?'))return;DOCUMENTOS=DOCUMENTOS.filter(d=>d.id!==id);saveAll();renderDocs();renderKPIs();}
+
+// ── CLIENTES ──
+function renderCliTable(){
+  document.querySelector('#tblClientes tbody').innerHTML=CLIENTES_FAC.map(c=>`<tr>
+    <td style="color:var(--white);font-weight:700">${c.nombre}</td>
+    <td style="font-family:var(--mono)">${c.rut}</td>
+    <td>${badge(c.tipo,'#38BDF8')}</td>
+    <td style="color:var(--muted)">${c.giro}</td>
+    <td style="color:var(--muted)">${c.email}</td>
+    <td style="color:var(--muted)">${c.telefono}</td>
+    <td style="color:var(--muted)">${c.ciudad}</td>
+    <td class="no-print"><div style="display:flex;gap:4px">
+      <button class="btn-sm btn-edit" onclick="openClienteModal(${c.id})">✎</button>
+      <button class="btn-sm btn-del"  onclick="delCliente(${c.id})">✕</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function openClienteModal(id){
+  const c=id?CLIENTES_FAC.find(x=>x.id===id):null;
+  document.getElementById('cliTitle').textContent=c?'Editar':'Nuevo Cliente / Proveedor';
+  document.getElementById('cliId').value=id||'';
+  ['cliNombre','cliRut','cliGiro','cliEmail','cliTel','cliDir','cliCiudad'].forEach(fId=>{
+    const map={cliNombre:'nombre',cliRut:'rut',cliGiro:'giro',cliEmail:'email',cliTel:'telefono',cliDir:'direccion',cliCiudad:'ciudad'};
+    document.getElementById(fId).value=c?c[map[fId]]||'':'';
+  });
+  if(c){document.getElementById('cliTipo').value=c.tipo;document.getElementById('cliCondPago').value=c.condPago;document.getElementById('cliLimite').value=c.limite||0;}
+  document.getElementById('modalCliente').classList.add('open');
+}
+function saveCliente(){
+  const id=document.getElementById('cliId').value;
+  const obj={nombre:document.getElementById('cliNombre').value.trim(),rut:document.getElementById('cliRut').value.trim(),tipo:document.getElementById('cliTipo').value,giro:document.getElementById('cliGiro').value.trim(),email:document.getElementById('cliEmail').value.trim(),telefono:document.getElementById('cliTel').value.trim(),direccion:document.getElementById('cliDir').value.trim(),ciudad:document.getElementById('cliCiudad').value.trim(),condPago:document.getElementById('cliCondPago').value,limite:parseFloat(document.getElementById('cliLimite').value)||0};
+  if(!obj.nombre||!obj.rut){alert('Nombre y RUT requeridos');return;}
+  if(id){const idx=CLIENTES_FAC.findIndex(c=>c.id==id);if(idx>=0)CLIENTES_FAC[idx]={...CLIENTES_FAC[idx],...obj};}
+  else CLIENTES_FAC.push({id:uid(),...obj});
+  saveAll();closeModal('modalCliente');renderCliTable();
+}
+function delCliente(id){if(!confirm('¿Eliminar?'))return;CLIENTES_FAC=CLIENTES_FAC.filter(c=>c.id!==id);saveAll();renderCliTable();}
+
+// ── PRODUCTOS ──
+function renderProdTable(){
+  document.querySelector('#tblProds tbody').innerHTML=PRODUCTOS.map(p=>`<tr>
+    <td style="color:var(--gold);font-family:var(--mono)">${p.codigo}</td>
+    <td style="color:var(--white);font-weight:600">${p.descripcion}</td>
+    <td>${badge(p.tipo,'#10B981')}</td>
+    <td style="color:var(--acc);font-weight:700;text-align:right">${clp(p.precio)}</td>
+    <td>${badge(p.iva==='si'?'Afecto 19%':'Exento',p.iva==='si'?'#F59E0B':'#22C55E')}</td>
+    <td style="color:var(--muted)">${p.unidad}</td>
+    <td class="no-print"><div style="display:flex;gap:4px">
+      <button class="btn-sm btn-edit" onclick="openProdModal(${p.id})">✎</button>
+      <button class="btn-sm btn-del"  onclick="delProd(${p.id})">✕</button>
+    </div></td>
+  </tr>`).join('');
+}
+function openProdModal(id){
+  const p=id?PRODUCTOS.find(x=>x.id===id):null;
+  document.getElementById('prodTitle').textContent=p?'Editar':'Nuevo Producto/Servicio';
+  document.getElementById('prodId').value=id||'';
+  document.getElementById('prodCod').value=p?.codigo||'';
+  document.getElementById('prodDesc').value=p?.descripcion||'';
+  document.getElementById('prodPrecio').value=p?.precio||'';
+  document.getElementById('prodUnidad').value=p?.unidad||'Unidad';
+  document.getElementById('prodTipo').value=p?.tipo||'Servicio';
+  document.getElementById('prodIVA').value=p?.iva||'si';
+  document.getElementById('modalProd').classList.add('open');
+}
+function saveProd(){
+  const id=document.getElementById('prodId').value;
+  const obj={codigo:document.getElementById('prodCod').value,tipo:document.getElementById('prodTipo').value,descripcion:document.getElementById('prodDesc').value,precio:parseFloat(document.getElementById('prodPrecio').value)||0,unidad:document.getElementById('prodUnidad').value,iva:document.getElementById('prodIVA').value};
+  if(!obj.descripcion){alert('Ingresa la descripción');return;}
+  if(id){const idx=PRODUCTOS.findIndex(p=>p.id==id);if(idx>=0)PRODUCTOS[idx]={...PRODUCTOS[idx],...obj};}
+  else PRODUCTOS.push({id:uid(),...obj});
+  saveAll();closeModal('modalProd');renderProdTable();
+}
+function delProd(id){if(!confirm('¿Eliminar?'))return;PRODUCTOS=PRODUCTOS.filter(p=>p.id!==id);saveAll();renderProdTable();}
+
+// ── RESUMEN ──
+function renderResumen(){
+  const docs=DOCUMENTOS.filter(d=>d.estado!=='Anulada');
+  const totalFact=docs.reduce((s,d)=>s+d.total,0);
+  const porCobrar=docs.filter(d=>['Emitida','Vencida'].includes(d.estado)).reduce((s,d)=>s+d.total,0);
+  const cobrado=docs.filter(d=>d.estado==='Pagada').reduce((s,d)=>s+d.total,0);
+  document.getElementById('kpiResumen').innerHTML=`
+    <div class="kpi"><div class="kpi-label">Facturación Total</div><div class="kpi-value" style="color:var(--acc)">${M(totalFact)}</div></div>
+    <div class="kpi" style="--kc:rgba(34,197,94,0.1)"><div class="kpi-label">Cobrado</div><div class="kpi-value" style="color:var(--ok)">${M(cobrado)}</div></div>
+    <div class="kpi" style="--kc:rgba(245,158,11,0.1)"><div class="kpi-label">Por Cobrar</div><div class="kpi-value" style="color:var(--warn)">${M(porCobrar)}</div></div>
+    <div class="kpi"><div class="kpi-label">IVA Débito Total</div><div class="kpi-value" style="color:var(--gold)">${M(docs.reduce((s,d)=>s+d.iva,0))}</div></div>
+  `;
+  // Ventas por mes
+  const byMes={};
+  docs.forEach(d=>{const m=d.fecha?.substring(0,7)||'';if(!byMes[m])byMes[m]=0;byMes[m]+=d.total;});
+  document.getElementById('resVentas').innerHTML=Object.entries(byMes).sort().map(([m,v])=>`
+    <div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:3px;font-size:11px;font-family:var(--mono)"><span>${m}</span><span style="color:var(--acc);font-weight:700">${clp(v)}</span></div>
+    <div style="background:rgba(255,255,255,0.07);border-radius:3px;height:6px"><div style="height:6px;border-radius:3px;background:var(--acc);width:${Math.min(100,(v/totalFact)*100)}%"></div></div></div>`).join('');
+
+  // Por estado
+  const estados={Emitida:0,Pagada:0,Vencida:0};
+  docs.forEach(d=>{if(estados[d.estado]!==undefined)estados[d.estado]+=d.total;});
+  document.getElementById('resEstado').innerHTML=Object.entries(estados).map(([e,v])=>`
+    <div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;font-family:var(--mono)">${e}</span><span style="font-size:13px;font-weight:700;color:${ESTADO_COLOR[e]};font-family:var(--mono)">${clp(v)}</span></div>
+    <div style="background:rgba(255,255,255,0.07);border-radius:3px;height:7px"><div style="height:7px;border-radius:3px;background:${ESTADO_COLOR[e]};width:${totalFact>0?Math.min(100,(v/totalFact)*100):0}%"></div></div></div>`).join('');
+
+  // Top clientes
+  const byCliente={};
+  docs.forEach(d=>{if(!byCliente[d.clienteNombre])byCliente[d.clienteNombre]=0;byCliente[d.clienteNombre]+=d.total;});
+  const topClis=Object.entries(byCliente).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  document.getElementById('resTopCli').innerHTML=topClis.map(([n,v],i)=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(56,189,248,0.06)">
+      <div style="font-size:13px;font-weight:800;color:var(--muted);font-family:var(--mono);width:20px">${i+1}</div>
+      <div style="flex:1;font-size:12px;font-family:var(--mono)">${n}</div>
+      <div style="font-size:14px;font-weight:800;color:var(--acc);font-family:var(--mono)">${clp(v)}</div>
+    </div>`).join('');
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
+
+loadAll();
+const today=new Date().toISOString().split('T')[0];
+document.getElementById('newFecha').value=today;
+const vcto=new Date();vcto.setDate(vcto.getDate()+30);
+document.getElementById('newVcto').value=vcto.toISOString().split('T')[0];
+document.getElementById('newFolio').value=DOCUMENTOS.filter(d=>d.tipo==='Factura').length+1;
+renderKPIs();renderDocs();
+populateClientesSelect();renderItems();updateTotales();
+document.getElementById('hInfo').textContent=`${DOCUMENTOS.length} documentos`;
+</script>
+</body>
+</html>

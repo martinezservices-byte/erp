@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Martinez Services Spa — Respaldo de Datos</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#04080F;--surf:#08101C;--surf2:#0D1826;
+  --border:rgba(201,168,76,0.15);--border2:rgba(201,168,76,0.07);
+  --gold:#C9A84C;--goldHi:#E8C97A;
+  --white:#F2EFEA;--muted:#4A5568;--mutedHi:#718096;
+  --ok:#22C55E;--danger:#EF4444;--warn:#F59E0B;--info:#38BDF8;
+}
+body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;min-height:100vh;}
+#header{background:var(--surf);border-bottom:1px solid var(--border2);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:14px;}
+.logo-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--goldHi));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--bg);}
+.logo-name{font-size:15px;font-weight:800;}
+.logo-mod{font-size:10px;color:var(--gold);font-weight:700;letter-spacing:2px;font-family:monospace;}
+.content{max-width:900px;margin:0 auto;padding:28px 24px 60px;}
+.card{background:var(--surf);border-radius:14px;padding:22px;border:1px solid var(--border2);margin-bottom:16px;}
+.card-title{font-size:15px;font-weight:800;margin-bottom:6px;}
+.card-sub{font-size:11px;color:var(--muted);font-family:monospace;margin-bottom:18px;}
+.btn-gold{padding:11px 24px;border-radius:9px;border:none;cursor:pointer;font-weight:700;font-size:13px;font-family:monospace;background:var(--gold);color:var(--bg);transition:all .15s;display:inline-flex;align-items:center;gap:8px;}
+.btn-gold:hover{background:var(--goldHi);}
+.btn-outline{padding:11px 24px;border-radius:9px;cursor:pointer;font-weight:700;font-size:13px;font-family:monospace;background:transparent;border:1px solid var(--border);color:var(--mutedHi);transition:all .15s;display:inline-flex;align-items:center;gap:8px;}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+.btn-danger{padding:11px 24px;border-radius:9px;border:none;cursor:pointer;font-weight:700;font-size:13px;font-family:monospace;background:transparent;border:1px solid rgba(239,68,68,0.4);color:var(--danger);transition:all .15s;display:inline-flex;align-items:center;gap:8px;}
+.btn-danger:hover{background:rgba(239,68,68,0.08);}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:18px;}
+.mod-item{background:var(--bg);border-radius:10px;padding:14px;border:1px solid var(--border2);display:flex;flex-direction:column;gap:6px;}
+.mod-name{font-size:12px;font-weight:700;font-family:monospace;}
+.mod-key{font-size:10px;color:var(--muted);font-family:monospace;}
+.mod-size{font-size:11px;font-family:monospace;}
+.mod-status{font-size:10px;font-weight:700;font-family:monospace;}
+.badge{display:inline-flex;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;font-family:monospace;}
+.log{background:var(--bg);border-radius:10px;padding:16px;border:1px solid var(--border2);font-family:monospace;font-size:11px;max-height:200px;overflow-y:auto;margin-top:14px;}
+.log-line{padding:3px 0;border-bottom:1px solid rgba(201,168,76,0.04);}
+.log-ok{color:var(--ok);}
+.log-warn{color:var(--warn);}
+.log-info{color:var(--info);}
+.log-err{color:var(--danger);}
+.prog-wrap{background:rgba(255,255,255,0.07);border-radius:4px;height:8px;margin:10px 0;}
+.prog-bar{height:8px;border-radius:4px;background:var(--gold);transition:width .3s;}
+.tip{background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.2);border-radius:10px;padding:12px 16px;display:flex;gap:10px;margin-bottom:14px;}
+.tip-text{font-size:12px;color:var(--mutedHi);line-height:1.6;}
+.warn-box{background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:12px 16px;display:flex;gap:10px;margin-bottom:14px;}
+.restore-area{background:var(--bg);border:2px dashed rgba(201,168,76,0.25);border-radius:10px;padding:24px;text-align:center;cursor:pointer;margin-bottom:14px;}
+.restore-area:hover{border-color:var(--gold);background:rgba(201,168,76,0.03);}
+textarea.restore-input{width:100%;height:120px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-family:monospace;font-size:11px;padding:12px;outline:none;resize:vertical;}
+textarea.restore-input:focus{border-color:var(--gold);}
+#footer{border-top:1px solid var(--border2);padding:13px 28px;font-size:10px;color:var(--muted);font-family:monospace;}
+@media(max-width:600px){.modules-grid{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="logo">
+    <div class="logo-icon">M</div>
+    <div>
+      <div class="logo-name">Martinez Services Spa</div>
+      <div class="logo-mod">RESPALDO Y RESTAURACIÓN DE DATOS</div>
+    </div>
+  </div>
+  <span style="font-size:11px;color:var(--muted);font-family:monospace" id="hFecha">—</span>
+</div>
+
+<div class="content">
+
+  <!-- ESTADO ACTUAL -->
+  <div class="card">
+    <div class="card-title">📊 Estado Actual de los Datos</div>
+    <div class="card-sub">Datos almacenados en este navegador por módulo</div>
+    <div class="modules-grid" id="modulesGrid"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div style="font-size:12px;font-family:monospace;color:var(--muted)">Total almacenado: <span id="totalSize" style="color:var(--gold);font-weight:700">calculando...</span></div>
+      <button class="btn-outline" onclick="refreshStatus()">🔄 Actualizar</button>
+    </div>
+  </div>
+
+  <!-- EXPORTAR COMPLETO -->
+  <div class="card">
+    <div class="card-title">💾 Exportar Respaldo Completo</div>
+    <div class="card-sub">Descarga un archivo JSON con TODOS tus datos — trabajadores, liquidaciones, finanzas, contratos, etc.</div>
+    <div class="tip">
+      <div style="font-size:16px">💡</div>
+      <div class="tip-text"><strong>Recomendado:</strong> Haz un respaldo cada semana o antes de cambiar de computador. El archivo JSON contiene absolutamente todos tus datos y puedes restaurarlos en cualquier momento.</div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+      <button class="btn-gold" onclick="exportarTodo()">⬇ Exportar TODO (JSON)</button>
+      <button class="btn-outline" onclick="exportarCSVTodo()">📊 Exportar CSV por módulo</button>
+    </div>
+    <div id="exportLog" class="log" style="display:none"></div>
+  </div>
+
+  <!-- EXPORTAR POR MÓDULO -->
+  <div class="card">
+    <div class="card-title">📁 Exportar Módulo Individual</div>
+    <div class="card-sub">Descarga los datos de un módulo específico en CSV para abrir en Excel</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap" id="btnsMods"></div>
+  </div>
+
+  <!-- RESTAURAR -->
+  <div class="card">
+    <div class="card-title">📤 Restaurar desde Respaldo</div>
+    <div class="card-sub">Carga un archivo de respaldo JSON previamente exportado</div>
+    <div class="warn-box">
+      <div style="font-size:16px">⚠</div>
+      <div class="tip-text"><strong>Atención:</strong> Restaurar reemplazará los datos actuales del módulo o de todo el sistema. Haz un respaldo antes si tienes datos que quieras conservar.</div>
+    </div>
+    <div class="restore-area" onclick="document.getElementById('fileInput').click()">
+      <div style="font-size:32px;margin-bottom:8px">📂</div>
+      <div style="font-size:13px;color:var(--mutedHi)">Arrastra o <span style="color:var(--gold)">selecciona tu archivo de respaldo</span></div>
+      <div style="font-size:11px;color:var(--muted);font-family:monospace;margin-top:4px">Formatos aceptados: .json</div>
+    </div>
+    <input type="file" id="fileInput" accept=".json" style="display:none" onchange="cargarArchivo(this)"/>
+    <div id="previewRestore" style="display:none">
+      <div style="font-size:12px;color:var(--ok);font-family:monospace;margin-bottom:10px" id="previewMsg"></div>
+      <div id="previewContent" style="background:var(--bg);border-radius:8px;padding:14px;border:1px solid var(--border2);font-size:11px;font-family:monospace;max-height:200px;overflow-y:auto;margin-bottom:14px"></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-gold" onclick="restaurarTodo()">✓ Restaurar Datos</button>
+        <button class="btn-outline" onclick="cancelarRestore()">Cancelar</button>
+      </div>
+    </div>
+    <div id="restoreLog" class="log" style="display:none"></div>
+  </div>
+
+  <!-- LIMPIAR DATOS -->
+  <div class="card" style="border-color:rgba(239,68,68,0.15)">
+    <div class="card-title" style="color:var(--danger)">🗑 Limpiar Datos</div>
+    <div class="card-sub">Eliminar datos de módulos específicos o todo el sistema</div>
+    <div class="warn-box">
+      <div style="font-size:16px">⚠</div>
+      <div class="tip-text"><strong>Esta acción no se puede deshacer.</strong> Asegúrate de haber exportado un respaldo antes de limpiar datos.</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn-danger" onclick="limpiarModulo()">🗑 Limpiar un módulo...</button>
+      <button class="btn-danger" onclick="limpiarTodo()">⛔ Limpiar TODO el sistema</button>
+    </div>
+  </div>
+
+  <!-- GUÍA RÁPIDA -->
+  <div class="card">
+    <div class="card-title">📋 Guía Rápida de Respaldo</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      ${[
+        {icon:'🗓',titulo:'Respaldo semanal',desc:'Exporta el JSON completo cada lunes. Guárdalo en Google Drive o Dropbox.'},
+        {icon:'💻',titulo:'Cambiar computador',desc:'Exporta en el computador viejo → Restaura en el nuevo. Todos tus datos se transfieren.'},
+        {icon:'🔄',titulo:'Antes de actualizar',desc:'Siempre exporta antes de subir una versión nueva del sistema a GitHub.'},
+        {icon:'📧',titulo:'Respaldo en email',desc:'Puedes enviarte el archivo JSON a tu propio email como respaldo adicional.'},
+      ].map(t=>`<div style="background:var(--bg);border-radius:10px;padding:14px;border:1px solid var(--border2)"><div style="font-size:20px;margin-bottom:6px">${t.icon}</div><div style="font-size:12px;font-weight:700;margin-bottom:4px">${t.titulo}</div><div style="font-size:11px;color:var(--muted);line-height:1.6">${t.desc}</div></div>`).join('')}
+    </div>
+  </div>
+
+</div>
+
+<div id="footer">
+  <span>Martinez Services Spa · Sistema de Respaldo v1.0 · 2025</span>
+  <span>Los datos se guardan automáticamente en el navegador (localStorage)</span>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// MÓDULOS Y SUS STORAGE KEYS
+// ════════════════════════════════════════
+const MODULOS = [
+  {nombre:'Empresas Hub',     key:'mss_hub_v3',               icon:'🏢', color:'#C9A84C'},
+  {nombre:'Finanzas',         key:'mss_finanzas_v1',           icon:'₲',  color:'#C9A84C'},
+  {nombre:'Trabajadores',     key:'mss_rem_trabajadores_v1',   icon:'👥', color:'#22C55E'},
+  {nombre:'Liquidaciones',    key:'mss_rem_liquidaciones_v1',  icon:'📄', color:'#22C55E'},
+  {nombre:'Vacaciones',       key:'mss_rem_vacaciones_v1',     icon:'🏖', color:'#22C55E'},
+  {nombre:'Finiquitos',       key:'mss_rem_finiquitos_v1',     icon:'📋', color:'#22C55E'},
+  {nombre:'Parámetros Rem.',  key:'mss_rem_params_v1',         icon:'⚙',  color:'#22C55E'},
+  {nombre:'Asientos Cont.',   key:'mss_cont_asientos_v1',      icon:'📗', color:'#10B981'},
+  {nombre:'Plan Cuentas',     key:'mss_cont_cuentas_v1',       icon:'📗', color:'#10B981'},
+  {nombre:'Facturación Docs', key:'mss_fact_docs_v1',          icon:'🧾', color:'#38BDF8'},
+  {nombre:'Clientes Fact.',   key:'mss_fact_clis_v1',          icon:'🏢', color:'#38BDF8'},
+  {nombre:'Productos',        key:'mss_fact_prods_v1',         icon:'📦', color:'#38BDF8'},
+  {nombre:'Cuentas Banco',    key:'mss_tes_cuentas_v1',        icon:'🏦', color:'#FBBF24'},
+  {nombre:'Movimientos',      key:'mss_tes_movs_v1',           icon:'💳', color:'#FBBF24'},
+  {nombre:'Presupuesto Tes.', key:'mss_tes_presup_v1',         icon:'📋', color:'#FBBF24'},
+  {nombre:'Contratos',        key:'mss_contratos_v1',          icon:'📄', color:'#A78BFA'},
+  {nombre:'Anexos',           key:'mss_anexos_v1',             icon:'📎', color:'#A78BFA'},
+  {nombre:'Proyectos',        key:'mss_proyectos_v1',          icon:'◈',  color:'#38BDF8'},
+  {nombre:'Tareas',           key:'mss_tareas_v1',             icon:'✅', color:'#38BDF8'},
+  {nombre:'Clientes CRM',     key:'mss_clientes_v1',           icon:'◎',  color:'#FB923C'},
+  {nombre:'Ventas Plan',      key:'mss_ventas_v1',             icon:'📈', color:'#FB923C'},
+  {nombre:'Personas RRHH',    key:'mss_personas_v1',           icon:'◉',  color:'#A78BFA'},
+  {nombre:'Clima Org.',       key:'mss_clima_v1',              icon:'🌡', color:'#A78BFA'},
+  {nombre:'Formaciones',      key:'mss_formacion_v1',          icon:'📚', color:'#A78BFA'},
+  {nombre:'KPIs',             key:'mss_kpis_v1',               icon:'◆',  color:'#10B981'},
+  {nombre:'SMART',            key:'mss_smart_v1',              icon:'🎯', color:'#10B981'},
+  {nombre:'FODA',             key:'mss_foda_v1',               icon:'⬡',  color:'#10B981'},
+  {nombre:'PESTEL',           key:'mss_pestel_v1',             icon:'🌐', color:'#10B981'},
+  {nombre:'Plan Estrat.',     key:'mss_plan_v1',               icon:'🗺', color:'#10B981'},
+  {nombre:'ERP Multi-Emp.',   key:'mss_erp3_empresas',         icon:'🏗', color:'#C9A84C'},
+  {nombre:'ERP Data',         key:'mss_erp3_data',             icon:'💾', color:'#C9A84C'},
+];
+
+let pendingRestore = null;
+
+// ════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════
+function getSize(key){
+  const val = localStorage.getItem(key);
+  if(!val) return 0;
+  return new Blob([val]).size;
+}
+function formatSize(bytes){
+  if(bytes===0) return '—';
+  if(bytes<1024) return bytes+'B';
+  return (bytes/1024).toFixed(1)+'KB';
+}
+function log(containerId, msg, tipo='info'){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  el.style.display='block';
+  const icons = {ok:'✓',warn:'⚠',info:'ℹ',err:'✕'};
+  el.innerHTML += `<div class="log-line log-${tipo}">${icons[tipo]} ${new Date().toLocaleTimeString('es-CL')} — ${msg}</div>`;
+  el.scrollTop = el.scrollHeight;
+}
+function dateStr(){
+  const d=new Date();
+  return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}_${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}`;
+}
+function download(content, filename, type='application/json'){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([content],{type}));
+  a.download=filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ════════════════════════════════════════
+// STATUS
+// ════════════════════════════════════════
+function refreshStatus(){
+  let totalBytes=0;
+  const grid=document.getElementById('modulesGrid');
+  grid.innerHTML='';
+  MODULOS.forEach(m=>{
+    const val=localStorage.getItem(m.key);
+    const size=getSize(m.key);
+    totalBytes+=size;
+    let count='—', statusColor='var(--muted)', statusTxt='Sin datos';
+    if(val){
+      try{
+        const parsed=JSON.parse(val);
+        if(Array.isArray(parsed)){count=parsed.length+' reg.';statusColor='var(--ok)';statusTxt='Con datos';}
+        else if(typeof parsed==='object'){count=Object.keys(parsed).length+' items';statusColor='var(--ok)';statusTxt='Con datos';}
+        else{count='1';statusColor='var(--ok)';statusTxt='Con datos';}
+      }catch(e){count='?';statusColor='var(--warn)';statusTxt='Error formato';}
+    }
+    grid.innerHTML+=`<div class="mod-item">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:16px">${m.icon}</span>
+        <span class="mod-name">${m.nombre}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="mod-size" style="color:${statusColor}">${count}</span>
+        <span class="badge" style="background:${statusColor}20;color:${statusColor};border:1px solid ${statusColor}40">${size>0?formatSize(size):'vacío'}</span>
+      </div>
+    </div>`;
+  });
+  document.getElementById('totalSize').textContent = formatSize(totalBytes);
+}
+
+// ════════════════════════════════════════
+// EXPORTAR TODO (JSON)
+// ════════════════════════════════════════
+function exportarTodo(){
+  const backup = {
+    version: '3.0',
+    fecha: new Date().toISOString(),
+    empresa: 'Martinez Services Spa',
+    modulos: {}
+  };
+  let count=0;
+  document.getElementById('exportLog').innerHTML='';
+  MODULOS.forEach(m=>{
+    const val=localStorage.getItem(m.key);
+    if(val){
+      backup.modulos[m.key]=JSON.parse(val);
+      count++;
+      log('exportLog',`${m.icon} ${m.nombre} — ${formatSize(getSize(m.key))}`,'ok');
+    }
+  });
+  const json=JSON.stringify(backup,null,2);
+  const filename=`MSS_Respaldo_Completo_${dateStr()}.json`;
+  download(json,filename);
+  log('exportLog',`✅ Respaldo completo exportado: ${filename} (${count} módulos, ${formatSize(new Blob([json]).size)})`,'ok');
+}
+
+// ════════════════════════════════════════
+// EXPORTAR CSV POR MÓDULO
+// ════════════════════════════════════════
+function exportarCSVTodo(){
+  document.getElementById('exportLog').innerHTML='';
+  log('exportLog','Exportando CSVs por módulo...','info');
+  // Finanzas
+  const fin=localStorage.getItem('mss_finanzas_v1');
+  if(fin){
+    try{
+      const data=JSON.parse(fin);
+      if(Array.isArray(data)){
+        let csv='mes,ingresos,gastos,utilidad,rentabilidad,categoria\n';
+        data.forEach(r=>{const u=r.ingresos-r.gastos;csv+=`"${r.mes}",${r.ingresos},${r.gastos},${u},${r.ingresos>0?((u/r.ingresos)*100).toFixed(1):0}%,"${r.cat||'—'}"\n`;});
+        download(csv,`MSS_Finanzas_${dateStr()}.csv`,'text/csv');
+        log('exportLog','₲ Finanzas exportado','ok');
+      }
+    }catch(e){log('exportLog','Error Finanzas','err');}
+  }
+  // Trabajadores
+  const trabs=localStorage.getItem('mss_rem_trabajadores_v1');
+  if(trabs){
+    try{
+      const data=JSON.parse(trabs);
+      if(Array.isArray(data)){
+        let csv='nombre,rut,cargo,area,contrato,sueldo,afp,salud,estado,ingreso\n';
+        data.forEach(r=>{csv+=`"${r.nombre}","${r.rut}","${r.cargo}","${r.area}","${r.contrato}",${r.sueldo},"${r.afp}","${r.salud}","${r.estado}","${r.ingreso}"\n`;});
+        download(csv,`MSS_Trabajadores_${dateStr()}.csv`,'text/csv');
+        log('exportLog','👥 Trabajadores exportado','ok');
+      }
+    }catch(e){log('exportLog','Error Trabajadores','err');}
+  }
+  // Liquidaciones
+  const liqs=localStorage.getItem('mss_rem_liquidaciones_v1');
+  if(liqs){
+    try{
+      const data=JSON.parse(liqs);
+      if(Array.isArray(data)){
+        let csv='periodo,trabajador,rut,sueldo_base,gratificacion,total_haberes,total_descuentos,liquido,estado\n';
+        data.forEach(r=>{csv+=`"${r.periodo}","${r.nombre}","${r.rut}",${r.sueldoBase||0},${r.gratif||0},${r.totalHaberes||0},${r.totalDescuentos||0},${r.liquido||0},"${r.estado}"\n`;});
+        download(csv,`MSS_Liquidaciones_${dateStr()}.csv`,'text/csv');
+        log('exportLog','📄 Liquidaciones exportado','ok');
+      }
+    }catch(e){log('exportLog','Error Liquidaciones','err');}
+  }
+  // Contratos
+  const ctrs=localStorage.getItem('mss_contratos_v1');
+  if(ctrs){
+    try{
+      const data=JSON.parse(ctrs);
+      if(Array.isArray(data)){
+        let csv='tipo,contraparte,rut,cargo,inicio,termino,monto,estado\n';
+        data.forEach(r=>{csv+=`"${r.tipo}","${r.contraparte}","${r.rut}","${r.cargo}","${r.inicio}","${r.termino||'Indefinido'}",${r.monto},"${r.estado}"\n`;});
+        download(csv,`MSS_Contratos_${dateStr()}.csv`,'text/csv');
+        log('exportLog','📄 Contratos exportado','ok');
+      }
+    }catch(e){log('exportLog','Error Contratos','err');}
+  }
+  // Facturación
+  const docs=localStorage.getItem('mss_fact_docs_v1');
+  if(docs){
+    try{
+      const data=JSON.parse(docs);
+      if(Array.isArray(data)){
+        let csv='tipo,folio,fecha,cliente,rut,glosa,neto,iva,total,estado\n';
+        data.forEach(r=>{csv+=`"${r.tipo}",${r.folio},"${r.fecha}","${r.clienteNombre}","${r.clienteRut}","${r.glosa}",${r.neto},${r.iva},${r.total},"${r.estado}"\n`;});
+        download(csv,`MSS_Facturacion_${dateStr()}.csv`,'text/csv');
+        log('exportLog','🧾 Facturación exportado','ok');
+      }
+    }catch(e){log('exportLog','Error Facturación','err');}
+  }
+  // Movimientos tesorería
+  const movs=localStorage.getItem('mss_tes_movs_v1');
+  if(movs){
+    try{
+      const data=JSON.parse(movs);
+      if(Array.isArray(data)){
+        let csv='fecha,tipo,categoria,descripcion,monto,referencia,estado\n';
+        data.forEach(r=>{csv+=`"${r.fecha}","${r.tipo}","${r.cat}","${r.desc}",${r.monto},"${r.ref||''}","${r.estado}"\n`;});
+        download(csv,`MSS_Tesoreria_${dateStr()}.csv`,'text/csv');
+        log('exportLog','🏦 Tesorería exportado','ok');
+      }
+    }catch(e){log('exportLog','Error Tesorería','err');}
+  }
+  log('exportLog','✅ Exportación CSV completada — revisa tus descargas','ok');
+}
+
+// ════════════════════════════════════════
+// BOTONES INDIVIDUALES
+// ════════════════════════════════════════
+function renderBtnsMods(){
+  document.getElementById('btnsMods').innerHTML=MODULOS.filter(m=>localStorage.getItem(m.key)).map(m=>`
+    <button class="btn-outline" style="font-size:11px;padding:8px 14px" onclick="exportarModulo('${m.key}','${m.nombre}')">
+      ${m.icon} ${m.nombre}
+    </button>`).join('');
+}
+
+function exportarModulo(key,nombre){
+  const val=localStorage.getItem(key);
+  if(!val){alert('Sin datos para '+nombre);return;}
+  const backup={version:'3.0',fecha:new Date().toISOString(),modulo:nombre,key,data:JSON.parse(val)};
+  download(JSON.stringify(backup,null,2),`MSS_${nombre.replace(/ /g,'_')}_${dateStr()}.json`);
+}
+
+// ════════════════════════════════════════
+// RESTAURAR
+// ════════════════════════════════════════
+function cargarArchivo(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      pendingRestore=data;
+      const modCount=data.modulos?Object.keys(data.modulos).length:1;
+      const isFull=!!data.modulos;
+      document.getElementById('previewMsg').textContent=`✓ Archivo válido: ${file.name} — ${isFull?`Respaldo completo con ${modCount} módulos`:'Módulo individual: '+data.modulo}`;
+      document.getElementById('previewContent').innerHTML=`
+        <div style="color:var(--gold);margin-bottom:6px">Fecha del respaldo: ${new Date(data.fecha).toLocaleString('es-CL')}</div>
+        <div style="color:var(--white);margin-bottom:6px">Empresa: ${data.empresa||data.modulo||'—'}</div>
+        <div style="color:var(--mutedHi)">Módulos: ${isFull?Object.keys(data.modulos).map(k=>{const m=MODULOS.find(x=>x.key===k);return m?m.nombre:k;}).join(', '):data.modulo}</div>
+      `;
+      document.getElementById('previewRestore').style.display='block';
+    }catch(err){alert('Archivo inválido — asegúrate de usar un respaldo exportado desde este sistema');}
+  };
+  reader.readAsText(file);
+}
+
+function restaurarTodo(){
+  if(!pendingRestore){alert('Sin datos para restaurar');return;}
+  document.getElementById('restoreLog').innerHTML='';
+  if(pendingRestore.modulos){
+    // Respaldo completo
+    let count=0;
+    Object.entries(pendingRestore.modulos).forEach(([key,val])=>{
+      try{
+        localStorage.setItem(key,JSON.stringify(val));
+        const m=MODULOS.find(x=>x.key===key);
+        log('restoreLog',`${m?m.icon:'📦'} ${m?m.nombre:key} restaurado`,'ok');
+        count++;
+      }catch(err){log('restoreLog',`Error restaurando ${key}`,'err');}
+    });
+    log('restoreLog',`✅ Restauración completa: ${count} módulos restaurados`,'ok');
+  } else {
+    // Módulo individual
+    try{
+      localStorage.setItem(pendingRestore.key,JSON.stringify(pendingRestore.data));
+      log('restoreLog',`✅ ${pendingRestore.modulo} restaurado correctamente`,'ok');
+    }catch(err){log('restoreLog','Error al restaurar','err');}
+  }
+  document.getElementById('previewRestore').style.display='none';
+  pendingRestore=null;
+  setTimeout(()=>{refreshStatus();renderBtnsMods();},500);
+}
+
+function cancelarRestore(){
+  pendingRestore=null;
+  document.getElementById('previewRestore').style.display='none';
+  document.getElementById('fileInput').value='';
+}
+
+// ════════════════════════════════════════
+// LIMPIAR
+// ════════════════════════════════════════
+function limpiarModulo(){
+  const opts=MODULOS.filter(m=>localStorage.getItem(m.key)).map(m=>`${m.icon} ${m.nombre}`).join('\n');
+  const choice=prompt(`¿Qué módulo deseas limpiar?\n\nEscribe el nombre exacto:\n\n${opts}`);
+  if(!choice)return;
+  const m=MODULOS.find(x=>(`${x.icon} ${x.nombre}`).toLowerCase()===choice.toLowerCase());
+  if(!m){alert('No se encontró ese módulo');return;}
+  if(!confirm(`¿Limpiar "${m.nombre}"? Esta acción no se puede deshacer.`))return;
+  localStorage.removeItem(m.key);
+  alert(`✓ ${m.nombre} limpiado`);
+  refreshStatus();renderBtnsMods();
+}
+
+function limpiarTodo(){
+  if(!confirm('⚠ ¿Limpiar TODOS los datos del sistema?\n\nEsta acción eliminará todos los trabajadores, liquidaciones, contratos, facturación y demás datos.\n\nAsegúrate de haber exportado un respaldo primero.\n\n¿Continuar?'))return;
+  if(!confirm('Segunda confirmación: ¿Estás SEGURO de limpiar todo?'))return;
+  MODULOS.forEach(m=>localStorage.removeItem(m.key));
+  alert('✓ Sistema limpiado. Puedes restaurar desde un respaldo.');
+  refreshStatus();renderBtnsMods();
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+document.getElementById('hFecha').textContent = new Date().toLocaleString('es-CL');
+refreshStatus();
+renderBtnsMods();
+</script>
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Instrucciones GitHub Pages — Martinez Services Spa</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#04080F;--surf:#08101C;--surf2:#0D1826;--border:rgba(201,168,76,0.15);--border2:rgba(201,168,76,0.07);--gold:#C9A84C;--goldHi:#E8C97A;--white:#F2EFEA;--muted:#4A5568;--mutedHi:#718096;--ok:#22C55E;--danger:#EF4444;--warn:#F59E0B;--info:#38BDF8;}
+body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;min-height:100vh;padding:0;}
+#header{background:var(--surf);border-bottom:1px solid var(--border2);padding:0 36px;height:58px;display:flex;align-items:center;gap:14px;}
+.logo-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--goldHi));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--bg);}
+.logo-name{font-size:15px;font-weight:800;}
+.logo-mod{font-size:10px;color:var(--gold);font-weight:700;letter-spacing:2px;font-family:monospace;}
+.content{max-width:900px;margin:0 auto;padding:32px 24px 60px;}
+h1{font-size:28px;font-weight:900;margin-bottom:8px;}
+h1 span{color:var(--gold);}
+.intro{font-size:14px;color:var(--mutedHi);line-height:1.7;margin-bottom:32px;max-width:680px;}
+/* STEPS */
+.step{background:var(--surf);border-radius:16px;border:1px solid var(--border2);margin-bottom:20px;overflow:hidden;}
+.step-header{display:flex;align-items:center;gap:16px;padding:20px 24px;border-bottom:1px solid var(--border2);background:var(--surf2);}
+.step-num{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--gold),var(--goldHi));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:var(--bg);flex-shrink:0;}
+.step-title{font-size:16px;font-weight:800;}
+.step-sub{font-size:11px;color:var(--muted);font-family:monospace;margin-top:3px;}
+.step-body{padding:22px 24px;}
+.step-img{background:var(--surf2);border-radius:12px;border:1px solid var(--border2);padding:20px;margin-bottom:16px;font-family:monospace;font-size:12px;line-height:1.8;}
+.step-img .url{color:var(--gold);font-weight:700;}
+.step-img .btn-sim{display:inline-block;background:var(--info);color:white;padding:4px 12px;border-radius:5px;font-size:11px;font-weight:700;margin:0 4px;}
+.step-img .btn-green{background:var(--ok);}
+.step-img .highlight{background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.3);border-radius:5px;padding:2px 8px;color:var(--gold);}
+.step-img .arrow{color:var(--gold);font-size:16px;}
+.tip{background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start;}
+.tip-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.tip-text{font-size:12px;color:var(--mutedHi);line-height:1.6;}
+.warn-box{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start;}
+.ok-box{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start;}
+.badge{display:inline-flex;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;font-family:monospace;white-space:nowrap;}
+/* FILES LIST */
+.files-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;}
+.file-item{background:var(--bg);border-radius:8px;padding:10px 14px;border:1px solid var(--border2);display:flex;align-items:center;gap:10px;}
+.file-icon{font-size:16px;}
+.file-name{font-size:11px;font-weight:700;font-family:monospace;color:var(--gold);}
+.file-desc{font-size:10px;color:var(--muted);}
+/* RESULT */
+.result-box{background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(16,185,129,0.05));border:1px solid rgba(34,197,94,0.3);border-radius:16px;padding:28px;text-align:center;margin-top:32px;}
+.result-url{font-size:22px;font-weight:900;color:var(--ok);font-family:monospace;margin:12px 0;}
+/* COSTOS */
+.cost-table{width:100%;border-collapse:collapse;font-size:12px;font-family:monospace;}
+.cost-table th{padding:8px 12px;text-align:left;color:var(--gold);font-weight:700;border-bottom:1px solid var(--border);}
+.cost-table td{padding:8px 12px;border-bottom:1px solid rgba(201,168,76,0.05);}
+#footer{border-top:1px solid var(--border2);padding:14px 36px;font-size:10px;color:var(--muted);font-family:monospace;}
+@media(max-width:600px){.files-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="logo-icon">M</div>
+  <div>
+    <div class="logo-name">Martinez Services Spa</div>
+    <div class="logo-mod">GUÍA DE PUBLICACIÓN — GITHUB PAGES</div>
+  </div>
+</div>
+
+<div class="content">
+  <div style="margin-bottom:8px"><span class="badge" style="background:rgba(34,197,94,0.15);color:var(--ok);border:1px solid rgba(34,197,94,0.3);">✓ Gratis para siempre</span> <span class="badge" style="background:rgba(56,189,248,0.15);color:var(--info);border:1px solid rgba(56,189,248,0.3);">⏱ 10 minutos</span> <span class="badge" style="background:rgba(201,168,76,0.15);color:var(--gold);border:1px solid rgba(201,168,76,0.3);">🔒 100% tuyo</span></div>
+  <h1 style="margin-top:12px">Publica tu ERP en <span>Internet</span></h1>
+  <p class="intro">Siguiendo estos pasos tendrás tu ERP en una URL propia, accesible desde cualquier celular, tablet o PC, gratis y para siempre. No necesitas saber programar — solo seguir las instrucciones.</p>
+
+  <!-- PASO 1 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Crear cuenta en GitHub</div>
+        <div class="step-sub">Si ya tienes cuenta, salta al Paso 2</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="tip"><div class="tip-icon">ℹ</div><div class="tip-text">GitHub es el servicio de hosting más confiable del mundo — usado por Microsoft, Google y millones de empresas. GitHub Pages es completamente gratis y nunca expira.</div></div>
+      <div class="step-img">
+        <div style="margin-bottom:8px">1. Abre el navegador y ve a:</div>
+        <div style="font-size:16px;margin-bottom:16px"><span class="url">https://github.com</span></div>
+        <div style="margin-bottom:8px">2. Haz clic en el botón verde <span class="btn-sim btn-green">Sign up</span></div>
+        <div style="margin-bottom:8px">3. Ingresa tu email: <span class="highlight">alejandro@martinezservices.cl</span></div>
+        <div style="margin-bottom:8px">4. Crea una contraseña segura</div>
+        <div style="margin-bottom:8px">5. Elige un nombre de usuario — <strong>este será parte de tu URL:</strong></div>
+        <div style="background:rgba(201,168,76,0.1);border-radius:8px;padding:12px;margin:8px 0;text-align:center;">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Si tu usuario es:</div>
+          <div style="font-size:16px;color:var(--gold);font-weight:700;">martinezservices</div>
+          <div style="font-size:11px;color:var(--muted);margin:6px 0">Tu URL será:</div>
+          <div style="font-size:16px;color:var(--ok);font-weight:700;">martinezservices.github.io/erp</div>
+        </div>
+        <div>6. Completa verificación y confirma tu email</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO 2 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Crear un Repositorio</div>
+        <div class="step-sub">Es como una carpeta en la nube para tus archivos</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="step-img">
+        <div style="margin-bottom:8px">1. Una vez dentro de GitHub, haz clic en el botón <span class="btn-sim btn-green">+ New</span> (esquina superior izquierda)</div>
+        <div style="margin-bottom:8px">2. En "Repository name" escribe exactamente: <span class="highlight">erp</span></div>
+        <div style="margin-bottom:8px">3. Selecciona <span class="highlight">✓ Public</span> (debe ser público para GitHub Pages gratis)</div>
+        <div style="margin-bottom:8px">4. Marca la casilla <span class="highlight">☑ Add a README file</span></div>
+        <div style="margin-bottom:8px">5. Haz clic en <span class="btn-sim btn-green">Create repository</span></div>
+      </div>
+      <div class="tip"><div class="tip-icon">💡</div><div class="tip-text">El repositorio es la "carpeta" donde vivirán todos tus archivos HTML. Una vez creado, cualquier archivo que subas ahí será parte de tu sitio web.</div></div>
+    </div>
+  </div>
+
+  <!-- PASO 3 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Subir todos los archivos HTML</div>
+        <div class="step-sub">Asegúrate de tener todos los archivos en una sola carpeta</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="ok-box"><div style="font-size:16px">📁</div><div style="font-size:12px;color:var(--mutedHi)"><strong>Archivos a subir — todos en una misma carpeta de tu computador:</strong></div></div>
+      <div class="files-grid">
+        <div class="file-item"><div class="file-icon">🏠</div><div><div class="file-name">index.html</div><div class="file-desc">← Hub principal (ESTE ES LA PORTADA)</div></div></div>
+        <div class="file-item"><div class="file-icon">📄</div><div><div class="file-name">MSS-Finanzas.html</div><div class="file-desc">Módulo Finanzas</div></div></div>
+        <div class="file-item"><div class="file-icon">📄</div><div><div class="file-name">MSS-Remuneraciones.html</div><div class="file-desc">Liquidaciones completas</div></div></div>
+        <div class="file-item"><div class="file-icon">📄</div><div><div class="file-name">MSS-Contabilidad.html</div><div class="file-desc">Libro Diario, Balance</div></div></div>
+        <div class="file-item"><div class="file-icon">📄</div><div><div class="file-name">MSS-Facturacion.html</div><div class="file-desc">Facturas, boletas</div></div></div>
+        <div class="file-item"><div class="file-icon">📄</div><div><div class="file-name">MSS-Tesoreria.html</div><div class="file-desc">Cuentas bancarias</div></div></div>
+        <div class="file-item"><div class="file-icon">📄</div><div><div class="file-name">MSS-Contratos.html</div><div class="file-desc">Contratos y documentos</div></div></div>
+        <div class="file-item"><div class="file-icon">📄</div><div><div class="file-name">MSS-Proyectos.html</div><div class="file-desc">Gestión proyectos</div></div></div>
+        <div class="file-item"><div class="file-icon">📄</div><div><div class="file-name">MSS-Ventas-CRM.html</div><div class="file-desc">Pipeline y CRM</div></div></div>
+        <div class="file-item"><div class="file-icon">📄</div><div><div class="file-name">MSS-RRHH.html</div><div class="file-desc">Gestión personas</div></div></div>
+        <div class="file-item"><div class="file-icon">📄</div><div><div class="file-name">MSS-Estrategia.html</div><div class="file-desc">KPI y estrategia</div></div></div>
+        <div class="file-item" style="border-color:rgba(201,168,76,0.3)"><div class="file-icon">📋</div><div><div class="file-name" style="color:var(--warn)">INSTRUCCIONES-GITHUB.html</div><div class="file-desc">Esta guía (opcional)</div></div></div>
+      </div>
+      <div class="step-img" style="margin-top:16px">
+        <div style="margin-bottom:8px">Para subir los archivos:</div>
+        <div style="margin-bottom:8px">1. Dentro de tu repositorio recién creado, haz clic en <span class="highlight">Add file</span> → <span class="highlight">Upload files</span></div>
+        <div style="margin-bottom:8px">2. <strong>Arrastra y suelta TODOS los archivos</strong> de golpe (selecciónalos todos con Ctrl+A)</div>
+        <div style="margin-bottom:8px">3. Espera a que todos se carguen (puede tomar 30-60 segundos)</div>
+        <div style="margin-bottom:8px">4. En la parte inferior escribe un mensaje: <span class="highlight">ERP Martinez Services - versión inicial</span></div>
+        <div>5. Haz clic en <span class="btn-sim btn-green">Commit changes</span></div>
+      </div>
+      <div class="warn-box"><div class="tip-icon">⚠</div><div class="tip-text"><strong>Importante:</strong> El archivo que se llama <strong>index.html</strong> es el que GitHub mostrará automáticamente como portada del sitio. No le cambies el nombre.</div></div>
+    </div>
+  </div>
+
+  <!-- PASO 4 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">Activar GitHub Pages</div>
+        <div class="step-sub">Esto publica tus archivos como sitio web</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="step-img">
+        <div style="margin-bottom:8px">1. En tu repositorio, haz clic en la pestaña <span class="highlight">⚙ Settings</span> (parte superior derecha)</div>
+        <div style="margin-bottom:8px">2. En el menú izquierdo busca y haz clic en <span class="highlight">Pages</span></div>
+        <div style="margin-bottom:8px">3. En "Source" selecciona <span class="highlight">Deploy from a branch</span></div>
+        <div style="margin-bottom:8px">4. En "Branch" selecciona <span class="highlight">main</span> y luego <span class="highlight">/ (root)</span></div>
+        <div style="margin-bottom:8px">5. Haz clic en <span class="btn-sim btn-green">Save</span></div>
+        <div style="margin-bottom:8px">6. Espera 2-3 minutos</div>
+        <div style="margin-bottom:8px">7. Recarga la página Settings → Pages</div>
+        <div>8. Verás el mensaje: <span style="color:var(--ok);font-weight:700">✓ Your site is live at https://tunombre.github.io/erp</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO 5 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-title">¡Tu ERP está en línea! 🎉</div>
+        <div class="step-sub">Accesible desde cualquier dispositivo, en cualquier lugar</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="result-box">
+        <div style="font-size:13px;color:var(--mutedHi);margin-bottom:6px">Tu ERP estará disponible en:</div>
+        <div class="result-url">https://tunombre.github.io/erp</div>
+        <div style="font-size:12px;color:var(--mutedHi);margin-bottom:20px">Reemplaza "tunombre" con tu nombre de usuario de GitHub</div>
+        <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+          <div style="text-align:center;background:rgba(34,197,94,0.1);border-radius:10px;padding:12px 20px;border:1px solid rgba(34,197,94,0.2)">
+            <div style="font-size:24px;margin-bottom:4px">💻</div>
+            <div style="font-size:11px;color:var(--ok);font-weight:700">Computador</div>
+          </div>
+          <div style="text-align:center;background:rgba(34,197,94,0.1);border-radius:10px;padding:12px 20px;border:1px solid rgba(34,197,94,0.2)">
+            <div style="font-size:24px;margin-bottom:4px">📱</div>
+            <div style="font-size:11px;color:var(--ok);font-weight:700">Celular</div>
+          </div>
+          <div style="text-align:center;background:rgba(34,197,94,0.1);border-radius:10px;padding:12px 20px;border:1px solid rgba(34,197,94,0.2)">
+            <div style="font-size:24px;margin-bottom:4px">🖥</div>
+            <div style="font-size:11px;color:var(--ok);font-weight:700">Tablet</div>
+          </div>
+          <div style="text-align:center;background:rgba(34,197,94,0.1);border-radius:10px;padding:12px 20px;border:1px solid rgba(34,197,94,0.2)">
+            <div style="font-size:24px;margin-bottom:4px">🌐</div>
+            <div style="font-size:11px;color:var(--ok);font-weight:700">Sin instalar nada</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO 6 OPCIONAL — DOMINIO PROPIO -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" style="background:linear-gradient(135deg,var(--info),#7DD3FC)">★</div>
+      <div>
+        <div class="step-title">Opcional — Dominio Propio</div>
+        <div class="step-sub">Para tener martinezservices.cl en vez de github.io</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="tip"><div class="tip-icon">💡</div><div class="tip-text">Si quieres que tu URL sea <strong style="color:var(--gold)">www.martinezservices.cl</strong> en vez de github.io, necesitas comprar un dominio. GitHub Pages seguirá siendo gratis — solo pagas el dominio.</div></div>
+      <table class="cost-table">
+        <thead><tr><th>Opción</th><th>Proveedor</th><th>Costo anual</th><th>URL resultante</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--white)">Sin dominio (gratis)</td><td style="color:var(--muted)">GitHub</td><td style="color:var(--ok)">$0 / año</td><td style="color:var(--muted);font-family:monospace">tunombre.github.io/erp</td></tr>
+          <tr><td style="color:var(--white)">.cl dominio propio</td><td style="color:var(--muted)">NIC Chile</td><td style="color:var(--warn)">~$12.000 / año</td><td style="color:var(--gold);font-family:monospace">martinezservices.cl</td></tr>
+          <tr><td style="color:var(--white)">.com dominio propio</td><td style="color:var(--muted)">Namecheap</td><td style="color:var(--warn)">~USD $12 / año</td><td style="color:var(--gold);font-family:monospace">martinezservices.com</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:14px;font-size:12px;color:var(--mutedHi);line-height:1.7">Para conectar un dominio propio: Settings → Pages → Custom domain → Escribe tu dominio → Save. Luego en tu proveedor de dominio apunta los DNS a GitHub. Si lo necesitas, pídeme ayuda y te guío paso a paso.</div>
+    </div>
+  </div>
+
+  <!-- ACTUALIZAR EL SISTEMA -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">🔄</div>
+      <div>
+        <div class="step-title">Cómo actualizar tu ERP</div>
+        <div class="step-sub">Cuando yo te haga mejoras o agregue módulos</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="step-img">
+        <div style="margin-bottom:8px">1. Descarga el archivo nuevo o mejorado que yo te entregue</div>
+        <div style="margin-bottom:8px">2. Ve a tu repositorio en <span class="url">github.com/tunombre/erp</span></div>
+        <div style="margin-bottom:8px">3. Haz clic en <span class="highlight">Add file</span> → <span class="highlight">Upload files</span></div>
+        <div style="margin-bottom:8px">4. Sube el archivo nuevo (reemplaza automáticamente el anterior)</div>
+        <div style="margin-bottom:8px">5. Haz clic en <span class="btn-sim btn-green">Commit changes</span></div>
+        <div>6. En 1-2 minutos el cambio está en vivo en tu URL ✓</div>
+      </div>
+      <div class="ok-box"><div style="font-size:16px">✅</div><div style="font-size:12px;color:var(--mutedHi)"><strong>Los datos de tus empresas no se pierden</strong> — se guardan en el navegador de cada usuario (localStorage). Actualizar los archivos HTML no borra los datos.</div></div>
+    </div>
+  </div>
+
+  <!-- PREGUNTAS FRECUENTES -->
+  <div style="background:var(--surf);border-radius:16px;border:1px solid var(--border2);padding:24px;margin-top:8px;">
+    <div style="font-size:16px;font-weight:800;margin-bottom:18px;">Preguntas Frecuentes</div>
+    ${[
+      {q:'¿Si dejo de usar Claude puedo seguir usando el ERP?','a':'Sí. Tu ERP es 100% tuyo. Una vez publicado en GitHub Pages funciona independientemente de Claude y de cualquier suscripción.'},
+      {q:'¿GitHub puede cerrar mi sitio?','a':'Es muy poco probable — GitHub Pages lleva más de 15 años funcionando. Pero como respaldo, siempre tienes los archivos HTML guardados en tu computador.'},
+      {q:'¿Puedo compartir el link con mis clientes?','a':'Sí. Puedes enviar el link de cualquier módulo directamente. Por ejemplo: "Aquí está su dashboard de KPIs: martinezservices.github.io/erp/MSS-Estrategia.html"'},
+      {q:'¿Los datos de mis clientes son visibles para otros?','a':'No. Los datos se guardan en el navegador de cada usuario (localStorage) y son privados. Nadie más puede ver los datos que ingresa otro usuario.'},
+      {q:'¿Puedo usar el ERP en el celular?','a':'Sí. Todos los módulos están optimizados para móvil. Abre el link desde Chrome en tu celular y funciona perfectamente.'},
+      {q:'¿Puedo agregar más módulos después?','a':'Sí. Solo le pides a Claude que te construya el nuevo módulo, descargas el archivo y lo subes a GitHub. Se integra automáticamente.'},
+    ].map(f=>`<div style="border-bottom:1px solid rgba(201,168,76,0.06);padding:12px 0"><div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:5px">❓ ${f.q}</div><div style="font-size:12px;color:var(--mutedHi);line-height:1.6">${f.a}</div></div>`).join('')}
+  </div>
+
+</div>
+
+<div id="footer">
+  <span>Martinez Services Spa · Guía GitHub Pages · ERP Profesional v3.0 · 2025</span>
+</div>
+</body>
+</html>

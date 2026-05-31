@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Martinez Services Spa — Remuneraciones</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#04080F;--surf:#08101C;--surf2:#0D1826;--surf3:#122030;
+  --border:rgba(201,168,76,0.15);--border2:rgba(201,168,76,0.08);
+  --gold:#C9A84C;--goldHi:#E8C97A;
+  --white:#F2EFEA;--muted:#4A5568;--mutedHi:#718096;
+  --ok:#22C55E;--danger:#EF4444;--warn:#F59E0B;--info:#38BDF8;
+  --purple:#A78BFA;--teal:#10B981;
+  --font:'Playfair Display',serif;
+  --mono:'JetBrains Mono',monospace;
+  --body:'Segoe UI',system-ui,sans-serif;
+}
+body{background:var(--bg);color:var(--white);font-family:var(--body);min-height:100vh;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:rgba(201,168,76,0.2);border-radius:3px;}
+
+/* HEADER */
+#header{background:var(--surf);border-bottom:1px solid var(--border2);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:14px;}
+.logo-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--goldHi));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--bg);font-family:var(--font);}
+.logo-name{font-size:15px;font-weight:800;font-family:var(--font);}
+.logo-mod{font-size:10px;color:var(--gold);font-weight:700;letter-spacing:2px;font-family:var(--mono);}
+.hright{display:flex;gap:10px;align-items:center;}
+
+/* TABS */
+#tabbar{display:flex;gap:3px;background:var(--bg);padding:4px;border-radius:10px;width:fit-content;margin:22px 24px 0;flex-wrap:wrap;}
+.tab{padding:7px 15px;border-radius:7px;border:none;cursor:pointer;font-size:11px;font-weight:700;transition:all .18s;background:transparent;color:var(--muted);font-family:var(--mono);}
+.tab.active{background:var(--gold);color:var(--bg);}
+
+#content{max-width:1280px;margin:0 auto;padding:20px 24px 40px;}
+.section{display:none;}.section.active{display:block;}
+
+/* KPI */
+.kpi-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
+.kpi{flex:1;min-width:145px;background:var(--surf);border-radius:12px;padding:16px 18px;border:1px solid var(--border2);position:relative;overflow:hidden;}
+.kpi::before{content:'';position:absolute;top:0;right:0;width:55px;height:55px;background:radial-gradient(circle at top right,var(--kc,rgba(201,168,76,0.08)),transparent 70%);}
+.kpi-label{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;font-family:var(--mono);}
+.kpi-value{font-size:22px;font-weight:900;font-family:var(--font);}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* GRID & CARD */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;}
+.card{background:var(--surf);border-radius:12px;padding:18px;border:1px solid var(--border2);}
+.card-title{font-size:13px;font-weight:700;color:var(--white);margin-bottom:14px;font-family:var(--font);}
+.badge{display:inline-flex;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;font-family:var(--mono);white-space:nowrap;}
+.progress-wrap{background:rgba(255,255,255,0.07);border-radius:4px;height:5px;}
+.progress-bar{border-radius:4px;transition:width .8s;}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono);}
+th{padding:9px 11px;text-align:left;color:var(--gold);font-weight:700;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:8px 11px;border-bottom:1px solid rgba(201,168,76,0.05);}
+tr:nth-child(even) td{background:rgba(255,255,255,0.012);}
+tfoot td{border-top:2px solid rgba(201,168,76,0.25);font-weight:800;font-size:12px;}
+
+/* LIQUIDACION */
+.liq-box{background:var(--surf);border-radius:16px;border:1px solid var(--border);overflow:hidden;margin-bottom:20px;}
+.liq-header{background:linear-gradient(135deg,var(--surf2),var(--surf3));padding:20px 24px;border-bottom:1px solid var(--border2);}
+.liq-title{font-size:18px;font-weight:900;font-family:var(--font);color:var(--white);}
+.liq-sub{font-size:11px;color:var(--mutedHi);margin-top:4px;font-family:var(--mono);}
+.liq-body{padding:20px 24px;}
+.liq-section{margin-bottom:18px;}
+.liq-section-title{font-size:11px;font-weight:700;color:var(--gold);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border2);}
+.liq-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(201,168,76,0.04);}
+.liq-row-label{font-size:12px;color:var(--mutedHi);font-family:var(--mono);}
+.liq-row-val{font-size:13px;font-weight:700;font-family:var(--mono);}
+.liq-total{background:var(--surf2);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--gold);}
+.liq-total-label{font-size:14px;font-weight:800;color:var(--white);font-family:var(--font);}
+.liq-total-val{font-size:26px;font-weight:900;color:var(--ok);font-family:var(--font);}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surf);border-radius:16px;padding:28px;border:1px solid rgba(201,168,76,0.3);width:560px;max-height:92vh;overflow-y:auto;}
+.modal h3{font-size:18px;font-weight:900;color:var(--white);margin-bottom:20px;font-family:var(--font);}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.fgrid .full{grid-column:1/3;}
+.field label{font-size:10px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;font-family:var(--mono);}
+.field input,.field select,.field textarea{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-size:12px;font-family:var(--mono);outline:none;transition:border-color .15s;}
+.field input:focus,.field select:focus{border-color:var(--gold);}
+.btn-gold{padding:10px 22px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:13px;font-family:var(--mono);background:var(--gold);color:var(--bg);transition:all .15s;}
+.btn-gold:hover{background:var(--goldHi);}
+.btn-ghost{padding:10px 22px;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px;font-family:var(--mono);background:transparent;border:1px solid var(--border);color:var(--muted);}
+.btn-sm{padding:4px 10px;border-radius:5px;font-size:10px;cursor:pointer;font-family:var(--mono);}
+.btn-edit{background:transparent;border:1px solid rgba(201,168,76,0.3);color:var(--gold);}
+.btn-del{background:transparent;border:1px solid rgba(239,68,68,0.3);color:var(--danger);}
+.btn-view{background:transparent;border:1px solid rgba(56,189,248,0.3);color:var(--info);}
+.btn-print{background:transparent;border:1px solid rgba(34,197,94,0.3);color:var(--ok);}
+
+/* PRINT */
+@media print{
+  #header,#tabbar,.hright,.no-print{display:none!important;}
+  body{background:white;color:black;}
+  .liq-box{border:1px solid #ccc;break-inside:avoid;}
+  .liq-header{background:#f5f5f5!important;}
+  .liq-title,.liq-total-label{color:black!important;}
+  .liq-total{background:#f0f0f0!important;}
+  .card{border:1px solid #ddd;}
+}
+
+#footer{border-top:1px solid var(--border2);padding:13px 28px;display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-family:var(--mono);}
+@media(max-width:700px){.grid-2,.grid-3{grid-template-columns:1fr;}.fgrid{grid-template-columns:1fr;}.fgrid .full{grid-column:1;}}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="logo">
+    <div class="logo-icon">M</div>
+    <div>
+      <div class="logo-name">Martinez Services Spa</div>
+      <div class="logo-mod">MÓDULO REMUNERACIONES</div>
+    </div>
+  </div>
+  <div class="hright">
+    <span style="font-size:11px;color:var(--muted);font-family:var(--mono)" id="hInfo">Cargando...</span>
+    <button class="btn-gold" style="padding:7px 16px;font-size:12px" onclick="openTrabajadorModal(null)">+ Trabajador</button>
+  </div>
+</div>
+
+<div id="tabbar">
+  <button class="tab active" onclick="showTab('liquidaciones',this)">📄 Liquidaciones</button>
+  <button class="tab" onclick="showTab('trabajadores',this)">👥 Trabajadores</button>
+  <button class="tab" onclick="showTab('libro',this)">📚 Libro Remuneraciones</button>
+  <button class="tab" onclick="showTab('vacaciones',this)">🏖 Vacaciones</button>
+  <button class="tab" onclick="showTab('finiquitos',this)">📋 Finiquitos</button>
+  <button class="tab" onclick="showTab('parametros',this)">⚙ Parámetros</button>
+</div>
+
+<div id="content">
+
+  <!-- LIQUIDACIONES -->
+  <div id="sec-liquidaciones" class="section active">
+    <div class="kpi-row" id="kpiLiq"></div>
+    <div class="card no-print" style="margin-bottom:16px">
+      <div class="card-title">Generar Liquidación de Sueldo</div>
+      <div class="fgrid">
+        <div class="field">
+          <label>Trabajador</label>
+          <select id="selTrabajador"></select>
+        </div>
+        <div class="field">
+          <label>Período (Mes/Año)</label>
+          <input type="month" id="selPeriodo" value="2025-06"/>
+        </div>
+        <div class="field">
+          <label>Días Trabajados</label>
+          <input type="number" id="inpDias" value="30" min="1" max="31"/>
+        </div>
+        <div class="field">
+          <label>Horas Extra (cantidad)</label>
+          <input type="number" id="inpHExtra" value="0" min="0"/>
+        </div>
+        <div class="field full" style="grid-column:1/3">
+          <label style="color:var(--gold);font-size:11px;letter-spacing:1px">── HABERES NO IMPONIBLES (No cotizan AFP ni salud)</label>
+        </div>
+        <div class="field">
+          <label>Colación ($)</label>
+          <input type="number" id="inpColacion" value="0" min="0" placeholder="Ej: 96.000"/>
+        </div>
+        <div class="field">
+          <label>Movilización ($)</label>
+          <input type="number" id="inpMovilizacion" value="0" min="0" placeholder="Ej: 96.000"/>
+        </div>
+        <div class="field">
+          <label>Asig. Pérdida de Caja ($)</label>
+          <input type="number" id="inpCaja" value="0" min="0"/>
+        </div>
+        <div class="field">
+          <label>Asig. Viáticos ($)</label>
+          <input type="number" id="inpViaticos" value="0" min="0"/>
+        </div>
+        <div class="field">
+          <label>Bono Desgaste Herramientas ($)</label>
+          <input type="number" id="inpHerramientas" value="0" min="0"/>
+        </div>
+        <div class="field">
+          <label>Otro Haber No Imponible ($)</label>
+          <input type="number" id="inpOtroNI" value="0" min="0"/>
+        </div>
+        <div class="field full" style="grid-column:1/3;margin-top:4px">
+          <label style="color:var(--info);font-size:11px;letter-spacing:1px">── HABERES IMPONIBLES ADICIONALES (Sí cotizan AFP y salud)</label>
+        </div>
+        <div class="field">
+          <label>Bono de Producción ($)</label>
+          <input type="number" id="inpBonoProd" value="0" min="0"/>
+        </div>
+        <div class="field">
+          <label>Bono de Asistencia ($)</label>
+          <input type="number" id="inpBonoAsist" value="0" min="0"/>
+        </div>
+        <div class="field">
+          <label>Bono de Responsabilidad ($)</label>
+          <input type="number" id="inpBonoResp" value="0" min="0"/>
+        </div>
+        <div class="field">
+          <label>Otro Bono Imponible ($)</label>
+          <input type="number" id="inpOtroI" value="0" min="0"/>
+        </div>
+        <div class="field full" style="grid-column:1/3;margin-top:4px">
+          <label style="color:var(--danger);font-size:11px;letter-spacing:1px">── DESCUENTOS ADICIONALES</label>
+        </div>
+        <div class="field">
+          <label>Descuento Adicional ($)</label>
+          <input type="number" id="inpDescExtra" value="0" min="0"/>
+        </div>
+        <div class="field">
+          <label>Anticipo ($)</label>
+          <input type="number" id="inpAnticipo" value="0" min="0"/>
+        </div>
+        <div class="field">
+          <label>Tipo Contrato</label>
+          <select id="selTipoContrato">
+            <option value="indefinido">Indefinido</option>
+            <option value="plazo_fijo">Plazo Fijo</option>
+            <option value="honorarios">Honorarios (Boleta)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tipo de Gratificación</label>
+          <select id="selTipoGratif" onchange="actualizarInfoGratif(this.value)">
+            <option value="mensual_25">Mensual 25% tope 4.75 UF (Art.47 — más común)</option>
+            <option value="anual">Anual — NO aparece en liquidación mensual</option>
+            <option value="incluida">Ya incluida en sueldo base — NO calcular</option>
+            <option value="sin_gratif">Sin gratificación (honorarios, condominio, etc.)</option>
+          </select>
+        </div>
+        <div id="gratifInfo" style="grid-column:1/3;padding:8px 12px;border-radius:8px;font-size:11px;font-family:monospace;background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);color:var(--mutedHi)">
+          ✓ Se calcula gratificación mensual 25% del sueldo base con tope 4.75 UF (Art. 47 CT)
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+        <button class="btn-gold" onclick="calcularLiquidacion()">⚡ Calcular Liquidación</button>
+        <button class="btn-ghost" onclick="guardarLiquidacion()">💾 Guardar</button>
+        <button class="btn-ghost" onclick="window.print()">🖨 Imprimir</button>
+      </div>
+    </div>
+    <div id="liqResult"></div>
+    <div style="margin-top:20px">
+      <div class="card-title" style="margin-bottom:12px;font-family:var(--font);font-size:13px;font-weight:700">Liquidaciones Guardadas</div>
+      <div class="card tbl-wrap">
+        <table id="tblLiqs">
+          <thead><tr><th>Período</th><th>Trabajador</th><th>RUT</th><th>Sueldo Base</th><th>Total Haberes</th><th>Descuentos</th><th>Líquido a Pagar</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRABAJADORES -->
+  <div id="sec-trabajadores" class="section">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+      <button class="btn-gold" style="padding:8px 18px;font-size:12px" onclick="openTrabajadorModal(null)">+ Nuevo Trabajador</button>
+    </div>
+    <div class="card tbl-wrap">
+      <table id="tblTrabajadores">
+        <thead><tr><th>Nombre</th><th>RUT</th><th>Cargo</th><th>Área</th><th>Contrato</th><th>Ingreso</th><th>Sueldo Base</th><th>AFP</th><th>Salud</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- LIBRO REMUNERACIONES -->
+  <div id="sec-libro" class="section">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-size:18px;font-weight:900;font-family:var(--font)">Libro de Remuneraciones</div>
+        <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">Registro oficial mensual — Art. 62 Código del Trabajo</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <select id="selLibroMes" style="padding:8px 12px;background:var(--surf);border:1px solid var(--border);border-radius:8px;color:var(--white);font-family:var(--mono);font-size:12px;outline:none">
+          <option value="">Todos los períodos</option>
+        </select>
+        <button class="btn-gold" style="padding:8px 16px;font-size:12px" onclick="window.print()">🖨 Imprimir Libro</button>
+      </div>
+    </div>
+    <div class="card tbl-wrap">
+      <table id="tblLibro">
+        <thead>
+          <tr>
+            <th>Período</th><th>RUT</th><th>Trabajador</th><th>Cargo</th>
+            <th>Sueldo Base</th><th>Gratif.</th><th>H.Extra</th><th>Bonos</th><th>Total Haberes</th>
+            <th>AFP</th><th>Salud</th><th>Seg.Cesantía</th><th>Imp.Único</th><th>Otros Desc.</th><th>Total Desc.</th>
+            <th>Líquido</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot></tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- VACACIONES -->
+  <div id="sec-vacaciones" class="section">
+    <div class="kpi-row" id="kpiVac"></div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+      <button class="btn-gold" style="padding:8px 18px;font-size:12px" onclick="openVacModal()">+ Registrar Vacaciones</button>
+    </div>
+    <div class="card tbl-wrap">
+      <table id="tblVac">
+        <thead><tr><th>Trabajador</th><th>Período Solicitud</th><th>Fecha Inicio</th><th>Fecha Fin</th><th>Días Hábiles</th><th>Días Disponibles</th><th>Saldo</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">Saldo de Vacaciones por Trabajador</div>
+      <div id="vacSaldos"></div>
+    </div>
+  </div>
+
+  <!-- FINIQUITOS -->
+  <div id="sec-finiquitos" class="section">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+      <button class="btn-gold" style="padding:8px 18px;font-size:12px" onclick="openFiniqModal()">+ Calcular Finiquito</button>
+    </div>
+    <div id="finiqResult"></div>
+    <div class="card tbl-wrap" style="margin-top:16px">
+      <table id="tblFiniq">
+        <thead><tr><th>Trabajador</th><th>RUT</th><th>Fecha Término</th><th>Causal</th><th>Años Servicio</th><th>Indemnización</th><th>Vacaciones</th><th>Meses Aviso</th><th>Total Finiquito</th><th>Acciones</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="sec-parametros" class="section">
+    <div class="card-title" style="font-size:16px;font-weight:900;margin-bottom:6px">⚙ Parámetros Legales Chile</div>
+    <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:20px">Actualiza estos valores cuando cambien las tasas legales. Se aplican a todos los cálculos.</div>
+
+    <!-- VALORES PRINCIPALES -->
+    <div class="grid-3" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card-title">💰 Remuneraciones Base</div>
+        <div class="field" style="margin-bottom:12px">
+          <label>Sueldo Mínimo Mensual ($)</label>
+          <input type="number" id="pSueldoMin" onchange="saveParams()"/>
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:3px">Vigente desde Aug 2024: $500.000</div>
+        </div>
+        <div class="field" style="margin-bottom:12px">
+          <label>UF del Mes ($)</label>
+          <input type="number" id="pUF" onchange="saveParams()"/>
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:3px">Actualizar mensualmente desde sii.cl</div>
+        </div>
+        <div class="field">
+          <label>UTM del Mes ($)</label>
+          <input type="number" id="pUTM" onchange="saveParams()"/>
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:3px">Actualizar mensualmente desde sii.cl</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📊 Cotizaciones Previsionales</div>
+        <div class="field" style="margin-bottom:10px">
+          <label>AFP Tasa Referencial (%)</label>
+          <input type="number" id="pAFP" step="0.01" onchange="saveParams()"/>
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:3px">Se usa si el trabajador no tiene AFP asignada</div>
+        </div>
+        <div class="field" style="margin-bottom:10px">
+          <label>Salud Fonasa / Isapre Base (%)</label>
+          <input type="number" id="pSalud" step="0.01" onchange="saveParams()"/>
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:3px">Mínimo legal: 7%</div>
+        </div>
+        <div class="field" style="margin-bottom:10px">
+          <label>Seg. Cesantía Trabajador (%)</label>
+          <input type="number" id="pCesantiaT" step="0.01" onchange="saveParams()"/>
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:3px">Indefinido: 0.60% · Plazo Fijo: 0%</div>
+        </div>
+        <div class="field">
+          <label>Seg. Cesantía Empleador (%)</label>
+          <input type="number" id="pCesantiaE" step="0.01" onchange="saveParams()"/>
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:3px">Indefinido: 2.40% · Plazo Fijo: 3%</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🎁 Gratificación y H. Extra</div>
+        <div class="field" style="margin-bottom:12px">
+          <label>% Gratificación Mensual (Art.47)</label>
+          <input type="number" id="pGratif" step="0.1" onchange="saveParams()"/>
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:3px">Valor legal: 25%</div>
+        </div>
+        <div class="field" style="margin-bottom:12px">
+          <label>Tope Gratificación (UF/mes)</label>
+          <input type="number" id="pGratifTope" step="0.01" onchange="saveParams()"/>
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:3px">Valor legal: 4.75 UF</div>
+        </div>
+        <div class="field">
+          <label>Recargo Horas Extra (%)</label>
+          <input type="number" id="pHExtra" onchange="saveParams()"/>
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:3px">Mínimo legal: 50%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLA AFP COMPLETA -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">🏦 Tasas AFP Vigentes 2025</div>
+      <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:14px">Tasa que se descuenta al trabajador. El SIS (Seguro Invalidez y Sobrevivencia) lo paga el empleador adicional.</div>
+      <div class="tbl-wrap">
+        <table id="tblAFP">
+          <thead>
+            <tr>
+              <th>AFP</th>
+              <th>Tasa Trabajador (%)</th>
+              <th>SIS Empleador (%)</th>
+              <th>Tasa Total (%)</th>
+              <th>Actualizar</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyAFP"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px;padding:10px 14px;background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.2);border-radius:8px;font-size:11px;color:var(--mutedHi);font-family:var(--mono)">
+        ℹ Fuente oficial: <strong style="color:var(--info)">spensiones.cl</strong> · Las tasas se actualizan anualmente en febrero. Última actualización: Febrero 2025.
+      </div>
+    </div>
+
+    <!-- TABLA IMPUESTO 2DA CATEGORÍA -->
+    <div class="card">
+      <div class="card-title">📋 Tabla Impuesto Único 2ª Categoría 2025</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;font-family:var(--mono)">Tramos en UTM · Tasas vigentes SII Chile 2025 · Fuente: sii.cl</div>
+      <div class="tbl-wrap">
+        <table id="tblImpuesto">
+          <thead><tr><th>Tramo</th><th>Desde (UTM)</th><th>Hasta (UTM)</th><th>Tasa (%)</th><th>Factor Rebaja (UTM)</th><th>Ejemplo ($)</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;padding:14px;background:var(--surf2);border-radius:10px;border:1px solid var(--border2)">
+      <div style="font-size:11px;color:var(--mutedHi);font-family:var(--mono);line-height:1.8">
+        ⚠️ <strong style="color:var(--warn)">Importante:</strong> Los parámetros se actualizan anualmente.
+        Verifica siempre en <strong style="color:var(--info)">sii.cl</strong> (UF, UTM, tabla impuesto),
+        <strong style="color:var(--info)">spensiones.cl</strong> (AFP) y
+        <strong style="color:var(--info)">dt.gob.cl</strong> (sueldo mínimo) antes de emitir liquidaciones.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="footer">
+  <span>Martinez Services Spa · Módulo Remuneraciones v1.0 · 2025</span>
+  <span>Legislación Laboral Chile · Datos guardados automáticamente</span>
+</div>
+
+<!-- MODAL TRABAJADOR -->
+<div class="modal-overlay" id="modalTrab">
+  <div class="modal">
+    <h3 id="trabTitle">Nuevo Trabajador</h3>
+    <input type="hidden" id="trabId"/>
+    <div class="fgrid">
+      <div class="field full"><label>Nombre Completo</label><input id="tNombre" type="text" placeholder="Juan Andrés Pérez González"/></div>
+      <div class="field"><label>RUT</label><input id="tRut" type="text" placeholder="12.345.678-9"/></div>
+      <div class="field"><label>Fecha de Nacimiento</label><input id="tNacimiento" type="date"/></div>
+      <div class="field"><label>Cargo / Función</label><input id="tCargo" type="text"/></div>
+      <div class="field"><label>Área / Departamento</label><input id="tArea" type="text"/></div>
+      <div class="field"><label>Fecha de Ingreso</label><input id="tIngreso" type="date"/></div>
+      <div class="field"><label>Sueldo Base Bruto ($)</label><input id="tSueldo" type="number" min="0"/></div>
+      <div class="field"><label>Tipo Contrato</label>
+        <select id="tContrato"><option value="indefinido">Indefinido</option><option value="plazo_fijo">Plazo Fijo</option><option value="honorarios">Honorarios</option></select>
+      </div>
+      <div class="field"><label>AFP</label>
+        <select id="tAFP">
+          <option value="capital">AFP Capital (11.44%)</option>
+          <option value="cuprum">AFP Cuprum (11.44%)</option>
+          <option value="habitat">AFP Hábitat (11.27%)</option>
+          <option value="planvital">AFP PlanVital (11.16%)</option>
+          <option value="provida">AFP ProVida (11.44%)</option>
+          <option value="uno">AFP Uno (10.49%)</option>
+          <option value="modelo">AFP Modelo (10.58%)</option>
+        </select>
+      </div>
+      <div class="field"><label>Salud</label>
+        <select id="tSalud">
+          <option value="fonasa">Fonasa (7%)</option>
+          <option value="isapre_banmedica">Isapre Banmédica</option>
+          <option value="isapre_colmena">Isapre Colmena</option>
+          <option value="isapre_cruz_blanca">Isapre Cruz Blanca</option>
+          <option value="isapre_vida_tres">Isapre Vida Tres</option>
+          <option value="isapre_consalud">Isapre Consalud</option>
+        </select>
+      </div>
+      <div class="field"><label>% Salud (si Isapre)</label><input id="tPctSalud" type="number" step="0.01" value="7" min="7"/></div>
+      <div class="field"><label>Nacionalidad</label><input id="tNacionalidad" type="text" value="Chilena"/></div>
+      <div class="field"><label>Dirección</label><input id="tDireccion" type="text"/></div>
+      <div class="field"><label>Email</label><input id="tEmail" type="email"/></div>
+      <div class="field"><label>Teléfono</label><input id="tTelefono" type="text"/></div>
+      <div class="field"><label>Banco</label>
+        <select id="tBanco"><option>Banco de Chile</option><option>BancoEstado</option><option>Santander</option><option>BCI</option><option>Itaú</option><option>Scotiabank</option><option>BICE</option><option>Security</option><option>Otro</option></select>
+      </div>
+      <div class="field"><label>Nº Cuenta</label><input id="tCuenta" type="text"/></div>
+      <div class="field"><label>Tipo Cuenta</label>
+        <select id="tTipoCuenta"><option>Cuenta Corriente</option><option>Cuenta Vista</option><option>CuentaRUT</option><option>Cuenta de Ahorro</option></select>
+      </div>
+      <div class="field"><label>Estado</label>
+        <select id="tEstado"><option value="activo">Activo</option><option value="licencia">Licencia Médica</option><option value="vacaciones">Vacaciones</option><option value="desvinculado">Desvinculado</option></select>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn-gold" style="flex:1" onclick="saveTrabajador()">Guardar Trabajador</button>
+      <button class="btn-ghost" onclick="closeModal('modalTrab')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL VACACIONES -->
+<div class="modal-overlay" id="modalVac">
+  <div class="modal" style="width:420px">
+    <h3>Registrar Vacaciones</h3>
+    <div class="fgrid">
+      <div class="field full"><label>Trabajador</label><select id="vacTrabId"></select></div>
+      <div class="field"><label>Fecha Inicio</label><input id="vacInicio" type="date"/></div>
+      <div class="field"><label>Fecha Fin</label><input id="vacFin" type="date"/></div>
+      <div class="field full"><label>Tipo</label>
+        <select id="vacTipo"><option>Vacaciones Anuales</option><option>Vacaciones Proporcionales</option><option>Feriado Progresivo</option></select>
+      </div>
+      <div class="field full"><label>Observaciones</label><textarea id="vacObs" rows="2"></textarea></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn-gold" style="flex:1" onclick="saveVac()">Registrar</button>
+      <button class="btn-ghost" onclick="closeModal('modalVac')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FINIQUITO -->
+<div class="modal-overlay" id="modalFiniq">
+  <div class="modal" style="width:460px">
+    <h3>Calcular Finiquito</h3>
+    <div class="fgrid">
+      <div class="field full"><label>Trabajador</label><select id="finiqTrabId"></select></div>
+      <div class="field"><label>Fecha Término Contrato</label><input id="finiqFecha" type="date"/></div>
+      <div class="field"><label>Causal de Término</label>
+        <select id="finiqCausal">
+          <option value="159_1">Art. 159 Nº1 — Mutuo Acuerdo</option>
+          <option value="159_2">Art. 159 Nº2 — Renuncia Voluntaria</option>
+          <option value="159_4">Art. 159 Nº4 — Vencimiento Plazo</option>
+          <option value="161">Art. 161 — Necesidades Empresa</option>
+          <option value="160">Art. 160 — Despido por Causa (sin indemnización)</option>
+        </select>
+      </div>
+      <div class="field"><label>Último Sueldo Bruto ($)</label><input id="finiqSueldo" type="number"/></div>
+      <div class="field"><label>Días Vacaciones Pendientes</label><input id="finiqVacDias" type="number" value="0"/></div>
+      <div class="field"><label>Meses Trabajados Año Actual</label><input id="finiqMeses" type="number" min="0" max="12" value="6"/></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn-gold" style="flex:1" onclick="calcularFiniquito()">Calcular</button>
+      <button class="btn-ghost" onclick="closeModal('modalFiniq')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+//  STORAGE & STATE
+// ════════════════════════════════════════
+const SK_TRAB  = 'mss_rem_trabajadores_v1';
+const SK_LIQS  = 'mss_rem_liquidaciones_v1';
+const SK_VAC   = 'mss_rem_vacaciones_v1';
+const SK_FINIQ = 'mss_rem_finiquitos_v1';
+const SK_PARAM = 'mss_rem_params_v1';
+
+let _id = 2000; const uid = () => ++_id;
+
+// ════════════════════════════════════════
+//  PARÁMETROS LEGALES CHILE 2025
+// ════════════════════════════════════════
+const DEFAULT_PARAMS = {
+  sueldoMin:  500000,
+  uf:         38500,
+  utm:        68306,
+  afp:        11.44,
+  salud:      7.00,
+  cesantiaT:  0.60,
+  cesantiaE:  2.40,
+  gratif:     25,
+  gratifTope: 4.75,
+  hExtra:     50,
+};
+
+// Tabla Impuesto Único 2da Categoría 2025 (en UTM)
+const TABLA_IMPUESTO = [
+  {desde:0,     hasta:13.5,  tasa:0,   rebaja:0},
+  {desde:13.5,  hasta:30,    tasa:4,   rebaja:0.54},
+  {desde:30,    hasta:50,    tasa:8,   rebaja:1.74},
+  {desde:50,    hasta:70,    tasa:13.5,rebaja:4.49},
+  {desde:70,    hasta:90,    tasa:23,  rebaja:11.14},
+  {desde:90,    hasta:120,   tasa:30.4,rebaja:17.80},
+  {desde:120,   hasta:150,   tasa:35,  rebaja:23.32},
+  {desde:150,   hasta:999999,tasa:40,  rebaja:30.82},
+];
+
+// Tasas AFP reales 2025
+// Tasas AFP 2025 — tasa que se descuenta al TRABAJADOR (no incluye SIS que paga el empleador)
+const AFP_TASAS = {
+  capital:   10.44,  // Capital: 10.44% trabajador + SIS empleador
+  cuprum:    10.44,  // Cuprum:  10.44% trabajador + SIS empleador
+  habitat:   10.27,  // Hábitat: 10.27% trabajador + SIS empleador
+  planvital: 10.16,  // PlanVital:10.16% trabajador + SIS empleador
+  provida:   10.44,  // ProVida: 10.44% trabajador + SIS empleador
+  uno:        9.49,  // AFP Uno:  9.49% trabajador + SIS empleador
+  modelo:     9.58,  // Modelo:   9.58% trabajador + SIS empleador
+};
+
+let TRABAJADORES=[], LIQUIDACIONES=[], VACACIONES=[], FINIQUITOS=[];
+let PARAMS = {...DEFAULT_PARAMS};
+
+function saveAll(){
+  try{
+    localStorage.setItem(SK_TRAB,  JSON.stringify(TRABAJADORES));
+    localStorage.setItem(SK_LIQS,  JSON.stringify(LIQUIDACIONES));
+    localStorage.setItem(SK_VAC,   JSON.stringify(VACACIONES));
+    localStorage.setItem(SK_FINIQ, JSON.stringify(FINIQUITOS));
+    localStorage.setItem(SK_PARAM, JSON.stringify(PARAMS));
+  }catch(e){}
+}
+function loadAll(){
+  try{
+    TRABAJADORES  = JSON.parse(localStorage.getItem(SK_TRAB))  || [];
+    LIQUIDACIONES = JSON.parse(localStorage.getItem(SK_LIQS))  || [];
+    VACACIONES    = JSON.parse(localStorage.getItem(SK_VAC))   || [];
+    FINIQUITOS    = JSON.parse(localStorage.getItem(SK_FINIQ)) || [];
+    PARAMS        = JSON.parse(localStorage.getItem(SK_PARAM)) || {...DEFAULT_PARAMS};
+  }catch(e){
+    TRABAJADORES=[]; LIQUIDACIONES=[]; VACACIONES=[]; FINIQUITOS=[];
+    PARAMS={...DEFAULT_PARAMS};
+  }
+}
+
+// ════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════
+const clp  = n => new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Math.round(n));
+const dateF= d => {try{return new Date(d+'T00:00:00').toLocaleDateString('es-CL');}catch{return d||'—';}};
+function badge(label,color){return `<span class="badge" style="background:${color}20;color:${color};border:1px solid ${color}40">${label}</span>`;}
+
+function diasHabiles(inicio, fin){
+  let count=0, cur=new Date(inicio+'T00:00:00');
+  const end=new Date(fin+'T00:00:00');
+  while(cur<=end){const d=cur.getDay();if(d!==0&&d!==6)count++;cur.setDate(cur.getDate()+1);}
+  return count;
+}
+
+function calcAntiguedad(ingreso){
+  if(!ingreso) return 0;
+  const diff=new Date()-new Date(ingreso+'T00:00:00');
+  return diff/(1000*60*60*24*365);
+}
+
+function diasVacacionesLegales(ingreso){
+  const años=calcAntiguedad(ingreso);
+  if(años<1) return Math.round((años*365/365)*15);
+  if(años>=10) return 20; // feriado progresivo base
+  return 15;
+}
+
+// ════════════════════════════════════════
+//  CÁLCULO LIQUIDACIÓN
+// ════════════════════════════════════════
+function calcularLiquidacion(){
+  const trabId = parseInt(document.getElementById('selTrabajador').value);
+  const trab = TRABAJADORES.find(t=>t.id===trabId);
+  if(!trab){alert('Selecciona un trabajador');return;}
+
+  const periodo   = document.getElementById('selPeriodo').value;
+  const dias      = parseFloat(document.getElementById('inpDias').value)||30;
+  const hExtra    = parseFloat(document.getElementById('inpHExtra').value)||0;
+  // Haberes NO imponibles (no cotizan AFP ni salud)
+  const colacion      = parseFloat(document.getElementById('inpColacion').value)||0;
+  const movilizacion  = parseFloat(document.getElementById('inpMovilizacion').value)||0;
+  const caja          = parseFloat(document.getElementById('inpCaja').value)||0;
+  const viaticos      = parseFloat(document.getElementById('inpViaticos').value)||0;
+  const herramientas  = parseFloat(document.getElementById('inpHerramientas').value)||0;
+  const otroNI        = parseFloat(document.getElementById('inpOtroNI').value)||0;
+  // Haberes IMPONIBLES adicionales (sí cotizan)
+  const bonoProd      = parseFloat(document.getElementById('inpBonoProd').value)||0;
+  const bonoAsist     = parseFloat(document.getElementById('inpBonoAsist').value)||0;
+  const bonoResp      = parseFloat(document.getElementById('inpBonoResp').value)||0;
+  const otroI         = parseFloat(document.getElementById('inpOtroI').value)||0;
+  const descExtra     = parseFloat(document.getElementById('inpDescExtra').value)||0;
+  const anticipo      = parseFloat(document.getElementById('inpAnticipo').value)||0;
+  // Totales para cálculo
+  const totalBonusNoImponible = colacion + movilizacion + caja + viaticos + herramientas + otroNI;
+  const totalBonusImponible   = bonoProd + bonoAsist + bonoResp + otroI;
+  const bonoExtra = totalBonusNoImponible; // para compatibilidad
+  const tipoContr    = document.getElementById('selTipoContrato').value;
+  const tipoGratif   = document.getElementById('selTipoGratif').value;
+  // Mostrar info gratificación
+  const gInfo = document.getElementById('gratifInfo');
+  const gMsgs = {
+    mensual_25: '✓ Se calcula gratificación mensual 25% del sueldo base con tope 4.75 UF (Art. 47 CT)',
+    anual:      'ℹ La gratificación se paga anualmente si hay utilidades — NO se incluye en esta liquidación mensual',
+    incluida:   'ℹ Gratificación ya incluida en el sueldo base pactado — NO se calcula por separado',
+    sin_gratif: '⚠ Sin gratificación — Aplica para honorarios, condominios u otros casos especiales',
+  };
+  gInfo.style.display='block';
+  gInfo.textContent = gMsgs[tipoGratif]||'';
+  gInfo.style.background = tipoGratif==='mensual_25'?'rgba(34,197,94,0.07)':tipoGratif==='sin_gratif'?'rgba(245,158,11,0.07)':'rgba(56,189,248,0.07)';
+  gInfo.style.borderColor = tipoGratif==='mensual_25'?'rgba(34,197,94,0.25)':tipoGratif==='sin_gratif'?'rgba(245,158,11,0.25)':'rgba(56,189,248,0.25)';
+
+  // Honorarios — sin cotizaciones previsionales obligatorias (retención 10.75% PPM)
+  if(tipoContr==='honorarios'){
+    const bruto = trab.sueldo * (dias/30);
+    const ppm   = Math.round(bruto * 0.1075);
+    const liquido = bruto - ppm + bonoExtra - descExtra - anticipo;
+    const html = renderLiquidacionHonorarios(trab, periodo, bruto, ppm, bonoExtra, descExtra, anticipo, liquido);
+    document.getElementById('liqResult').innerHTML = html;
+    return;
+  }
+
+  const sueldoBase = trab.sueldo * (dias/30);
+
+  // ── GRATIFICACIÓN LEGAL — según tipo seleccionado ──
+  const topGratif = PARAMS.gratifTope * PARAMS.uf;
+  let gratif = 0;
+  let gratifLabel = '';
+  if(tipoGratif === 'mensual_25'){
+    gratif = Math.min(sueldoBase * (PARAMS.gratif/100), topGratif);
+    gratifLabel = `Gratificación Legal 25% (tope ${PARAMS.gratifTope} UF)`;
+  } else if(tipoGratif === 'anual'){
+    gratif = 0;
+    gratifLabel = 'Gratificación Anual — No aplica en liquidación mensual';
+  } else if(tipoGratif === 'incluida'){
+    gratif = 0;
+    gratifLabel = 'Gratificación incluida en sueldo base';
+  } else {
+    gratif = 0;
+    gratifLabel = 'Sin gratificación';
+  }
+
+  // ── HORAS EXTRA ──
+  const valorHora     = trab.sueldo / 30 / 8; // valor hora normal
+  const valorHExtra   = valorHora * (1 + PARAMS.hExtra/100);
+  const montoHExtra   = Math.round(hExtra * valorHExtra);
+
+  // ── TOTAL HABERES IMPONIBLES ──
+  const totalImponible = sueldoBase + gratif + montoHExtra + totalBonusImponible;
+
+  // ── COTIZACIONES (sobre base imponible) ──
+  const tasaAFP   = (AFP_TASAS[trab.afp] || PARAMS.afp) / 100;
+  const tasaSalud = (parseFloat(trab.pctSalud)||7) / 100;
+  const tasaCesT  = PARAMS.cesantiaT / 100;
+
+  const montAFP     = Math.round(totalImponible * tasaAFP);
+  const montSalud   = Math.round(totalImponible * tasaSalud);
+  const montCesantia= Math.round(totalImponible * tasaCesT);
+  const totalCotiz  = montAFP + montSalud + montCesantia;
+
+  // ── BASE TRIBUTABLE ──
+  const baseTributable = totalImponible - totalCotiz;
+
+  // ── IMPUESTO ÚNICO 2DA CATEGORÍA ──
+  const utm = PARAMS.utm;
+  const rentaUTM = baseTributable / utm;
+  let impuesto = 0;
+  for(const t of TABLA_IMPUESTO){
+    if(rentaUTM > t.desde && rentaUTM <= t.hasta){
+      impuesto = Math.round((baseTributable * t.tasa/100) - (t.rebaja * utm));
+      break;
+    }
+  }
+  impuesto = Math.max(0, impuesto);
+
+  // ── TOTAL HABERES NO IMPONIBLES ──
+  const totalNoImponible = totalBonusNoImponible;
+
+  // ── TOTAL HABERES BRUTOS ──
+  const totalHaberes = totalImponible + totalNoImponible;
+
+  // ── TOTAL DESCUENTOS ──
+  const totalDescuentos = totalCotiz + impuesto + descExtra + anticipo;
+
+  // ── LÍQUIDO A PAGAR ──
+  const liquido = Math.round(totalHaberes - totalDescuentos);
+
+  // ── APORTE EMPLEADOR ──
+  const cesantiaEmp = Math.round(totalImponible * (PARAMS.cesantiaE/100));
+  const accidentesTrab = Math.round(totalImponible * 0.0093); // tasa base mutualidad
+
+  // Render
+  const html = renderLiquidacion({
+    trab, periodo, dias,
+    sueldoBase, gratif, gratifLabel, tipoGratif, montoHExtra,
+    bonusImponibles:{bonoProd, bonoAsist, bonoResp, otroI, totalBonusImponible},
+    bonusNoImponibles:{colacion, movilizacion, caja, viaticos, herramientas, otroNI, totalBonusNoImponible},
+    bonoExtra:totalBonusNoImponible,
+    totalImponible, totalNoImponible, totalHaberes,
+    montAFP, montSalud, montCesantia, impuesto, descExtra, anticipo,
+    totalCotiz, totalDescuentos, liquido,
+    cesantiaEmp, accidentesTrab, tasaAFP, tasaSalud, baseTributable,
+  });
+  document.getElementById('liqResult').innerHTML = html;
+
+  // Store temp for save
+  window._lastLiq = {
+    id:uid(), trabId:trab.id, nombre:trab.nombre, rut:trab.rut,
+    periodo, sueldoBase, gratif, gratifLabel, tipoGratif, montoHExtra, bonoExtra,
+    totalImponible, totalHaberes, totalDescuentos, liquido,
+    montAFP, montSalud, montCesantia, impuesto, descExtra, anticipo,
+    cesantiaEmp, estado:'Pendiente', fecha:new Date().toISOString().split('T')[0],
+  };
+}
+
+function renderLiquidacion(d){
+  const emp = 'Martinez Services Spa';
+  const [y,m] = d.periodo.split('-');
+  const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const perLabel = `${meses[parseInt(m)-1]} ${y}`;
+
+  return `
+  <div class="liq-box">
+    <div class="liq-header">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+        <div>
+          <div class="liq-title">LIQUIDACIÓN DE SUELDO</div>
+          <div class="liq-sub">Período: ${perLabel} · Días trabajados: ${d.dias}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:13px;font-weight:800;color:var(--white);font-family:var(--font)">${emp}</div>
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono)">RUT Empresa: 76.123.456-7</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px;background:rgba(0,0,0,0.2);padding:12px;border-radius:8px">
+        <div><div style="font-size:9px;color:var(--muted);font-family:var(--mono)">TRABAJADOR</div><div style="font-size:13px;font-weight:700">${d.trab.nombre}</div></div>
+        <div><div style="font-size:9px;color:var(--muted);font-family:var(--mono)">RUT</div><div style="font-size:13px;font-weight:700">${d.trab.rut}</div></div>
+        <div><div style="font-size:9px;color:var(--muted);font-family:var(--mono)">CARGO</div><div style="font-size:13px;font-weight:700">${d.trab.cargo}</div></div>
+        <div><div style="font-size:9px;color:var(--muted);font-family:var(--mono)">AFP</div><div style="font-size:12px">${d.trab.afp?.toUpperCase()||'—'} (${(d.tasaAFP*100).toFixed(2)}%)</div></div>
+        <div><div style="font-size:9px;color:var(--muted);font-family:var(--mono)">SALUD</div><div style="font-size:12px">${d.trab.salud?.toUpperCase()||'—'} (${d.tasaSalud*100}%)</div></div>
+        <div><div style="font-size:9px;color:var(--muted);font-family:var(--mono)">CONTRATO</div><div style="font-size:12px">Indefinido</div></div>
+      </div>
+    </div>
+    <div class="liq-body">
+      <div class="grid-2">
+        <div>
+          <!-- HABERES -->
+          <div class="liq-section">
+            <div class="liq-section-title">HABERES IMPONIBLES</div>
+            <div class="liq-row"><span class="liq-row-label">Sueldo Base</span><span class="liq-row-val" style="color:var(--ok)">${clp(d.sueldoBase)}</span></div>
+            ${d.gratif>0?`<div class="liq-row"><span class="liq-row-label">${d.gratifLabel||'Gratificación Legal (25%)'}</span><span class="liq-row-val" style="color:var(--ok)">${clp(d.gratif)}</span></div>`:`<div class="liq-row"><span class="liq-row-label" style="color:var(--muted)">${d.gratifLabel||'Sin gratificación'}</span><span class="liq-row-val" style="color:var(--muted)">$0</span></div>`}
+            ${d.montoHExtra>0?`<div class="liq-row"><span class="liq-row-label">Horas Extra (${PARAMS.hExtra}% recargo)</span><span class="liq-row-val" style="color:var(--ok)">${clp(d.montoHExtra)}</span></div>`:''}
+            ${d.bonusImponibles?.bonoProd>0?`<div class="liq-row"><span class="liq-row-label">Bono de Producción</span><span class="liq-row-val" style="color:var(--ok)">${clp(d.bonusImponibles.bonoProd)}</span></div>`:''}
+            ${d.bonusImponibles?.bonoAsist>0?`<div class="liq-row"><span class="liq-row-label">Bono de Asistencia</span><span class="liq-row-val" style="color:var(--ok)">${clp(d.bonusImponibles.bonoAsist)}</span></div>`:''}
+            ${d.bonusImponibles?.bonoResp>0?`<div class="liq-row"><span class="liq-row-label">Bono de Responsabilidad</span><span class="liq-row-val" style="color:var(--ok)">${clp(d.bonusImponibles.bonoResp)}</span></div>`:''}
+            ${d.bonusImponibles?.otroI>0?`<div class="liq-row"><span class="liq-row-label">Otro Bono Imponible</span><span class="liq-row-val" style="color:var(--ok)">${clp(d.bonusImponibles.otroI)}</span></div>`:''}
+            <div class="liq-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:8px"><span class="liq-row-label" style="font-weight:700">Total Haberes Imponibles</span><span class="liq-row-val" style="color:var(--ok);font-size:14px">${clp(d.totalImponible)}</span></div>
+          </div>
+          ${d.bonusNoImponibles?.totalBonusNoImponible>0?`<div class="liq-section">
+            <div class="liq-section-title">HABERES NO IMPONIBLES</div>
+            ${d.bonusNoImponibles.colacion>0?`<div class="liq-row"><span class="liq-row-label">Asignación de Colación</span><span class="liq-row-val" style="color:var(--ok)">${clp(d.bonusNoImponibles.colacion)}</span></div>`:''}
+            ${d.bonusNoImponibles.movilizacion>0?`<div class="liq-row"><span class="liq-row-label">Asignación de Movilización</span><span class="liq-row-val" style="color:var(--ok)">${clp(d.bonusNoImponibles.movilizacion)}</span></div>`:''}
+            ${d.bonusNoImponibles.caja>0?`<div class="liq-row"><span class="liq-row-label">Asig. Pérdida de Caja</span><span class="liq-row-val" style="color:var(--ok)">${clp(d.bonusNoImponibles.caja)}</span></div>`:''}
+            ${d.bonusNoImponibles.viaticos>0?`<div class="liq-row"><span class="liq-row-label">Asignación Viáticos</span><span class="liq-row-val" style="color:var(--ok)">${clp(d.bonusNoImponibles.viaticos)}</span></div>`:''}
+            ${d.bonusNoImponibles.herramientas>0?`<div class="liq-row"><span class="liq-row-label">Desgaste Herramientas</span><span class="liq-row-val" style="color:var(--ok)">${clp(d.bonusNoImponibles.herramientas)}</span></div>`:''}
+            ${d.bonusNoImponibles.otroNI>0?`<div class="liq-row"><span class="liq-row-label">Otro Haber No Imponible</span><span class="liq-row-val" style="color:var(--ok)">${clp(d.bonusNoImponibles.otroNI)}</span></div>`:''}
+            <div class="liq-row" style="border-top:1px solid var(--border);padding-top:6px"><span class="liq-row-label" style="font-weight:700">Total No Imponibles</span><span class="liq-row-val" style="color:var(--ok)">${clp(d.bonusNoImponibles.totalBonusNoImponible)}</span></div>
+            <div style="font-size:10px;color:var(--muted);font-family:monospace;margin-top:4px">ℹ No afectos a cotizaciones previsionales ni impuesto</div>
+          </div>`:''}
+          <div class="liq-row" style="padding:8px 0;border-top:2px solid rgba(201,168,76,0.2)"><span class="liq-row-label" style="font-weight:800;font-size:13px">TOTAL HABERES BRUTOS</span><span class="liq-row-val" style="color:var(--gold);font-size:15px">${clp(d.totalHaberes)}</span></div>
+        </div>
+        <div>
+          <!-- DESCUENTOS -->
+          <div class="liq-section">
+            <div class="liq-section-title">DESCUENTOS PREVISIONALES</div>
+            <div class="liq-row"><span class="liq-row-label">AFP ${d.trab.afp?.toUpperCase()} (${(d.tasaAFP*100).toFixed(2)}%)</span><span class="liq-row-val" style="color:var(--danger)">${clp(d.montAFP)}</span></div>
+            <div class="liq-row"><span class="liq-row-label">Salud ${d.trab.salud?.toUpperCase()} (${d.tasaSalud*100}%)</span><span class="liq-row-val" style="color:var(--danger)">${clp(d.montSalud)}</span></div>
+            <div class="liq-row"><span class="liq-row-label">Seg. Cesantía Trab. (${PARAMS.cesantiaT}%)</span><span class="liq-row-val" style="color:var(--danger)">${clp(d.montCesantia)}</span></div>
+          </div>
+          <div class="liq-section">
+            <div class="liq-section-title">IMPUESTO Y OTROS</div>
+            <div class="liq-row"><span class="liq-row-label">Base Tributable</span><span class="liq-row-val">${clp(d.baseTributable)}</span></div>
+            <div class="liq-row"><span class="liq-row-label">Impuesto Único 2ª Categoría</span><span class="liq-row-val" style="color:var(--danger)">${clp(d.impuesto)}</span></div>
+            ${d.descExtra>0?`<div class="liq-row"><span class="liq-row-label">Descuento Adicional</span><span class="liq-row-val" style="color:var(--danger)">${clp(d.descExtra)}</span></div>`:''}
+            ${d.anticipo>0?`<div class="liq-row"><span class="liq-row-label">Anticipo de Sueldo</span><span class="liq-row-val" style="color:var(--danger)">${clp(d.anticipo)}</span></div>`:''}
+          </div>
+          <div class="liq-row" style="padding:8px 0;border-top:2px solid rgba(239,68,68,0.2)"><span class="liq-row-label" style="font-weight:800;font-size:13px">TOTAL DESCUENTOS</span><span class="liq-row-val" style="color:var(--danger);font-size:15px">${clp(d.totalDescuentos)}</span></div>
+        </div>
+      </div>
+      <!-- APORTES EMPLEADOR (referencial) -->
+      <div class="liq-section" style="margin-top:8px;padding:12px;background:var(--surf2);border-radius:8px;">
+        <div class="liq-section-title">APORTES EMPLEADOR (Referencial — No descuentan del trabajador)</div>
+        <div style="display:flex;gap:24px;flex-wrap:wrap">
+          <div class="liq-row" style="flex:1"><span class="liq-row-label">Seg. Cesantía Empleador (${PARAMS.cesantiaE}%)</span><span class="liq-row-val" style="color:var(--info)">${clp(d.cesantiaEmp)}</span></div>
+          <div class="liq-row" style="flex:1"><span class="liq-row-label">Seguro Accidentes Trabajo (0.93%)</span><span class="liq-row-val" style="color:var(--info)">${clp(d.accidentesTrab)}</span></div>
+          <div class="liq-row" style="flex:1"><span class="liq-row-label">Costo Total Empleador</span><span class="liq-row-val" style="color:var(--info)">${clp(d.totalHaberes+d.cesantiaEmp+d.accidentesTrab)}</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="liq-total">
+      <div>
+        <div class="liq-total-label">LÍQUIDO A PAGAR</div>
+        <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:2px">Banco: ${d.trab.banco||'—'} · ${d.trab.tipoCuenta||'—'} · Cta: ${d.trab.cuenta||'—'}</div>
+      </div>
+      <div class="liq-total-val">${clp(d.liquido)}</div>
+    </div>
+  </div>
+  <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap" class="no-print">
+    <button class="btn-gold" onclick="guardarLiquidacion()">💾 Guardar Liquidación</button>
+    <button class="btn-ghost" onclick="window.print()">🖨 Imprimir</button>
+  </div>`;
+}
+
+function renderLiquidacionHonorarios(trab, periodo, bruto, ppm, bono, descExtra, anticipo, liquido){
+  const [y,m]=periodo.split('-');
+  const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  return `
+  <div class="liq-box">
+    <div class="liq-header">
+      <div class="liq-title">BOLETA DE HONORARIOS — Retención PPM</div>
+      <div class="liq-sub">Período: ${meses[parseInt(m)-1]} ${y} · ${trab.nombre} · ${trab.rut}</div>
+    </div>
+    <div class="liq-body">
+      <div class="liq-section">
+        <div class="liq-row"><span class="liq-row-label">Honorarios Brutos</span><span class="liq-row-val" style="color:var(--ok)">${clp(bruto)}</span></div>
+        ${bono>0?`<div class="liq-row"><span class="liq-row-label">Bono Adicional</span><span class="liq-row-val" style="color:var(--ok)">${clp(bono)}</span></div>`:''}
+        <div class="liq-row"><span class="liq-row-label">Retención PPM (10.75%)</span><span class="liq-row-val" style="color:var(--danger)">${clp(ppm)}</span></div>
+        ${descExtra>0?`<div class="liq-row"><span class="liq-row-label">Descuento Adicional</span><span class="liq-row-val" style="color:var(--danger)">${clp(descExtra)}</span></div>`:''}
+        ${anticipo>0?`<div class="liq-row"><span class="liq-row-label">Anticipo</span><span class="liq-row-val" style="color:var(--danger)">${clp(anticipo)}</span></div>`:''}
+      </div>
+    </div>
+    <div class="liq-total">
+      <div class="liq-total-label">TOTAL A PAGAR</div>
+      <div class="liq-total-val">${clp(liquido)}</div>
+    </div>
+  </div>`;
+}
+
+function guardarLiquidacion(){
+  if(!window._lastLiq){alert('Primero calcula la liquidación');return;}
+  // Check duplicado
+  const dup=LIQUIDACIONES.find(l=>l.trabId===window._lastLiq.trabId&&l.periodo===window._lastLiq.periodo);
+  if(dup){if(!confirm('Ya existe una liquidación para este trabajador en este período. ¿Reemplazar?'))return;
+    LIQUIDACIONES=LIQUIDACIONES.filter(l=>!(l.trabId===window._lastLiq.trabId&&l.periodo===window._lastLiq.periodo));
+  }
+  window._lastLiq.estado='Pagada';
+  LIQUIDACIONES.push({...window._lastLiq});
+  saveAll();
+  renderLiquidacionesTable();
+  alert('✓ Liquidación guardada correctamente');
+}
+
+// ════════════════════════════════════════
+//  RENDER FUNCTIONS
+// ════════════════════════════════════════
+function renderKPIs(){
+  const activos=TRABAJADORES.filter(t=>t.estado==='activo').length;
+  const masaBruta=TRABAJADORES.filter(t=>t.estado==='activo').reduce((s,t)=>s+t.sueldo,0);
+  const liqMes=LIQUIDACIONES.filter(l=>{const d=new Date();return l.periodo===`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;});
+  const totalLiq=liqMes.reduce((s,l)=>s+l.liquido,0);
+  document.getElementById('kpiLiq').innerHTML=`
+    <div class="kpi" style="--kc:rgba(201,168,76,0.1)"><div class="kpi-label">Trabajadores Activos</div><div class="kpi-value" style="color:var(--gold)">${activos}</div><div class="kpi-sub">de ${TRABAJADORES.length} total</div></div>
+    <div class="kpi" style="--kc:rgba(245,158,11,0.1)"><div class="kpi-label">Masa Salarial Bruta</div><div class="kpi-value" style="color:var(--warn)">$${(masaBruta/1e6).toFixed(2)}M</div><div class="kpi-sub">Mensual</div></div>
+    <div class="kpi" style="--kc:rgba(34,197,94,0.1)"><div class="kpi-label">Líquido Total Mes</div><div class="kpi-value" style="color:var(--ok)">$${(totalLiq/1e6).toFixed(2)}M</div><div class="kpi-sub">Liquidaciones del mes</div></div>
+    <div class="kpi" style="--kc:rgba(56,189,248,0.1)"><div class="kpi-label">Liquidaciones Emitidas</div><div class="kpi-value" style="color:var(--info)">${LIQUIDACIONES.length}</div><div class="kpi-sub">Total historial</div></div>
+  `;
+}
+
+function renderLiquidacionesTable(){
+  const tbody=document.querySelector('#tblLiqs tbody');
+  const sorted=[...LIQUIDACIONES].sort((a,b)=>b.periodo.localeCompare(a.periodo));
+  tbody.innerHTML=sorted.map(l=>`<tr>
+    <td style="color:var(--white);font-weight:600">${l.periodo}</td>
+    <td style="color:var(--white)">${l.nombre}</td>
+    <td style="color:var(--muted);font-family:var(--mono)">${l.rut}</td>
+    <td style="color:var(--muted)">${clp(l.sueldoBase)}</td>
+    <td style="color:var(--ok)">${clp(l.totalHaberes)}</td>
+    <td style="color:var(--danger)">${clp(l.totalDescuentos)}</td>
+    <td style="color:var(--gold);font-weight:800">${clp(l.liquido)}</td>
+    <td>${badge(l.estado,l.estado==='Pagada'?'#22C55E':'#F59E0B')}</td>
+    <td><div style="display:flex;gap:4px">
+      <button class="btn-sm btn-del" onclick="delLiq(${l.id})">✕</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function renderTrabajadoresTable(){
+  const tbody=document.querySelector('#tblTrabajadores tbody');
+  tbody.innerHTML=TRABAJADORES.map(t=>{
+    const ec={activo:'#22C55E',licencia:'#F59E0B',vacaciones:'#38BDF8',desvinculado:'#EF4444'}[t.estado]||'#5A7090';
+    return `<tr>
+      <td style="color:var(--white);font-weight:700">${t.nombre}</td>
+      <td style="color:var(--muted);font-family:var(--mono)">${t.rut}</td>
+      <td style="color:var(--mutedHi)">${t.cargo}</td>
+      <td>${badge(t.area||'—','#38BDF8')}</td>
+      <td style="color:var(--mutedHi)">${t.contrato}</td>
+      <td style="color:var(--muted)">${dateF(t.ingreso)}</td>
+      <td style="color:var(--gold);font-weight:700">${clp(t.sueldo)}</td>
+      <td style="color:var(--muted);font-size:10px">${t.afp?.toUpperCase()||'—'}</td>
+      <td style="color:var(--muted);font-size:10px">${t.salud?.toUpperCase()||'—'}</td>
+      <td>${badge(t.estado,ec)}</td>
+      <td><div style="display:flex;gap:4px">
+        <button class="btn-sm btn-edit" onclick="openTrabajadorModal(${t.id})">✎</button>
+        <button class="btn-sm btn-del"  onclick="delTrabajador(${t.id})">✕</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderLibro(){
+  // Populate month select
+  const meses=[...new Set(LIQUIDACIONES.map(l=>l.periodo))].sort().reverse();
+  const sel=document.getElementById('selLibroMes');
+  sel.innerHTML='<option value="">Todos los períodos</option>'+meses.map(m=>`<option value="${m}">${m}</option>`).join('');
+
+  const filtro=sel.value;
+  const liqs=filtro?LIQUIDACIONES.filter(l=>l.periodo===filtro):LIQUIDACIONES;
+  const sorted=[...liqs].sort((a,b)=>a.nombre.localeCompare(b.nombre));
+
+  const tbody=document.querySelector('#tblLibro tbody');
+  const tfoot=document.querySelector('#tblLibro tfoot');
+  tbody.innerHTML=sorted.map(l=>`<tr>
+    <td style="color:var(--white)">${l.periodo}</td>
+    <td style="font-family:var(--mono)">${l.rut}</td>
+    <td style="color:var(--white);font-weight:600">${l.nombre}</td>
+    <td style="color:var(--muted)">${TRABAJADORES.find(t=>t.id===l.trabId)?.cargo||'—'}</td>
+    <td style="color:var(--gold)">${clp(l.sueldoBase)}</td>
+    <td>${clp(l.gratif||0)}</td>
+    <td>${clp(l.montoHExtra||0)}</td>
+    <td>${clp(l.bonoExtra||0)}</td>
+    <td style="color:var(--ok);font-weight:700">${clp(l.totalHaberes)}</td>
+    <td style="color:var(--danger)">${clp(l.montAFP||0)}</td>
+    <td style="color:var(--danger)">${clp(l.montSalud||0)}</td>
+    <td style="color:var(--danger)">${clp(l.montCesantia||0)}</td>
+    <td style="color:var(--danger)">${clp(l.impuesto||0)}</td>
+    <td style="color:var(--danger)">${clp((l.descExtra||0)+(l.anticipo||0))}</td>
+    <td style="color:var(--danger);font-weight:700">${clp(l.totalDescuentos)}</td>
+    <td style="color:var(--gold);font-weight:800">${clp(l.liquido)}</td>
+  </tr>`).join('');
+
+  // Totales
+  const sum=(key)=>sorted.reduce((s,l)=>s+(l[key]||0),0);
+  tfoot.innerHTML=`<tr>
+    <td colspan="4" style="color:var(--gold)">TOTALES</td>
+    <td style="color:var(--gold)">${clp(sum('sueldoBase'))}</td>
+    <td>${clp(sum('gratif'))}</td>
+    <td>${clp(sum('montoHExtra'))}</td>
+    <td>${clp(sum('bonoExtra'))}</td>
+    <td style="color:var(--ok)">${clp(sum('totalHaberes'))}</td>
+    <td style="color:var(--danger)">${clp(sum('montAFP'))}</td>
+    <td style="color:var(--danger)">${clp(sum('montSalud'))}</td>
+    <td style="color:var(--danger)">${clp(sum('montCesantia'))}</td>
+    <td style="color:var(--danger)">${clp(sum('impuesto'))}</td>
+    <td style="color:var(--danger)">${clp(sorted.reduce((s,l)=>s+(l.descExtra||0)+(l.anticipo||0),0))}</td>
+    <td style="color:var(--danger)">${clp(sum('totalDescuentos'))}</td>
+    <td style="color:var(--gold)">${clp(sum('liquido'))}</td>
+  </tr>`;
+}
+
+function renderVacaciones(){
+  // KPI vacaciones
+  document.getElementById('kpiVac').innerHTML=`
+    <div class="kpi"><div class="kpi-label">Registros Vacaciones</div><div class="kpi-value" style="color:var(--info)">${VACACIONES.length}</div></div>
+    <div class="kpi"><div class="kpi-label">En Vacaciones</div><div class="kpi-value" style="color:var(--ok)">${TRABAJADORES.filter(t=>t.estado==='vacaciones').length}</div></div>
+  `;
+
+  const tbody=document.querySelector('#tblVac tbody');
+  tbody.innerHTML=VACACIONES.map(v=>{
+    const t=TRABAJADORES.find(x=>x.id===v.trabId);
+    const dias=v.inicio&&v.fin?diasHabiles(v.inicio,v.fin):0;
+    const dispTotal=t?diasVacacionesLegales(t.ingreso):15;
+    const usados=VACACIONES.filter(x=>x.trabId===v.trabId&&x.estado!=='Rechazado').reduce((s,x)=>s+(x.inicio&&x.fin?diasHabiles(x.inicio,x.fin):0),0);
+    const saldo=dispTotal-usados;
+    const ec={Aprobado:'#22C55E',Pendiente:'#F59E0B',Rechazado:'#EF4444'}[v.estado]||'#5A7090';
+    return `<tr>
+      <td style="color:var(--white);font-weight:600">${t?.nombre||'—'}</td>
+      <td style="color:var(--muted)">${v.periodo||'—'}</td>
+      <td>${dateF(v.inicio)}</td>
+      <td>${dateF(v.fin)}</td>
+      <td style="text-align:center;font-weight:700">${dias}</td>
+      <td style="text-align:center">${dispTotal}</td>
+      <td style="text-align:center;color:${saldo>=0?'var(--ok)':'var(--danger)'};font-weight:700">${saldo}</td>
+      <td>${badge(v.estado||'Pendiente',ec)}</td>
+      <td><div style="display:flex;gap:4px">
+        ${v.estado!=='Aprobado'?`<button class="btn-sm" style="background:transparent;border:1px solid rgba(34,197,94,0.3);color:var(--ok);cursor:pointer" onclick="aprobarVac(${v.id})">✓</button>`:''}
+        <button class="btn-sm btn-del" onclick="delVac(${v.id})">✕</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+
+  // Saldos
+  document.getElementById('vacSaldos').innerHTML=TRABAJADORES.filter(t=>t.estado==='activo').map(t=>{
+    const dispTotal=diasVacacionesLegales(t.ingreso);
+    const usados=VACACIONES.filter(v=>v.trabId===t.id&&v.estado==='Aprobado').reduce((s,v)=>s+(v.inicio&&v.fin?diasHabiles(v.inicio,v.fin):0),0);
+    const saldo=dispTotal-usados;
+    const años=Math.floor(calcAntiguedad(t.ingreso));
+    return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(201,168,76,0.06)">
+      <div style="flex:1"><div style="font-size:12px;font-weight:700;font-family:var(--mono)">${t.nombre}</div><div style="font-size:10px;color:var(--muted)">${años} año${años!==1?'s':''} antigüedad · ${t.cargo}</div></div>
+      <div style="text-align:center;min-width:60px"><div style="font-size:18px;font-weight:900;color:var(--info);font-family:var(--font)">${dispTotal}</div><div style="font-size:9px;color:var(--muted)">DISPONIBLES</div></div>
+      <div style="text-align:center;min-width:60px"><div style="font-size:18px;font-weight:900;color:var(--warn);font-family:var(--font)">${usados}</div><div style="font-size:9px;color:var(--muted)">USADOS</div></div>
+      <div style="text-align:center;min-width:60px"><div style="font-size:18px;font-weight:900;color:${saldo>=0?'var(--ok)':'var(--danger)'};font-family:var(--font)">${saldo}</div><div style="font-size:9px;color:var(--muted)">SALDO</div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderFiniquitos(){
+  const tbody=document.querySelector('#tblFiniq tbody');
+  tbody.innerHTML=FINIQUITOS.map(f=>{
+    const t=TRABAJADORES.find(x=>x.id===f.trabId);
+    return `<tr>
+      <td style="color:var(--white);font-weight:600">${t?.nombre||f.nombre||'—'}</td>
+      <td style="color:var(--muted);font-family:var(--mono)">${t?.rut||'—'}</td>
+      <td>${dateF(f.fechaTermino)}</td>
+      <td style="font-size:10px;color:var(--muted)">${f.causalLabel||f.causal||'—'}</td>
+      <td style="text-align:center">${f.años?.toFixed(1)||'—'}</td>
+      <td style="color:var(--gold)">${clp(f.indemnizacion||0)}</td>
+      <td style="color:var(--info)">${clp(f.vacaciones||0)}</td>
+      <td style="text-align:center">${f.mesesAviso||0}</td>
+      <td style="color:var(--ok);font-weight:800">${clp(f.total||0)}</td>
+      <td><button class="btn-sm btn-del" onclick="delFiniq(${f.id})">✕</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderParametros(){
+  document.getElementById('pSueldoMin').value = PARAMS.sueldoMin;
+  document.getElementById('pUF').value        = PARAMS.uf;
+  document.getElementById('pUTM').value       = PARAMS.utm;
+  document.getElementById('pAFP').value       = PARAMS.afp;
+  document.getElementById('pSalud').value     = PARAMS.salud;
+  document.getElementById('pCesantiaT').value = PARAMS.cesantiaT;
+  document.getElementById('pCesantiaE').value = PARAMS.cesantiaE;
+  document.getElementById('pGratif').value    = PARAMS.gratif;
+  document.getElementById('pGratifTope').value= PARAMS.gratifTope;
+  document.getElementById('pHExtra').value    = PARAMS.hExtra;
+
+  // Tabla AFP editable
+  const AFPS = [
+    {key:'capital',   nombre:'AFP Capital',   sis:1.49},
+    {key:'cuprum',    nombre:'AFP Cuprum',     sis:1.49},
+    {key:'habitat',   nombre:'AFP Hábitat',   sis:1.49},
+    {key:'planvital', nombre:'AFP PlanVital',  sis:1.49},
+    {key:'provida',   nombre:'AFP ProVida',    sis:1.49},
+    {key:'uno',       nombre:'AFP Uno',        sis:1.49},
+    {key:'modelo',    nombre:'AFP Modelo',     sis:1.49},
+  ];
+  const afpLocal = JSON.parse(localStorage.getItem('mss_afp_tasas_v1')||'{}');
+  const tbody = document.getElementById('tbodyAFP');
+  if(tbody) tbody.innerHTML = AFPS.map(a=>{
+    const tasa = afpLocal[a.key] || AFP_TASAS[a.key];
+    const total = (tasa + a.sis).toFixed(2);
+    return `<tr>
+      <td style="color:var(--white);font-weight:700">${a.nombre}</td>
+      <td>
+        <input type="number" step="0.01" value="${tasa}" id="afp_${a.key}"
+          style="width:80px;padding:5px 8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--gold);font-family:var(--mono);font-size:12px;outline:none"
+          onchange="updateAFPTasa('${a.key}',this.value)"/>
+        <span style="font-size:10px;color:var(--muted);margin-left:4px">%</span>
+      </td>
+      <td style="color:var(--info);font-family:var(--mono)">${a.sis}% <span style="font-size:9px;color:var(--muted)">(empleador)</span></td>
+      <td style="color:var(--warn);font-weight:700;font-family:var(--mono)">${total}%</td>
+      <td><span style="font-size:9px;color:var(--muted);font-family:var(--mono)">Verificar en spensiones.cl</span></td>
+    </tr>`;
+  }).join('');
+
+  // Tabla impuesto
+  const tbody2=document.querySelector('#tblImpuesto tbody');
+  if(tbody2) tbody2.innerHTML=TABLA_IMPUESTO.map((t,i)=>`<tr>
+    <td style="color:var(--mutedHi)">Tramo ${i+1}</td>
+    <td style="color:var(--white)">${t.desde.toFixed(2)}</td>
+    <td style="color:var(--white)">${t.hasta>=999999?'Sin tope':t.hasta.toFixed(2)}</td>
+    <td style="color:var(--gold);font-weight:700">${t.tasa}%</td>
+    <td style="color:var(--muted)">${t.rebaja}</td>
+    <td style="color:var(--mutedHi);font-size:10px">${t.tasa===0?'Exento de impuesto':clp(Math.round((t.desde+1)*PARAMS.utm*t.tasa/100 - t.rebaja*PARAMS.utm))+' aprox.'}</td>
+  </tr>`).join('');
+}
+
+function saveParams(){
+  PARAMS.sueldoMin = parseFloat(document.getElementById('pSueldoMin').value)||DEFAULT_PARAMS.sueldoMin;
+  PARAMS.uf        = parseFloat(document.getElementById('pUF').value)||DEFAULT_PARAMS.uf;
+  PARAMS.utm       = parseFloat(document.getElementById('pUTM').value)||DEFAULT_PARAMS.utm;
+  PARAMS.afp       = parseFloat(document.getElementById('pAFP').value)||DEFAULT_PARAMS.afp;
+  PARAMS.salud     = parseFloat(document.getElementById('pSalud').value)||DEFAULT_PARAMS.salud;
+  PARAMS.cesantiaT = parseFloat(document.getElementById('pCesantiaT').value)||DEFAULT_PARAMS.cesantiaT;
+  PARAMS.cesantiaE = parseFloat(document.getElementById('pCesantiaE').value)||DEFAULT_PARAMS.cesantiaE;
+  PARAMS.gratif    = parseFloat(document.getElementById('pGratif').value)||DEFAULT_PARAMS.gratif;
+  PARAMS.gratifTope= parseFloat(document.getElementById('pGratifTope').value)||DEFAULT_PARAMS.gratifTope;
+  PARAMS.hExtra    = parseFloat(document.getElementById('pHExtra').value)||DEFAULT_PARAMS.hExtra;
+  saveAll();
+}
+
+// ════════════════════════════════════════
+//  WORKERS SELECTS (helpers)
+// ════════════════════════════════════════
+function populateTrabajadoresSelects(){
+  const opts=TRABAJADORES.map(t=>`<option value="${t.id}">${t.nombre} — ${t.rut}</option>`).join('');
+  ['selTrabajador','vacTrabId','finiqTrabId'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=opts||'<option>Sin trabajadores registrados</option>';});
+}
+
+// ════════════════════════════════════════
+//  FINIQUITO CÁLCULO
+// ════════════════════════════════════════
+function calcularFiniquito(){
+  const trabId=parseInt(document.getElementById('finiqTrabId').value);
+  const trab=TRABAJADORES.find(t=>t.id===trabId);
+  if(!trab){alert('Selecciona un trabajador');return;}
+  const fechaTermino=document.getElementById('finiqFecha').value;
+  const causal=document.getElementById('finiqCausal').value;
+  const sueldo=parseFloat(document.getElementById('finiqSueldo').value)||trab.sueldo;
+  const vacDias=parseFloat(document.getElementById('finiqVacDias').value)||0;
+  const mesesActual=parseFloat(document.getElementById('finiqMeses').value)||0;
+
+  const años=calcAntiguedad(trab.ingreso);
+  const mesesTotal=Math.floor(años*12);
+
+  // Indemnización por años de servicio (Art. 163)
+  const tieneIndemnizacion=['161','159_4'].includes(causal);
+  const añosIndemniz=Math.floor(años);
+  const topeIndemniz=11; // máximo 11 años
+  const baseIndemniz=Math.min(sueldo, PARAMS.uf*90); // tope 90 UF
+  const indemnizacion=tieneIndemnizacion?Math.round(baseIndemniz*Math.min(añosIndemniz,topeIndemniz)):0;
+
+  // Aviso previo (Art. 161 — 30 días o pago en lugar)
+  const mesesAviso=causal==='161'?1:0;
+  const pagoAviso=Math.round(sueldo*mesesAviso);
+
+  // Vacaciones proporcionales
+  const diasVacProp=Math.round((mesesActual/12)*15);
+  const totalVacDias=vacDias+diasVacProp;
+  const valorDia=sueldo/30;
+  const pagoVacaciones=Math.round(totalVacDias*valorDia);
+
+  // Gratificación proporcional
+  const topGratif=PARAMS.gratifTope*PARAMS.uf;
+  const gratifMens=Math.min(sueldo*(PARAMS.gratif/100),topGratif);
+  const gratifProp=Math.round(gratifMens*mesesActual);
+
+  const total=indemnizacion+pagoAviso+pagoVacaciones+gratifProp;
+
+  const causalLabels={'159_1':'Art.159 Nº1 Mutuo Acuerdo','159_2':'Art.159 Nº2 Renuncia','159_4':'Art.159 Nº4 Vencimiento Plazo','161':'Art.161 Necesidades Empresa','160':'Art.160 Despido con Causa'};
+
+  // Show result
+  document.getElementById('finiqResult').innerHTML=`
+  <div class="liq-box">
+    <div class="liq-header">
+      <div class="liq-title">FINIQUITO LABORAL</div>
+      <div class="liq-sub">${trab.nombre} · ${trab.rut} · Término: ${dateF(fechaTermino)}</div>
+    </div>
+    <div class="liq-body">
+      <div class="grid-2">
+        <div>
+          <div class="liq-section">
+            <div class="liq-section-title">DATOS DEL CONTRATO</div>
+            <div class="liq-row"><span class="liq-row-label">Fecha de Ingreso</span><span class="liq-row-val">${dateF(trab.ingreso)}</span></div>
+            <div class="liq-row"><span class="liq-row-label">Fecha de Término</span><span class="liq-row-val">${dateF(fechaTermino)}</span></div>
+            <div class="liq-row"><span class="liq-row-label">Antigüedad</span><span class="liq-row-val">${años.toFixed(1)} años (${mesesTotal} meses)</span></div>
+            <div class="liq-row"><span class="liq-row-label">Causal de Término</span><span class="liq-row-val" style="font-size:11px">${causalLabels[causal]||causal}</span></div>
+            <div class="liq-row"><span class="liq-row-label">Último Sueldo Bruto</span><span class="liq-row-val" style="color:var(--gold)">${clp(sueldo)}</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="liq-section">
+            <div class="liq-section-title">CONCEPTOS A PAGAR</div>
+            <div class="liq-row"><span class="liq-row-label">Indemnización por Años Servicio</span><span class="liq-row-val" style="color:${indemnizacion>0?'var(--ok)':'var(--muted)'}">${clp(indemnizacion)}</span></div>
+            <div class="liq-row"><span class="liq-row-label">Indemnización Sustitutiva Aviso</span><span class="liq-row-val" style="color:${pagoAviso>0?'var(--ok)':'var(--muted)'}">${clp(pagoAviso)}</span></div>
+            <div class="liq-row"><span class="liq-row-label">Vacaciones Pendientes (${totalVacDias} días)</span><span class="liq-row-val" style="color:var(--ok)">${clp(pagoVacaciones)}</span></div>
+            <div class="liq-row"><span class="liq-row-label">Gratificación Proporcional (${mesesActual} meses)</span><span class="liq-row-val" style="color:var(--ok)">${clp(gratifProp)}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="liq-total">
+      <div class="liq-total-label">TOTAL FINIQUITO A PAGAR</div>
+      <div class="liq-total-val">${clp(total)}</div>
+    </div>
+  </div>
+  <div style="margin-top:12px;display:flex;gap:8px" class="no-print">
+    <button class="btn-gold" onclick="guardarFiniquito(${trabId},'${fechaTermino}','${causal}','${causalLabels[causal]||causal}',${años.toFixed(2)},${indemnizacion},${pagoVacaciones},${mesesAviso},${total})">💾 Guardar Finiquito</button>
+    <button class="btn-ghost" onclick="window.print()">🖨 Imprimir</button>
+  </div>`;
+
+  closeModal('modalFiniq');
+}
+
+function guardarFiniquito(trabId,fecha,causal,causalLabel,años,indemnizacion,vacaciones,mesesAviso,total){
+  FINIQUITOS.push({id:uid(),trabId,fechaTermino:fecha,causal,causalLabel,años:parseFloat(años),indemnizacion,vacaciones,mesesAviso,total});
+  // Marcar trabajador como desvinculado
+  const idx=TRABAJADORES.findIndex(t=>t.id===trabId);
+  if(idx>=0){TRABAJADORES[idx].estado='desvinculado';}
+  saveAll();renderFiniquitos();
+  alert('✓ Finiquito guardado');
+}
+
+// ════════════════════════════════════════
+//  CRUD TRABAJADORES
+// ════════════════════════════════════════
+function openTrabajadorModal(id){
+  const t=id?TRABAJADORES.find(x=>x.id===id):null;
+  document.getElementById('trabTitle').textContent=t?'Editar Trabajador':'Nuevo Trabajador';
+  document.getElementById('trabId').value=id||'';
+  const fields={tNombre:'nombre',tRut:'rut',tNacimiento:'nacimiento',tCargo:'cargo',tArea:'area',tIngreso:'ingreso',tSueldo:'sueldo',tPctSalud:'pctSalud',tNacionalidad:'nacionalidad',tDireccion:'direccion',tEmail:'email',tTelefono:'telefono',tCuenta:'cuenta'};
+  Object.entries(fields).forEach(([fId,key])=>{const el=document.getElementById(fId);if(el)el.value=t?t[key]||'':'';});
+  if(t){
+    ['tContrato','tAFP','tSalud','tBanco','tTipoCuenta','tEstado'].forEach(sId=>{
+      const map={tContrato:'contrato',tAFP:'afp',tSalud:'salud',tBanco:'banco',tTipoCuenta:'tipoCuenta',tEstado:'estado'};
+      const el=document.getElementById(sId);if(el&&t[map[sId]])el.value=t[map[sId]];
+    });
+  }
+  document.getElementById('modalTrab').classList.add('open');
+}
+
+function saveTrabajador(){
+  const id=document.getElementById('trabId').value;
+  const obj={
+    nombre:document.getElementById('tNombre').value.trim(),
+    rut:document.getElementById('tRut').value.trim(),
+    nacimiento:document.getElementById('tNacimiento').value,
+    cargo:document.getElementById('tCargo').value.trim(),
+    area:document.getElementById('tArea').value.trim(),
+    ingreso:document.getElementById('tIngreso').value,
+    sueldo:parseFloat(document.getElementById('tSueldo').value)||0,
+    contrato:document.getElementById('tContrato').value,
+    afp:document.getElementById('tAFP').value,
+    salud:document.getElementById('tSalud').value,
+    pctSalud:parseFloat(document.getElementById('tPctSalud').value)||7,
+    nacionalidad:document.getElementById('tNacionalidad').value,
+    direccion:document.getElementById('tDireccion').value,
+    email:document.getElementById('tEmail').value,
+    telefono:document.getElementById('tTelefono').value,
+    banco:document.getElementById('tBanco').value,
+    cuenta:document.getElementById('tCuenta').value,
+    tipoCuenta:document.getElementById('tTipoCuenta').value,
+    estado:document.getElementById('tEstado').value,
+  };
+  if(!obj.nombre||!obj.rut){alert('Ingresa nombre y RUT');return;}
+  if(id){const idx=TRABAJADORES.findIndex(t=>t.id==id);if(idx>=0)TRABAJADORES[idx]={...TRABAJADORES[idx],...obj};}
+  else TRABAJADORES.push({id:uid(),...obj});
+  saveAll();closeModal('modalTrab');populateTrabajadoresSelects();renderTrabajadoresTable();renderKPIs();
+}
+
+function delTrabajador(id){if(!confirm('¿Eliminar trabajador?'))return;TRABAJADORES=TRABAJADORES.filter(t=>t.id!==id);saveAll();renderTrabajadoresTable();renderKPIs();populateTrabajadoresSelects();}
+function delLiq(id){if(!confirm('¿Eliminar liquidación?'))return;LIQUIDACIONES=LIQUIDACIONES.filter(l=>l.id!==id);saveAll();renderLiquidacionesTable();renderKPIs();}
+function delVac(id){if(!confirm('¿Eliminar registro?'))return;VACACIONES=VACACIONES.filter(v=>v.id!==id);saveAll();renderVacaciones();}
+function delFiniq(id){if(!confirm('¿Eliminar finiquito?'))return;FINIQUITOS=FINIQUITOS.filter(f=>f.id!==id);saveAll();renderFiniquitos();}
+function aprobarVac(id){VACACIONES=VACACIONES.map(v=>v.id===id?{...v,estado:'Aprobado'}:v);saveAll();renderVacaciones();}
+
+// ════════════════════════════════════════
+//  VACACIONES MODAL
+// ════════════════════════════════════════
+function openVacModal(){
+  populateTrabajadoresSelects();
+  document.getElementById('vacInicio').value='';
+  document.getElementById('vacFin').value='';
+  document.getElementById('vacObs').value='';
+  document.getElementById('modalVac').classList.add('open');
+}
+function saveVac(){
+  const trabId=parseInt(document.getElementById('vacTrabId').value);
+  const inicio=document.getElementById('vacInicio').value;
+  const fin=document.getElementById('vacFin').value;
+  if(!trabId||!inicio||!fin){alert('Completa todos los campos');return;}
+  const now=new Date();
+  VACACIONES.push({id:uid(),trabId,inicio,fin,periodo:`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`,tipo:document.getElementById('vacTipo').value,obs:document.getElementById('vacObs').value,estado:'Pendiente'});
+  saveAll();closeModal('modalVac');renderVacaciones();
+}
+function openFiniqModal(){populateTrabajadoresSelects();document.getElementById('finiqFecha').value=new Date().toISOString().split('T')[0];document.getElementById('modalFiniq').classList.add('open');}
+
+// ════════════════════════════════════════
+//  TABS
+// ════════════════════════════════════════
+function showTab(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='liquidaciones'){renderKPIs();renderLiquidacionesTable();populateTrabajadoresSelects();}
+  if(id==='trabajadores') renderTrabajadoresTable();
+  if(id==='libro')        renderLibro();
+  if(id==='vacaciones')   renderVacaciones();
+  if(id==='finiquitos')   {renderFiniquitos();populateTrabajadoresSelects();}
+  if(id==='parametros')   renderParametros();
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
+
+// ════════════════════════════════════════
+//  GRATIFICACIÓN — INFO DINÁMICA
+// ════════════════════════════════════════
+function updateAFPTasa(key, val){
+  const tasa = parseFloat(val)||AFP_TASAS[key];
+  AFP_TASAS[key] = tasa;
+  // Guardar en localStorage para persistencia
+  const afpLocal = JSON.parse(localStorage.getItem('mss_afp_tasas_v1')||'{}');
+  afpLocal[key] = tasa;
+  localStorage.setItem('mss_afp_tasas_v1', JSON.stringify(afpLocal));
+  // Actualizar total visible
+  renderParametros();
+}
+
+function actualizarInfoGratif(val){
+  const el = document.getElementById('gratifInfo');
+  if(!el) return;
+  const msgs = {
+    mensual_25: {txt:'✓ Gratificación mensual 25% con tope 4.75 UF — Se calcula y suma a los haberes imponibles (Art. 47 CT)',  bg:'rgba(34,197,94,0.07)',   bc:'rgba(34,197,94,0.25)'},
+    anual:      {txt:'ℹ Gratificación anual — Solo se paga si la empresa tuvo utilidades. NO aparece en esta liquidación mensual (Art. 46 CT)', bg:'rgba(56,189,248,0.07)', bc:'rgba(56,189,248,0.25)'},
+    incluida:   {txt:'ℹ Gratificación ya pactada e incluida dentro del sueldo base. El sistema NO la calcula por separado.',    bg:'rgba(56,189,248,0.07)', bc:'rgba(56,189,248,0.25)'},
+    sin_gratif: {txt:'⚠ Sin gratificación — Aplica para contratos de honorarios, condominios u otros casos específicos pactados.',bg:'rgba(245,158,11,0.07)', bc:'rgba(245,158,11,0.25)'},
+  };
+  const m = msgs[val] || msgs.mensual_25;
+  el.textContent = m.txt;
+  el.style.background = m.bg;
+  el.style.borderColor = m.bc;
+}
+
+// ════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════
+loadAll();
+// Cargar tasas AFP personalizadas si existen
+try{
+  const afpLocal=JSON.parse(localStorage.getItem('mss_afp_tasas_v1')||'{}');
+  Object.entries(afpLocal).forEach(([k,v])=>{AFP_TASAS[k]=parseFloat(v)||AFP_TASAS[k];});
+}catch(e){}
+renderKPIs();
+renderLiquidacionesTable();
+populateTrabajadoresSelects();
+document.getElementById('hInfo').textContent=`${TRABAJADORES.length} trabajadores · ${LIQUIDACIONES.length} liquidaciones`;
+</script>
+</body>
+</html>

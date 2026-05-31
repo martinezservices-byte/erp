@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Martinez Services Spa — Tesorería</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#050C14;--surf:#091622;--surf2:#0E1E2E;--border:rgba(251,191,36,0.15);--border2:rgba(251,191,36,0.08);--acc:#FBBF24;--accHi:#FDE68A;--white:#FFFBEB;--muted:#5C4F2A;--mutedHi:#8A7340;--ok:#22C55E;--danger:#EF4444;--warn:#F59E0B;--info:#38BDF8;--purple:#A78BFA;}
+body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;min-height:100vh;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-thumb{background:rgba(251,191,36,0.2);border-radius:3px;}
+#header{background:var(--surf);border-bottom:1px solid var(--border2);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--acc),var(--accHi));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--bg);}
+.logo-name{font-size:15px;font-weight:800;}
+.logo-mod{font-size:10px;color:var(--acc);font-weight:700;letter-spacing:2px;font-family:monospace;}
+#tabbar{display:flex;gap:3px;background:var(--bg);padding:4px;border-radius:10px;width:fit-content;margin:22px 24px 0;flex-wrap:wrap;}
+.tab{padding:7px 15px;border-radius:7px;border:none;cursor:pointer;font-size:11px;font-weight:700;background:transparent;color:var(--muted);font-family:monospace;}
+.tab.active{background:var(--acc);color:var(--bg);}
+#content{max-width:1280px;margin:0 auto;padding:20px 24px 40px;}
+.section{display:none;}.section.active{display:block;}
+.kpi-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
+.kpi{flex:1;min-width:145px;background:var(--surf);border-radius:12px;padding:16px 18px;border:1px solid var(--border2);}
+.kpi-label{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;font-family:monospace;}
+.kpi-value{font-size:22px;font-weight:900;}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.card{background:var(--surf);border-radius:12px;padding:18px;border:1px solid var(--border2);}
+.card-title{font-size:13px;font-weight:700;color:var(--white);margin-bottom:14px;}
+.badge{display:inline-flex;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;font-family:monospace;white-space:nowrap;}
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:11px;font-family:monospace;}
+th{padding:9px 11px;text-align:left;color:var(--acc);font-weight:700;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:8px 11px;border-bottom:1px solid rgba(251,191,36,0.05);}
+tr:nth-child(even) td{background:rgba(255,255,255,0.012);}
+tfoot td{border-top:2px solid rgba(251,191,36,0.25);font-weight:800;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surf);border-radius:16px;padding:28px;border:1px solid rgba(251,191,36,0.3);width:500px;max-height:92vh;overflow-y:auto;}
+.modal h3{font-size:18px;font-weight:900;color:var(--white);margin-bottom:20px;}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.fgrid .full{grid-column:1/3;}
+.field label{font-size:10px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;font-family:monospace;}
+.field input,.field select{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-size:12px;font-family:monospace;outline:none;}
+.field input:focus{border-color:var(--acc);}
+.btn-acc{padding:10px 22px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:13px;font-family:monospace;background:var(--acc);color:var(--bg);}
+.btn-ghost{padding:10px 22px;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px;font-family:monospace;background:transparent;border:1px solid var(--border);color:var(--muted);}
+.btn-sm{padding:4px 10px;border-radius:5px;font-size:10px;cursor:pointer;font-family:monospace;}
+.btn-edit{background:transparent;border:1px solid rgba(251,191,36,0.3);color:var(--acc);}
+.btn-del{background:transparent;border:1px solid rgba(239,68,68,0.3);color:var(--danger);}
+.cuenta-card{background:var(--surf);border-radius:14px;padding:20px;border:1px solid var(--border2);border-left:4px solid var(--acc);}
+#footer{border-top:1px solid var(--border2);padding:13px 28px;display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-family:monospace;}
+@media(max-width:700px){.grid-2{grid-template-columns:1fr;}.fgrid{grid-template-columns:1fr;}.fgrid .full{grid-column:1;}}
+</style>
+</head>
+<body>
+<div id="header">
+  <div style="display:flex;align-items:center;gap:14px">
+    <div class="logo-icon">M</div>
+    <div><div class="logo-name">Martinez Services Spa</div><div class="logo-mod">MÓDULO TESORERÍA</div></div>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center">
+    <span style="font-size:11px;color:var(--muted);font-family:monospace" id="hInfo">Cargando...</span>
+    <button class="btn-acc" style="padding:7px 16px;font-size:12px" onclick="openMovModal(null)">+ Movimiento</button>
+    <button class="btn-ghost" style="padding:7px 14px;font-size:12px" onclick="openCuentaModal(null)">+ Cuenta</button>
+  </div>
+</div>
+<div id="tabbar">
+  <button class="tab active" onclick="showTab('cuentas',this)">🏦 Cuentas Bancarias</button>
+  <button class="tab" onclick="showTab('movimientos',this)">💳 Movimientos</button>
+  <button class="tab" onclick="showTab('flujo',this)">📊 Flujo de Caja</button>
+  <button class="tab" onclick="showTab('conciliacion',this)">✅ Conciliación</button>
+  <button class="tab" onclick="showTab('presupuesto',this)">📋 Presupuesto</button>
+</div>
+<div id="content">
+  <div id="sec-cuentas" class="section active">
+    <div class="kpi-row" id="kpiCuentas"></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px" id="cuentasGrid"></div>
+  </div>
+  <div id="sec-movimientos" class="section">
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:flex-end">
+      <div class="field" style="flex:1;min-width:160px"><label>Cuenta</label><select id="filtCuenta" onchange="renderMovimientos()"></select></div>
+      <div class="field" style="min-width:130px"><label>Desde</label><input type="date" id="filtDesde" onchange="renderMovimientos()"/></div>
+      <div class="field" style="min-width:130px"><label>Hasta</label><input type="date" id="filtHasta" onchange="renderMovimientos()"/></div>
+      <div class="field" style="min-width:120px"><label>Tipo</label><select id="filtTipo" onchange="renderMovimientos()"><option value="">Todos</option><option>Ingreso</option><option>Egreso</option></select></div>
+      <button class="btn-acc" style="padding:9px 16px;font-size:12px" onclick="openMovModal(null)">+ Nuevo</button>
+    </div>
+    <div class="card tbl-wrap">
+      <table id="tblMovs">
+        <thead><tr><th>Fecha</th><th>Cuenta</th><th>Tipo</th><th>Categoría</th><th>Descripción</th><th>Ingreso</th><th>Egreso</th><th>Saldo</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody></tbody><tfoot></tfoot>
+      </table>
+    </div>
+  </div>
+  <div id="sec-flujo" class="section">
+    <div class="kpi-row" id="kpiFlujo"></div>
+    <div class="grid-2">
+      <div class="card"><div class="card-title">Flujo Mensual</div><div id="flujoBarras"></div></div>
+      <div class="card"><div class="card-title">Por Categoría</div><div id="flujoCategoria"></div></div>
+    </div>
+  </div>
+  <div id="sec-conciliacion" class="section">
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:flex-end">
+      <div class="field" style="flex:1"><label>Cuenta</label><select id="concCuenta"></select></div>
+      <div class="field"><label>Mes</label><input type="month" id="concMes"/></div>
+      <button class="btn-acc" style="padding:9px 16px;font-size:12px" onclick="renderConciliacion()">Ver</button>
+    </div>
+    <div id="concContent"></div>
+  </div>
+  <div id="sec-presupuesto" class="section">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+      <button class="btn-acc" style="padding:8px 18px;font-size:12px" onclick="openPresupModal()">+ Agregar Línea</button>
+    </div>
+    <div class="card tbl-wrap">
+      <table id="tblPresup">
+        <thead><tr><th>Concepto</th><th>Tipo</th><th>Ene</th><th>Feb</th><th>Mar</th><th>Abr</th><th>May</th><th>Jun</th><th>Jul</th><th>Ago</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dic</th><th>Total</th><th></th></tr></thead>
+        <tbody></tbody><tfoot></tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+<div id="footer">
+  <span>Martinez Services Spa · Módulo Tesorería v1.0 · 2025</span>
+  <span>Datos guardados automáticamente</span>
+</div>
+
+<!-- MODAL CUENTA -->
+<div class="modal-overlay" id="modalCuenta">
+  <div class="modal" style="width:440px">
+    <h3 id="ctaTitle">Nueva Cuenta Bancaria</h3>
+    <input type="hidden" id="ctaId"/>
+    <div class="fgrid">
+      <div class="field full"><label>Nombre / Alias</label><input id="ctaNombre" type="text"/></div>
+      <div class="field"><label>Banco</label><select id="ctaBanco"><option>BCI</option><option>BancoEstado</option><option>Banco de Chile</option><option>Santander</option><option>Itaú</option><option>Scotiabank</option></select></div>
+      <div class="field"><label>Tipo</label><select id="ctaTipo"><option>Cuenta Corriente</option><option>Cuenta Vista</option><option>CuentaRUT</option><option>Cuenta de Ahorro</option></select></div>
+      <div class="field"><label>Nº Cuenta</label><input id="ctaNum" type="text"/></div>
+      <div class="field"><label>Saldo Inicial ($)</label><input id="ctaSaldo" type="number" value="0"/></div>
+      <div class="field"><label>Color</label><select id="ctaColor"><option value="#FBBF24">Dorado</option><option value="#38BDF8">Azul</option><option value="#22C55E">Verde</option><option value="#A78BFA">Púrpura</option></select></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn-acc" style="flex:1" onclick="saveCuenta()">Guardar</button>
+      <button class="btn-ghost" onclick="closeModal('modalCuenta')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MOVIMIENTO -->
+<div class="modal-overlay" id="modalMov">
+  <div class="modal">
+    <h3 id="movTitle">Nuevo Movimiento</h3>
+    <input type="hidden" id="movId"/>
+    <div class="fgrid">
+      <div class="field"><label>Fecha</label><input id="movFecha" type="date"/></div>
+      <div class="field"><label>Tipo</label><select id="movTipo"><option>Ingreso</option><option>Egreso</option></select></div>
+      <div class="field"><label>Cuenta</label><select id="movCuenta"></select></div>
+      <div class="field"><label>Categoría</label><select id="movCat"><option>Ventas / Cobros</option><option>Remuneraciones</option><option>Proveedores</option><option>Arriendo</option><option>Servicios Básicos</option><option>Impuestos</option><option>AFP/Salud</option><option>Gastos Generales</option><option>Otro</option></select></div>
+      <div class="field"><label>Monto ($)</label><input id="movMonto" type="number" min="0"/></div>
+      <div class="field"><label>Referencia</label><input id="movRef" type="text"/></div>
+      <div class="field full"><label>Descripción</label><input id="movDesc" type="text"/></div>
+      <div class="field"><label>Estado</label><select id="movEstado"><option>Efectivo</option><option>Pendiente</option><option>Conciliado</option></select></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn-acc" style="flex:1" onclick="saveMov()">Guardar</button>
+      <button class="btn-ghost" onclick="closeModal('modalMov')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PRESUPUESTO -->
+<div class="modal-overlay" id="modalPresup">
+  <div class="modal" style="width:400px">
+    <h3>Nueva Línea Presupuesto</h3>
+    <div class="fgrid">
+      <div class="field full"><label>Concepto</label><input id="presupConcepto" type="text"/></div>
+      <div class="field"><label>Tipo</label><select id="presupTipo"><option>Ingreso</option><option>Egreso</option></select></div>
+      <div class="field"><label>Monto Mensual ($)</label><input id="presupMonto" type="number"/></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn-acc" style="flex:1" onclick="savePresup()">Guardar</button>
+      <button class="btn-ghost" onclick="closeModal('modalPresup')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SK_CTAS='mss_tes_cuentas_v1',SK_MOVS='mss_tes_movs_v1',SK_PRES='mss_tes_presup_v1';
+let _id=5000;const uid=()=>++_id;
+
+const DEF_CUENTAS=[
+  {id:5001,nombre:'BCI Cuenta Corriente Principal',banco:'BCI',tipo:'Cuenta Corriente',num:'1234567890',saldoInicial:15000000,color:'#38BDF8'},
+  {id:5002,nombre:'BancoEstado Cuenta Vista',banco:'BancoEstado',tipo:'Cuenta Vista',num:'9876543210',saldoInicial:3500000,color:'#22C55E'},
+  {id:5003,nombre:'Santander Cuenta Ahorro',banco:'Santander',tipo:'Cuenta de Ahorro',num:'5555444433',saldoInicial:8000000,color:'#FBBF24'},
+];
+const DEF_MOVS=[
+  {id:5101,fecha:'2025-06-01',tipo:'Ingreso',cuentaId:5001,cat:'Ventas / Cobros',desc:'Cobro Minera Atacama',monto:4165000,ref:'FAC-001',estado:'Conciliado'},
+  {id:5102,fecha:'2025-06-02',tipo:'Egreso',cuentaId:5001,cat:'Arriendo',desc:'Arriendo oficina Junio',monto:800000,ref:'REC-056',estado:'Conciliado'},
+  {id:5103,fecha:'2025-06-05',tipo:'Egreso',cuentaId:5001,cat:'Remuneraciones',desc:'Pago remuneraciones',monto:3200000,ref:'LR-06',estado:'Efectivo'},
+  {id:5104,fecha:'2025-06-10',tipo:'Ingreso',cuentaId:5001,cat:'Ventas / Cobros',desc:'Cobro Agrícola Sur Verde',monto:3332000,ref:'FAC-002',estado:'Conciliado'},
+  {id:5105,fecha:'2025-06-15',tipo:'Egreso',cuentaId:5001,cat:'Servicios Básicos',desc:'Luz, agua, internet',monto:185000,ref:'SB-06',estado:'Efectivo'},
+  {id:5106,fecha:'2025-06-22',tipo:'Egreso',cuentaId:5001,cat:'AFP/Salud',desc:'Pago cotizaciones',monto:950000,ref:'PREV-06',estado:'Efectivo'},
+];
+const DEF_PRESUP=[
+  {id:5201,concepto:'Ingresos por Servicios',tipo:'Ingreso',montos:[5500000,5800000,6000000,6200000,6500000,7000000,7200000,7500000,8000000,8200000,8500000,9000000]},
+  {id:5202,concepto:'Remuneraciones',tipo:'Egreso',montos:[3200000,3200000,3200000,3200000,3200000,3200000,3200000,3200000,3200000,3200000,3200000,3200000]},
+  {id:5203,concepto:'Arriendo Oficina',tipo:'Egreso',montos:[800000,800000,800000,800000,800000,800000,800000,800000,800000,800000,800000,800000]},
+  {id:5204,concepto:'Gastos Operacionales',tipo:'Egreso',montos:[400000,400000,450000,420000,430000,500000,480000,460000,520000,500000,550000,600000]},
+];
+
+let CUENTAS_TES=[],MOVIMIENTOS=[],PRESUPUESTO=[];
+
+function saveAll(){try{localStorage.setItem(SK_CTAS,JSON.stringify(CUENTAS_TES));localStorage.setItem(SK_MOVS,JSON.stringify(MOVIMIENTOS));localStorage.setItem(SK_PRES,JSON.stringify(PRESUPUESTO));}catch(e){}}
+function loadAll(){
+  try{
+    CUENTAS_TES=JSON.parse(localStorage.getItem(SK_CTAS))||DEF_CUENTAS.map(x=>({...x}));
+    MOVIMIENTOS=JSON.parse(localStorage.getItem(SK_MOVS))||DEF_MOVS.map(x=>({...x}));
+    PRESUPUESTO=JSON.parse(localStorage.getItem(SK_PRES))||DEF_PRESUP.map(x=>({...x}));
+  }catch(e){CUENTAS_TES=DEF_CUENTAS.map(x=>({...x}));MOVIMIENTOS=DEF_MOVS.map(x=>({...x}));PRESUPUESTO=DEF_PRESUP.map(x=>({...x}));}
+}
+
+const clp=n=>new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Math.round(n||0));
+const M=n=>'$'+(n/1e6).toFixed(2)+'M';
+const dateF=d=>{try{return new Date(d+'T00:00:00').toLocaleDateString('es-CL');}catch{return d||'—';}};
+function badge(l,c){return '<span class="badge" style="background:'+c+'20;color:'+c+';border:1px solid '+c+'40">'+l+'</span>';}
+
+function saldoCuenta(cuentaId){
+  const cta=CUENTAS_TES.find(c=>c.id===cuentaId);
+  const ini=cta?.saldoInicial||0;
+  const movs=MOVIMIENTOS.filter(m=>m.cuentaId===cuentaId);
+  return ini+movs.filter(m=>m.tipo==='Ingreso').reduce((s,m)=>s+m.monto,0)-movs.filter(m=>m.tipo==='Egreso').reduce((s,m)=>s+m.monto,0);
+}
+
+function populateCuentasSelects(){
+  const opts=CUENTAS_TES.map(c=>'<option value="'+c.id+'">'+c.nombre+'</option>').join('');
+  ['filtCuenta','movCuenta','concCuenta'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='<option value="">Todas</option>'+opts;});
+}
+
+function showTab(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  btn.classList.add('active');
+  populateCuentasSelects();
+  if(id==='cuentas')renderCuentas();
+  if(id==='movimientos')renderMovimientos();
+  if(id==='flujo')renderFlujo();
+  if(id==='conciliacion')renderConciliacion();
+  if(id==='presupuesto')renderPresupuesto();
+}
+
+function renderCuentas(){
+  const totSaldo=CUENTAS_TES.reduce((s,c)=>s+saldoCuenta(c.id),0);
+  const totI=MOVIMIENTOS.filter(m=>m.tipo==='Ingreso').reduce((s,m)=>s+m.monto,0);
+  const totE=MOVIMIENTOS.filter(m=>m.tipo==='Egreso').reduce((s,m)=>s+m.monto,0);
+  document.getElementById('kpiCuentas').innerHTML='<div class="kpi"><div class="kpi-label">Saldo Total</div><div class="kpi-value" style="color:var(--acc)">'+M(totSaldo)+'</div></div><div class="kpi"><div class="kpi-label">Total Ingresos</div><div class="kpi-value" style="color:var(--ok)">'+M(totI)+'</div></div><div class="kpi"><div class="kpi-label">Total Egresos</div><div class="kpi-value" style="color:var(--danger)">'+M(totE)+'</div></div><div class="kpi"><div class="kpi-label">Flujo Neto</div><div class="kpi-value" style="color:'+(totI-totE>=0?'var(--ok)':'var(--danger)')+'">'+M(totI-totE)+'</div></div>';
+  document.getElementById('cuentasGrid').innerHTML=CUENTAS_TES.map(c=>{
+    const saldo=saldoCuenta(c.id);
+    const movsCta=MOVIMIENTOS.filter(m=>m.cuentaId===c.id);
+    return '<div class="cuenta-card" style="border-left-color:'+c.color+'"><div style="font-size:14px;font-weight:800;margin-bottom:4px">'+c.nombre+'</div><div style="font-size:10px;color:var(--muted);font-family:monospace;margin-bottom:12px">'+c.banco+' · '+c.tipo+' · '+c.num+'</div><div style="font-size:26px;font-weight:900;color:'+(saldo>=0?c.color:'var(--danger)')+'">'+clp(saldo)+'</div><div style="font-size:10px;color:var(--muted);margin-top:3px">Inicial: '+clp(c.saldoInicial)+'</div><div style="display:flex;gap:12px;margin-top:10px;font-size:11px;font-family:monospace"><span style="color:var(--ok)">▲'+clp(movsCta.filter(m=>m.tipo==="Ingreso").reduce((s,m)=>s+m.monto,0))+'</span><span style="color:var(--danger)">▼'+clp(movsCta.filter(m=>m.tipo==="Egreso").reduce((s,m)=>s+m.monto,0))+'</span></div><div style="display:flex;gap:6px;margin-top:12px"><button class="btn-sm btn-edit" onclick="openCuentaModal('+c.id+')">✎ Editar</button><button class="btn-sm btn-del" onclick="delCuenta('+c.id+')">✕</button></div></div>';
+  }).join('')+'<div onclick="openCuentaModal(null)" style="background:transparent;border:1px dashed rgba(251,191,36,0.3);border-radius:14px;padding:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;min-height:160px"><div style="font-size:28px;color:var(--acc)">+</div><div style="font-size:12px;color:var(--muted);font-family:monospace">Agregar Cuenta</div></div>';
+}
+
+function renderMovimientos(){
+  const filtCta=document.getElementById('filtCuenta')?.value;
+  const filtDesde=document.getElementById('filtDesde')?.value;
+  const filtHasta=document.getElementById('filtHasta')?.value;
+  const filtTipo=document.getElementById('filtTipo')?.value||'';
+  let movs=[...MOVIMIENTOS].filter(m=>{
+    return (!filtCta||m.cuentaId==filtCta)&&(!filtDesde||m.fecha>=filtDesde)&&(!filtHasta||m.fecha<=filtHasta)&&(!filtTipo||m.tipo===filtTipo);
+  }).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  let saldoAcum=0;
+  const TIPO_COLOR={Ingreso:'#22C55E',Egreso:'#EF4444'};
+  const ESTADO_COLOR={Efectivo:'#22C55E',Pendiente:'#F59E0B',Conciliado:'#A78BFA'};
+  const tbody=document.querySelector('#tblMovs tbody');
+  const tfoot=document.querySelector('#tblMovs tfoot');
+  tbody.innerHTML=movs.map(m=>{
+    const c=CUENTAS_TES.find(x=>x.id===m.cuentaId);
+    if(m.tipo==='Ingreso')saldoAcum+=m.monto;else saldoAcum-=m.monto;
+    return '<tr><td>'+dateF(m.fecha)+'</td><td style="color:var(--mutedHi);font-size:10px">'+(c?.nombre||'—')+'</td><td>'+badge(m.tipo,TIPO_COLOR[m.tipo]||'#5A7090')+'</td><td style="color:var(--mutedHi);font-size:10px">'+m.cat+'</td><td style="color:var(--white)">'+m.desc+'</td><td style="text-align:right;color:var(--ok);font-weight:700">'+(m.tipo==='Ingreso'?clp(m.monto):'—')+'</td><td style="text-align:right;color:var(--danger);font-weight:700">'+(m.tipo==='Egreso'?clp(m.monto):'—')+'</td><td style="text-align:right;color:'+(saldoAcum>=0?'var(--acc)':'var(--danger)')+';font-weight:800">'+clp(saldoAcum)+'</td><td>'+badge(m.estado,ESTADO_COLOR[m.estado]||'#5A7090')+'</td><td><div style="display:flex;gap:4px"><button class="btn-sm btn-edit" onclick="openMovModal('+m.id+')">✎</button><button class="btn-sm btn-del" onclick="delMov('+m.id+')">✕</button></div></td></tr>';
+  }).join('');
+  const totI=movs.filter(m=>m.tipo==='Ingreso').reduce((s,m)=>s+m.monto,0);
+  const totE=movs.filter(m=>m.tipo==='Egreso').reduce((s,m)=>s+m.monto,0);
+  tfoot.innerHTML='<tr><td colspan="5" style="color:var(--acc)">TOTALES ('+movs.length+')</td><td style="text-align:right;color:var(--ok)">'+clp(totI)+'</td><td style="text-align:right;color:var(--danger)">'+clp(totE)+'</td><td style="text-align:right;color:var(--acc)">'+clp(totI-totE)+'</td><td colspan="2"></td></tr>';
+}
+
+function renderFlujo(){
+  const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const year=new Date().getFullYear();
+  const byMes=MESES.map((m,i)=>{
+    const mes=year+'-'+String(i+1).padStart(2,'0');
+    const ing=MOVIMIENTOS.filter(x=>x.tipo==='Ingreso'&&x.fecha?.startsWith(mes)).reduce((s,x)=>s+x.monto,0);
+    const egr=MOVIMIENTOS.filter(x=>x.tipo==='Egreso'&&x.fecha?.startsWith(mes)).reduce((s,x)=>s+x.monto,0);
+    return {mes:m,ing,egr,neto:ing-egr};
+  });
+  const totI=byMes.reduce((s,m)=>s+m.ing,0);
+  const totE=byMes.reduce((s,m)=>s+m.egr,0);
+  document.getElementById('kpiFlujo').innerHTML='<div class="kpi"><div class="kpi-label">Ingresos '+year+'</div><div class="kpi-value" style="color:var(--ok)">'+M(totI)+'</div></div><div class="kpi"><div class="kpi-label">Egresos '+year+'</div><div class="kpi-value" style="color:var(--danger)">'+M(totE)+'</div></div><div class="kpi"><div class="kpi-label">Flujo Neto</div><div class="kpi-value" style="color:'+(totI-totE>=0?'var(--ok)':'var(--danger)')+'">'+M(totI-totE)+'</div></div>';
+  const maxVal=Math.max(...byMes.map(m=>Math.max(m.ing,m.egr)),1);
+  document.getElementById('flujoBarras').innerHTML=byMes.map(m=>'<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:3px;font-size:11px;font-family:monospace"><span>'+m.mes+'</span><div style="display:flex;gap:8px"><span style="color:var(--ok)">▲'+M(m.ing)+'</span><span style="color:var(--danger)">▼'+M(m.egr)+'</span></div></div><div style="height:7px;background:rgba(255,255,255,0.06);border-radius:4px;margin-bottom:2px"><div style="height:7px;border-radius:4px;background:rgba(34,197,94,0.7);width:'+Math.min(100,(m.ing/maxVal)*100)+'%"></div></div><div style="height:7px;background:rgba(255,255,255,0.06);border-radius:4px"><div style="height:7px;border-radius:4px;background:rgba(239,68,68,0.7);width:'+Math.min(100,(m.egr/maxVal)*100)+'%"></div></div></div>').join('');
+  const byCat={};
+  MOVIMIENTOS.forEach(m=>{if(!byCat[m.cat])byCat[m.cat]={ing:0,egr:0};if(m.tipo==='Ingreso')byCat[m.cat].ing+=m.monto;else byCat[m.cat].egr+=m.monto;});
+  document.getElementById('flujoCategoria').innerHTML=Object.entries(byCat).map(([cat,v])=>'<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(251,191,36,0.06)"><span style="font-size:12px;font-family:monospace">'+cat+'</span><div style="display:flex;gap:10px">'+(v.ing>0?'<span style="color:var(--ok);font-family:monospace;font-weight:700">+'+clp(v.ing)+'</span>':'')+(v.egr>0?'<span style="color:var(--danger);font-family:monospace;font-weight:700">-'+clp(v.egr)+'</span>':'')+'</div></div>').join('');
+}
+
+function renderConciliacion(){
+  const cuentaId=parseInt(document.getElementById('concCuenta')?.value);
+  const mes=document.getElementById('concMes')?.value;
+  if(!cuentaId||!mes){document.getElementById('concContent').innerHTML='<div style="color:var(--muted);font-family:monospace;padding:20px">Selecciona cuenta y período</div>';return;}
+  const movs=MOVIMIENTOS.filter(m=>m.cuentaId===cuentaId&&m.fecha?.startsWith(mes));
+  const conc=movs.filter(m=>m.estado==='Conciliado');
+  const pend=movs.filter(m=>m.estado!=='Conciliado');
+  document.getElementById('concContent').innerHTML='<div class="kpi-row"><div class="kpi"><div class="kpi-label">Movimientos</div><div class="kpi-value" style="color:var(--acc)">'+movs.length+'</div></div><div class="kpi"><div class="kpi-label">Conciliados</div><div class="kpi-value" style="color:var(--ok)">'+conc.length+'</div></div><div class="kpi"><div class="kpi-label">Pendientes</div><div class="kpi-value" style="color:'+(pend.length>0?'var(--warn)':'var(--ok)')+'">'+pend.length+'</div></div></div><div class="card tbl-wrap"><table><thead><tr><th>Fecha</th><th>Descripción</th><th>Ingreso</th><th>Egreso</th><th>Estado</th><th>Acción</th></tr></thead><tbody>'+movs.map(m=>'<tr><td>'+dateF(m.fecha)+'</td><td style="color:var(--white)">'+m.desc+'</td><td style="color:var(--ok);text-align:right">'+(m.tipo==='Ingreso'?clp(m.monto):'—')+'</td><td style="color:var(--danger);text-align:right">'+(m.tipo==='Egreso'?clp(m.monto):'—')+'</td><td>'+badge(m.estado,m.estado==='Conciliado'?'#A78BFA':'#F59E0B')+'</td><td>'+(m.estado!=='Conciliado'?'<button class="btn-sm" style="background:transparent;border:1px solid rgba(167,139,250,0.3);color:var(--purple);cursor:pointer" onclick="conciliarMov('+m.id+')">✓ Conciliar</button>':badge('✓ OK','#A78BFA'))+'</td></tr>').join('')+'</tbody></table></div>';
+}
+
+function conciliarMov(id){MOVIMIENTOS=MOVIMIENTOS.map(m=>m.id===id?{...m,estado:'Conciliado'}:m);saveAll();renderConciliacion();}
+
+function renderPresupuesto(){
+  const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const tbody=document.querySelector('#tblPresup tbody');
+  const tfoot=document.querySelector('#tblPresup tfoot');
+  tbody.innerHTML=PRESUPUESTO.map(p=>{
+    const tot=p.montos.reduce((s,m)=>s+m,0);
+    const color=p.tipo==='Ingreso'?'var(--ok)':'var(--danger)';
+    return '<tr><td style="color:var(--white);font-weight:600">'+p.concepto+'</td><td>'+badge(p.tipo,p.tipo==='Ingreso'?'#22C55E':'#EF4444')+'</td>'+p.montos.map(m=>'<td style="text-align:right;color:'+color+'">'+clp(m)+'</td>').join('')+'<td style="text-align:right;font-weight:800;color:'+color+'">'+clp(tot)+'</td><td><button class="btn-sm btn-del" onclick="delPresup('+p.id+')">✕</button></td></tr>';
+  }).join('');
+  const totIngRow=MESES.map((_,i)=>PRESUPUESTO.filter(p=>p.tipo==='Ingreso').reduce((s,p)=>s+p.montos[i],0));
+  const totEgrRow=MESES.map((_,i)=>PRESUPUESTO.filter(p=>p.tipo==='Egreso').reduce((s,p)=>s+p.montos[i],0));
+  const totIng=totIngRow.reduce((s,v)=>s+v,0);
+  const totEgr=totEgrRow.reduce((s,v)=>s+v,0);
+  tfoot.innerHTML='<tr><td style="color:var(--ok)">Total Ingresos</td><td></td>'+totIngRow.map(v=>'<td style="text-align:right;color:var(--ok)">'+clp(v)+'</td>').join('')+'<td style="text-align:right;color:var(--ok)">'+clp(totIng)+'</td><td></td></tr><tr><td style="color:var(--danger)">Total Egresos</td><td></td>'+totEgrRow.map(v=>'<td style="text-align:right;color:var(--danger)">'+clp(v)+'</td>').join('')+'<td style="text-align:right;color:var(--danger)">'+clp(totEgr)+'</td><td></td></tr><tr><td style="color:var(--acc)">Flujo Neto</td><td></td>'+MESES.map((_,i)=>{const n=totIngRow[i]-totEgrRow[i];return '<td style="text-align:right;color:'+(n>=0?'var(--ok)':'var(--danger)')+'">'+clp(n)+'</td>';}).join('')+'<td style="text-align:right;color:'+(totIng-totEgr>=0?'var(--ok)':'var(--danger)')+'">'+clp(totIng-totEgr)+'</td><td></td></tr>';
+}
+
+function openCuentaModal(id){
+  const c=id?CUENTAS_TES.find(x=>x.id===id):null;
+  document.getElementById('ctaTitle').textContent=c?'Editar Cuenta':'Nueva Cuenta Bancaria';
+  document.getElementById('ctaId').value=id||'';
+  document.getElementById('ctaNombre').value=c?.nombre||'';
+  document.getElementById('ctaBanco').value=c?.banco||'BCI';
+  document.getElementById('ctaTipo').value=c?.tipo||'Cuenta Corriente';
+  document.getElementById('ctaNum').value=c?.num||'';
+  document.getElementById('ctaSaldo').value=c?.saldoInicial||0;
+  document.getElementById('ctaColor').value=c?.color||'#FBBF24';
+  document.getElementById('modalCuenta').classList.add('open');
+}
+function saveCuenta(){
+  const id=document.getElementById('ctaId').value;
+  const obj={nombre:document.getElementById('ctaNombre').value.trim(),banco:document.getElementById('ctaBanco').value,tipo:document.getElementById('ctaTipo').value,num:document.getElementById('ctaNum').value,saldoInicial:parseFloat(document.getElementById('ctaSaldo').value)||0,color:document.getElementById('ctaColor').value};
+  if(!obj.nombre){alert('Ingresa el nombre');return;}
+  if(id){const idx=CUENTAS_TES.findIndex(c=>c.id==id);if(idx>=0)CUENTAS_TES[idx]={...CUENTAS_TES[idx],...obj};}
+  else CUENTAS_TES.push({id:uid(),...obj});
+  saveAll();closeModal('modalCuenta');renderCuentas();
+}
+function delCuenta(id){if(!confirm('¿Eliminar?'))return;CUENTAS_TES=CUENTAS_TES.filter(c=>c.id!==id);saveAll();renderCuentas();}
+
+function openMovModal(id){
+  populateCuentasSelects();
+  const m=id?MOVIMIENTOS.find(x=>x.id===id):null;
+  document.getElementById('movTitle').textContent=m?'Editar':'Nuevo Movimiento';
+  document.getElementById('movId').value=id||'';
+  document.getElementById('movFecha').value=m?.fecha||new Date().toISOString().split('T')[0];
+  document.getElementById('movTipo').value=m?.tipo||'Ingreso';
+  if(m&&document.getElementById('movCuenta'))document.getElementById('movCuenta').value=m.cuentaId;
+  document.getElementById('movCat').value=m?.cat||'Ventas / Cobros';
+  document.getElementById('movMonto').value=m?.monto||'';
+  document.getElementById('movRef').value=m?.ref||'';
+  document.getElementById('movDesc').value=m?.desc||'';
+  document.getElementById('movEstado').value=m?.estado||'Efectivo';
+  document.getElementById('modalMov').classList.add('open');
+}
+function saveMov(){
+  const id=document.getElementById('movId').value;
+  const obj={fecha:document.getElementById('movFecha').value,tipo:document.getElementById('movTipo').value,cuentaId:parseInt(document.getElementById('movCuenta').value),cat:document.getElementById('movCat').value,monto:parseFloat(document.getElementById('movMonto').value)||0,ref:document.getElementById('movRef').value,desc:document.getElementById('movDesc').value,estado:document.getElementById('movEstado').value};
+  if(!obj.monto||!obj.desc){alert('Monto y descripción requeridos');return;}
+  if(id){const idx=MOVIMIENTOS.findIndex(m=>m.id==id);if(idx>=0)MOVIMIENTOS[idx]={...MOVIMIENTOS[idx],...obj};}
+  else MOVIMIENTOS.push({id:uid(),...obj});
+  saveAll();closeModal('modalMov');renderMovimientos();renderCuentas();
+}
+function delMov(id){if(!confirm('¿Eliminar?'))return;MOVIMIENTOS=MOVIMIENTOS.filter(m=>m.id!==id);saveAll();renderMovimientos();}
+
+function openPresupModal(){document.getElementById('presupConcepto').value='';document.getElementById('presupMonto').value='';document.getElementById('modalPresup').classList.add('open');}
+function savePresup(){
+  const concepto=document.getElementById('presupConcepto').value.trim();
+  const tipo=document.getElementById('presupTipo').value;
+  const monto=parseFloat(document.getElementById('presupMonto').value)||0;
+  if(!concepto||!monto){alert('Completa todos los campos');return;}
+  PRESUPUESTO.push({id:uid(),concepto,tipo,montos:Array(12).fill(monto)});
+  saveAll();closeModal('modalPresup');renderPresupuesto();
+}
+function delPresup(id){if(!confirm('¿Eliminar?'))return;PRESUPUESTO=PRESUPUESTO.filter(p=>p.id!==id);saveAll();renderPresupuesto();}
+
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
+
+loadAll();
+populateCuentasSelects();
+renderCuentas();
+document.getElementById('hInfo').textContent=CUENTAS_TES.length+' cuentas · '+MOVIMIENTOS.length+' movimientos';
+document.getElementById('concMes').value=new Date().toISOString().substring(0,7);
+</script>
+</body>
+</html>
