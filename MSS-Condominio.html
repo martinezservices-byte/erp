@@ -1,50 +1,58 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8"/>
-<title>Gestión Administrativa - Martínez Services SpA</title>
-<style>
-/* Estilos base para una interfaz amplia */
-body{background:#04080F; color:#F0FDF4; font-family:sans-serif; padding:20px;}
-.container{max-width:1200px; margin:auto;}
-.grid-torres{display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:20px;}
-.card{background:#0D1826; padding:20px; border-radius:8px; border:1px solid rgba(16,185,129,0.2);}
-input, button{padding:10px; margin:5px 0; width:100%; border-radius:4px; border:1px solid #10B981; background:#04080F; color:white;}
-button{background:#10B981; cursor:pointer; font-weight:bold;}
-</style>
+    <meta charset="UTF-8">
+    <title>Administración - Martínez Services SpA</title>
+    <style>
+        /* Diseño original restaurado */
+        body { background: #04080F; color: #F0FDF4; font-family: sans-serif; }
+        .sidebar { width: 250px; background: #08101C; height: 100vh; position: fixed; padding: 20px; }
+        .main-content { margin-left: 270px; padding: 20px; }
+        .card { background: #0D1826; padding: 20px; border-radius: 8px; border: 1px solid rgba(16,185,129,0.2); margin-bottom: 20px; }
+        button { background: #10B981; color: #04080F; border: none; padding: 10px; border-radius: 4px; cursor: pointer; }
+        .grid-torres { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+    </style>
 </head>
 <body>
-<div class="container">
-    <h1>Administración: Martínez Services SpA</h1>
-    <p>Panel de control para gestión de 8 torres.</p>
-    
+
+<div class="sidebar">
+    <h3>Martínez Services SpA</h3>
+    <p>Administradora: Gaudy Martínez</p>
+    <hr>
+    <ul>
+        <li>Dashboard</li>
+        <li>Gestión de Unidades</li>
+        <li>Gastos Comunes</li>
+        <li>Egresos</li>
+        <li>Fondo de Reserva</li>
+        <li>Novedades</li>
+        <li>Configuración</li>
+    </ul>
+</div>
+
+<div class="main-content">
     <div class="card">
-        <h3>Agregar Nueva Torre</h3>
-        <input type="text" id="nombreTorre" placeholder="Ej: Torre 1, Torre 2...">
-        <button onclick="agregarTorre()">Crear Torre</button>
+        <h1>Gestión de Torres</h1>
+        <p>Panel para administrar tus 8 torres.</p>
+        <input type="text" id="nombreTorre" placeholder="Nombre de la Torre (ej: Torre A)">
+        <button onclick="agregarTorre()">Agregar Torre</button>
     </div>
 
-    <div id="listaTorres" class="grid-torres" style="margin-top:20px;">
-        <!-- Aquí aparecerán tus 8 torres -->
+    <div id="listaTorres" class="grid-torres">
+        <!-- Aquí se mostrarán tus torres dinámicamente -->
     </div>
 </div>
 
 <script>
-function agregarTorre() {
-    const nombre = document.getElementById('nombreTorre').value;
-    if(!nombre) return;
-    
-    const div = document.createElement('div');
-    div.className = 'card';
-    div.innerHTML = `
-        <h4>${nombre}</h4>
-        <p>Unidades: [Ingresa los departamentos aquí]</p>
-        <p>Estado: [Pendiente de carga de datos]</p>
-        <button onclick="this.parentElement.remove()">Eliminar</button>
-    `;
-    document.getElementById('listaTorres').appendChild(div);
-    document.getElementById('nombreTorre').value = '';
-}
+    function agregarTorre() {
+        const nombre = document.getElementById('nombreTorre').value;
+        if(!nombre) return;
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `<h4>${nombre}</h4><p>Sin datos cargados.</p><button onclick="this.parentElement.remove()">Eliminar</button>`;
+        document.getElementById('listaTorres').appendChild(div);
+        document.getElementById('nombreTorre').value = '';
+    }
 </script>
 </body>
 </html>
