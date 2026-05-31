@@ -89,6 +89,11 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.012);}
 #footer{border-top:1px solid var(--border);padding:13px 28px;display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-family:monospace;}
 canvas{max-height:230px;}
 @media(max-width:700px){.grid-2,.foda-grid{grid-template-columns:1fr;}.fgrid{grid-template-columns:1fr;}.fgrid .full{grid-column:1;}}
+@media print{
+  #nav-bar,#header,#tabbar,.no-print,
+  .tabs{display:none!important;}
+  body{background:white!important;}
+}
 </style>
 </head>
 <body>

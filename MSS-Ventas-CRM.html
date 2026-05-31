@@ -93,6 +93,11 @@ tfoot td{border-top:2px solid rgba(251,146,60,0.3);font-weight:800;}
 #footer{border-top:1px solid var(--border);padding:13px 28px;display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-family:monospace;}
 canvas{max-height:230px;}
 @media(max-width:700px){.grid-2,.grid-3{grid-template-columns:1fr;}.fgrid{grid-template-columns:1fr;}.fgrid .full{grid-column:1;}.pipeline-board{grid-template-columns:1fr;}}
+@media print{
+  #nav-bar,#header,#tabbar,.no-print,
+  .tabs{display:none!important;}
+  body{background:white!important;}
+}
 </style>
 </head>
 <body>

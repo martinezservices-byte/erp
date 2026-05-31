@@ -80,6 +80,11 @@ tfoot td{border-top:2px solid rgba(201,168,76,0.3);font-weight:800;}
 #footer{border-top:1px solid var(--border);padding:13px 28px;display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-family:monospace;}
 canvas{max-height:240px;}
 @media(max-width:700px){.grid-2,.grid-3{grid-template-columns:1fr;}.kpi-row{flex-direction:column;}}
+@media print{
+  #nav-bar,#header,#tabbar,.no-print,
+  .tabs{display:none!important;}
+  body{background:white!important;}
+}
 </style>
 </head>
 <body>
