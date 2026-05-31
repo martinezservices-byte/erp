@@ -98,14 +98,13 @@ tfoot td{border-top:2px solid rgba(201,168,76,0.25);font-weight:800;font-size:12
 
 /* PRINT */
 @media print{
-  #nav-bar,#header,#tabbar,.no-print,
-  #sec-trabajadores,#sec-vacaciones,#sec-finiquitos,#sec-parametros,
-  .tabs{display:none!important;}
-  body{background:white!important;}
-  #sec-liquidaciones{display:block!important;}
-  .liq-box{box-shadow:none!important;}
-  .liq-header{-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#0D1826!important;}
-  .liq-section-title{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  #nav-bar,#header,#footer,#content,#tabbar,.no-print,.tabs{display:none!important;}
+  body{background:white!important;margin:0!important;padding:0!important;}
+  #printOnly{display:block!important;}
+  .factura-preview,.doc-preview,.liq-box{box-shadow:none!important;margin:0!important;border-radius:0!important;max-width:100%!important;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  @page{margin:10mm;size:A4;}
+}
 }
   body{background:white;color:black;}
   .liq-box{border:1px solid #ccc;break-inside:avoid;}
@@ -287,7 +286,7 @@ try{
       <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
         <button class="btn-gold" onclick="calcularLiquidacion()">⚡ Calcular Liquidación</button>
         <button class="btn-ghost" onclick="guardarLiquidacion()">💾 Guardar</button>
-        <button class="btn-ghost" onclick="window.print()">🖨 Imprimir</button>
+        <button class="btn-ghost" onclick="imprimirDoc()">🖨 Imprimir</button>
       </div>
     </div>
     <div id="liqResult"></div>
@@ -326,7 +325,7 @@ try{
         <select id="selLibroMes" style="padding:8px 12px;background:var(--surf);border:1px solid var(--border);border-radius:8px;color:var(--white);font-family:var(--mono);font-size:12px;outline:none">
           <option value="">Todos los períodos</option>
         </select>
-        <button class="btn-gold" style="padding:8px 16px;font-size:12px" onclick="window.print()">🖨 Imprimir Libro</button>
+        <button class="btn-gold" style="padding:8px 16px;font-size:12px" onclick="imprimirDoc()">🖨 Imprimir Libro</button>
       </div>
     </div>
     <div class="card tbl-wrap">
@@ -962,7 +961,7 @@ function renderLiquidacion(d){
   </div>
   <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap" class="no-print">
     <button class="btn-gold" onclick="guardarLiquidacion()">💾 Guardar Liquidación</button>
-    <button class="btn-ghost" onclick="window.print()">🖨 Imprimir</button>
+    <button class="btn-ghost" onclick="imprimirDoc()">🖨 Imprimir</button>
   </div>`;
 }
 
@@ -1331,7 +1330,7 @@ function calcularFiniquito(){
   </div>
   <div style="margin-top:12px;display:flex;gap:8px" class="no-print">
     <button class="btn-gold" onclick="guardarFiniquito(${trabId},'${fechaTermino}','${causal}','${causalLabels[causal]||causal}',${años.toFixed(2)},${indemnizacion},${pagoVacaciones},${mesesAviso},${total})">💾 Guardar Finiquito</button>
-    <button class="btn-ghost" onclick="window.print()">🖨 Imprimir</button>
+    <button class="btn-ghost" onclick="imprimirDoc()">🖨 Imprimir</button>
   </div>`;
 
   closeModal('modalFiniq');
@@ -1481,6 +1480,18 @@ renderKPIs();
 renderLiquidacionesTable();
 populateTrabajadoresSelects();
 document.getElementById('hInfo').textContent=`${TRABAJADORES.length} trabajadores · ${LIQUIDACIONES.length} liquidaciones`;
+
+function imprimirDoc(){
+  var prev=document.getElementById('previewContainer')||document.getElementById('docPreview');
+  if(!prev){window.print();return;}
+  var clone=prev.cloneNode(true);
+  clone.id='printOnly';
+  clone.style.cssText='display:block;position:fixed;top:0;left:0;width:100%;z-index:99999;background:white;';
+  clone.querySelectorAll('.no-print').forEach(function(el){el.remove();});
+  document.body.appendChild(clone);
+  window.print();
+  document.body.removeChild(clone);
+}
 </script>
 </body>
 </html>

@@ -53,7 +53,15 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.012);}
 .doc-sign{display:flex;justify-content:space-around;margin-top:60px;flex-wrap:wrap;gap:20px;}
 .doc-sign-line{text-align:center;min-width:200px;}
 .alert-card{background:var(--surf2);border-radius:10px;padding:14px 16px;border:1px solid var(--border2);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
-@media print{#header,#tabbar,.no-print{display:none!important;}body{background:white;}.doc-preview{box-shadow:none;}}
+@media print{
+  #nav-bar,#header,#footer,#content,#tabbar,.no-print,.tabs{display:none!important;}
+  body{background:white!important;margin:0!important;padding:0!important;}
+  #printOnly{display:block!important;}
+  .factura-preview,.doc-preview,.liq-box{box-shadow:none!important;margin:0!important;border-radius:0!important;max-width:100%!important;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  @page{margin:10mm;size:A4;}
+}
+}
 #footer{border-top:1px solid var(--border2);padding:13px 28px;display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-family:monospace;}
 @media(max-width:700px){.grid-2{grid-template-columns:1fr;}.fgrid{grid-template-columns:1fr;}.fgrid .full{grid-column:1;}}
 </style>
@@ -141,7 +149,7 @@ try{
       <div id="genForm" class="fgrid" style="margin-bottom:14px"></div>
       <div style="display:flex;gap:10px">
         <button class="btn-acc" onclick="generarDocumento()">📄 Generar</button>
-        <button class="btn-ghost" onclick="window.print()">🖨 Imprimir</button>
+        <button class="btn-ghost" onclick="imprimirDoc()">🖨 Imprimir</button>
       </div>
     </div>
     <div id="docPreview"></div>
@@ -296,7 +304,7 @@ function generarDocumento(){
   } else {
     html='<div class="doc-preview"><p style="text-align:center;padding:20px;color:#666">Selecciona un tipo de documento y completa el formulario</p></div>';
   }
-  document.getElementById('docPreview').innerHTML='<div style="margin-top:16px"><div style="font-size:11px;color:var(--acc);font-family:monospace;margin-bottom:10px">DOCUMENTO GENERADO</div>'+html+'<div style="margin-top:10px;display:flex;gap:8px" class="no-print"><button class="btn-ghost" onclick="window.print()">🖨 Imprimir</button><button class="btn-acc" onclick="guardarComoCtrRapido()">💾 Guardar Contrato</button></div></div>';
+  document.getElementById('docPreview').innerHTML='<div style="margin-top:16px"><div style="font-size:11px;color:var(--acc);font-family:monospace;margin-bottom:10px">DOCUMENTO GENERADO</div>'+html+'<div style="margin-top:10px;display:flex;gap:8px" class="no-print"><button class="btn-ghost" onclick="imprimirDoc()">🖨 Imprimir</button><button class="btn-acc" onclick="guardarComoCtrRapido()">💾 Guardar Contrato</button></div></div>';
 }
 function guardarComoCtrRapido(){
   const tipo=document.getElementById('genTipo').value;
@@ -354,6 +362,18 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
 loadAll();renderKPIs();renderContratos();
 document.getElementById('hInfo').textContent=CONTRATOS.length+' contratos · '+ANEXOS.length+' anexos';
+
+function imprimirDoc(){
+  var prev=document.getElementById('previewContainer')||document.getElementById('docPreview');
+  if(!prev){window.print();return;}
+  var clone=prev.cloneNode(true);
+  clone.id='printOnly';
+  clone.style.cssText='display:block;position:fixed;top:0;left:0;width:100%;z-index:99999;background:white;';
+  clone.querySelectorAll('.no-print').forEach(function(el){el.remove();});
+  document.body.appendChild(clone);
+  window.print();
+  document.body.removeChild(clone);
+}
 </script>
 </body>
 </html>
