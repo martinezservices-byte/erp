@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Guía de Respaldo — Martinez Services Spa</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#04080F;--surf:#08101C;--surf2:#0D1826;--border:rgba(201,168,76,0.15);--border2:rgba(201,168,76,0.07);--gold:#C9A84C;--goldHi:#E8C97A;--white:#F2EFEA;--muted:#4A5568;--mutedHi:#718096;--ok:#22C55E;--danger:#EF4444;--warn:#F59E0B;--info:#38BDF8;}
+body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;min-height:100vh;}
+#header{background:var(--surf);border-bottom:1px solid var(--border2);padding:0 28px;height:58px;display:flex;align-items:center;gap:14px;}
+.logo-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--goldHi));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--bg);}
+.content{max-width:860px;margin:0 auto;padding:28px 24px 60px;}
+h1{font-size:26px;font-weight:900;margin-bottom:6px;}
+h1 span{color:var(--gold);}
+.intro{font-size:13px;color:var(--mutedHi);line-height:1.7;margin-bottom:28px;}
+.step{background:var(--surf);border-radius:14px;border:1px solid var(--border2);margin-bottom:16px;overflow:hidden;}
+.step-header{display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--surf2);border-bottom:1px solid var(--border2);}
+.step-num{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--gold),var(--goldHi));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--bg);flex-shrink:0;}
+.step-title{font-size:15px;font-weight:800;}
+.step-sub{font-size:10px;color:var(--muted);font-family:monospace;margin-top:2px;}
+.step-body{padding:18px 20px;}
+.tip{background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.2);border-radius:9px;padding:11px 15px;display:flex;gap:10px;margin-bottom:12px;font-size:12px;color:var(--mutedHi);line-height:1.6;}
+.ok-box{background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.2);border-radius:9px;padding:11px 15px;display:flex;gap:10px;margin-bottom:12px;font-size:12px;color:var(--mutedHi);line-height:1.6;}
+.warn-box{background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);border-radius:9px;padding:11px 15px;display:flex;gap:10px;margin-bottom:12px;font-size:12px;color:var(--mutedHi);line-height:1.6;}
+.instruc{background:var(--bg);border-radius:9px;padding:14px 16px;border:1px solid var(--border2);font-size:12px;line-height:2;margin-bottom:12px;}
+.instruc div{padding:3px 0;border-bottom:1px solid rgba(201,168,76,0.04);}
+.instruc div:last-child{border:none;}
+.num{display:inline-flex;width:22px;height:22px;background:var(--gold);color:var(--bg);border-radius:50%;font-size:11px;font-weight:900;align-items:center;justify-content:center;margin-right:8px;flex-shrink:0;}
+.badge{display:inline-flex;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;font-family:monospace;}
+.rutina-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;}
+.rutina-card{background:var(--bg);border-radius:10px;padding:14px;border:1px solid var(--border2);}
+.rutina-icon{font-size:24px;margin-bottom:8px;}
+.rutina-title{font-size:12px;font-weight:800;margin-bottom:4px;}
+.rutina-desc{font-size:11px;color:var(--muted);line-height:1.6;}
+table{width:100%;border-collapse:collapse;font-size:11px;font-family:monospace;margin-top:8px;}
+th{padding:8px 12px;text-align:left;color:var(--gold);font-weight:700;border-bottom:1px solid var(--border);}
+td{padding:8px 12px;border-bottom:1px solid rgba(201,168,76,0.05);}
+#footer{border-top:1px solid var(--border2);padding:13px 28px;font-size:10px;color:var(--muted);font-family:monospace;}
+@media(max-width:600px){.rutina-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div id="header">
+  <div class="logo-icon">M</div>
+  <div>
+    <div style="font-size:15px;font-weight:800;">Martinez Services Spa</div>
+    <div style="font-size:10px;color:var(--gold);font-family:monospace;letter-spacing:2px;">GUÍA DE RESPALDO DIARIO</div>
+  </div>
+</div>
+
+<div class="content">
+  <div style="margin-bottom:8px;display:flex;gap:6px;flex-wrap:wrap;">
+    <span class="badge" style="background:rgba(34,197,94,0.15);color:var(--ok);border:1px solid rgba(34,197,94,0.3);">✓ 2 clics para respaldar</span>
+    <span class="badge" style="background:rgba(56,189,248,0.15);color:var(--info);border:1px solid rgba(56,189,248,0.3);">⏱ 1 minuto al día</span>
+    <span class="badge" style="background:rgba(201,168,76,0.15);color:var(--gold);border:1px solid rgba(201,168,76,0.3);">🔒 Tus datos seguros</span>
+  </div>
+  <h1 style="margin-top:12px;">Guía de <span>Respaldo</span> de Datos</h1>
+  <p class="intro">Todo lo que ingresas en tu ERP se guarda en el navegador de tu computador. Esta guía te enseña a respaldar esos datos para que nunca los pierdas, y cómo usarlos en otro dispositivo si lo necesitas.</p>
+
+  <!-- POR QUÉ RESPALDAR -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">?</div>
+      <div>
+        <div class="step-title">¿Por qué es importante respaldar?</div>
+        <div class="step-sub">Entiende cómo funcionan tus datos</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="warn-box"><div style="font-size:16px">⚠</div><div>Tus datos se guardan en el <strong>localStorage</strong> del navegador — es como una memoria interna de Chrome. Si limpias el caché, cambias de computador o formateas tu PC, los datos se pierden. Por eso debes respaldar regularmente.</div></div>
+      <table>
+        <thead><tr><th>Situación</th><th>Sin respaldo</th><th>Con respaldo</th></tr></thead>
+        <tbody>
+          <tr><td>Limpias caché del navegador</td><td style="color:var(--danger)">❌ Pierdes todo</td><td style="color:var(--ok)">✓ Restauras en 1 minuto</td></tr>
+          <tr><td>Cambias de computador</td><td style="color:var(--danger)">❌ Datos no se transfieren</td><td style="color:var(--ok)">✓ Importas el archivo</td></tr>
+          <tr><td>Formateas el PC</td><td style="color:var(--danger)">❌ Pierdes todo</td><td style="color:var(--ok)">✓ Restauras completo</td></tr>
+          <tr><td>Trabajas desde otro PC</td><td style="color:var(--danger)">❌ Sistema vacío</td><td style="color:var(--ok)">✓ Importas y trabajas</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PASO 1 RESPALDAR -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Cómo respaldar todos tus datos — 2 clics</div>
+        <div class="step-sub">Hazlo al terminar cada día de trabajo</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="instruc">
+        <div><span class="num">1</span>Abre tu ERP: <strong style="color:var(--gold)">martinezservices-byte.github.io/erp/</strong></div>
+        <div><span class="num">2</span>En el menú de módulos busca y abre <strong style="color:var(--gold)">MSS-Respaldo.html</strong></div>
+        <div><span class="num">3</span>Haz clic en el botón dorado <strong style="color:var(--gold)">⬇ Exportar TODO (JSON)</strong></div>
+        <div><span class="num">4</span>Se descarga automáticamente un archivo llamado: <strong style="color:var(--info)">MSS_Respaldo_Completo_YYYYMMDD_HHMM.json</strong></div>
+        <div><span class="num">5</span>¡Listo! Ese archivo tiene TODOS tus datos</div>
+      </div>
+      <div class="ok-box"><div style="font-size:16px">✅</div><div>El archivo JSON contiene absolutamente todo — trabajadores, liquidaciones, contratos, facturas, movimientos, empresas y configuraciones.</div></div>
+    </div>
+  </div>
+
+  <!-- PASO 2 GUARDAR EN DRIVE -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Guardar el respaldo en Google Drive</div>
+        <div class="step-sub">Para tenerlo disponible desde cualquier dispositivo</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="tip"><div style="font-size:16px">💡</div><div>Google Drive es gratis con 15GB. Crea una carpeta llamada <strong>"Respaldos ERP Martinez"</strong> y guarda ahí todos los archivos JSON.</div></div>
+      <div class="instruc">
+        <div><span class="num">1</span>Abre <strong style="color:var(--gold)">drive.google.com</strong> en el navegador</div>
+        <div><span class="num">2</span>Haz clic en <strong>+ Nuevo</strong> → <strong>Carpeta</strong></div>
+        <div><span class="num">3</span>Nómbrala: <strong style="color:var(--info)">Respaldos ERP Martinez</strong></div>
+        <div><span class="num">4</span>Entra a esa carpeta y arrastra el archivo JSON descargado</div>
+        <div><span class="num">5</span>Listo — tu respaldo está en la nube seguro</div>
+      </div>
+      <div class="ok-box"><div style="font-size:16px">📁</div><div>Recomendación: guarda los respaldos con nombre que incluya la fecha. Ejemplo: <strong style="color:var(--gold)">Respaldo_30_Mayo_2025.json</strong> — así puedes volver a cualquier fecha.</div></div>
+    </div>
+  </div>
+
+  <!-- PASO 3 RESTAURAR -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Cómo restaurar en otro computador</div>
+        <div class="step-sub">Si cambias de PC o necesitas trabajar desde otro lugar</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="instruc">
+        <div><span class="num">1</span>Descarga el archivo JSON desde tu Google Drive</div>
+        <div><span class="num">2</span>Abre tu ERP: <strong style="color:var(--gold)">martinezservices-byte.github.io/erp/</strong></div>
+        <div><span class="num">3</span>Abre <strong style="color:var(--gold)">MSS-Respaldo.html</strong></div>
+        <div><span class="num">4</span>En la sección <strong>"Restaurar desde Respaldo"</strong> haz clic en el área punteada</div>
+        <div><span class="num">5</span>Selecciona el archivo JSON de tu respaldo</div>
+        <div><span class="num">6</span>Haz clic en <strong style="color:var(--ok)">✓ Restaurar Datos</strong></div>
+        <div><span class="num">7</span>¡Listo! Todos tus datos aparecen en el nuevo computador</div>
+      </div>
+      <div class="warn-box"><div style="font-size:16px">⚠</div><div><strong>Importante:</strong> Al restaurar se reemplazan los datos actuales del navegador. Si el PC nuevo ya tenía datos, haz primero un respaldo del PC nuevo antes de restaurar el antiguo.</div></div>
+    </div>
+  </div>
+
+  <!-- RUTINA DIARIA -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">📅</div>
+      <div>
+        <div class="step-title">Rutina de Respaldo Recomendada</div>
+        <div class="step-sub">Para nunca perder nada</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="rutina-grid">
+        <div class="rutina-card">
+          <div class="rutina-icon">🌙</div>
+          <div class="rutina-title">Cada día — Al terminar</div>
+          <div class="rutina-desc">Exportar JSON completo → guardar en carpeta del PC con fecha de hoy</div>
+        </div>
+        <div class="rutina-card">
+          <div class="rutina-icon">📅</div>
+          <div class="rutina-title">Cada semana — Lunes</div>
+          <div class="rutina-desc">Subir el respaldo de la semana a Google Drive. Mantener últimas 4 semanas.</div>
+        </div>
+        <div class="rutina-card">
+          <div class="rutina-icon">📧</div>
+          <div class="rutina-title">Cada mes — Día 1</div>
+          <div class="rutina-desc">Enviarte el respaldo mensual a tu email como copia extra de seguridad.</div>
+        </div>
+        <div class="rutina-card">
+          <div class="rutina-icon">💾</div>
+          <div class="rutina-title">Antes de actualizar</div>
+          <div class="rutina-desc">Siempre respalda antes de subir una versión nueva de un módulo a GitHub.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPORTAR CSV -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">📊</div>
+      <div>
+        <div class="step-title">Exportar CSV para Excel</div>
+        <div class="step-sub">Para análisis o enviar a tu contador</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="tip"><div style="font-size:16px">💡</div><div>El CSV es un formato que abre Excel directamente. Útil para enviar liquidaciones, movimientos o facturas a tu contador o para hacer análisis adicionales.</div></div>
+      <div class="instruc">
+        <div><span class="num">1</span>Abre <strong style="color:var(--gold)">MSS-Respaldo.html</strong></div>
+        <div><span class="num">2</span>Haz clic en <strong style="color:var(--gold)">📊 Exportar CSV por módulo</strong></div>
+        <div><span class="num">3</span>Se descargan automáticamente archivos CSV separados por módulo:</div>
+        <div style="padding-left:30px;font-size:11px;color:var(--mutedHi)">• MSS_Finanzas_FECHA.csv — ingresos y gastos</div>
+        <div style="padding-left:30px;font-size:11px;color:var(--mutedHi)">• MSS_Trabajadores_FECHA.csv — datos del personal</div>
+        <div style="padding-left:30px;font-size:11px;color:var(--mutedHi)">• MSS_Liquidaciones_FECHA.csv — todas las liquidaciones</div>
+        <div style="padding-left:30px;font-size:11px;color:var(--mutedHi)">• MSS_Contratos_FECHA.csv — registro de contratos</div>
+        <div style="padding-left:30px;font-size:11px;color:var(--mutedHi)">• MSS_Facturacion_FECHA.csv — documentos emitidos</div>
+        <div style="padding-left:30px;font-size:11px;color:var(--mutedHi)">• MSS_Tesoreria_FECHA.csv — movimientos bancarios</div>
+        <div><span class="num">4</span>Abre cualquiera con Excel — datos listos para analizar</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREGUNTAS FRECUENTES -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">❓</div>
+      <div>
+        <div class="step-title">Preguntas Frecuentes</div>
+      </div>
+    </div>
+    <div class="step-body">
+      ${[
+        {q:'¿El respaldo incluye las empresas que creé?',a:'Sí. El JSON incluye absolutamente todo — empresas, trabajadores, liquidaciones, contratos, facturas y todos los módulos.'},
+        {q:'¿Puedo trabajar desde el celular?',a:'Sí. Abre el link desde Chrome en tu celular. Pero recuerda que los datos del celular son independientes del computador. Trabaja siempre desde el mismo dispositivo o importa el respaldo.'},
+        {q:'¿Cuánto pesa el archivo de respaldo?',a:'Depende de cuántos datos tengas. Generalmente entre 50KB y 500KB — muy liviano, cabe en cualquier email o Drive.'},
+        {q:'¿Puedo tener varios respaldos de diferentes fechas?',a:'Sí, se recomienda. Cada exportación genera un archivo con fecha y hora distintos. Guarda los últimos 30 días como mínimo.'},
+        {q:'¿Qué pasa si abro el ERP desde el modo incógnito?',a:'En modo incógnito el localStorage no se guarda al cerrar la ventana. Nunca trabajes en modo incógnito.'},
+      ].map(f=>`<div style="border-bottom:1px solid rgba(201,168,76,0.06);padding:10px 0"><div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:4px">❓ ${f.q}</div><div style="font-size:12px;color:var(--mutedHi);line-height:1.6">${f.a}</div></div>`).join('')}
+    </div>
+  </div>
+
+</div>
+<div id="footer">
+  <span>Martinez Services Spa · Guía de Respaldo v1.0 · Gaudy Martínez · 2025</span>
+</div>
+</body>
+</html>
