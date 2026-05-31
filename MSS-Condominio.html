@@ -148,7 +148,7 @@ try{
     </div>
     <div class="card tw">
       <table id="tblUnidades">
-        <thead><tr><th>Unidad</th><th>Tipo</th><th>Propietario</th><th>RUT</th><th>Email</th><th>Teléfono</th><th>Rol SII</th><th>Prorrateo %</th><th>Estado</th><th></th></tr></thead>
+        <thead><tr><th>Torre/Block</th><th>Piso</th><th>Unidad</th><th>Tipo</th><th>Propietario</th><th>RUT</th><th>Email</th><th>Teléfono</th><th>Rol SII</th><th>GC ($)</th><th>Estado</th><th></th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
@@ -161,13 +161,19 @@ try{
         <label style="font-size:10px;color:var(--muted);font-family:monospace;display:block;margin-bottom:3px">PERÍODO</label>
         <input type="month" id="filtMesGC" onchange="renderGastos()" style="padding:8px 12px;background:var(--surf);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-family:monospace;font-size:12px;outline:none"/>
       </div>
+      <div>
+        <label style="font-size:10px;color:var(--muted);font-family:monospace;display:block;margin-bottom:3px">TORRE / BLOCK</label>
+        <select id="filtTorre" onchange="renderGastos()" style="padding:8px 12px;background:var(--surf);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+          <option value="">Todas</option>
+        </select>
+      </div>
       <button class="bg" style="padding:8px 16px;font-size:12px" onclick="generarCobros()">⚡ Generar Cobros del Mes</button>
       <button class="bgh" style="padding:8px 16px;font-size:12px" onclick="openMo('moCobro')">+ Registrar Pago</button>
     </div>
     <div class="krow" id="kpiGC"></div>
     <div class="card tw">
       <table id="tblGC">
-        <thead><tr><th>Período</th><th>Unidad</th><th>Propietario</th><th>GC Ordinario</th><th>GC Extra</th><th>Mora</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th></th></tr></thead>
+        <thead><tr><th>Período</th><th>Torre/Block</th><th>Piso</th><th>Unidad</th><th>Propietario</th><th>GC Ord.</th><th>GC Extra</th><th>Mora</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th></th></tr></thead>
         <tbody></tbody>
         <tfoot></tfoot>
       </table>
@@ -276,8 +282,28 @@ try{
     <h3 id="tUnidad">Nueva Unidad</h3>
     <input type="hidden" id="uId"/>
     <div class="fg">
-      <div class="fl"><label>Número/Identificador</label><input id="uNum" type="text" placeholder="Ej: 101, A-1, Casa 5"/></div>
-      <div class="fl"><label>Tipo</label><select id="uTipo"><option>Departamento</option><option>Casa</option><option>Oficina</option><option>Local Comercial</option><option>Estacionamiento</option><option>Bodega</option></select></div>
+      <div class="fl"><label>Torre / Block</label>
+        <select id="uTorre">
+          <option value="">Sin Torre/Block</option>
+          <option>Torre A</option><option>Torre B</option><option>Torre C</option>
+          <option>Block 1</option><option>Block 2</option><option>Block 3</option>
+          <option>Block 4</option><option>Block 5</option>
+        </select>
+      </div>
+      <div class="fl"><label>Número Piso</label>
+        <select id="uPiso">
+          <option value="">Sin piso</option>
+          ${Array.from({length:30},(_,i)=>`<option>Piso ${i+1}</option>`).join('')}
+          <option>Subterráneo</option>
+        </select>
+      </div>
+      <div class="fl"><label>Número/Identificador Unidad</label><input id="uNum" type="text" placeholder="Ej: 101, A-1, Casa 5"/></div>
+      <div class="fl"><label>Tipo</label>
+        <select id="uTipo">
+          <option>Departamento</option><option>Casa</option><option>Oficina</option>
+          <option>Local Comercial</option><option>Estacionamiento</option><option>Bodega</option>
+        </select>
+      </div>
       <div class="fl f"><label>Propietario</label><input id="uProp" type="text"/></div>
       <div class="fl"><label>RUT Propietario</label><input id="uRut" type="text"/></div>
       <div class="fl"><label>Email</label><input id="uEmail" type="email"/></div>
@@ -550,14 +576,16 @@ function renderDashboard(){
 // ════════════════════
 function renderUnidades(){
   document.querySelector('#tblUnidades tbody').innerHTML=UNIDADES.map(u=>`<tr>
-    <td style="color:var(--acc);font-weight:700">${u.num}</td>
+    <td>${u.torre?`<span class="badge" style="background:rgba(16,185,129,0.15);color:#10B981;border:1px solid rgba(16,185,129,0.3)">${u.torre}</span>`:'<span style="color:var(--muted)">—</span>'}</td>
+    <td style="color:var(--muted);font-family:monospace">${u.piso||'—'}</td>
+    <td style="color:var(--acc);font-weight:800">${u.num}</td>
     <td>${badge(u.tipo,'#38BDF8')}</td>
     <td style="color:var(--white);font-weight:600">${u.prop}</td>
     <td style="color:var(--muted);font-family:monospace">${u.rut}</td>
     <td style="color:var(--muted)">${u.email}</td>
     <td style="color:var(--muted)">${u.tel}</td>
     <td style="color:var(--muted);font-family:monospace">${u.rol}</td>
-    <td style="color:var(--gold)">${u.prorrateo}%</td>
+    <td style="color:var(--gold)">${clp(gcUnidad(u))}</td>
     <td>${badge(u.estado,ESTADO_C[u.estado]||'#5A7090')}</td>
     <td><div style="display:flex;gap:4px">
       <button class="bsm be" onclick="editUnidad(${u.id})">✎</button>
@@ -570,6 +598,8 @@ function editUnidad(id){
   const u=UNIDADES.find(x=>x.id===id);if(!u)return;
   document.getElementById('tUnidad').textContent='Editar Unidad';
   document.getElementById('uId').value=id;
+  document.getElementById('uTorre').value=u.torre||'';
+  document.getElementById('uPiso').value=u.piso||'';
   document.getElementById('uNum').value=u.num;
   document.getElementById('uTipo').value=u.tipo;
   document.getElementById('uProp').value=u.prop;
@@ -584,7 +614,20 @@ function editUnidad(id){
 }
 function saveUnidad(){
   const id=document.getElementById('uId').value;
-  const obj={num:document.getElementById('uNum').value.trim(),tipo:document.getElementById('uTipo').value,prop:document.getElementById('uProp').value.trim(),rut:document.getElementById('uRut').value.trim(),email:document.getElementById('uEmail').value.trim(),tel:document.getElementById('uTel').value.trim(),rol:document.getElementById('uRol').value.trim(),prorrateo:parseFloat(document.getElementById('uProrrateo').value)||0,gcCustom:parseFloat(document.getElementById('uGCCustom').value)||0,estado:document.getElementById('uEstado').value};
+  const obj={
+    torre:document.getElementById('uTorre').value,
+    piso:document.getElementById('uPiso').value,
+    num:document.getElementById('uNum').value.trim(),
+    tipo:document.getElementById('uTipo').value,
+    prop:document.getElementById('uProp').value.trim(),
+    rut:document.getElementById('uRut').value.trim(),
+    email:document.getElementById('uEmail').value.trim(),
+    tel:document.getElementById('uTel').value.trim(),
+    rol:document.getElementById('uRol').value.trim(),
+    prorrateo:parseFloat(document.getElementById('uProrrateo').value)||0,
+    gcCustom:parseFloat(document.getElementById('uGCCustom').value)||0,
+    estado:document.getElementById('uEstado').value
+  };
   if(!obj.num||!obj.prop){alert('Número y propietario requeridos');return;}
   if(id){const i=UNIDADES.findIndex(u=>u.id==id);if(i>=0)UNIDADES[i]={...UNIDADES[i],...obj};}
   else UNIDADES.push({id:uid(),...obj});
@@ -597,7 +640,20 @@ function delUnidad(id){if(!confirm('¿Eliminar?'))return;UNIDADES=UNIDADES.filte
 // ════════════════════
 function renderGastos(){
   const mes=document.getElementById('filtMesGC').value||mesActual;
-  const cobMes=COBROS.filter(c=>c.mes===mes);
+  const filtTorre=document.getElementById('filtTorre')?.value||'';
+  // Poblar selector torres
+  const torres=[...new Set(UNIDADES.map(u=>u.torre).filter(t=>t))];
+  const selTorre=document.getElementById('filtTorre');
+  if(selTorre){
+    const cur=selTorre.value;
+    selTorre.innerHTML='<option value="">Todas</option>'+torres.map(t=>`<option ${cur===t?'selected':''}>${t}</option>`).join('');
+  }
+  let cobMes=COBROS.filter(c=>c.mes===mes);
+  // Filtrar por torre si está seleccionada
+  if(filtTorre){
+    const uIds=UNIDADES.filter(u=>u.torre===filtTorre).map(u=>u.id);
+    cobMes=cobMes.filter(c=>uIds.includes(c.unidadId));
+  }
   const totEsp=cobMes.reduce((s,c)=>s+c.total,0);
   const totPag=cobMes.reduce((s,c)=>s+c.pagado,0);
   const pct=totEsp>0?Math.round(totPag/totEsp*100):0;
@@ -607,24 +663,26 @@ function renderGastos(){
     <div class="kc"><div class="kl">Pendiente</div><div class="kv" style="color:${totEsp-totPag>0?'var(--danger)':'var(--ok)'}">${clp(totEsp-totPag)}</div></div>
     <div class="kc"><div class="kl">% Recaudado</div><div class="kv" style="color:${pct>=90?'var(--ok)':'var(--warn)'}">${pct}%</div></div>
   `;
-  const tbody=document.querySelector('#tblGC tbody');
-  const tfoot=document.querySelector('#tblGC tfoot');
-  tbody.innerHTML=cobMes.map(c=>`<tr>
+  tbody.innerHTML=cobMes.map(c=>{
+    const u=UNIDADES.find(x=>x.id===c.unidadId);
+    return `<tr>
     <td style="font-family:monospace">${c.mes}</td>
-    <td style="color:var(--acc);font-weight:700">${c.unidadNum}</td>
+    <td>${u?.torre?`<span class="badge" style="background:rgba(16,185,129,0.15);color:#10B981;border:1px solid rgba(16,185,129,0.3)">${u.torre}</span>`:'<span style="color:var(--muted)">—</span>'}</td>
+    <td style="color:var(--muted);font-size:10px">${u?.piso||'—'}</td>
+    <td style="color:var(--acc);font-weight:800">${c.unidadNum}</td>
     <td style="color:var(--white)">${c.prop}</td>
     <td style="text-align:right">${clp(c.gcOrd)}</td>
     <td style="text-align:right;color:${c.gcExtra>0?'var(--warn)':'var(--muted)'}">${clp(c.gcExtra)}</td>
     <td style="text-align:right;color:${c.mora>0?'var(--danger)':'var(--muted)'}">${clp(c.mora)}</td>
     <td style="text-align:right;font-weight:700">${clp(c.total)}</td>
     <td style="text-align:right;color:var(--ok)">${clp(c.pagado)}</td>
-    <td style="text-align:right;color:${c.saldo>0?'var(--danger)':'var(--ok)'}; font-weight:700">${clp(c.saldo)}</td>
+    <td style="text-align:right;color:${c.saldo>0?'var(--danger)':'var(--ok)'};font-weight:700">${clp(c.saldo)}</td>
     <td>${badge(c.estado,ESTADO_C[c.estado]||'#5A7090')}</td>
     <td><div style="display:flex;gap:4px">
       <button class="bsm be" onclick="imprimirComprobante(${c.id})">🖨</button>
-      ${c.estado!=='Pagado'?`<button class="bsm" style="background:transparent;border:1px solid rgba(34,197,94,0.3);color:var(--ok)" onclick="registrarPagoRapido(${c.id})">✓ Pagar</button>`:''}
+      ${c.estado!=='Pagado'?`<button class="bsm" style="background:transparent;border:1px solid rgba(34,197,94,0.3);color:var(--ok)" onclick="registrarPagoRapido(${c.id})">✓</button>`:''}
     </div></td>
-  </tr>`).join('');
+  </tr>`;}).join('');
   tfoot.innerHTML=`<tr><td colspan="3" style="color:var(--acc)">TOTALES</td><td style="text-align:right">${clp(cobMes.reduce((s,c)=>s+c.gcOrd,0))}</td><td style="text-align:right">${clp(cobMes.reduce((s,c)=>s+c.gcExtra,0))}</td><td style="text-align:right;color:var(--danger)">${clp(cobMes.reduce((s,c)=>s+c.mora,0))}</td><td style="text-align:right">${clp(totEsp)}</td><td style="text-align:right;color:var(--ok)">${clp(totPag)}</td><td style="text-align:right;color:var(--danger)">${clp(totEsp-totPag)}</td><td colspan="2"></td></tr>`;
 }
 
@@ -822,6 +880,7 @@ function saveConfig(){
 // ════════════════════
 function imprimirComprobante(id){
   const c=COBROS.find(x=>x.id===id);if(!c)return;
+  const u=UNIDADES.find(x=>x.id===c.unidadId);
   const html=`<div class="comp">
     <div class="comp-head">
       <div>
@@ -838,7 +897,7 @@ function imprimirComprobante(id){
     <div class="comp-body">
       <div style="background:#f0fff8;padding:12px;border-radius:6px;margin-bottom:14px">
         <div style="font-size:10px;font-weight:700;color:#1a5c3a;margin-bottom:6px">DATOS DEL PROPIETARIO</div>
-        <div style="font-size:11px;margin-bottom:3px"><strong>Unidad:</strong> ${c.unidadNum}</div>
+        <div style="font-size:11px;margin-bottom:3px"><strong>Unidad:</strong> ${c.unidadNum}${u?.torre?' — '+u.torre:''}${u?.piso?' · '+u.piso:''}</div>
         <div style="font-size:11px;margin-bottom:3px"><strong>Propietario:</strong> ${c.prop}</div>
         <div style="font-size:11px"><strong>Período:</strong> ${c.mes}</div>
       </div>
