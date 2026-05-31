@@ -260,11 +260,25 @@ tfoot td{border-top:2px solid rgba(56,189,248,0.2);font-weight:800;}
 // ════════════════════
 function getEmpresaEmisora(){
   try{
-    // Primero intenta leer la empresa seleccionada desde el Hub
     const emp=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}');
-    if(emp&&emp.nombre) return emp;
+    if(emp&&emp.nombre){
+      // Completar campos que podrían faltar con defaults de Martinez Services Spa
+      return {
+        id: emp.id,
+        nombre: emp.nombre||'Martinez Services Spa',
+        rut: emp.rut||'76.999.888-1',
+        rubro: emp.rubro||'Consultoría / Auditoría',
+        contacto: emp.contacto||'Gaudy Martínez',
+        email: emp.email||'aybserviciosg@gmail.com',
+        tel: emp.tel||'+569 74889039',
+        direccion: emp.direccion||'Av. Calle Nueva 2 3345, Oficina 2.204, Alto Hospicio',
+        banco: emp.banco||'BCI / Cuenta Corriente',
+        cuenta: emp.cuenta||'13772970',
+        color: emp.color||'#C9A84C'
+      };
+    }
   }catch(e){}
-  // Default si no hay empresa seleccionada
+  // Default absoluto si no hay nada
   return {
     nombre:'Martinez Services Spa',
     rut:'76.999.888-1',
@@ -516,20 +530,23 @@ function previewDoc(){
   const tipo=document.getElementById('docTipo').value;
   const clienteId=parseInt(document.getElementById('docCliente').value)||null;
   const cliente=CLIENTES_COT.find(c=>c.id===clienteId);
+  const itemsValidos=ITEMS.filter(it=>it.total>0);
+  // Permite vista previa aunque no haya items — muestra con datos vacíos
   const neto=ITEMS.reduce((s,it)=>s+it.total,0);
   const doc={
-    tipo,num:document.getElementById('docNum').value,
-    fecha:document.getElementById('docFecha').value,
-    vence:document.getElementById('docVence').value,
-    clienteNombre:cliente?.nombre||'—',
-    clienteRut:document.getElementById('docClienteRut').value||'—',
-    clienteGiro:document.getElementById('docClienteGiro').value||'—',
-    clienteDir:document.getElementById('docClienteDir').value||'—',
-    contacto:document.getElementById('docContacto').value||'—',
+    tipo,
+    num:document.getElementById('docNum').value||1,
+    fecha:document.getElementById('docFecha').value||new Date().toISOString().split('T')[0],
+    vence:document.getElementById('docVence').value||'',
+    clienteNombre:cliente?.nombre||document.getElementById('docClienteRut').value||'[Nombre del Cliente]',
+    clienteRut:document.getElementById('docClienteRut').value||'[RUT]',
+    clienteGiro:document.getElementById('docClienteGiro').value||'[Giro]',
+    clienteDir:document.getElementById('docClienteDir').value||'[Dirección]',
+    contacto:document.getElementById('docContacto').value||'[Contacto]',
     condPago:document.getElementById('docCondPago').value,
     comentarios:document.getElementById('docComentarios').value,
-    repLegal:document.getElementById('docRepLegal').value,
-    items:ITEMS.filter(it=>it.total>0),
+    repLegal:document.getElementById('docRepLegal').value||'Gaudy Martínez',
+    items:itemsValidos.length>0?itemsValidos:[{desc:'[Descripción del servicio]',qty:1,precio:0,total:0}],
     neto,iva:Math.round(neto*0.19),total:neto+Math.round(neto*0.19),
   };
   renderPreviewFromDoc(doc);

@@ -206,6 +206,8 @@ body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;m
         <div class="color-picks" id="colorPicks"></div>
       </div>
       <div class="field full"><label>Notas / Descripción</label><textarea id="eNotas" rows="2" placeholder="Ej: Cliente auditoría Q1 2025, contrato vigente..."></textarea></div>
+      <div class="field"><label>Banco</label><input id="eBanco" type="text" placeholder="Ej: BCI / Cuenta Corriente"/></div>
+      <div class="field"><label>Nº Cuenta</label><input id="eCuenta" type="text" placeholder="Ej: 13772970"/></div>
     </div>
     <div style="display:flex;gap:10px;margin-top:16px">
       <button class="btn-gold" style="flex:1" onclick="saveEmpresa()">Guardar Empresa</button>
@@ -412,6 +414,8 @@ function openEmpresaModal(id){
   document.getElementById('eTel').value=emp?.tel||'';
   document.getElementById('eDireccion').value=emp?.direccion||'';
   document.getElementById('eNotas').value=emp?.notas||'';
+  document.getElementById('eBanco').value=emp?.banco||'';
+  document.getElementById('eCuenta').value=emp?.cuenta||'';
   if(emp){selColor=emp.color;}
   document.getElementById('modalEmp').classList.add('open');
 }
@@ -435,6 +439,8 @@ function saveEmpresa(){
     email:document.getElementById('eEmail').value.trim(),
     tel:document.getElementById('eTel').value.trim(),
     direccion:document.getElementById('eDireccion').value.trim(),
+    banco:document.getElementById('eBanco').value.trim(),
+    cuenta:document.getElementById('eCuenta').value.trim(),
     notas:document.getElementById('eNotas').value.trim(),
     color:selColor,
     ingresos:0, proyectos:0, trabajadores:0, clientes:0,
