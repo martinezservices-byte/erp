@@ -310,15 +310,23 @@ function renderHeroStats(){
 }
 
 function renderEmpresas(){
+  // Cargar logos desde MSS-Logos
+  let LOGOS={};
+  try{LOGOS=JSON.parse(localStorage.getItem('mss_logos_v1')||'{}');}catch(e){}
+
   const grid=document.getElementById('empGrid');
   grid.innerHTML='';
   EMPRESAS.forEach(emp=>{
+    const logo=LOGOS[String(emp.id)];
+    const avatarHTML=logo
+      ?`<div class="emp-avatar" style="background:white;padding:4px"><img src="${logo}" style="width:100%;height:100%;object-fit:contain;border-radius:8px"/></div>`
+      :`<div class="emp-avatar" style="background:${emp.color}20;color:${emp.color}">${emp.nombre.charAt(0)}</div>`;
     const card=document.createElement('div');
     card.className='emp-card';
     card.style.setProperty('--ec',emp.color);
     card.innerHTML=`
       <div class="emp-card-header">
-        <div class="emp-avatar" style="background:${emp.color}20;color:${emp.color}">${emp.nombre.charAt(0)}</div>
+        ${avatarHTML}
         <div class="emp-info">
           <div class="emp-name">${emp.nombre}</div>
           <div class="emp-meta">${emp.rut} · ${emp.rubro}</div>

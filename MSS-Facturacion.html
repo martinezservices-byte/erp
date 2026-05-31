@@ -504,12 +504,15 @@ function previewDocumento(docData){
     <div style="font-size:12px;color:var(--acc);font-family:var(--mono);margin-bottom:10px">VISTA PREVIA DEL DOCUMENTO</div>
     <div class="factura-preview">
       <div class="fac-header">
-        <div>
-          <div class="fac-empresa">Martinez Services Spa</div>
-          <div style="font-size:11px;color:#666;margin-top:4px">RUT: 76.123.456-7</div>
-          <div style="font-size:11px;color:#666">Giro: Consultoría y Gestión Empresarial</div>
-          <div style="font-size:11px;color:#666">Av. Providencia 123, Santiago</div>
-          <div style="font-size:11px;color:#666">Tel: +56 9 1234 5678</div>
+        <div style="display:flex;align-items:flex-start;gap:14px">
+          ${(()=>{try{const l=JSON.parse(localStorage.getItem('mss_logos_v1')||'{}');const k=Object.keys(l)[0];return k&&l[k]?`<img src="${l[k]}" style="width:70px;height:55px;object-fit:contain;border-radius:6px;border:1px solid #eee;padding:4px"/>`:'';} catch(e){return '';}})()}
+          <div>
+            <div class="fac-empresa">Martinez Services Spa</div>
+            <div style="font-size:11px;color:#666;margin-top:4px">RUT: 76.123.456-7</div>
+            <div style="font-size:11px;color:#666">Giro: Consultoría y Gestión Empresarial</div>
+            <div style="font-size:11px;color:#666">Av. Providencia 123, Santiago</div>
+            <div style="font-size:11px;color:#666">Tel: +56 9 1234 5678</div>
+          </div>
         </div>
         <div>
           <div class="fac-doc-box">

@@ -815,14 +815,26 @@ function renderLiquidacion(d){
   const [y,m] = d.periodo.split('-');
   const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const perLabel = `${meses[parseInt(m)-1]} ${y}`;
+  // Cargar logo empresa
+  let logoEmp='';
+  try{
+    const logos=JSON.parse(localStorage.getItem('mss_logos_v1')||'{}');
+    // Buscar logo por nombre empresa
+    const empActual=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}');
+    const empId=empActual.id?String(empActual.id):Object.keys(logos)[0]||'';
+    if(logos[empId])logoEmp=logos[empId];
+  }catch(e){}
 
   return `
   <div class="liq-box">
     <div class="liq-header">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
-        <div>
-          <div class="liq-title">LIQUIDACIÓN DE SUELDO</div>
-          <div class="liq-sub">Período: ${perLabel} · Días trabajados: ${d.dias}</div>
+        <div style="display:flex;align-items:center;gap:14px">
+          ${logoEmp?`<div style="width:70px;height:55px;background:white;border-radius:8px;padding:4px;display:flex;align-items:center;justify-content:center"><img src="${logoEmp}" style="max-width:100%;max-height:100%;object-fit:contain"/></div>`:''}
+          <div>
+            <div class="liq-title">LIQUIDACIÓN DE SUELDO</div>
+            <div class="liq-sub">Período: ${perLabel} · Días trabajados: ${d.dias}</div>
+          </div>
         </div>
         <div style="text-align:right">
           <div style="font-size:13px;font-weight:800;color:var(--white);font-family:var(--font)">${emp}</div>
