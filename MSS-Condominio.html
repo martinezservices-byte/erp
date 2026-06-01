@@ -1149,7 +1149,7 @@ function renderDashboard(){
   document.getElementById('kpiDash').innerHTML=`
     <div class="kc"><div class="kl">Unidades</div><div class="kv" style="color:var(--acc)">${UNIDADES.length}</div><div class="ks">${UNIDADES.filter(u=>u.estado==='Al día').length} al día</div></div>
     <div class="kc"><div class="kl">GC Cobrado</div><div class="kv" style="color:var(--ok)">${clp(totPag)}</div><div class="ks">de ${clp(totEsp)} esperado</div></div>
-    <div class="kc"><div class="kl">Egresos Mes</div><div class="kv" style="color:var(--danger)">${clp(totEgr)}</div><div class="ks">Mayo 2025</div></div>
+    <div class="kc"><div class="kl">Egresos Mes</div><div class="kv" style="color:var(--danger)">${clp(totEgr)}</div><div class="ks">${new Date().toLocaleDateString('es-CL',{month:'long',year:'numeric'})}</div></div>
     <div class="kc"><div class="kl">Morosos</div><div class="kv" style="color:${totMora>0?'var(--danger)':'var(--ok)'}">${totMora}</div><div class="ks">Unidades</div></div>
     <div class="kc"><div class="kl">Fondo Reserva</div><div class="kv" style="color:${saldoFondo>=CONFIG.fondoMin?'var(--ok)':'var(--warn)'}">${clp(saldoFondo)}</div><div class="ks">Min: ${clp(CONFIG.fondoMin)}</div></div>
     <div class="kc"><div class="kl">Balance Mes</div><div class="kv" style="color:${totPag-totEgr>=0?'var(--ok)':'var(--danger)'}">${clp(totPag-totEgr)}</div><div class="ks">Ingresos - Egresos</div></div>
@@ -1285,7 +1285,12 @@ function renderGastos(){
     <div class="kc"><div class="kl">Pendiente</div><div class="kv" style="color:${totEsp-totPag>0?'var(--danger)':'var(--ok)'}">${clp(totEsp-totPag)}</div></div>
     <div class="kc"><div class="kl">% Recaudado</div><div class="kv" style="color:${pct>=90?'var(--ok)':'var(--warn)'}">${pct}%</div></div>
   `;
-  tbody.innerHTML=cobMes.map(c=>{
+  const tbody=document.querySelector('#tblGC tbody');
+  const tfoot=document.querySelector('#tblGC tfoot');
+  if(!tbody)return;
+  tbody.innerHTML=cobMes.length===0
+    ?`<tr><td colspan="13" style="text-align:center;color:var(--muted);padding:20px">Sin cobros para este período — usa "Generar Cobros del Mes"</td></tr>`
+    :cobMes.map(c=>{
     const u=UNIDADES.find(x=>x.id===c.unidadId);
     return `<tr>
     <td style="font-family:monospace">${c.mes}</td>
@@ -1307,7 +1312,7 @@ function renderGastos(){
       <button class="bsm bd" onclick="delCobro(${c.id})">✕</button>
     </div></td>
   </tr>`;}).join('');
-  tfoot.innerHTML=`<tr><td colspan="3" style="color:var(--acc)">TOTALES</td><td style="text-align:right">${clp(cobMes.reduce((s,c)=>s+c.gcOrd,0))}</td><td style="text-align:right">${clp(cobMes.reduce((s,c)=>s+c.gcExtra,0))}</td><td style="text-align:right;color:var(--danger)">${clp(cobMes.reduce((s,c)=>s+c.mora,0))}</td><td style="text-align:right">${clp(totEsp)}</td><td style="text-align:right;color:var(--ok)">${clp(totPag)}</td><td style="text-align:right;color:var(--danger)">${clp(totEsp-totPag)}</td><td colspan="2"></td></tr>`;
+  if(tfoot) tfoot.innerHTML=`<tr><td colspan="3" style="color:var(--acc)">TOTALES</td><td style="text-align:right">${clp(cobMes.reduce((s,c)=>s+c.gcOrd,0))}</td><td style="text-align:right">${clp(cobMes.reduce((s,c)=>s+c.gcExtra,0))}</td><td style="text-align:right;color:var(--danger)">${clp(cobMes.reduce((s,c)=>s+c.mora,0))}</td><td style="text-align:right">${clp(totEsp)}</td><td style="text-align:right;color:var(--ok)">${clp(totPag)}</td><td style="text-align:right;color:var(--danger)">${clp(totEsp-totPag)}</td><td colspan="2"></td></tr>`;
 }
 
 function generarCobros(){
@@ -1374,15 +1379,42 @@ function renderEgresos(){
     <td style="color:var(--danger);font-weight:700;text-align:right">${clp(e.monto)}</td>
     <td style="color:var(--muted);font-family:monospace">${e.doc}</td>
     <td>${badge(e.estado,ESTADO_C[e.estado]||'#5A7090')}</td>
-    <td><button class="bsm bd" onclick="delEgreso(${e.id})">✕</button></td>
+    <td><div style="display:flex;gap:4px">
+      <button class="bsm be" onclick="editarEgreso(${e.id})">✎</button>
+      <button class="bsm bd" onclick="delEgreso(${e.id})">✕</button>
+    </div></td>
   </tr>`).join('');
   document.querySelector('#tblEgresos tfoot').innerHTML=`<tr><td colspan="4" style="color:var(--danger)">TOTAL</td><td style="text-align:right;color:var(--danger)">${clp(totEgr)}</td><td colspan="3"></td></tr>`;
 }
 
+function editarEgreso(id){
+  const e=EGRESOS.find(x=>x.id===id);if(!e)return;
+  document.getElementById('egrFecha').value=e.fecha||'';
+  document.getElementById('egrCat').value=e.cat||'Electricidad Áreas Comunes';
+  document.getElementById('egrDesc').value=e.desc||'';
+  document.getElementById('egrProv').value=e.prov||'';
+  document.getElementById('egrMonto').value=e.monto||0;
+  document.getElementById('egrDoc').value=e.doc||'';
+  document.getElementById('egrEstado').value=e.estado||'Pagado';
+  // Guardar ID para actualizar en lugar de crear nuevo
+  document.getElementById('moEgreso').dataset.editId=id;
+  document.querySelector('#moEgreso h3').textContent='Editar Egreso';
+  openMo('moEgreso');
+}
+
 function saveEgreso(){
-  const obj={id:uid(),fecha:document.getElementById('egrFecha').value,cat:document.getElementById('egrCat').value,desc:document.getElementById('egrDesc').value,prov:document.getElementById('egrProv').value,monto:parseFloat(document.getElementById('egrMonto').value)||0,doc:document.getElementById('egrDoc').value,estado:document.getElementById('egrEstado').value};
+  const editId=parseInt(document.getElementById('moEgreso').dataset.editId||0);
+  const obj={fecha:document.getElementById('egrFecha').value,cat:document.getElementById('egrCat').value,desc:document.getElementById('egrDesc').value,prov:document.getElementById('egrProv').value,monto:parseFloat(document.getElementById('egrMonto').value)||0,doc:document.getElementById('egrDoc').value,estado:document.getElementById('egrEstado').value};
   if(!obj.desc||!obj.monto){alert('Descripción y monto requeridos');return;}
-  EGRESOS.push(obj);saveAll();closeMo('moEgreso');renderEgresos();
+  if(editId){
+    const idx=EGRESOS.findIndex(e=>e.id===editId);
+    if(idx>=0)EGRESOS[idx]={...EGRESOS[idx],...obj};
+    document.getElementById('moEgreso').dataset.editId='';
+    document.querySelector('#moEgreso h3').textContent='Nuevo Egreso';
+  } else {
+    EGRESOS.push({id:uid(),...obj});
+  }
+  saveAll();closeMo('moEgreso');renderEgresos();
 }
 function delEgreso(id){if(!confirm('¿Eliminar?'))return;EGRESOS=EGRESOS.filter(e=>e.id!==id);saveAll();renderEgresos();}
 
