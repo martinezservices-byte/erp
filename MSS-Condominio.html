@@ -1612,10 +1612,12 @@ function openMo(id){
   if(id==='moEgreso'){document.getElementById('egrFecha').value=hoy;}
   if(id==='moFondo'){document.getElementById('fndFecha').value=hoy;}
   if(id==='moNovedad'){document.getElementById('novFecha').value=hoy;}
-  if(id==='moUnidad'){document.getElementById('tUnidad').textContent='Nueva Unidad';document.getElementById('uId').value='';}
-  document.getElementById(id).classList.add('open');
+  if(id==='moOT'){document.getElementById('otFecha').value=hoy;document.getElementById('otId').value='';document.getElementById('tOT').textContent='Nueva Orden de Trabajo';}
+  if(id==='moUnidad'){document.getElementById('tUnidad').textContent='Nueva Unidad';document.getElementById('uId').value='';populateTorreSelect();}
+  const el=document.getElementById(id);
+  if(el)el.classList.add('open');
 }
-function closeMo(id){document.getElementById(id).classList.remove('open');}
+function closeMo(id){const el=document.getElementById(id);if(el)el.classList.remove('open');}
 document.querySelectorAll('.mo').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
 
 // ════════════════════
@@ -1720,12 +1722,6 @@ function cargarDatosPioneros2(){
   alert('✓ Datos cargados — 160 unidades, 212 cobros, 8 Blocks');
 }
 
-// Poblar torres al abrir modal unidad
-const _origOpenMo=openMo;
-function openMo(id){
-  _origOpenMo(id);
-  if(id==='moUnidad')populateTorreSelect();
-}
 </script>
 </body>
 </html>
