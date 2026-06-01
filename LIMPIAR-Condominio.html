@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<title>Limpiar Datos Condominio</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#04080F;color:#F0FDF4;font-family:'Segoe UI',sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+.box{background:#08101C;border:2px solid rgba(16,185,129,0.4);border-radius:16px;padding:32px;max-width:480px;width:90%;text-align:center;}
+h1{font-size:20px;font-weight:900;margin-bottom:8px;color:#10B981;}
+p{font-size:12px;color:#6B9E8A;margin-bottom:24px;line-height:1.7;}
+.btn{width:100%;padding:14px;border-radius:10px;border:none;cursor:pointer;font-size:15px;font-weight:800;font-family:monospace;margin-bottom:10px;}
+.btn-green{background:linear-gradient(135deg,#10B981,#6EE7B7);color:#04080F;}
+.btn-red{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#EF4444;}
+#msg{margin-top:16px;padding:12px;border-radius:8px;display:none;font-size:13px;font-weight:700;}
+.ok{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#22C55E;}
+</style>
+</head>
+<body>
+<div class="box">
+  <div style="font-size:48px;margin-bottom:12px">🧹</div>
+  <h1>Limpiar Datos del Condominio</h1>
+  <p>Esto borra todos los cobros, egresos y pagos guardados en tu navegador para este condominio.<br/><br/>Las <strong>160 unidades y 8 Blocks</strong> se cargan de nuevo limpios — sin ningún pago ingresado.<br/><br/>Tú ingresas todo desde cero.</p>
+  
+  <button class="btn btn-green" onclick="limpiarYCargar()">🧹 Limpiar y Cargar Unidades Limpias</button>
+  <button class="btn btn-red" onclick="limpiarTodo()">⚠️ Borrar TODO (incluso unidades)</button>
+  
+  <div id="msg"></div>
+</div>
+
+<script>
+function getCondId(){
+  try{
+    // Buscar todas las keys que tengan _cond_
+    return null; // limpiar todas
+  }catch(e){return null;}
+}
+
+function limpiarYCargar(){
+  try{
+    // Borrar TODAS las keys de condominios del navegador
+    const keys = Object.keys(localStorage).filter(k => k.includes('_cond_'));
+    keys.forEach(k => localStorage.removeItem(k));
+    
+    const msg = document.getElementById('msg');
+    msg.className = 'ok';
+    msg.innerHTML = '✓ Datos borrados (' + keys.length + ' registros eliminados)<br/>Ahora haz clic en "Ir al Condominio"';
+    msg.style.display = 'block';
+    
+    setTimeout(()=>{
+      window.location.href = 'MSS-Condominio.html';
+    }, 2000);
+  }catch(e){
+    alert('Error: ' + e.message);
+  }
+}
+
+function limpiarTodo(){
+  if(!confirm('¿Borrar absolutamente todo del condominio?'))return;
+  const keys = Object.keys(localStorage).filter(k => k.includes('_cond_') || k.includes('mss'));
+  keys.forEach(k => localStorage.removeItem(k));
+  const msg = document.getElementById('msg');
+  msg.className = 'ok';
+  msg.innerHTML = '✓ Todo borrado. Redirigiendo...';
+  msg.style.display = 'block';
+  setTimeout(()=>{ window.location.href = 'MSS-Condominio.html'; }, 2000);
+}
+</script>
+</body>
+</html>
