@@ -542,23 +542,23 @@ const OT_C={Completado:'#22C55E',Programado:'#38BDF8','En Proceso':'#F59E0B',Can
 // PANEL RESIDENTE
 // ════════════════════
 function initPanel(){
-  // Leer torres directamente de las unidades — no del storage separado
+  // Leer torres directamente de las unidades actuales
   const torres=[...new Set(UNIDADES.map(u=>u.torre).filter(t=>t))].sort((a,b)=>{
-    const na=parseInt(a.replace(/\D/g,''))||0;
-    const nb=parseInt(b.replace(/\D/g,''))||0;
-    return na-nb;
+    return (parseInt(a.replace(/\D/g,''))||0)-(parseInt(b.replace(/\D/g,''))||0);
   });
   const sel=document.getElementById('panelBlock');
-  sel.innerHTML='<option value="">Seleccionar Block...</option>'+torres.map(t=>`<option>${t}</option>`).join('');
-  
+  if(!sel)return;
+  sel.innerHTML='<option value="">Seleccionar Block...</option>'+torres.map(t=>`<option value="${t}">${t}</option>`).join('');
   sel.onchange=function(){
     const t=this.value;
-    const deptos=[...new Set(UNIDADES.filter(u=>u.torre===t).map(u=>u.num))].sort((a,b)=>{
-      return parseInt(a)-parseInt(b);
-    });
+    const deptos=[...new Set(UNIDADES.filter(u=>u.torre===t).map(u=>u.num))].sort((a,b)=>parseInt(a)-parseInt(b));
     const sd=document.getElementById('panelDepto');
-    sd.innerHTML='<option value="">Seleccionar Depto...</option>'+deptos.map(d=>`<option>${d}</option>`).join('');
+    if(sd) sd.innerHTML='<option value="">Seleccionar Depto...</option>'+deptos.map(d=>`<option value="${d}">${d}</option>`).join('');
+    document.getElementById('panelResult').innerHTML='';
   };
+  // Limpiar resultado anterior
+  document.getElementById('panelResult').innerHTML='';
+  document.getElementById('panelDepto').innerHTML='<option value="">Seleccionar Depto...</option>';
 }
 
 function buscarResidente(){
@@ -888,8 +888,20 @@ function showTab(id,btn){
     mantenimiento:()=>{loadOT();renderMantenimiento();},
     rendicion:()=>{
       const mi=document.getElementById('rendMes');
-      if(mi&&!mi.value)mi.value=mesActual;
-      initRendicion();
+      if(mi){
+        if(!mi.value||mi.value===''){
+          mi.value=new Date().toISOString().substring(0,7);
+        }
+      }
+      // Poblar blocks desde unidades actuales
+      const torres2=[...new Set(UNIDADES.map(u=>u.torre).filter(t=>t))].sort((a,b)=>{
+        return (parseInt(a.replace(/\D/g,''))||0)-(parseInt(b.replace(/\D/g,''))||0);
+      });
+      const sr=document.getElementById('rendBlock');
+      if(sr){
+        const cv=sr.value;
+        sr.innerHTML='<option value="">Todos los Blocks</option>'+torres2.map(t=>`<option value="${t}" ${cv===t?'selected':''}>${t}</option>`).join('');
+      }
     }
   };
   if(handlers[id])handlers[id]();
