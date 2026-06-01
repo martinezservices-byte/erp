@@ -536,12 +536,20 @@ const OT_C={Completado:'#22C55E',Programado:'#38BDF8','En Proceso':'#F59E0B',Can
 // PANEL RESIDENTE
 // ════════════════════
 function initPanel(){
-  const torres=[...new Set(UNIDADES.map(u=>u.torre).filter(t=>t))].sort();
+  // Leer torres directamente de las unidades — no del storage separado
+  const torres=[...new Set(UNIDADES.map(u=>u.torre).filter(t=>t))].sort((a,b)=>{
+    const na=parseInt(a.replace(/\D/g,''))||0;
+    const nb=parseInt(b.replace(/\D/g,''))||0;
+    return na-nb;
+  });
   const sel=document.getElementById('panelBlock');
   sel.innerHTML='<option value="">Seleccionar Block...</option>'+torres.map(t=>`<option>${t}</option>`).join('');
+  
   sel.onchange=function(){
     const t=this.value;
-    const deptos=UNIDADES.filter(u=>u.torre===t).map(u=>u.num).sort();
+    const deptos=[...new Set(UNIDADES.filter(u=>u.torre===t).map(u=>u.num))].sort((a,b)=>{
+      return parseInt(a)-parseInt(b);
+    });
     const sd=document.getElementById('panelDepto');
     sd.innerHTML='<option value="">Seleccionar Depto...</option>'+deptos.map(d=>`<option>${d}</option>`).join('');
   };
@@ -686,9 +694,20 @@ function delOT(id){if(!confirm('¿Eliminar OT?'))return;OT=OT.filter(o=>o.id!==i
 // RENDICIÓN
 // ════════════════════
 function initRendicion(){
-  const torres=[...new Set(UNIDADES.map(u=>u.torre).filter(t=>t))].sort();
+  // Poblar blocks desde unidades cargadas
+  const torres=[...new Set(UNIDADES.map(u=>u.torre).filter(t=>t))].sort((a,b)=>{
+    const na=parseInt(a.replace(/\D/g,''))||0;
+    const nb=parseInt(b.replace(/\D/g,''))||0;
+    return na-nb;
+  });
   const sel=document.getElementById('rendBlock');
-  sel.innerHTML='<option value="">Todos los Blocks</option>'+torres.map(t=>`<option>${t}</option>`).join('');
+  if(sel){
+    const cur=sel.value;
+    sel.innerHTML='<option value="">Todos los Blocks</option>'+torres.map(t=>`<option value="${t}" ${cur===t?'selected':''}>${t}</option>`).join('');
+  }
+  // Fijar mes actual
+  const mesInput=document.getElementById('rendMes');
+  if(mesInput&&!mesInput.value) mesInput.value=mesActual;
 }
 
 function renderRendicion(){
@@ -839,14 +858,35 @@ function imprimirRendicion(){
 }
 
 // ════════════════════
-// PATCH SHOWTAB + INIT
+// TABS EXTENDIDO
 // ════════════════════
-const _origShowTab=showTab;
+// Sobreescribir showTab para incluir tabs nuevos
+const _origShowTab2=showTab;
 function showTab(id,btn){
-  _origShowTab(id,btn);
-  if(id==='panel'){initPanel();}
-  if(id==='mantenimiento'){loadOT();renderMantenimiento();}
-  if(id==='rendicion'){initRendicion();document.getElementById('rendMes').value=mesActual;}
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('#mainTabs .tab').forEach(b=>b.classList.remove('on'));
+  const sec=document.getElementById('sec-'+id);
+  if(sec)sec.classList.add('on');
+  if(btn)btn.classList.add('on');
+  // Callbacks por sección
+  const handlers={
+    dashboard:renderDashboard,
+    unidades:renderUnidades,
+    gastos:renderGastos,
+    egresos:renderEgresos,
+    morosidad:renderMorosidad,
+    fondo:renderFondo,
+    novedades:renderNovedades,
+    config:loadConfig,
+    panel:initPanel,
+    mantenimiento:()=>{loadOT();renderMantenimiento();},
+    rendicion:()=>{
+      const mi=document.getElementById('rendMes');
+      if(mi&&!mi.value)mi.value=mesActual;
+      initRendicion();
+    }
+  };
+  if(handlers[id])handlers[id]();
 }
 
 // GENERADOR 160 UNIDADES desde tu Excel
