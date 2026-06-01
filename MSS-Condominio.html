@@ -992,41 +992,40 @@ const DATOS_PRECARGADOS = {
 };
 function loadAll(){
   try{
-    const cfgGuardado = localStorage.getItem(SK.cfg);
-    const unidadesGuardadas = localStorage.getItem(SK.unidades);
+    const cfgGuardado=localStorage.getItem(SK.cfg);
+    const unidadesGuardadas=localStorage.getItem(SK.unidades);
+    const cobrosGuardados=localStorage.getItem(SK.cobros);
 
-    // Solo usar datos precargados si es Pioneros 2 (empresa con ese nombre)
-    // o si es la primera vez que se abre este condominio específico
-    let esPioneros2 = false;
-    try{
-      const emp=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}');
-      esPioneros2 = emp.nombre && (
-        emp.nombre.toLowerCase().includes('pionero') ||
-        emp.nombre.toLowerCase().includes('torre 2') ||
-        emp.nombre.toLowerCase().includes('condominio pionero')
-      );
-    }catch(e){}
-
-    CONFIG = cfgGuardado ? JSON.parse(cfgGuardado) : (esPioneros2 ? {...DATOS_PRECARGADOS.config} : {...DEF_CONFIG});
-    UNIDADES = unidadesGuardadas ? JSON.parse(unidadesGuardadas) : (esPioneros2 ? [...DATOS_PRECARGADOS.unidades] : []);
-    COBROS = JSON.parse(localStorage.getItem(SK.cobros)||'null') || (esPioneros2 ? [...DATOS_PRECARGADOS.cobros] : []);
-    EGRESOS = JSON.parse(localStorage.getItem(SK.egresos)||'null') || (esPioneros2 ? [...DATOS_PRECARGADOS.egresos] : []);
-    FONDO = JSON.parse(localStorage.getItem(SK.fondo)||'null') || [];
-    NOVEDADES = JSON.parse(localStorage.getItem(SK.novedades)||'null') || [];
-
-    // Guardar en storage para la próxima vez
-    if(!unidadesGuardadas){
-      try{
-        localStorage.setItem(SK.cfg, JSON.stringify(CONFIG));
-        localStorage.setItem(SK.unidades, JSON.stringify(UNIDADES));
-        localStorage.setItem(SK.cobros, JSON.stringify(COBROS));
-        localStorage.setItem(SK.egresos, JSON.stringify(EGRESOS));
-        localStorage.setItem(SK.fondo, JSON.stringify(FONDO));
-        localStorage.setItem(SK.novedades, JSON.stringify(NOVEDADES));
-      }catch(e){}
+    // Si YA hay datos guardados para este condominio — usarlos
+    if(unidadesGuardadas!==null){
+      CONFIG=JSON.parse(cfgGuardado)||{...DEF_CONFIG};
+      UNIDADES=JSON.parse(unidadesGuardadas)||[];
+      COBROS=JSON.parse(cobrosGuardados)||[];
+      EGRESOS=JSON.parse(localStorage.getItem(SK.egresos)||'[]');
+      FONDO=JSON.parse(localStorage.getItem(SK.fondo)||'[]');
+      NOVEDADES=JSON.parse(localStorage.getItem(SK.novedades)||'[]');
+    } else {
+      // Primera vez que se abre — cargar datos de Pioneros 2 del Excel
+      CONFIG={...DATOS_PRECARGADOS.config};
+      UNIDADES=[...DATOS_PRECARGADOS.unidades];
+      COBROS=[...DATOS_PRECARGADOS.cobros];
+      EGRESOS=[...DATOS_PRECARGADOS.egresos];
+      FONDO=[];
+      NOVEDADES=[];
+      // Guardar en storage inmediatamente
+      localStorage.setItem(SK.cfg,JSON.stringify(CONFIG));
+      localStorage.setItem(SK.unidades,JSON.stringify(UNIDADES));
+      localStorage.setItem(SK.cobros,JSON.stringify(COBROS));
+      localStorage.setItem(SK.egresos,JSON.stringify(EGRESOS));
+      localStorage.setItem(SK.fondo,JSON.stringify(FONDO));
+      localStorage.setItem(SK.novedades,JSON.stringify(NOVEDADES));
     }
   }catch(e){
-    CONFIG={...DEF_CONFIG};UNIDADES=[];COBROS=[];EGRESOS=[];FONDO=[];NOVEDADES=[];
+    CONFIG={...DATOS_PRECARGADOS.config};
+    UNIDADES=[...DATOS_PRECARGADOS.unidades];
+    COBROS=[...DATOS_PRECARGADOS.cobros];
+    EGRESOS=[...DATOS_PRECARGADOS.egresos];
+    FONDO=[];NOVEDADES=[];
   }
 }
 
@@ -1510,16 +1509,13 @@ let TORRES=[];
 function loadTorres(){
   try{
     const t=localStorage.getItem(SK_TORRES);
-    if(t){
+    if(t!==null){
       TORRES=JSON.parse(t);
     } else {
-      // Solo cargar torres precargadas si es Pioneros 2
-      const emp=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}');
-      const esPioneros2=emp.nombre&&(emp.nombre.toLowerCase().includes('pionero')||emp.nombre.toLowerCase().includes('torre 2'));
-      TORRES=esPioneros2?[...DATOS_PRECARGADOS.torres]:[];
+      TORRES=[...DATOS_PRECARGADOS.torres];
       try{localStorage.setItem(SK_TORRES,JSON.stringify(TORRES));}catch(e){}
     }
-  }catch(e){TORRES=[];}
+  }catch(e){TORRES=[...DATOS_PRECARGADOS.torres];}
 }
 function saveTorres(){
   try{localStorage.setItem(SK_TORRES,JSON.stringify(TORRES));}catch(e){}
