@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Importar Datos — M&P Arriendos SpA</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#04080F;--surf:#08101C;--acc:#F59E0B;--ok:#22C55E;--danger:#EF4444;--white:#FFFBEB;--muted:#78716C;--b2:rgba(245,158,11,0.07);}
+body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.box{background:var(--surf);border:1px solid rgba(245,158,11,0.3);border-radius:16px;padding:32px;max-width:600px;width:100%;}
+.logo{font-size:40px;text-align:center;margin-bottom:8px;}
+h1{font-size:18px;font-weight:900;text-align:center;color:var(--acc);margin-bottom:4px;}
+.sub{font-size:11px;color:var(--muted);text-align:center;font-family:monospace;margin-bottom:24px;}
+.resumen{background:rgba(245,158,11,0.05);border:1px solid rgba(245,158,11,0.15);border-radius:10px;padding:16px;margin-bottom:20px;}
+.resumen-titulo{font-size:10px;color:var(--acc);font-weight:700;font-family:monospace;letter-spacing:1px;margin-bottom:10px;}
+.item{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(245,158,11,0.07);font-size:12px;font-family:monospace;}
+.item:last-child{border:none;}
+.item-n{color:var(--acc);font-weight:700;}
+.btn{width:100%;padding:14px;border-radius:10px;border:none;cursor:pointer;font-size:14px;font-weight:900;font-family:monospace;margin-bottom:10px;transition:all .2s;}
+.btn-importar{background:var(--acc);color:#04080F;}
+.btn-importar:hover{background:#FCD34D;}
+.btn-abrir{background:transparent;border:1px solid rgba(245,158,11,0.4);color:var(--acc);}
+.btn-abrir:hover{background:rgba(245,158,11,0.1);}
+.btn-limpiar{background:transparent;border:1px solid rgba(239,68,68,0.3);color:var(--danger);font-size:11px;padding:8px;}
+#status{display:none;padding:14px;border-radius:10px;text-align:center;font-size:13px;font-weight:700;margin-bottom:10px;}
+.ok{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:var(--ok);}
+.err{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:var(--danger);}
+.warning{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);color:var(--acc);}
+.nota{font-size:10px;color:var(--muted);text-align:center;line-height:1.6;margin-top:12px;}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="logo">🚛</div>
+  <h1>Importador de Datos ERP</h1>
+  <div class="sub">MARTINEZ Y PAJUELO ARRIENDOS Y SERVICIOS SPA · RUT 78.361.479-0</div>
+
+  <div class="resumen">
+    <div class="resumen-titulo">📦 DATOS QUE SE CARGARÁN</div>
+    <div class="item"><span>🏢 Empresa configurada</span><span class="item-n">M&P Arriendos SpA</span></div>
+    <div class="item"><span>🔧 Activos / Equipos</span><span class="item-n">10 activos</span></div>
+    <div class="item"><span>👥 Clientes</span><span class="item-n">5 clientes</span></div>
+    <div class="item"><span>📋 Contratos de Arriendo</span><span class="item-n">5 contratos (1001–1006)</span></div>
+    <div class="item"><span>🚛 Fletes registrados</span><span class="item-n">11 fletes (FL-001 a FL-011)</span></div>
+    <div class="item"><span>🔩 Mantenciones</span><span class="item-n">5 registros</span></div>
+    <div class="item"><span>📅 Período</span><span class="item-n">Feb 2026 → May 2026</span></div>
+  </div>
+
+  <div id="status"></div>
+
+  <button class="btn btn-importar" onclick="importar()">⬆️ IMPORTAR TODOS LOS DATOS AL ERP</button>
+  <button class="btn btn-abrir" onclick="abrirERP()">🚀 Abrir ERP (MSS-Arriendos.html)</button>
+  <button class="btn btn-limpiar" onclick="limpiar()">🗑 Borrar todos los datos del ERP (resetear)</button>
+
+  <div class="nota">
+    ⚠️ Este archivo carga los datos en el navegador (localStorage).<br>
+    Debes abrirlo <strong>desde el mismo navegador y carpeta</strong> donde usas tu ERP.<br>
+    Los datos son editables en el ERP una vez importados.
+  </div>
+</div>
+
+<script>
+const DATOS = {
+  "mss_empresa_actual": {
+    "id": 1,
+    "nombre": "Martinez y Pajuelo Arriendos y Servicios SpA",
+    "rut": "78.361.479-0",
+    "direccion": "Av. Unión Europea 3175, Alto Hospicio",
+    "comuna": "Alto Hospicio",
+    "ciudad": "Iquique",
+    "giro": "Servicios de Arriendos, Flete y Venta de productos para Construcción y Ferretería",
+    "tel": "975157431",
+    "email": "ventas@maquinariasmyp.com",
+    "contacto": "Gaudy Martínez Yovera",
+    "rut_rep": "23.918.699-8"
+  },
+  "mss_arr1_activos": [
+    {
+      "id": 1,
+      "nombre": "Camioneta Porter II",
+      "tipo": "Vehículo",
+      "cat": "Camioneta",
+      "marca": "Hyundai",
+      "modelo": "Porter II DCAB 2.5",
+      "anio": 2011,
+      "patente": "RKJW59",
+      "motor": "D4CB5961734",
+      "chasis": "KMFZCY7JBBU753503",
+      "color": "Blanco",
+      "combustible": "Diesel",
+      "km": 0,
+      "estado": "Disponible",
+      "tarifaDia": 0,
+      "obs": "Cedida a título gratuito por Gaudy Martínez Yovera mediante Declaración Jurada notarial 25/02/2026"
+    },
+    {
+      "id": 2,
+      "nombre": "Betonera 200L 900W BONICA",
+      "tipo": "Equipo",
+      "cat": "Maquinaria",
+      "marca": "BONICA",
+      "modelo": "200L 900W",
+      "anio": 2026,
+      "patente": "S/S",
+      "km": 0,
+      "estado": "Disponible",
+      "tarifaDia": 15000,
+      "obs": "Comprada 05/03/2026. Usada en contratos 1001, 1003, 1005"
+    },
+    {
+      "id": 3,
+      "nombre": "Demoledor 3000W TASBEL",
+      "tipo": "Equipo",
+      "cat": "Maquinaria",
+      "marca": "TASBEL",
+      "modelo": "3000W",
+      "anio": 2026,
+      "patente": "S/S",
+      "km": 0,
+      "estado": "Disponible",
+      "tarifaDia": 15000,
+      "obs": "Comprado 24/02/2026 vía MercadoPago. Usado en contrato 1006"
+    },
+    {
+      "id": 4,
+      "nombre": "Generador c/s Extensión",
+      "tipo": "Equipo",
+      "cat": "Generador",
+      "marca": "—",
+      "modelo": "—",
+      "anio": 2026,
+      "patente": "S/S",
+      "km": 0,
+      "estado": "Disponible",
+      "tarifaDia": 0,
+      "obs": "Cedido a título gratuito por Gaudy Martínez Yovera, escritura notarial 25/02/2026"
+    },
+    {
+      "id": 5,
+      "nombre": "Compresor",
+      "tipo": "Equipo",
+      "cat": "Compresor",
+      "marca": "—",
+      "modelo": "—",
+      "anio": 2026,
+      "patente": "S/S",
+      "km": 0,
+      "estado": "Disponible",
+      "tarifaDia": 0,
+      "obs": "Cedido a título gratuito por Gaudy Martínez Yovera, escritura notarial 25/02/2026"
+    },
+    {
+      "id": 6,
+      "nombre": "Rotomartillo",
+      "tipo": "Equipo",
+      "cat": "Herramienta",
+      "marca": "—",
+      "modelo": "—",
+      "anio": 2026,
+      "patente": "S/S",
+      "km": 0,
+      "estado": "Disponible",
+      "tarifaDia": 0,
+      "obs": "Cedido a título gratuito, escritura notarial 25/02/2026"
+    },
+    {
+      "id": 7,
+      "nombre": "Sierra de Banco",
+      "tipo": "Equipo",
+      "cat": "Herramienta",
+      "marca": "—",
+      "modelo": "—",
+      "anio": 2026,
+      "patente": "S/S",
+      "km": 0,
+      "estado": "Disponible",
+      "tarifaDia": 0,
+      "obs": "Cedido a título gratuito, escritura notarial 25/02/2026"
+    },
+    {
+      "id": 8,
+      "nombre": "Ingletadora",
+      "tipo": "Equipo",
+      "cat": "Herramienta",
+      "marca": "—",
+      "modelo": "—",
+      "anio": 2026,
+      "patente": "S/S",
+      "km": 0,
+      "estado": "Disponible",
+      "tarifaDia": 0,
+      "obs": "Cedido a título gratuito, escritura notarial 25/02/2026"
+    },
+    {
+      "id": 9,
+      "nombre": "Sierra Circular",
+      "tipo": "Equipo",
+      "cat": "Herramienta",
+      "marca": "—",
+      "modelo": "—",
+      "anio": 2026,
+      "patente": "S/S",
+      "km": 0,
+      "estado": "Disponible",
+      "tarifaDia": 0,
+      "obs": "Cedido a título gratuito, escritura notarial 25/02/2026"
+    },
+    {
+      "id": 10,
+      "nombre": "Moto Suzuki Lets 4 50cc",
+      "tipo": "Vehículo",
+      "cat": "Moto",
+      "marca": "Suzuki",
+      "modelo": "Lets 4 50cc",
+      "anio": 2008,
+      "patente": "MGP-76",
+      "motor": "A404589303",
+      "km": 0,
+      "estado": "Disponible",
+      "tarifaDia": 25000,
+      "obs": "Arrendada en Ctto 1004 a Nelson Lien Catrilaf 14/05/2026"
+    }
+  ],
+  "mss_arr1_arriendos": [
+    {
+      "id": 1001,
+      "num": "ARR-1001",
+      "activoId": 2,
+      "activoNombre": "Betonera 200L 900W BONICA",
+      "clienteId": 1,
+      "clienteNombre": "Rubén Darío Núñez Rocha",
+      "inicio": "2026-04-08",
+      "termino": "2026-04-08",
+      "tipoTarifa": "Diaria",
+      "tarifa": 15000,
+      "total": 15000,
+      "pagado": 15000,
+      "lugar": "Feria Navideña Frente al Jumbo",
+      "resp": "Rubén Núñez",
+      "estado": "Finalizado",
+      "garantia": 0,
+      "formaPago": "Transferencia",
+      "tipoDoc": "Boleta",
+      "numDoc": "7007",
+      "obs": "Ctto 1001 — Sin garantía (error administrativo, se exime por única vez). Guía 111."
+    },
+    {
+      "id": 1003,
+      "num": "ARR-1003",
+      "activoId": 2,
+      "activoNombre": "Betonera 200L 900W BONICA",
+      "clienteId": 1,
+      "clienteNombre": "Rubén Darío Núñez Rocha",
+      "inicio": "2026-04-10",
+      "termino": "2026-04-10",
+      "tipoTarifa": "Diaria",
+      "tarifa": 15000,
+      "total": 15000,
+      "pagado": 15000,
+      "lugar": "China con Proyectada, Alto Hospicio",
+      "resp": "Rubén Núñez",
+      "estado": "Finalizado",
+      "garantia": 50000,
+      "formaPago": "Transferencia",
+      "tipoDoc": "Boleta",
+      "numDoc": "7008",
+      "obs": "Ctto 1003 — Garantía $50.000 transferencia. Guía 113. Conductor: Joseph Pajuelo, RKJW59."
+    },
+    {
+      "id": 1004,
+      "num": "ARR-1004",
+      "activoId": 10,
+      "activoNombre": "Moto Suzuki Lets 4 50cc",
+      "clienteId": 2,
+      "clienteNombre": "Nelson Enrique Lien Catrilaf",
+      "inicio": "2026-05-14",
+      "termino": "2026-05-15",
+      "tipoTarifa": "Diaria",
+      "tarifa": 25000,
+      "total": 25000,
+      "pagado": 25000,
+      "lugar": "Pozo Almonte",
+      "resp": "Nelson Lien",
+      "estado": "Finalizado",
+      "garantia": 100000,
+      "formaPago": "Efectivo",
+      "tipoDoc": "Boleta",
+      "numDoc": "7011",
+      "obs": "Ctto 1004 — Garantía $100.000 efectivo, devuelta 15/05/2026 17:15 hrs. Devuelto en buen estado."
+    },
+    {
+      "id": 1005,
+      "num": "ARR-1005",
+      "activoId": 2,
+      "activoNombre": "Betonera 200L 900W BONICA",
+      "clienteId": 3,
+      "clienteNombre": "Miguel Ángel Morales Villalobos",
+      "inicio": "2026-05-20",
+      "termino": "2026-05-20",
+      "tipoTarifa": "Diaria",
+      "tarifa": 15000,
+      "total": 15000,
+      "pagado": 15000,
+      "lugar": "La Cantera N°2447, Iquique",
+      "resp": "Miguel Morales",
+      "estado": "Finalizado",
+      "garantia": 50000,
+      "formaPago": "Efectivo",
+      "tipoDoc": "Boleta",
+      "numDoc": "9006",
+      "obs": "Ctto 1005 — Garantía $50.000 efectivo. Guía 115. Conductor: Joseph Pajuelo, RKJW59. Flete $10.000."
+    },
+    {
+      "id": 1006,
+      "num": "ARR-1006",
+      "activoId": 3,
+      "activoNombre": "Demoledor 3000W TASBEL",
+      "clienteId": 4,
+      "clienteNombre": "José Alfredo Avilés Varela",
+      "inicio": "2026-05-28",
+      "termino": "2026-05-29",
+      "tipoTarifa": "Diaria",
+      "tarifa": 15000,
+      "total": 15000,
+      "pagado": 15000,
+      "lugar": "Santa Marta 4237, Alto Hospicio",
+      "resp": "José Avilés",
+      "estado": "Finalizado",
+      "garantia": 50000,
+      "formaPago": "Transferencia",
+      "tipoDoc": "Boleta",
+      "numDoc": "",
+      "obs": "Ctto 1006 — Garantía $50.000 transferencia. Guía 116. Retira cliente. Entrega 18:00 PM 28/05."
+    }
+  ],
+  "mss_arr1_fletes": [
+    {
+      "id": 2001,
+      "num": "FL-001",
+      "fecha": "2026-03-06",
+      "vehiculoId": 1,
+      "vehiculoNombre": "Camioneta Porter II",
+      "conductor": "Joseph Pajuelo Valderrama",
+      "origen": "Alto Hospicio",
+      "destino": "Iquique",
+      "carga": "Mudanza",
+      "peso": "",
+      "km": 0,
+      "tarifa": 25000,
+      "clienteId": 5,
+      "clienteNombre": "Particular",
+      "estado": "Completado",
+      "formaPago": "Transferencia",
+      "estadoPago": "Pagado",
+      "tipoDoc": "Boleta",
+      "numDoc": "2",
+      "obs": "FL-001 del registro inicial"
+    },
+    {
+      "id": 2002,
+      "num": "FL-002",
+      "fecha": "2026-04-15",
+      "vehiculoId": 1,
+      "vehiculoNombre": "Camioneta Porter II",
+      "conductor": "Joseph Pajuelo Valderrama",
+      "origen": "Hospicio",
+      "destino": "Hospicio",
+      "carga": "Mudanza",
+      "peso": "",
+      "km": 0,
+      "tarifa": 25000,
+      "clienteId": 5,
+      "clienteNombre": "Particular",
+      "estado": "Completado",
+      "formaPago": "Tarjeta",
+      "estadoPago": "Pagado",
+      "tipoDoc": "Boleta",
+      "numDoc": "154885222544",
+      "obs": ""
+    },
+    {
+      "id": 2003,
+      "num": "FL-003",
+      "fecha": "2026-04-16",
+      "vehiculoId": 1,
+      "vehiculoNombre": "Camioneta Porter II",
+      "conductor": "Joseph Pajuelo Valderrama",
+      "origen": "Hospicio",
+      "destino": "Hospicio",
+      "carga": "Mudanza",
+      "peso": "",
+      "km": 0,
+      "tarifa": 15000,
+      "clienteId": 5,
+      "clienteNombre": "Particular",
+      "estado": "Completado",
+      "formaPago": "Tarjeta",
+      "estadoPago": "Pagado",
+      "tipoDoc": "Boleta",
+      "numDoc": "155066556404",
+      "obs": ""
+    },
+    {
+      "id": 2004,
+      "num": "FL-004",
+      "fecha": "2026-04-30",
+      "vehiculoId": 1,
+      "vehiculoNombre": "Camioneta Porter II",
+      "conductor": "Joseph Pajuelo Valderrama",
+      "origen": "Iquique",
+      "destino": "Iquique",
+      "carga": "Flete",
+      "peso": "",
+      "km": 0,
+      "tarifa": 25000,
+      "clienteId": 5,
+      "clienteNombre": "Particular",
+      "estado": "Completado",
+      "formaPago": "Tarjeta",
+      "estadoPago": "Pagado",
+      "tipoDoc": "Boleta",
+      "numDoc": "156350052399",
+      "obs": ""
+    },
+    {
+      "id": 2005,
+      "num": "FL-005",
+      "fecha": "2026-05-15",
+      "vehiculoId": 1,
+      "vehiculoNombre": "Camioneta Porter II",
+      "conductor": "Joseph Pajuelo Valderrama",
+      "origen": "Alto Hospicio",
+      "destino": "Iquique",
+      "carga": "Flete",
+      "peso": "",
+      "km": 0,
+      "tarifa": 5000,
+      "clienteId": 5,
+      "clienteNombre": "Particular",
+      "estado": "Completado",
+      "formaPago": "Tarjeta",
+      "estadoPago": "Pagado",
+      "tipoDoc": "Boleta",
+      "numDoc": "158633275697",
+      "obs": ""
+    },
+    {
+      "id": 2006,
+      "num": "FL-006",
+      "fecha": "2026-03-08",
+      "vehiculoId": 1,
+      "vehiculoNombre": "Camioneta Porter II",
+      "conductor": "Joseph Pajuelo Valderrama",
+      "origen": "Alto Hospicio",
+      "destino": "Iquique",
+      "carga": "Flete / Arriendo",
+      "peso": "",
+      "km": 0,
+      "tarifa": 25000,
+      "clienteId": 5,
+      "clienteNombre": "Lázaro",
+      "estado": "Completado",
+      "formaPago": "Transferencia",
+      "estadoPago": "Pagado",
+      "tipoDoc": "Boleta",
+      "numDoc": "9003",
+      "obs": "Arriendo/Flete Lázaro"
+    },
+    {
+      "id": 2007,
+      "num": "FL-007",
+      "fecha": "2026-03-09",
+      "vehiculoId": 1,
+      "vehiculoNombre": "Camioneta Porter II",
+      "conductor": "Joseph Pajuelo Valderrama",
+      "origen": "Alto Hospicio",
+      "destino": "Iquique",
+      "carga": "Flete / Arriendo",
+      "peso": "",
+      "km": 0,
+      "tarifa": 25000,
+      "clienteId": 5,
+      "clienteNombre": "Lázaro",
+      "estado": "Completado",
+      "formaPago": "Transferencia",
+      "estadoPago": "Pagado",
+      "tipoDoc": "Boleta",
+      "numDoc": "7004",
+      "obs": "Arriendo/Flete Lázaro"
+    },
+    {
+      "id": 2008,
+      "num": "FL-008",
+      "fecha": "2026-03-12",
+      "vehiculoId": 1,
+      "vehiculoNombre": "Camioneta Porter II",
+      "conductor": "Joseph Pajuelo Valderrama",
+      "origen": "Alto Hospicio",
+      "destino": "Iquique",
+      "carga": "Flete / Arriendo",
+      "peso": "",
+      "km": 0,
+      "tarifa": 25000,
+      "clienteId": 5,
+      "clienteNombre": "Lázaro",
+      "estado": "Completado",
+      "formaPago": "Transferencia",
+      "estadoPago": "Pagado",
+      "tipoDoc": "Boleta",
+      "numDoc": "7005",
+      "obs": "Arriendo/Flete Lázaro"
+    },
+    {
+      "id": 2009,
+      "num": "FL-009",
+      "fecha": "2026-03-12",
+      "vehiculoId": 1,
+      "vehiculoNombre": "Camioneta Porter II",
+      "conductor": "Joseph Pajuelo Valderrama",
+      "origen": "Alto Hospicio",
+      "destino": "Iquique",
+      "carga": "Flete / Arriendo",
+      "peso": "",
+      "km": 0,
+      "tarifa": 25000,
+      "clienteId": 5,
+      "clienteNombre": "Lázaro",
+      "estado": "Completado",
+      "formaPago": "Transferencia",
+      "estadoPago": "Pagado",
+      "tipoDoc": "Boleta",
+      "numDoc": "9004",
+      "obs": "Arriendo/Flete Lázaro"
+    },
+    {
+      "id": 2010,
+      "num": "FL-010",
+      "fecha": "2026-03-13",
+      "vehiculoId": 1,
+      "vehiculoNombre": "Camioneta Porter II",
+      "conductor": "Joseph Pajuelo Valderrama",
+      "origen": "Alto Hospicio",
+      "destino": "Iquique",
+      "carga": "Flete / Arriendo",
+      "peso": "",
+      "km": 0,
+      "tarifa": 25000,
+      "clienteId": 5,
+      "clienteNombre": "Lázaro",
+      "estado": "Completado",
+      "formaPago": "Transferencia",
+      "estadoPago": "Pagado",
+      "tipoDoc": "Boleta",
+      "numDoc": "9005",
+      "obs": "Arriendo/Flete Lázaro"
+    },
+    {
+      "id": 2011,
+      "num": "FL-011",
+      "fecha": "2026-03-14",
+      "vehiculoId": 1,
+      "vehiculoNombre": "Camioneta Porter II",
+      "conductor": "Joseph Pajuelo Valderrama",
+      "origen": "Alto Hospicio",
+      "destino": "Iquique",
+      "carga": "Flete / Arriendo",
+      "peso": "",
+      "km": 0,
+      "tarifa": 25000,
+      "clienteId": 5,
+      "clienteNombre": "Lázaro",
+      "estado": "Completado",
+      "formaPago": "Transferencia",
+      "estadoPago": "Pagado",
+      "tipoDoc": "Boleta",
+      "numDoc": "89142086",
+      "obs": "Arriendo/Flete Lázaro"
+    }
+  ],
+  "mss_arr1_clientes": [
+    {
+      "id": 1,
+      "nombre": "Rubén Darío Núñez Rocha",
+      "rut": "27.967.415-4",
+      "tel": "+56983961043",
+      "dir": "Juan Martínez N°1757, Iquique",
+      "contacto": "Rubén Núñez",
+      "email": "",
+      "giro": ""
+    },
+    {
+      "id": 2,
+      "nombre": "Nelson Enrique Lien Catrilaf",
+      "rut": "13.632.114-5",
+      "tel": "+56994929624",
+      "dir": "Cala Cala N°619, Pozo Almonte",
+      "contacto": "Nelson Lien",
+      "email": "",
+      "giro": ""
+    },
+    {
+      "id": 3,
+      "nombre": "Miguel Ángel Morales Villalobos",
+      "rut": "19.975.831-4",
+      "tel": "+56986576978",
+      "dir": "La Cantera N°2447, Iquique",
+      "contacto": "Miguel Morales",
+      "email": "",
+      "giro": ""
+    },
+    {
+      "id": 4,
+      "nombre": "José Alfredo Avilés Varela",
+      "rut": "18.493.333-0",
+      "tel": "+56954834612",
+      "dir": "Santa Marta 4237, Alto Hospicio",
+      "contacto": "José Avilés",
+      "email": "",
+      "giro": ""
+    },
+    {
+      "id": 5,
+      "nombre": "Lázaro (Particular)",
+      "rut": "",
+      "tel": "",
+      "dir": "",
+      "contacto": "Lázaro",
+      "email": "",
+      "giro": "Particular"
+    }
+  ],
+  "mss_arr1_mantencion": [
+    {
+      "id": 3001,
+      "activoId": 1,
+      "activoNombre": "Camioneta Porter II",
+      "tipo": "Cambio Aceite",
+      "desc": "Lubricentro Ohiggins - Cambio de Aceite",
+      "fecha": "2026-03-20",
+      "proxima": "",
+      "costo": 55000,
+      "taller": "Lubricentro Ohiggins",
+      "estado": "Completada"
+    },
+    {
+      "id": 3002,
+      "activoId": 1,
+      "activoNombre": "Camioneta Porter II",
+      "tipo": "Correctiva",
+      "desc": "La Casa Del Encendido - Componentes Eléctricos",
+      "fecha": "2026-03-20",
+      "proxima": "",
+      "costo": 48490,
+      "taller": "La Casa Del Encendido",
+      "estado": "Completada"
+    },
+    {
+      "id": 3003,
+      "activoId": 1,
+      "activoNombre": "Camioneta Porter II",
+      "tipo": "Correctiva",
+      "desc": "Servicios Mecánicos Ronald Mamani",
+      "fecha": "2026-03-20",
+      "proxima": "",
+      "costo": 20000,
+      "taller": "Ronald Mamani",
+      "estado": "Completada"
+    },
+    {
+      "id": 3004,
+      "activoId": 1,
+      "activoNombre": "Camioneta Porter II",
+      "tipo": "Correctiva",
+      "desc": "Rs Diesel Ltda - Filtros y Repuestos",
+      "fecha": "2026-03-24",
+      "proxima": "",
+      "costo": 52360,
+      "taller": "Rs Diesel Ltda",
+      "estado": "Completada"
+    },
+    {
+      "id": 3005,
+      "activoId": 1,
+      "activoNombre": "Camioneta Porter II",
+      "tipo": "Correctiva",
+      "desc": "Arreglo Camión Porter II",
+      "fecha": "2026-05-14",
+      "proxima": "",
+      "costo": 65000,
+      "taller": "Taller externo",
+      "estado": "Completada"
+    }
+  ],
+  "mss_arr1_cfg": {
+    "tarifaKm": 500,
+    "tarifaBase": 50000,
+    "diasMant": 7
+  }
+};
+
+function mostrar(msg, tipo){
+  const s=document.getElementById('status');
+  s.textContent=msg;
+  s.className=tipo;
+  s.style.display='block';
+}
+
+function importar(){
+  try{
+    let ok=0;
+    for(const [k,v] of Object.entries(DATOS)){
+      localStorage.setItem(k, JSON.stringify(v));
+      ok++;
+    }
+    mostrar('✅ ¡Datos importados correctamente! '+ok+' registros cargados. Ahora puedes abrir el ERP.','ok');
+    document.querySelector('.btn-abrir').style.background='rgba(34,197,94,0.1)';
+    document.querySelector('.btn-abrir').style.borderColor='rgba(34,197,94,0.4)';
+    document.querySelector('.btn-abrir').style.color='#22C55E';
+  }catch(e){
+    mostrar('❌ Error al importar: '+e.message,'err');
+  }
+}
+
+function abrirERP(){
+  // Intenta abrir relativo; si no existe, avisa
+  try{
+    window.open('MSS-Arriendos.html','_blank');
+  }catch(e){
+    mostrar('⚠️ Abre manualmente el archivo MSS-Arriendos.html desde tu carpeta del ERP.','warning');
+  }
+}
+
+function limpiar(){
+  if(!confirm('¿Seguro? Esto borrará TODOS los datos del ERP del navegador.'))return;
+  try{
+    const keys=Object.keys(DATOS);
+    keys.forEach(k=>localStorage.removeItem(k));
+    mostrar('🗑 Datos eliminados. El ERP quedará vacío.','warning');
+  }catch(e){
+    mostrar('Error al limpiar: '+e.message,'err');
+  }
+}
+</script>
+</body>
+</html>
