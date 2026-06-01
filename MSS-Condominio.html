@@ -941,17 +941,18 @@ function imprimirRendicion(){
 }
 
 // ════════════════════
-// TABS EXTENDIDO
+// TABS
 // ════════════════════
-// Sobreescribir showTab para incluir tabs nuevos
-const _origShowTab2=showTab;
 function showTab(id,btn){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
   document.querySelectorAll('#mainTabs .tab').forEach(b=>b.classList.remove('on'));
   const sec=document.getElementById('sec-'+id);
   if(sec)sec.classList.add('on');
   if(btn)btn.classList.add('on');
-  // Callbacks por sección
+
+  // Garantizar datos cargados antes de cualquier render
+  if(UNIDADES.length===0){loadAll();loadTorres();loadOT();}
+
   const handlers={
     dashboard:renderDashboard,
     unidades:renderUnidades,
@@ -961,24 +962,39 @@ function showTab(id,btn){
     fondo:renderFondo,
     novedades:renderNovedades,
     config:loadConfig,
-    panel:initPanel,
+    panel:()=>{
+      const torres=[...new Set(UNIDADES.map(u=>u.torre).filter(t=>t))].sort((a,b)=>{
+        return (parseInt(a.replace(/\D/g,''))||0)-(parseInt(b.replace(/\D/g,''))||0);
+      });
+      const sel=document.getElementById('panelBlock');
+      if(sel){
+        sel.innerHTML='<option value="">Seleccionar Block...</option>'+torres.map(t=>`<option value="${t}">${t}</option>`).join('');
+        sel.onchange=function(){
+          const deptos=[...new Set(UNIDADES.filter(u=>u.torre===this.value).map(u=>u.num))].sort((a,b)=>parseInt(a)-parseInt(b));
+          const sd=document.getElementById('panelDepto');
+          if(sd)sd.innerHTML='<option value="">Seleccionar Depto...</option>'+deptos.map(d=>`<option>${d}</option>`).join('');
+          document.getElementById('panelResult').innerHTML='';
+        };
+      }
+      const sd=document.getElementById('panelDepto');
+      if(sd)sd.innerHTML='<option value="">Seleccionar Depto...</option>';
+      const pr=document.getElementById('panelResult');
+      if(pr)pr.innerHTML='';
+    },
     mantenimiento:()=>{loadOT();renderMantenimiento();},
     rendicion:()=>{
-      const mi=document.getElementById('rendMes');
-      if(mi){
-        if(!mi.value||mi.value===''){
-          mi.value=new Date().toISOString().substring(0,7);
-        }
-      }
-      // Poblar blocks desde unidades actuales
-      const torres2=[...new Set(UNIDADES.map(u=>u.torre).filter(t=>t))].sort((a,b)=>{
+      // Poblar blocks
+      const torres=[...new Set(UNIDADES.map(u=>u.torre).filter(t=>t))].sort((a,b)=>{
         return (parseInt(a.replace(/\D/g,''))||0)-(parseInt(b.replace(/\D/g,''))||0);
       });
       const sr=document.getElementById('rendBlock');
       if(sr){
         const cv=sr.value;
-        sr.innerHTML='<option value="">Todos los Blocks</option>'+torres2.map(t=>`<option value="${t}" ${cv===t?'selected':''}>${t}</option>`).join('');
+        sr.innerHTML='<option value="">Todos los Blocks</option>'+torres.map(t=>`<option value="${t}" ${cv===t?'selected':''}>${t}</option>`).join('');
       }
+      // Fijar mes actual
+      const mi=document.getElementById('rendMes');
+      if(mi&&!mi.value) mi.value=new Date().toISOString().substring(0,7);
     }
   };
   if(handlers[id])handlers[id]();
@@ -1693,23 +1709,11 @@ document.getElementById('condNombre').textContent=CONFIG.nombre||'Nuevo Condomin
 document.getElementById('filtMesGC').value=mesActual;
 renderDashboard();
 
-// Mostrar botón de carga si no hay datos
-if(UNIDADES.length===0){
-  const aviso=document.createElement('div');
-  aviso.id='avisoImportar';
-  aviso.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#08101C;border:2px solid rgba(16,185,129,0.5);border-radius:16px;padding:32px;text-align:center;z-index:9999;max-width:420px;width:90%';
-  aviso.innerHTML=`
-    <div style="font-size:48px;margin-bottom:12px">🏢</div>
-    <div style="font-size:18px;font-weight:900;color:#F0FDF4;margin-bottom:8px">Condominio Pioneros 2</div>
-    <div style="font-size:12px;color:#6B9E8A;margin-bottom:20px;line-height:1.6">Haz clic para cargar todos los datos del Excel:<br/>160 unidades · 8 Blocks · 212 registros · 2 egresos</div>
-    <button onclick="cargarDatosPioneros2()" style="width:100%;padding:14px;border-radius:10px;border:none;cursor:pointer;font-size:15px;font-weight:800;font-family:monospace;background:linear-gradient(135deg,#10B981,#6EE7B7);color:#04080F;margin-bottom:10px">⬇ Cargar Datos Pioneros 2</button>
-    <button onclick="document.getElementById('avisoImportar').remove()" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(16,185,129,0.3);cursor:pointer;font-size:12px;font-weight:700;font-family:monospace;background:transparent;color:#10B981">Empezar vacío (nuevo condominio)</button>
-  `;
-  document.body.appendChild(aviso);
-}
 
+// ════════════════════════════════════════
+// CARGA DE DATOS PIONEROS 2
+// ════════════════════════════════════════
 function cargarDatosPioneros2(){
-  // Limpiar storage de este condominio y cargar datos frescos
   Object.keys(localStorage).filter(k=>k.includes(CID)).forEach(k=>localStorage.removeItem(k));
   CONFIG={...DATOS_PRECARGADOS.config};
   UNIDADES=[...DATOS_PRECARGADOS.unidades];
@@ -1724,7 +1728,22 @@ function cargarDatosPioneros2(){
   document.getElementById('avisoImportar')?.remove();
   document.getElementById('condNombre').textContent=CONFIG.nombre;
   renderDashboard();
-  alert('✓ Datos cargados — 160 unidades, 212 cobros, 8 Blocks');
+  alert('✓ Datos cargados — 160 unidades, 8 Blocks');
+}
+
+// Mostrar botón de carga si no hay datos
+if(UNIDADES.length===0){
+  const aviso=document.createElement('div');
+  aviso.id='avisoImportar';
+  aviso.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#08101C;border:2px solid rgba(16,185,129,0.5);border-radius:16px;padding:32px;text-align:center;z-index:9999;max-width:420px;width:90%';
+  aviso.innerHTML=`
+    <div style="font-size:48px;margin-bottom:12px">🏢</div>
+    <div style="font-size:18px;font-weight:900;color:#F0FDF4;margin-bottom:8px">Condominio Pioneros 2</div>
+    <div style="font-size:12px;color:#6B9E8A;margin-bottom:20px;line-height:1.6">Haz clic para cargar las 160 unidades y 8 Blocks</div>
+    <button onclick="cargarDatosPioneros2()" style="width:100%;padding:14px;border-radius:10px;border:none;cursor:pointer;font-size:15px;font-weight:800;font-family:monospace;background:linear-gradient(135deg,#10B981,#6EE7B7);color:#04080F;margin-bottom:10px">⬇ Cargar Datos Pioneros 2</button>
+    <button onclick="document.getElementById('avisoImportar').remove()" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(16,185,129,0.3);cursor:pointer;font-size:12px;font-weight:700;font-family:monospace;background:transparent;color:#10B981">Empezar vacío (nuevo condominio)</button>
+  `;
+  document.body.appendChild(aviso);
 }
 
 </script>
