@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Administración de Condominio — Martinez Services Spa</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#04080F;--surf:#08101C;--surf2:#0D1826;
+  --border:rgba(16,185,129,0.15);--border2:rgba(16,185,129,0.07);
+  --acc:#10B981;--accHi:#6EE7B7;
+  --white:#F0FDF4;--muted:#3D6B5A;--mutedHi:#6B9E8A;
+  --ok:#22C55E;--danger:#EF4444;--warn:#F59E0B;--info:#38BDF8;--gold:#C9A84C;
+}
+body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;min-height:100vh;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-thumb{background:rgba(16,185,129,0.2);border-radius:3px;}
+#header{background:var(--surf);border-bottom:1px solid var(--border2);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:58px;z-index:99;}
+.logo-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--acc),var(--accHi));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--bg);}
+#content{max-width:1200px;margin:0 auto;padding:20px 20px 60px;}
+.tabs{display:flex;gap:3px;background:var(--bg);padding:3px;border-radius:9px;margin-bottom:16px;width:fit-content;flex-wrap:wrap;}
+.tab{padding:7px 13px;border-radius:7px;border:none;cursor:pointer;font-size:11px;font-weight:700;background:transparent;color:var(--muted);font-family:monospace;}
+.tab.on{background:var(--acc);color:var(--bg);}
+.sec{display:none;}.sec.on{display:block;}
+.krow{display:flex;gap:11px;flex-wrap:wrap;margin-bottom:16px;}
+.kc{flex:1;min-width:140px;background:var(--surf);border-radius:11px;padding:14px 16px;border:1px solid var(--border2);}
+.kl{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;font-family:monospace;}
+.kv{font-size:20px;font-weight:900;}
+.ks{font-size:10px;color:var(--muted);margin-top:2px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.card{background:var(--surf);border-radius:12px;padding:18px;border:1px solid var(--border2);margin-bottom:14px;}
+.ct{font-size:13px;font-weight:800;margin-bottom:14px;color:var(--white);}
+.badge{display:inline-flex;padding:2px 9px;border-radius:20px;font-size:9px;font-weight:700;font-family:monospace;white-space:nowrap;}
+.tw{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:11px;font-family:monospace;}
+th{padding:8px 10px;text-align:left;color:var(--acc);font-weight:700;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:7px 10px;border-bottom:1px solid rgba(16,185,129,0.04);}
+tr:nth-child(even) td{background:rgba(255,255,255,0.01);}
+tfoot td{border-top:2px solid rgba(16,185,129,0.2);font-weight:800;}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;padding:18px;overflow-y:auto;}
+.mo.open{display:flex;}
+.mb{background:var(--surf);border-radius:14px;padding:26px;border:1px solid rgba(16,185,129,0.3);width:520px;max-height:92vh;overflow-y:auto;}
+.mb h3{font-size:16px;font-weight:900;margin-bottom:18px;}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fg .f{grid-column:1/3;}
+.fl label{font-size:10px;color:var(--muted);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:1px;font-family:monospace;}
+.fl input,.fl select,.fl textarea{width:100%;padding:8px 11px;background:var(--bg);border:1px solid var(--border2);border-radius:7px;color:var(--white);font-size:12px;font-family:monospace;outline:none;}
+.fl input:focus,.fl select:focus{border-color:var(--acc);}
+.bg{padding:9px 20px;border-radius:7px;border:none;cursor:pointer;font-weight:700;font-size:12px;font-family:monospace;background:var(--acc);color:var(--bg);}
+.bgh{padding:9px 20px;border-radius:7px;cursor:pointer;font-weight:700;font-size:12px;font-family:monospace;background:transparent;border:1px solid var(--border);color:var(--muted);}
+.bsm{padding:3px 9px;border-radius:5px;font-size:10px;cursor:pointer;font-family:monospace;}
+.be{background:transparent;border:1px solid rgba(16,185,129,0.3);color:var(--acc);}
+.bd{background:transparent;border:1px solid rgba(239,68,68,0.3);color:var(--danger);}
+.pw{background:rgba(255,255,255,0.07);border-radius:3px;height:5px;}
+.pb{border-radius:3px;}
+/* COMPROBANTE */
+.comp{background:white;color:#1a1a1a;font-family:Arial,sans-serif;font-size:11px;max-width:600px;margin:0 auto;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.4);overflow:hidden;}
+.comp-head{background:#1a5c3a;color:white;padding:16px 22px;display:flex;justify-content:space-between;align-items:flex-start;}
+.comp-body{padding:18px 22px;}
+.comp-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:11px;}
+.comp-total{background:#1a5c3a;color:white;padding:10px 22px;display:flex;justify-content:space-between;font-weight:900;font-size:14px;}
+.comp-footer{padding:12px 22px;background:#f8fffe;font-size:10px;color:#666;border-top:1px solid #e0e0e0;}
+.alert-mora{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+#footer{border-top:1px solid var(--border2);padding:11px 24px;font-size:10px;color:var(--muted);font-family:monospace;}
+@media print{
+  #nav-bar,#header,#footer,#content,body>*:not(#printComp){display:none!important;}
+  #printComp{display:block!important;position:fixed;top:0;left:0;width:100%;background:white;}
+  .comp{box-shadow:none!important;border-radius:0!important;max-width:100%!important;}
+  .comp-head,.comp-total{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  @page{margin:8mm;size:A4;}
+}
+@media(max-width:700px){.g2{grid-template-columns:1fr;}.fg{grid-template-columns:1fr;}.fg .f{grid-column:1;}.krow{flex-direction:column;}}
+</style>
+</head>
+<body>
+<div id="nav-bar" style="background:#030609;border-bottom:1px solid rgba(201,168,76,0.1);padding:0 16px;display:flex;align-items:center;gap:4px;overflow-x:auto;flex-shrink:0;height:42px;position:sticky;top:0;z-index:200;">
+<a href="index.html" style="display:flex;align-items:center;padding:5px 10px;border-radius:6px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">&#127968; Hub</a>
+<div style="width:1px;height:20px;background:rgba(201,168,76,0.15);margin:0 2px;flex-shrink:0"></div>
+<a href="MSS-Finanzas.html" style="padding:5px 9px;border-radius:6px;color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Finanzas</a>
+<a href="MSS-Remuneraciones.html" style="padding:5px 9px;border-radius:6px;color:#22C55E;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Remuner.</a>
+<a href="MSS-Contabilidad.html" style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Contab.</a>
+<a href="MSS-Facturacion.html" style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Factur.</a>
+<a href="MSS-Cotizacion.html" style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Cotiz.</a>
+<a href="MSS-Tesoreria.html" style="padding:5px 9px;border-radius:6px;color:#FBBF24;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Tesor.</a>
+<a href="MSS-Contratos.html" style="padding:5px 9px;border-radius:6px;color:#A78BFA;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Contratos</a>
+<a href="MSS-Proyectos.html" style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Proyectos</a>
+<a href="MSS-Ventas-CRM.html" style="padding:5px 9px;border-radius:6px;color:#FB923C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Ventas</a>
+<a href="MSS-RRHH.html" style="padding:5px 9px;border-radius:6px;color:#A78BFA;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">RRHH</a>
+<a href="MSS-Estrategia.html" style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Estrategia</a>
+<a href="MSS-Condominio.html" style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;border:1px solid rgba(16,185,129,0.3);">&#127962; Condominio</a>
+<a href="MSS-Logos.html" style="padding:5px 9px;border-radius:6px;color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Logos</a>
+<a href="MSS-Respaldo.html" style="padding:5px 9px;border-radius:6px;color:#64748B;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Respaldo</a>
+<div id="nav-emp" style="margin-left:auto;padding:3px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;font-size:9px;color:#C9A84C;font-family:monospace;white-space:nowrap;flex-shrink:0;display:none"></div>
+</div>
+<script>
+(function(){
+try{
+  var emp=JSON.parse(localStorage.getItem("mss_empresa_actual")||"{}");
+  if(emp&&emp.nombre){
+    var nd=document.getElementById("nav-emp");
+    if(nd){nd.textContent="Empresa: "+emp.nombre;nd.style.display="block";}
+  }
+}catch(ex){}
+})();
+</script>
+
+
+<div id="header">
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="logo-icon">🏢</div>
+    <div>
+      <div style="font-size:14px;font-weight:800" id="condNombre">Condominio</div>
+      <div style="font-size:10px;color:var(--acc);font-family:monospace;letter-spacing:1px">ADMINISTRACIÓN DE CONDOMINIO · LEY 21.442</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="bg" style="padding:6px 14px;font-size:11px" onclick="openMo('moCobro')">+ Cobro GC</button>
+    <button class="bgh" style="padding:6px 14px;font-size:11px" onclick="openMo('moEgreso')">+ Egreso</button>
+  </div>
+</div>
+
+<div id="content">
+  <div class="tabs" id="mainTabs">
+    <button class="tab on" onclick="showTab('dashboard',this)">📊 Dashboard</button>
+    <button class="tab" onclick="showTab('unidades',this)">🏠 Unidades</button>
+    <button class="tab" onclick="showTab('gastos',this)">💰 Gastos Comunes</button>
+    <button class="tab" onclick="showTab('egresos',this)">📤 Egresos</button>
+    <button class="tab" onclick="showTab('morosidad',this)">⚠ Morosidad</button>
+    <button class="tab" onclick="showTab('fondo',this)">🏦 Fondo Reserva</button>
+    <button class="tab" onclick="showTab('novedades',this)">📋 Novedades</button>
+    <button class="tab" onclick="showTab('panel',this)">👤 Panel Residente</button>
+    <button class="tab" onclick="showTab('mantenimiento',this)">🔧 Mantenimiento</button>
+    <button class="tab" onclick="showTab('rendicion',this)">📝 Rendición</button>
+    <button class="tab" onclick="showTab('config',this)">⚙ Configuración</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="sec on" id="sec-dashboard">
+    <div class="krow" id="kpiDash"></div>
+    <div class="g2">
+      <div class="card"><div class="ct">Estado de Cobros — Mes Actual</div><div id="dashCobros"></div></div>
+      <div class="card"><div class="ct">Últimos Movimientos</div><div id="dashMovs"></div></div>
+    </div>
+    <div class="card"><div class="ct">⚠ Alertas de Morosidad</div><div id="dashMora"></div></div>
+  </div>
+
+  <!-- UNIDADES -->
+  <div class="sec" id="sec-unidades">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+      <button class="bg" style="padding:8px 16px;font-size:12px" onclick="openMo('moUnidad')">+ Nueva Unidad</button>
+    </div>
+    <div class="card tw">
+      <table id="tblUnidades">
+        <thead><tr><th>Torre/Block</th><th>Piso</th><th>Unidad</th><th>Tipo</th><th>Propietario</th><th>RUT</th><th>Email</th><th>Teléfono</th><th>Rol SII</th><th>GC ($)</th><th>Estado</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- GASTOS COMUNES -->
+  <div class="sec" id="sec-gastos">
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:flex-end">
+      <div style="flex:1">
+        <label style="font-size:10px;color:var(--muted);font-family:monospace;display:block;margin-bottom:3px">PERÍODO</label>
+        <input type="month" id="filtMesGC" onchange="renderGastos()" style="padding:8px 12px;background:var(--surf);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-family:monospace;font-size:12px;outline:none"/>
+      </div>
+      <div>
+        <label style="font-size:10px;color:var(--muted);font-family:monospace;display:block;margin-bottom:3px">TORRE / BLOCK</label>
+        <select id="filtTorre" onchange="renderGastos()" style="padding:8px 12px;background:var(--surf);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+          <option value="">Todas</option>
+        </select>
+      </div>
+      <button class="bg" style="padding:8px 16px;font-size:12px" onclick="generarCobros()">⚡ Generar Cobros del Mes</button>
+      <button class="bgh" style="padding:8px 16px;font-size:12px" onclick="openMo('moCobro')">+ Registrar Pago</button>
+      <button class="bgh" style="padding:8px 16px;font-size:12px;color:var(--danger);border-color:rgba(239,68,68,0.3)" onclick="limpiarSeccion('cobros')">🗑 Limpiar Cobros</button>
+    </div>
+    <div class="krow" id="kpiGC"></div>
+    <div class="card tw">
+      <table id="tblGC">
+        <thead><tr><th>Período</th><th>Torre/Block</th><th>Piso</th><th>Unidad</th><th>Propietario</th><th>GC Ord.</th><th>GC Extra</th><th>Mora</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th></th></tr></thead>
+        <tbody></tbody>
+        <tfoot></tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- EGRESOS -->
+  <div class="sec" id="sec-egresos">
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:12px">
+      <button class="bg" style="padding:8px 16px;font-size:12px" onclick="openMo('moEgreso')">+ Nuevo Egreso</button>
+      <button class="bgh" style="padding:8px 16px;font-size:12px;color:var(--danger);border-color:rgba(239,68,68,0.3)" onclick="limpiarSeccion('egresos')">🗑 Limpiar Egresos</button>
+    </div>
+    <div class="krow" id="kpiEgr"></div>
+    <div class="card tw">
+      <table id="tblEgresos">
+        <thead><tr><th>Fecha</th><th>Categoría</th><th>Descripción</th><th>Proveedor</th><th>Monto</th><th>Comprobante</th><th>Estado</th><th></th></tr></thead>
+        <tbody></tbody>
+        <tfoot></tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- MOROSIDAD -->
+  <div class="sec" id="sec-morosidad">
+    <div class="krow" id="kpiMora"></div>
+    <div id="listaMora"></div>
+  </div>
+
+  <!-- FONDO RESERVA -->
+  <div class="sec" id="sec-fondo">
+    <div class="krow" id="kpiFondo"></div>
+    <div class="g2">
+      <div class="card">
+        <div class="ct">Movimientos Fondo de Reserva</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <button class="bg" style="padding:6px 14px;font-size:11px" onclick="openMo('moFondo')">+ Movimiento</button>
+          <button class="bgh" style="padding:6px 14px;font-size:11px;color:var(--danger);border-color:rgba(239,68,68,0.3)" onclick="limpiarSeccion('fondo')">🗑 Limpiar Todo</button>
+        </div>
+        <div class="tw"><table id="tblFondo">
+          <thead><tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Monto</th><th>Saldo</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+      </div>
+      <div class="card">
+        <div class="ct">Información Fondo de Reserva</div>
+        <div style="font-size:12px;color:var(--mutedHi);line-height:1.9">
+          <div style="padding:8px 0;border-bottom:1px solid var(--border2)">📋 <strong style="color:var(--white)">Ley 21.442 Art. 7:</strong> El fondo de reserva debe ser al menos el 5% del presupuesto de gastos comunes anuales.</div>
+          <div style="padding:8px 0;border-bottom:1px solid var(--border2)">🏦 El fondo se deposita en cuenta separada a nombre del condominio.</div>
+          <div style="padding:8px 0;border-bottom:1px solid var(--border2)">📊 Solo puede usarse para reparaciones urgentes o imprevistas.</div>
+          <div style="padding:8px 0">✅ Cada uso debe ser aprobado por la asamblea o el comité.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOVEDADES -->
+  <div class="sec" id="sec-novedades">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+      <button class="bg" style="padding:8px 16px;font-size:12px" onclick="openMo('moNovedad')">+ Nueva Novedad</button>
+    </div>
+    <div id="listaNov"></div>
+  </div>
+
+  <!-- PANEL RESIDENTE -->
+  <div class="sec" id="sec-panel">
+    <div class="card" style="margin-bottom:14px">
+      <div class="ct">👤 Buscador de Residente — Historial Completo</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px">
+        <div class="fl" style="min-width:140px">
+          <label>Block / Torre</label>
+          <select id="panelBlock" onchange="buscarResidente()" style="padding:8px 11px;background:var(--bg);border:1px solid var(--border2);border-radius:7px;color:var(--white);font-family:monospace;font-size:12px;outline:none">
+            <option value="">Seleccionar...</option>
+          </select>
+        </div>
+        <div class="fl" style="min-width:140px">
+          <label>Depto / Unidad</label>
+          <select id="panelDepto" onchange="buscarResidente()" style="padding:8px 11px;background:var(--bg);border:1px solid var(--border2);border-radius:7px;color:var(--white);font-family:monospace;font-size:12px;outline:none">
+            <option value="">Seleccionar...</option>
+          </select>
+        </div>
+        <button class="bg" onclick="buscarResidente()" style="padding:8px 16px;font-size:12px">🔍 Buscar</button>
+      </div>
+      <div id="panelResult"></div>
+    </div>
+  </div>
+
+  <!-- MANTENIMIENTO -->
+  <div class="sec" id="sec-mantenimiento">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+      <button class="bg" style="padding:8px 16px;font-size:12px" onclick="openMo('moOT')">+ Nueva OT</button>
+    </div>
+    <div class="krow" id="kpiMant"></div>
+    <div class="card tw">
+      <table id="tblOT">
+        <thead><tr><th>N° OT</th><th>Fecha</th><th>Área/Zona</th><th>Descripción</th><th>Prioridad</th><th>Proveedor</th><th>F. Prog.</th><th>F. Término</th><th>Costo ($)</th><th>Factura</th><th>Estado</th><th></th></tr></thead>
+        <tbody></tbody>
+        <tfoot></tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- RENDICIÓN -->
+  <div class="sec" id="sec-rendicion">
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:flex-end">
+      <div class="fl" style="min-width:160px">
+        <label>Block / Torre</label>
+        <select id="rendBlock" style="padding:8px 11px;background:var(--surf);border:1px solid var(--border2);border-radius:7px;color:var(--white);font-family:monospace;font-size:12px;outline:none">
+          <option value="">Todos</option>
+        </select>
+      </div>
+      <div class="fl" style="min-width:130px">
+        <label>Mes</label>
+        <input type="month" id="rendMes" style="padding:8px 11px;background:var(--surf);border:1px solid var(--border2);border-radius:7px;color:var(--white);font-family:monospace;font-size:12px;outline:none"/>
+      </div>
+      <button class="bg" onclick="renderRendicion()" style="padding:8px 16px;font-size:12px">📊 Ver Rendición</button>
+      <button class="bgh" onclick="imprimirRendicion()" style="padding:8px 16px;font-size:12px">🖨 Imprimir</button>
+    </div>
+    <div id="rendContent"></div>
+  </div>
+
+  <!-- CONFIGURACIÓN -->
+  <div class="sec" id="sec-config">
+    <div class="card">
+      <div class="ct">⚙ Configuración del Condominio</div>
+      <div class="fg" style="margin-bottom:16px">
+        <div class="fl f"><label>Nombre del Condominio</label><input id="cfgNombre" type="text" placeholder="Ej: Condominio Los Aromos"/></div>
+        <div class="fl"><label>Dirección</label><input id="cfgDireccion" type="text"/></div>
+        <div class="fl"><label>RUT Condominio</label><input id="cfgRut" type="text"/></div>
+        <div class="fl"><label>Rol SII</label><input id="cfgRol" type="text"/></div>
+        <div class="fl"><label>Administrador</label><input id="cfgAdmin" type="text" value="Gaudy Martínez"/></div>
+        <div class="fl"><label>Teléfono Admin</label><input id="cfgTelAdmin" type="text" value="+569 74889039"/></div>
+        <div class="fl"><label>Email Admin</label><input id="cfgEmail" type="email" value="aybserviciosg@gmail.com"/></div>
+        <div class="fl"><label>Banco del Condominio</label><input id="cfgBanco" type="text"/></div>
+        <div class="fl"><label>Nº Cuenta Bancaria</label><input id="cfgCuenta" type="text"/></div>
+        <div class="fl"><label>GC Ordinario Mensual ($)</label><input id="cfgGCOrd" type="number" value="50000"/></div>
+        <div class="fl"><label>Tasa Mora mensual (%)</label><input id="cfgMora" type="number" value="1.5" step="0.1"/></div>
+        <div class="fl"><label>Fondo Reserva Mínimo ($)</label><input id="cfgFondoMin" type="number" value="500000"/></div>
+        <div class="fl"><label>Total Unidades</label><input id="cfgUnidades" type="number" value="0" readonly/></div>
+      </div>
+      <button class="bg" onclick="saveConfig()">💾 Guardar Configuración</button>
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border2)">
+        <div style="font-size:11px;font-weight:700;color:var(--danger);margin-bottom:10px">🗑 Limpiar Datos por Sección</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="bgh" style="font-size:11px;color:var(--danger);border-color:rgba(239,68,68,0.3)" onclick="limpiarSeccion('cobros')">Limpiar Cobros GC</button>
+          <button class="bgh" style="font-size:11px;color:var(--danger);border-color:rgba(239,68,68,0.3)" onclick="limpiarSeccion('egresos')">Limpiar Egresos</button>
+          <button class="bgh" style="font-size:11px;color:var(--danger);border-color:rgba(239,68,68,0.3)" onclick="limpiarSeccion('fondo')">Limpiar Fondo Reserva</button>
+          <button class="bgh" style="font-size:11px;color:var(--danger);border-color:rgba(239,68,68,0.3)" onclick="limpiarSeccion('unidades')">Limpiar Unidades + Cobros</button>
+          <button class="bgh" style="font-size:11px;color:var(--danger);border-color:rgba(239,68,68,0.3)" onclick="limpiarSeccion('ot')">Limpiar Mantenimiento</button>
+        </div>
+        <div style="margin-top:12px">
+          <button style="padding:10px 20px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.4);border-radius:8px;color:var(--danger);cursor:pointer;font-size:12px;font-weight:700;font-family:monospace" onclick="limpiarTodosDatos()">⚠️ Limpiar TODO — Comenzar desde Cero</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">📋 Marco Legal — Ley 21.442 (Condominios Chile)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${[
+          {art:'Art. 2',txt:'Define condominio como conjunto de unidades con bienes de uso común.'},
+          {art:'Art. 7',txt:'Fondo de reserva mínimo 5% del presupuesto anual de gastos comunes.'},
+          {art:'Art. 10',txt:'Administrador elegido en asamblea, puede ser persona natural o jurídica.'},
+          {art:'Art. 14',txt:'Asamblea ordinaria una vez al año para aprobar presupuesto y rendición.'},
+          {art:'Art. 26',txt:'Gastos comunes de cargo del propietario, no del arrendatario.'},
+          {art:'Art. 27',txt:'Mora en gastos comunes genera interés máximo igual a interés corriente.'},
+          {art:'Art. 33',txt:'El administrador lleva libro de actas, cuentas y registro de propietarios.'},
+          {art:'Art. 36',txt:'Rendición de cuentas documentada al menos una vez al año en asamblea.'},
+        ].map(a=>`<div style="background:var(--bg);border-radius:8px;padding:12px;border:1px solid var(--border2)"><div style="font-size:10px;font-weight:700;color:var(--acc);font-family:monospace;margin-bottom:4px">${a.art}</div><div style="font-size:11px;color:var(--mutedHi);line-height:1.5">${a.txt}</div></div>`).join('')}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="footer"><span>Martinez Services Spa · Administración Condominios · Ley 21.442 · Gaudy Martínez</span></div>
+
+<!-- MODAL UNIDAD -->
+<div class="mo" id="moUnidad">
+  <div class="mb">
+    <h3 id="tUnidad">Nueva Unidad</h3>
+    <input type="hidden" id="uId"/>
+    <div class="fg">
+      <div class="fl"><label>Torre / Block</label>
+        <div style="display:flex;gap:6px">
+          <select id="uTorre" style="flex:1;padding:8px 11px;background:var(--bg);border:1px solid var(--border2);border-radius:7px;color:var(--white);font-family:monospace;font-size:12px;outline:none">
+            <option value="">Sin Torre/Block</option>
+          </select>
+          <button type="button" onclick="agregarTorre()" style="padding:6px 10px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);border-radius:7px;color:var(--acc);cursor:pointer;font-size:11px;white-space:nowrap">+ Nueva</button>
+        </div>
+      </div>
+      <div class="fl"><label>Número Piso</label>
+        <select id="uPiso">
+          <option value="">Sin piso</option>
+          ${Array.from({length:30},(_,i)=>`<option>Piso ${i+1}</option>`).join('')}
+          <option>Subterráneo</option>
+        </select>
+      </div>
+      <div class="fl"><label>Número/Identificador Unidad</label><input id="uNum" type="text" placeholder="Ej: 101, A-1, Casa 5"/></div>
+      <div class="fl"><label>Tipo</label>
+        <select id="uTipo">
+          <option>Departamento</option><option>Casa</option><option>Oficina</option>
+          <option>Local Comercial</option><option>Estacionamiento</option><option>Bodega</option>
+        </select>
+      </div>
+      <div class="fl f"><label>Propietario</label><input id="uProp" type="text"/></div>
+      <div class="fl"><label>RUT Propietario</label><input id="uRut" type="text"/></div>
+      <div class="fl"><label>Email</label><input id="uEmail" type="email"/></div>
+      <div class="fl"><label>Teléfono</label><input id="uTel" type="text"/></div>
+      <div class="fl"><label>Rol SII</label><input id="uRol" type="text"/></div>
+      <div class="fl"><label>% Prorrateo GC</label><input id="uProrrateo" type="number" step="0.01" value="0"/></div>
+      <div class="fl"><label>GC Personalizado ($) — 0 = usa el general</label><input id="uGCCustom" type="number" value="0"/></div>
+      <div class="fl"><label>Estado</label><select id="uEstado"><option>Al día</option><option>Moroso</option><option>Inactivo</option></select></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="bg" style="flex:1" onclick="saveUnidad()">Guardar</button>
+      <button class="bgh" onclick="closeMo('moUnidad')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL COBRO/PAGO -->
+<div class="mo" id="moCobro">
+  <div class="mb">
+    <h3>Registrar Pago de Gastos Comunes</h3>
+    <div class="fg">
+      <div class="fl"><label>Período</label><input id="cobroMes" type="month"/></div>
+      <div class="fl"><label>Unidad</label><select id="cobroUnidad"></select></div>
+      <div class="fl"><label>Monto Pagado ($)</label><input id="cobroMonto" type="number"/></div>
+      <div class="fl"><label>Fecha de Pago</label><input id="cobroFecha" type="date"/></div>
+      <div class="fl"><label>Forma de Pago</label><select id="cobroForma"><option>Transferencia</option><option>Efectivo</option><option>Cheque</option><option>Depósito</option></select></div>
+      <div class="fl"><label>Referencia</label><input id="cobroRef" type="text" placeholder="Nº transferencia, recibo..."/></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="bg" style="flex:1" onclick="saveCobro()">✓ Registrar Pago</button>
+      <button class="bgh" onclick="closeMo('moCobro')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EGRESO -->
+<div class="mo" id="moEgreso">
+  <div class="mb">
+    <h3>Nuevo Egreso del Condominio</h3>
+    <div class="fg">
+      <div class="fl"><label>Fecha</label><input id="egrFecha" type="date"/></div>
+      <div class="fl"><label>Categoría</label>
+        <select id="egrCat">
+          <option>Conserjería / Personal</option>
+          <option>Mantención Ascensor</option>
+          <option>Electricidad Áreas Comunes</option>
+          <option>Agua Áreas Comunes</option>
+          <option>Limpieza</option>
+          <option>Jardinería</option>
+          <option>Seguridad / CCTV</option>
+          <option>Reparaciones Urgentes</option>
+          <option>Seguros</option>
+          <option>Administración</option>
+          <option>Fondo de Reserva</option>
+          <option>Otro</option>
+        </select>
+      </div>
+      <div class="fl f"><label>Descripción</label><input id="egrDesc" type="text"/></div>
+      <div class="fl"><label>Proveedor</label><input id="egrProv" type="text"/></div>
+      <div class="fl"><label>Monto ($)</label><input id="egrMonto" type="number"/></div>
+      <div class="fl"><label>Nº Documento</label><input id="egrDoc" type="text" placeholder="Factura, boleta..."/></div>
+      <div class="fl"><label>Estado</label><select id="egrEstado"><option>Pagado</option><option>Pendiente</option><option>Aprobado</option></select></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="bg" style="flex:1" onclick="saveEgreso()">Guardar</button>
+      <button class="bgh" onclick="closeMo('moEgreso')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FONDO -->
+<div class="mo" id="moFondo">
+  <div class="mb" style="width:420px">
+    <h3>Movimiento Fondo de Reserva</h3>
+    <div class="fg">
+      <div class="fl"><label>Fecha</label><input id="fndFecha" type="date"/></div>
+      <div class="fl"><label>Tipo</label><select id="fndTipo"><option>Aporte</option><option>Uso/Retiro</option></select></div>
+      <div class="fl f"><label>Descripción</label><input id="fndDesc" type="text"/></div>
+      <div class="fl f"><label>Monto ($)</label><input id="fndMonto" type="number"/></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="bg" style="flex:1" onclick="saveFondo()">Guardar</button>
+      <button class="bgh" onclick="closeMo('moFondo')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVEDAD -->
+<div class="mo" id="moNovedad">
+  <div class="mb">
+    <h3>Nueva Novedad / Acta</h3>
+    <div class="fg">
+      <div class="fl"><label>Fecha</label><input id="novFecha" type="date"/></div>
+      <div class="fl"><label>Tipo</label><select id="novTipo"><option>Novedad Operacional</option><option>Acta Asamblea</option><option>Acta Comité</option><option>Comunicado</option><option>Incidente</option><option>Mantención</option></select></div>
+      <div class="fl f"><label>Título</label><input id="novTitulo" type="text"/></div>
+      <div class="fl f"><label>Descripción / Contenido</label><textarea id="novDesc" rows="4"></textarea></div>
+      <div class="fl"><label>Responsable</label><input id="novResp" type="text" value="Gaudy Martínez"/></div>
+      <div class="fl"><label>Estado</label><select id="novEstado"><option>Abierta</option><option>En Proceso</option><option>Cerrada</option></select></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="bg" style="flex:1" onclick="saveNovedad()">Guardar</button>
+      <button class="bgh" onclick="closeMo('moNovedad')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMPROBANTE IMPRIMIBLE -->
+<div id="printComp" style="display:none"></div>
+
+<!-- MODAL OT MANTENIMIENTO -->
+<div class="mo" id="moOT">
+  <div class="mb">
+    <h3 id="tOT">Nueva Orden de Trabajo</h3>
+    <input type="hidden" id="otId"/>
+    <div class="fg">
+      <div class="fl"><label>N° OT</label><input id="otNum" type="text" placeholder="OT-001"/></div>
+      <div class="fl"><label>Fecha</label><input id="otFecha" type="date"/></div>
+      <div class="fl"><label>Área / Zona</label><input id="otArea" type="text" placeholder="Block 2 - Garita"/></div>
+      <div class="fl"><label>Prioridad</label>
+        <select id="otPrioridad"><option>Alta</option><option>Media</option><option>Baja</option><option>Urgente</option></select>
+      </div>
+      <div class="fl f"><label>Descripción</label><input id="otDesc" type="text"/></div>
+      <div class="fl"><label>Proveedor</label><input id="otProv" type="text"/></div>
+      <div class="fl"><label>Costo ($)</label><input id="otCosto" type="number" value="0"/></div>
+      <div class="fl"><label>N° Factura/Boleta</label><input id="otFactura" type="text"/></div>
+      <div class="fl"><label>Fecha Programada</label><input id="otFProg" type="date"/></div>
+      <div class="fl"><label>Fecha Término</label><input id="otFTerm" type="date"/></div>
+      <div class="fl"><label>Aprobado por</label><input id="otAprobado" type="text" value="Admin"/></div>
+      <div class="fl"><label>Estado</label>
+        <select id="otEstado"><option>Programado</option><option>En Proceso</option><option>Completado</option><option>Cancelado</option></select>
+      </div>
+      <div class="fl f"><label>Notas</label><textarea id="otNotas" rows="2"></textarea></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="bg" style="flex:1" onclick="saveOT()">Guardar OT</button>
+      <button class="bgh" onclick="closeMo('moOT')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════
+// DATOS OT — desde tu Excel
+// ════════════════════════════
+const SK_OT = 'mss'+getCondId()+'_ot';
+let OT = [];
+function loadOT(){
+  try{
+    const o=localStorage.getItem(SK_OT);
+    OT = o ? JSON.parse(o) : [...DATOS_PRECARGADOS.ots];
+    if(!o) try{localStorage.setItem(SK_OT,JSON.stringify(OT));}catch(e){}
+  }catch(e){OT=[...DATOS_PRECARGADOS.ots];}
+}
+function saveOT_(){try{localStorage.setItem(SK_OT,JSON.stringify(OT));}catch(e){}}
+
+const PRIO_C={Alta:'#EF4444',Urgente:'#EF4444',Media:'#F59E0B',Baja:'#22C55E'};
+const OT_C={Completado:'#22C55E',Programado:'#38BDF8','En Proceso':'#F59E0B',Cancelado:'#5A7090'};
+
+// ════════════════════
+// PANEL RESIDENTE
+// ════════════════════
+function initPanel(){
+  // Leer torres directamente de las unidades — no del storage separado
+  const torres=[...new Set(UNIDADES.map(u=>u.torre).filter(t=>t))].sort((a,b)=>{
+    const na=parseInt(a.replace(/\D/g,''))||0;
+    const nb=parseInt(b.replace(/\D/g,''))||0;
+    return na-nb;
+  });
+  const sel=document.getElementById('panelBlock');
+  sel.innerHTML='<option value="">Seleccionar Block...</option>'+torres.map(t=>`<option>${t}</option>`).join('');
+  
+  sel.onchange=function(){
+    const t=this.value;
+    const deptos=[...new Set(UNIDADES.filter(u=>u.torre===t).map(u=>u.num))].sort((a,b)=>{
+      return parseInt(a)-parseInt(b);
+    });
+    const sd=document.getElementById('panelDepto');
+    sd.innerHTML='<option value="">Seleccionar Depto...</option>'+deptos.map(d=>`<option>${d}</option>`).join('');
+  };
+}
+
+function buscarResidente(){
+  const torre=document.getElementById('panelBlock').value;
+  const num=document.getElementById('panelDepto').value;
+  if(!torre||!num){document.getElementById('panelResult').innerHTML='';return;}
+  const u=UNIDADES.find(x=>x.torre===torre&&x.num===num);
+  if(!u){document.getElementById('panelResult').innerHTML='<div style="color:var(--muted);font-size:12px;padding:16px">No se encontró la unidad</div>';return;}
+
+  // Historial de cobros de esta unidad
+  const hist=COBROS.filter(c=>c.unidadId===u.id).sort((a,b)=>a.mes.localeCompare(b.mes));
+  const deudaTotal=hist.reduce((s,c)=>s+c.saldo,0);
+  const pagadoTotal=hist.reduce((s,c)=>s+c.pagado,0);
+
+  document.getElementById('panelResult').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+      <div style="background:var(--surf2);border-radius:10px;padding:16px;border:1px solid var(--border2)">
+        <div style="font-size:10px;color:var(--acc);font-family:monospace;letter-spacing:1px;margin-bottom:10px">👤 PERFIL DEL RESIDENTE</div>
+        <div style="font-size:12px;margin-bottom:5px"><span style="color:var(--muted)">Unidad:</span> <strong>${u.torre} — Depto ${u.num}</strong></div>
+        <div style="font-size:12px;margin-bottom:5px"><span style="color:var(--muted)">Propietario:</span> <strong style="color:var(--white)">${u.prop}</strong></div>
+        <div style="font-size:12px;margin-bottom:5px"><span style="color:var(--muted)">RUT:</span> ${u.rut||'—'}</div>
+        <div style="font-size:12px;margin-bottom:5px"><span style="color:var(--muted)">Teléfono:</span> ${u.tel||'—'}</div>
+        <div style="font-size:12px;margin-bottom:5px"><span style="color:var(--muted)">Email:</span> ${u.email||'—'}</div>
+        <div style="font-size:12px;margin-bottom:5px"><span style="color:var(--muted)">Estado:</span> ${badge(u.estado,ESTADO_C[u.estado]||'#5A7090')}</div>
+        ${u.notas?`<div style="margin-top:8px;font-size:11px;color:var(--warn);background:rgba(245,158,11,0.08);padding:8px;border-radius:6px">📝 ${u.notas}</div>`:''}
+      </div>
+      <div style="background:var(--surf2);border-radius:10px;padding:16px;border:1px solid var(--border2)">
+        <div style="font-size:10px;color:var(--acc);font-family:monospace;letter-spacing:1px;margin-bottom:10px">💰 RESUMEN FINANCIERO</div>
+        <div style="font-size:12px;margin-bottom:8px"><span style="color:var(--muted)">Cuota mensual:</span> <strong style="color:var(--gold)">${clp(gcUnidad(u))}</strong></div>
+        <div style="font-size:12px;margin-bottom:8px"><span style="color:var(--muted)">Total pagado:</span> <strong style="color:var(--ok)">${clp(pagadoTotal)}</strong></div>
+        <div style="font-size:12px;margin-bottom:8px"><span style="color:var(--muted)">Deuda total:</span> <strong style="color:${deudaTotal>0?'var(--danger)':'var(--ok)'}">${clp(deudaTotal)}</strong></div>
+        <div style="font-size:12px;margin-bottom:8px"><span style="color:var(--muted)">Períodos:</span> ${hist.length} meses registrados</div>
+        <div style="font-size:12px"><span style="color:var(--muted)">Pagados:</span> <strong style="color:var(--ok)">${hist.filter(c=>c.estado==='Pagado').length}</strong> &nbsp;|&nbsp; <span style="color:var(--muted)">Morosos:</span> <strong style="color:var(--danger)">${hist.filter(c=>c.estado==='Moroso'||c.saldo>0).length}</strong></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">📜 Historial Completo de Pagos</div>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Período</th><th>Cuota</th><th>Pagado</th><th>Mora</th><th>Deuda</th><th>Estado</th><th>Fecha Pago</th><th>N° Comp.</th><th>Forma</th><th></th></tr></thead>
+          <tbody>
+            ${hist.length===0?`<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:20px">Sin cobros registrados aún — usa "Generar Cobros del Mes"</td></tr>`:
+            hist.map(c=>`<tr>
+              <td style="font-family:monospace;font-weight:700">${c.mes}</td>
+              <td style="text-align:right">${clp(c.gcOrd)}</td>
+              <td style="text-align:right;color:var(--ok)">${clp(c.pagado)}</td>
+              <td style="text-align:right;color:${c.mora>0?'var(--danger)':'var(--muted)'}">${clp(c.mora)}</td>
+              <td style="text-align:right;color:${c.saldo>0?'var(--danger)':'var(--ok)'};font-weight:700">${clp(c.saldo)}</td>
+              <td>${badge(c.estado,ESTADO_C[c.estado]||'#5A7090')}</td>
+              <td style="color:var(--muted)">${c.fechaPago?df(c.fechaPago):'—'}</td>
+              <td style="color:var(--gold);font-family:monospace">${c.ref||'—'}</td>
+              <td style="color:var(--muted)">${c.forma||'—'}</td>
+              <td>${c.saldo>0?`<button class="bsm be" onclick="registrarPagoRapido(${c.id})">✓</button>`:`<button class="bsm be" onclick="imprimirComprobante(${c.id})">🖨</button>`}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ════════════════════
+// MANTENIMIENTO
+// ════════════════════
+function renderMantenimiento(){
+  const pendientes=OT.filter(o=>o.estado!=='Completado'&&o.estado!=='Cancelado');
+  const totCosto=OT.reduce((s,o)=>s+o.costo,0);
+  document.getElementById('kpiMant').innerHTML=`
+    <div class="kc"><div class="kl">Total OT</div><div class="kv" style="color:var(--acc)">${OT.length}</div></div>
+    <div class="kc"><div class="kl">Pendientes</div><div class="kv" style="color:${pendientes.length>0?'var(--warn)':'var(--ok)'}">${pendientes.length}</div></div>
+    <div class="kc"><div class="kl">Completadas</div><div class="kv" style="color:var(--ok)">${OT.filter(o=>o.estado==='Completado').length}</div></div>
+    <div class="kc"><div class="kl">Costo Total</div><div class="kv" style="color:var(--danger)">${clp(totCosto)}</div></div>
+  `;
+  document.querySelector('#tblOT tbody').innerHTML=OT.map(o=>`<tr>
+    <td style="color:var(--gold);font-weight:700;font-family:monospace">${o.num}</td>
+    <td>${o.fecha?df(o.fecha):'—'}</td>
+    <td style="color:var(--white)">${o.area}</td>
+    <td>${o.desc}</td>
+    <td>${badge(o.prioridad,PRIO_C[o.prioridad]||'#5A7090')}</td>
+    <td style="color:var(--muted)">${o.prov||'—'}</td>
+    <td style="color:var(--muted)">${o.fprog?df(o.fprog):'—'}</td>
+    <td style="color:var(--muted)">${o.fterm?df(o.fterm):'—'}</td>
+    <td style="color:var(--danger);text-align:right;font-weight:700">${clp(o.costo)}</td>
+    <td style="color:var(--muted);font-family:monospace">${o.factura||'—'}</td>
+    <td>${badge(o.estado,OT_C[o.estado]||'#5A7090')}</td>
+    <td><div style="display:flex;gap:4px">
+      <button class="bsm be" onclick="editOT(${o.id})">✎</button>
+      <button class="bsm bd" onclick="delOT(${o.id})">✕</button>
+    </div></td>
+  </tr>`).join('');
+  document.querySelector('#tblOT tfoot').innerHTML=`<tr><td colspan="8" style="color:var(--danger)">COSTO TOTAL</td><td style="text-align:right;color:var(--danger)">${clp(totCosto)}</td><td colspan="3"></td></tr>`;
+}
+
+function saveOT(){
+  const id=document.getElementById('otId').value;
+  const obj={
+    num:document.getElementById('otNum').value||'OT-'+(OT.length+1).toString().padStart(3,'0'),
+    fecha:document.getElementById('otFecha').value,
+    area:document.getElementById('otArea').value,
+    desc:document.getElementById('otDesc').value,
+    prioridad:document.getElementById('otPrioridad').value,
+    prov:document.getElementById('otProv').value,
+    fprog:document.getElementById('otFProg').value,
+    fterm:document.getElementById('otFTerm').value,
+    costo:parseFloat(document.getElementById('otCosto').value)||0,
+    factura:document.getElementById('otFactura').value,
+    aprobado:document.getElementById('otAprobado').value,
+    estado:document.getElementById('otEstado').value,
+    notas:document.getElementById('otNotas').value,
+  };
+  if(!obj.desc){alert('Ingresa una descripción');return;}
+  if(id){const i=OT.findIndex(o=>o.id==id);if(i>=0)OT[i]={...OT[i],...obj};}
+  else OT.push({id:uid(),...obj});
+  saveOT_();closeMo('moOT');renderMantenimiento();
+}
+
+function editOT(id){
+  const o=OT.find(x=>x.id===id);if(!o)return;
+  document.getElementById('tOT').textContent='Editar OT';
+  document.getElementById('otId').value=id;
+  document.getElementById('otNum').value=o.num;
+  document.getElementById('otFecha').value=o.fecha||'';
+  document.getElementById('otArea').value=o.area;
+  document.getElementById('otDesc').value=o.desc;
+  document.getElementById('otPrioridad').value=o.prioridad;
+  document.getElementById('otProv').value=o.prov||'';
+  document.getElementById('otFProg').value=o.fprog||'';
+  document.getElementById('otFTerm').value=o.fterm||'';
+  document.getElementById('otCosto').value=o.costo;
+  document.getElementById('otFactura').value=o.factura||'';
+  document.getElementById('otAprobado').value=o.aprobado||'Admin';
+  document.getElementById('otEstado').value=o.estado;
+  document.getElementById('otNotas').value=o.notas||'';
+  openMo('moOT');
+}
+
+function delOT(id){if(!confirm('¿Eliminar OT?'))return;OT=OT.filter(o=>o.id!==id);saveOT_();renderMantenimiento();}
+
+// ════════════════════
+// RENDICIÓN
+// ════════════════════
+function initRendicion(){
+  // Poblar blocks desde unidades cargadas
+  const torres=[...new Set(UNIDADES.map(u=>u.torre).filter(t=>t))].sort((a,b)=>{
+    const na=parseInt(a.replace(/\D/g,''))||0;
+    const nb=parseInt(b.replace(/\D/g,''))||0;
+    return na-nb;
+  });
+  const sel=document.getElementById('rendBlock');
+  if(sel){
+    const cur=sel.value;
+    sel.innerHTML='<option value="">Todos los Blocks</option>'+torres.map(t=>`<option value="${t}" ${cur===t?'selected':''}>${t}</option>`).join('');
+  }
+  // Fijar mes actual
+  const mesInput=document.getElementById('rendMes');
+  if(mesInput&&!mesInput.value) mesInput.value=mesActual;
+}
+
+function renderRendicion(){
+  const torre=document.getElementById('rendBlock').value;
+  const mes=document.getElementById('rendMes').value||mesActual;
+  const [y,m]=mes.split('-');
+  const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const mesLabel=meses[parseInt(m)-1]+' '+y;
+
+  let uFilt=UNIDADES;
+  if(torre)uFilt=UNIDADES.filter(u=>u.torre===torre);
+  const uIds=uFilt.map(u=>u.id);
+  let cobFilt=COBROS.filter(c=>c.mes===mes&&uIds.includes(c.unidadId));
+  const egrFilt=EGRESOS.filter(e=>e.fecha.startsWith(mes));
+
+  const totIngreso=cobFilt.reduce((s,c)=>s+c.pagado,0);
+  const totEgreso=egrFilt.reduce((s,e)=>s+e.monto,0);
+  const saldo=totIngreso-totEgreso;
+  const pagados=cobFilt.filter(c=>c.estado==='Pagado').length;
+  const morosos=cobFilt.filter(c=>c.saldo>0).length;
+
+  document.getElementById('rendContent').innerHTML=`
+    <div id="rendDoc" style="background:white;color:#1a1a1a;font-family:Arial,sans-serif;border-radius:10px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.3)">
+      <div style="background:#1a5c3a;color:white;padding:18px 24px;display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="font-size:18px;font-weight:900">${CONFIG.nombre||'Condominio'}</div>
+          <div style="font-size:11px;opacity:.85">${torre?torre+' — ':''}Rendición de Cuentas · ${mesLabel}</div>
+          <div style="font-size:10px;opacity:.75;margin-top:3px">Administrador: ${CONFIG.admin} · ${CONFIG.telAdmin}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;opacity:.9">RENDICIÓN MENSUAL</div>
+          <div style="font-size:22px;font-weight:900">${mesLabel}</div>
+          <div style="font-size:10px;opacity:.8">Emitido: ${df(hoy)}</div>
+        </div>
+      </div>
+      <div style="padding:20px 24px">
+        <!-- KPIs -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+          ${[
+            {l:'Total Recaudado',v:clp(totIngreso),c:'#166534'},
+            {l:'Total Egresos',v:clp(totEgreso),c:'#dc2626'},
+            {l:'Saldo del Mes',v:clp(saldo),c:saldo>=0?'#166534':'#dc2626'},
+            {l:'Unidades Pagadas',v:pagados+' / '+uFilt.length,c:'#1a5c3a'},
+          ].map(k=>`<div style="background:#f0fff8;border:1px solid #d1fae5;border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:9px;color:#6b7280;font-weight:700;text-transform:uppercase;margin-bottom:4px">${k.l}</div>
+            <div style="font-size:16px;font-weight:900;color:${k.c}">${k.v}</div>
+          </div>`).join('')}
+        </div>
+
+        <!-- Tabla ingresos -->
+        <div style="margin-bottom:16px">
+          <div style="font-size:12px;font-weight:700;color:#1a5c3a;margin-bottom:8px;padding:6px 10px;background:#f0fff8;border-radius:6px">📥 INGRESOS — Gastos Comunes Recaudados</div>
+          <table style="width:100%;border-collapse:collapse;font-size:11px">
+            <thead><tr style="background:#1a5c3a;color:white">${['Block','Depto','Propietario','GC Ord.','GC Extra','Mora','Total','Pagado','Saldo','Estado','N°Comp','Fecha'].map(h=>`<th style="padding:6px 8px;text-align:left">${h}</th>`).join('')}</tr></thead>
+            <tbody>
+              ${cobFilt.map((c,i)=>{
+                const u=UNIDADES.find(x=>x.id===c.unidadId);
+                return `<tr style="background:${i%2===0?'#f8fffe':'white'}">
+                  <td style="padding:5px 8px">${u?.torre||'—'}</td>
+                  <td style="padding:5px 8px;font-weight:700">${c.unidadNum}</td>
+                  <td style="padding:5px 8px">${c.prop}</td>
+                  <td style="padding:5px 8px;text-align:right">${clp(c.gcOrd)}</td>
+                  <td style="padding:5px 8px;text-align:right">${clp(c.gcExtra)}</td>
+                  <td style="padding:5px 8px;text-align:right;color:${c.mora>0?'#dc2626':'#6b7280'}">${clp(c.mora)}</td>
+                  <td style="padding:5px 8px;text-align:right;font-weight:700">${clp(c.total)}</td>
+                  <td style="padding:5px 8px;text-align:right;color:#166534;font-weight:700">${clp(c.pagado)}</td>
+                  <td style="padding:5px 8px;text-align:right;color:${c.saldo>0?'#dc2626':'#166534'};font-weight:700">${clp(c.saldo)}</td>
+                  <td style="padding:5px 8px"><span style="padding:2px 6px;border-radius:10px;font-size:9px;font-weight:700;background:${c.estado==='Pagado'?'#d1fae5':c.estado==='Moroso'?'#fee2e2':'#fef3c7'};color:${c.estado==='Pagado'?'#166534':c.estado==='Moroso'?'#dc2626':'#92400e'}">${c.estado}</span></td>
+                  <td style="padding:5px 8px;color:#6b7280">${c.ref||'—'}</td>
+                  <td style="padding:5px 8px;color:#6b7280">${c.fechaPago?df(c.fechaPago):'—'}</td>
+                </tr>`;}).join('')}
+              <tr style="background:#1a5c3a;color:white;font-weight:900">
+                <td colspan="7" style="padding:7px 8px">TOTALES</td>
+                <td style="padding:7px 8px;text-align:right">${clp(totIngreso)}</td>
+                <td style="padding:7px 8px;text-align:right">${clp(cobFilt.reduce((s,c)=>s+c.saldo,0))}</td>
+                <td colspan="3"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Tabla egresos -->
+        <div style="margin-bottom:16px">
+          <div style="font-size:12px;font-weight:700;color:#dc2626;margin-bottom:8px;padding:6px 10px;background:#fff5f5;border-radius:6px">📤 EGRESOS — Gastos del Período</div>
+          <table style="width:100%;border-collapse:collapse;font-size:11px">
+            <thead><tr style="background:#dc2626;color:white">${['Fecha','Categoría','Descripción','Proveedor','Monto','Comprobante','Estado'].map(h=>`<th style="padding:6px 8px;text-align:left">${h}</th>`).join('')}</tr></thead>
+            <tbody>
+              ${egrFilt.length===0?`<tr><td colspan="7" style="padding:12px;text-align:center;color:#6b7280">Sin egresos registrados este período</td></tr>`:
+              egrFilt.map((e,i)=>`<tr style="background:${i%2===0?'#fff5f5':'white'}">
+                <td style="padding:5px 8px">${df(e.fecha)}</td>
+                <td style="padding:5px 8px">${e.cat}</td>
+                <td style="padding:5px 8px">${e.desc}</td>
+                <td style="padding:5px 8px;color:#6b7280">${e.prov}</td>
+                <td style="padding:5px 8px;text-align:right;color:#dc2626;font-weight:700">${clp(e.monto)}</td>
+                <td style="padding:5px 8px;color:#6b7280">${e.doc}</td>
+                <td style="padding:5px 8px">${e.estado}</td>
+              </tr>`).join('')}
+              <tr style="background:#dc2626;color:white;font-weight:900">
+                <td colspan="4" style="padding:7px 8px">TOTAL EGRESOS</td>
+                <td style="padding:7px 8px;text-align:right">${clp(totEgreso)}</td>
+                <td colspan="2"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Balance final -->
+        <div style="background:#f0fff8;border:2px solid #1a5c3a;border-radius:10px;padding:16px;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:14px;font-weight:900;color:#1a5c3a">BALANCE DEL PERÍODO</div>
+            <div style="font-size:11px;color:#6b7280;margin-top:3px">Ingresos GC ${clp(totIngreso)} − Egresos ${clp(totEgreso)}</div>
+          </div>
+          <div style="font-size:28px;font-weight:900;color:${saldo>=0?'#166534':'#dc2626'}">${clp(saldo)}</div>
+        </div>
+
+        <!-- Firma -->
+        <div style="display:flex;justify-content:space-between;margin-top:30px;padding-top:20px;border-top:1px solid #e5e7eb">
+          <div style="text-align:center;min-width:200px">
+            <div style="border-top:1px solid #1a5c3a;padding-top:8px;margin-top:35px">
+              <div style="font-size:12px;font-weight:700;color:#1a5c3a">${CONFIG.admin}</div>
+              <div style="font-size:10px;color:#6b7280">Administrador del Condominio</div>
+            </div>
+          </div>
+          <div style="text-align:center;min-width:200px">
+            <div style="border-top:1px solid #1a5c3a;padding-top:8px;margin-top:35px">
+              <div style="font-size:12px;font-weight:700;color:#1a5c3a">Presidente Comité</div>
+              <div style="font-size:10px;color:#6b7280">Representante de Copropietarios</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="background:#f0f6ff;padding:10px 24px;display:flex;justify-content:space-between;font-size:9px;color:#6b7280;border-top:1px solid #e0eaff">
+        <span>${CONFIG.nombre} · ${CONFIG.direccion||''} · Ley 21.442</span>
+        <span>Rendición ${mesLabel} · Emitido ${df(hoy)}</span>
+      </div>
+    </div>`;
+}
+
+function imprimirRendicion(){
+  const doc=document.getElementById('rendDoc');
+  if(!doc){alert('Genera primero la rendición');return;}
+  const clone=doc.cloneNode(true);
+  clone.id='printOnly';
+  clone.style.cssText='display:block;position:fixed;top:0;left:0;width:100%;z-index:99999;background:white;';
+  document.body.appendChild(clone);
+  window.print();
+  document.body.removeChild(clone);
+}
+
+// ════════════════════
+// TABS EXTENDIDO
+// ════════════════════
+// Sobreescribir showTab para incluir tabs nuevos
+const _origShowTab2=showTab;
+function showTab(id,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('#mainTabs .tab').forEach(b=>b.classList.remove('on'));
+  const sec=document.getElementById('sec-'+id);
+  if(sec)sec.classList.add('on');
+  if(btn)btn.classList.add('on');
+  // Callbacks por sección
+  const handlers={
+    dashboard:renderDashboard,
+    unidades:renderUnidades,
+    gastos:renderGastos,
+    egresos:renderEgresos,
+    morosidad:renderMorosidad,
+    fondo:renderFondo,
+    novedades:renderNovedades,
+    config:loadConfig,
+    panel:initPanel,
+    mantenimiento:()=>{loadOT();renderMantenimiento();},
+    rendicion:()=>{
+      const mi=document.getElementById('rendMes');
+      if(mi&&!mi.value)mi.value=mesActual;
+      initRendicion();
+    }
+  };
+  if(handlers[id])handlers[id]();
+}
+
+// GENERADOR 160 UNIDADES desde tu Excel
+function generarUnidades160(){
+  if(UNIDADES.length>0){if(!confirm('Ya tienes unidades registradas. ¿Reemplazar con las 160 unidades del condominio?'))return;}
+  UNIDADES=[];
+  const pisos=['101','102','103','104','201','202','203','204','301','302','303','304','401','402','403','404','501','502','503','504'];
+  // Residentes conocidos Block 2
+  const resBlock2={
+    '101':{prop:'Juan Pérez González',notas:''},
+    '102':{prop:'Nancy Azabache B.',notas:'Abono GG.CC atrasados — sin mes confirmado'},
+    '202':{prop:'Carlos Gomez Gomez',notas:'Abono Abr 2026'},
+    '203':{prop:'Juan Orderique Morales',notas:'Sin registro de pago 2026'},
+    '204':{prop:'Gaudy Martinez Yovera',tel:'974889039',email:'gaudy1994.gm@gmail.com',notas:'Al día — pagos desde Jun 2025'},
+    '301':{prop:'Angela Bone Vargas',notas:'Abono Feb+Mar 2026'},
+    '303':{prop:'Francisca Ossandón Fraga',notas:'Moroso Ene-Abr 2026',estado:'Moroso'},
+    '404':{prop:'Eucebio Yufra Garcia',notas:'Abono Mar+Abr 2026'},
+    '501':{prop:'José Morales',notas:'Abono Mayo 2026'},
+    '503':{prop:'Carlos Gomez Roco',notas:'Abono Abr 2026'},
+    '504':{prop:'Maria Jose Rodriguez',notas:'Al día'},
+  };
+  for(let b=1;b<=8;b++){
+    pisos.forEach(dep=>{
+      const isB2=b===2;
+      const res=isB2&&resBlock2[dep]?resBlock2[dep]:{};
+      UNIDADES.push({
+        id:uid(),
+        torre:'Block '+b,
+        piso:'Piso '+dep.charAt(0),
+        num:dep,
+        tipo:'Departamento',
+        prop:res.prop||'(Por completar)',
+        rut:'',
+        email:res.email||'',
+        tel:res.tel||'',
+        rol:'',
+        prorrateo:parseFloat((100/160).toFixed(4)),
+        gcCustom:0,
+        estado:res.estado||'Activo',
+        notas:res.notas||'',
+      });
+    });
+  }
+  saveAll();
+  alert('✓ 160 unidades generadas — 8 Blocks × 20 deptos · Block 2 con residentes reales');
+  renderUnidades();
+}
+
+loadOT();
+
+function getCondId(){try{const e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}');return e.id?'_cond_'+e.id:'_cond_default';}catch(e){return '_cond_default';}}
+const CID=getCondId();
+const SK={
+  cfg:'mss'+CID+'_cfg',
+  unidades:'mss'+CID+'_unidades',
+  cobros:'mss'+CID+'_cobros',
+  egresos:'mss'+CID+'_egresos',
+  fondo:'mss'+CID+'_fondo',
+  novedades:'mss'+CID+'_novedades',
+};
+
+let _id=8000; const uid=()=>++_id;
+let CONFIG={}, UNIDADES=[], COBROS=[], EGRESOS=[], FONDO=[], NOVEDADES=[];
+
+// Datos de ejemplo
+const DEF_CONFIG={
+  nombre:'',direccion:'',rut:'',rol:'',admin:'Gaudy Martínez',
+  telAdmin:'+569 74889039',email:'aybserviciosg@gmail.com',
+  banco:'',cuenta:'',gcOrd:40000,mora:1.5,fondoMin:0
+};
+
+const hoy=new Date().toISOString().split('T')[0];
+const mesActual=hoy.substring(0,7);
+
+function saveAll(){
+  try{
+    localStorage.setItem(SK.cfg,JSON.stringify(CONFIG));
+    localStorage.setItem(SK.unidades,JSON.stringify(UNIDADES));
+    localStorage.setItem(SK.cobros,JSON.stringify(COBROS));
+    localStorage.setItem(SK.egresos,JSON.stringify(EGRESOS));
+    localStorage.setItem(SK.fondo,JSON.stringify(FONDO));
+    localStorage.setItem(SK.novedades,JSON.stringify(NOVEDADES));
+  }catch(e){}
+}
+
+// ════════════════════════════════════════
+// DATOS PRECARGADOS DESDE EXCEL
+// Condominio Torre 2 — 160 unidades
+// ════════════════════════════════════════
+const DATOS_PRECARGADOS = {
+  config: {"nombre": "Condominio Torre 2", "direccion": "Alto Hospicio", "rut": "", "rol": "", "admin": "Gaudy Martínez", "telAdmin": "+569 74889039", "email": "aybserviciosg@gmail.com", "banco": "BCI", "cuenta": "13772970", "gcOrd": 40000, "mora": 1.5, "fondoMin": 0},
+  unidades: [{"id": 10001, "torre": "Block 1", "piso": "Piso 1", "num": "101", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10002, "torre": "Block 1", "piso": "Piso 1", "num": "102", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10003, "torre": "Block 1", "piso": "Piso 1", "num": "103", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10004, "torre": "Block 1", "piso": "Piso 1", "num": "104", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10005, "torre": "Block 1", "piso": "Piso 2", "num": "201", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10006, "torre": "Block 1", "piso": "Piso 2", "num": "202", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10007, "torre": "Block 1", "piso": "Piso 2", "num": "203", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10008, "torre": "Block 1", "piso": "Piso 2", "num": "204", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10009, "torre": "Block 1", "piso": "Piso 3", "num": "301", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10010, "torre": "Block 1", "piso": "Piso 3", "num": "302", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10011, "torre": "Block 1", "piso": "Piso 3", "num": "303", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10012, "torre": "Block 1", "piso": "Piso 3", "num": "304", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10013, "torre": "Block 1", "piso": "Piso 4", "num": "401", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10014, "torre": "Block 1", "piso": "Piso 4", "num": "402", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10015, "torre": "Block 1", "piso": "Piso 4", "num": "403", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10016, "torre": "Block 1", "piso": "Piso 4", "num": "404", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10017, "torre": "Block 1", "piso": "Piso 5", "num": "501", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10018, "torre": "Block 1", "piso": "Piso 5", "num": "502", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10019, "torre": "Block 1", "piso": "Piso 5", "num": "503", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10020, "torre": "Block 1", "piso": "Piso 5", "num": "504", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10021, "torre": "Block 2", "piso": "Piso 1", "num": "101", "tipo": "Departamento", "prop": "Juan Pérez González", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10022, "torre": "Block 2", "piso": "Piso 1", "num": "102", "tipo": "Departamento", "prop": "Nancy Azabache B.", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": "Abono GG.CC atrasados — sin mes confirmado (COMP-5)"}, {"id": 10023, "torre": "Block 2", "piso": "Piso 1", "num": "103", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10024, "torre": "Block 2", "piso": "Piso 1", "num": "104", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10025, "torre": "Block 2", "piso": "Piso 2", "num": "201", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10026, "torre": "Block 2", "piso": "Piso 2", "num": "202", "tipo": "Departamento", "prop": "Carlos Gomez Gomez", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": "Abono Abr 2026 (COMP-7)"}, {"id": 10027, "torre": "Block 2", "piso": "Piso 2", "num": "203", "tipo": "Departamento", "prop": "Juan Orderique Morales", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": "Sin registro de pago 2026"}, {"id": 10028, "torre": "Block 2", "piso": "Piso 2", "num": "204", "tipo": "Departamento", "prop": "Gaudy Martinez Yovera", "rut": "—", "email": "gaudy1994.gm@gmail.com", "tel": "974889039", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": "Al día — pagos desde Jun 2025"}, {"id": 10029, "torre": "Block 2", "piso": "Piso 3", "num": "301", "tipo": "Departamento", "prop": "Angela Bone Vargas", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": "Abono Feb+Mar 2026 (COMP-8)"}, {"id": 10030, "torre": "Block 2", "piso": "Piso 3", "num": "302", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10031, "torre": "Block 2", "piso": "Piso 3", "num": "303", "tipo": "Departamento", "prop": "Francisca Ossandón Fraga", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Moroso", "notas": "Moroso Ene-Abr 2026 / Pagó Nov+Dic 2025 (COMP-1)"}, {"id": 10032, "torre": "Block 2", "piso": "Piso 3", "num": "304", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10033, "torre": "Block 2", "piso": "Piso 4", "num": "401", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10034, "torre": "Block 2", "piso": "Piso 4", "num": "402", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10035, "torre": "Block 2", "piso": "Piso 4", "num": "403", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10036, "torre": "Block 2", "piso": "Piso 4", "num": "404", "tipo": "Departamento", "prop": "Eucebio Yufra Garcia", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": "Abono Mar+Abr 2026 (COMP-3)"}, {"id": 10037, "torre": "Block 2", "piso": "Piso 5", "num": "501", "tipo": "Departamento", "prop": "José Morales", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": "Abono Mayo 2026 (COMP-6)"}, {"id": 10038, "torre": "Block 2", "piso": "Piso 5", "num": "502", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10039, "torre": "Block 2", "piso": "Piso 5", "num": "503", "tipo": "Departamento", "prop": "Carlos Gomez Roco", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": "Abono Abr 2026 (COMP-2)"}, {"id": 10040, "torre": "Block 2", "piso": "Piso 5", "num": "504", "tipo": "Departamento", "prop": "Maria Jose Rodriguez", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": "Al día"}, {"id": 10041, "torre": "Block 3", "piso": "Piso 1", "num": "101", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10042, "torre": "Block 3", "piso": "Piso 1", "num": "102", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10043, "torre": "Block 3", "piso": "Piso 1", "num": "103", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10044, "torre": "Block 3", "piso": "Piso 1", "num": "104", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10045, "torre": "Block 3", "piso": "Piso 2", "num": "201", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10046, "torre": "Block 3", "piso": "Piso 2", "num": "202", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10047, "torre": "Block 3", "piso": "Piso 2", "num": "203", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10048, "torre": "Block 3", "piso": "Piso 2", "num": "204", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10049, "torre": "Block 3", "piso": "Piso 3", "num": "301", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10050, "torre": "Block 3", "piso": "Piso 3", "num": "302", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10051, "torre": "Block 3", "piso": "Piso 3", "num": "303", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10052, "torre": "Block 3", "piso": "Piso 3", "num": "304", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10053, "torre": "Block 3", "piso": "Piso 4", "num": "401", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10054, "torre": "Block 3", "piso": "Piso 4", "num": "402", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10055, "torre": "Block 3", "piso": "Piso 4", "num": "403", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10056, "torre": "Block 3", "piso": "Piso 4", "num": "404", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10057, "torre": "Block 3", "piso": "Piso 5", "num": "501", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10058, "torre": "Block 3", "piso": "Piso 5", "num": "502", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10059, "torre": "Block 3", "piso": "Piso 5", "num": "503", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10060, "torre": "Block 3", "piso": "Piso 5", "num": "504", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10061, "torre": "Block 4", "piso": "Piso 1", "num": "101", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10062, "torre": "Block 4", "piso": "Piso 1", "num": "102", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10063, "torre": "Block 4", "piso": "Piso 1", "num": "103", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10064, "torre": "Block 4", "piso": "Piso 1", "num": "104", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10065, "torre": "Block 4", "piso": "Piso 2", "num": "201", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10066, "torre": "Block 4", "piso": "Piso 2", "num": "202", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10067, "torre": "Block 4", "piso": "Piso 2", "num": "203", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10068, "torre": "Block 4", "piso": "Piso 2", "num": "204", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10069, "torre": "Block 4", "piso": "Piso 3", "num": "301", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10070, "torre": "Block 4", "piso": "Piso 3", "num": "302", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10071, "torre": "Block 4", "piso": "Piso 3", "num": "303", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10072, "torre": "Block 4", "piso": "Piso 3", "num": "304", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10073, "torre": "Block 4", "piso": "Piso 4", "num": "401", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10074, "torre": "Block 4", "piso": "Piso 4", "num": "402", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10075, "torre": "Block 4", "piso": "Piso 4", "num": "403", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10076, "torre": "Block 4", "piso": "Piso 4", "num": "404", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10077, "torre": "Block 4", "piso": "Piso 5", "num": "501", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10078, "torre": "Block 4", "piso": "Piso 5", "num": "502", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10079, "torre": "Block 4", "piso": "Piso 5", "num": "503", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10080, "torre": "Block 4", "piso": "Piso 5", "num": "504", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10081, "torre": "Block 5", "piso": "Piso 1", "num": "101", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10082, "torre": "Block 5", "piso": "Piso 1", "num": "102", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10083, "torre": "Block 5", "piso": "Piso 1", "num": "103", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10084, "torre": "Block 5", "piso": "Piso 1", "num": "104", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10085, "torre": "Block 5", "piso": "Piso 2", "num": "201", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10086, "torre": "Block 5", "piso": "Piso 2", "num": "202", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10087, "torre": "Block 5", "piso": "Piso 2", "num": "203", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10088, "torre": "Block 5", "piso": "Piso 2", "num": "204", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10089, "torre": "Block 5", "piso": "Piso 3", "num": "301", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10090, "torre": "Block 5", "piso": "Piso 3", "num": "302", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10091, "torre": "Block 5", "piso": "Piso 3", "num": "303", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10092, "torre": "Block 5", "piso": "Piso 3", "num": "304", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10093, "torre": "Block 5", "piso": "Piso 4", "num": "401", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10094, "torre": "Block 5", "piso": "Piso 4", "num": "402", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10095, "torre": "Block 5", "piso": "Piso 4", "num": "403", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10096, "torre": "Block 5", "piso": "Piso 4", "num": "404", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10097, "torre": "Block 5", "piso": "Piso 5", "num": "501", "tipo": "Departamento", "prop": "Aracely Duran", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10098, "torre": "Block 5", "piso": "Piso 5", "num": "502", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10099, "torre": "Block 5", "piso": "Piso 5", "num": "503", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10100, "torre": "Block 5", "piso": "Piso 5", "num": "504", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10101, "torre": "Block 6", "piso": "Piso 1", "num": "101", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10102, "torre": "Block 6", "piso": "Piso 1", "num": "102", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10103, "torre": "Block 6", "piso": "Piso 1", "num": "103", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10104, "torre": "Block 6", "piso": "Piso 1", "num": "104", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10105, "torre": "Block 6", "piso": "Piso 2", "num": "201", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10106, "torre": "Block 6", "piso": "Piso 2", "num": "202", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10107, "torre": "Block 6", "piso": "Piso 2", "num": "203", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10108, "torre": "Block 6", "piso": "Piso 2", "num": "204", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10109, "torre": "Block 6", "piso": "Piso 3", "num": "301", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10110, "torre": "Block 6", "piso": "Piso 3", "num": "302", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10111, "torre": "Block 6", "piso": "Piso 3", "num": "303", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10112, "torre": "Block 6", "piso": "Piso 3", "num": "304", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10113, "torre": "Block 6", "piso": "Piso 4", "num": "401", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10114, "torre": "Block 6", "piso": "Piso 4", "num": "402", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10115, "torre": "Block 6", "piso": "Piso 4", "num": "403", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10116, "torre": "Block 6", "piso": "Piso 4", "num": "404", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10117, "torre": "Block 6", "piso": "Piso 5", "num": "501", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10118, "torre": "Block 6", "piso": "Piso 5", "num": "502", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10119, "torre": "Block 6", "piso": "Piso 5", "num": "503", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10120, "torre": "Block 6", "piso": "Piso 5", "num": "504", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10121, "torre": "Block 7", "piso": "Piso 1", "num": "101", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10122, "torre": "Block 7", "piso": "Piso 1", "num": "102", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10123, "torre": "Block 7", "piso": "Piso 1", "num": "103", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10124, "torre": "Block 7", "piso": "Piso 1", "num": "104", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10125, "torre": "Block 7", "piso": "Piso 2", "num": "201", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10126, "torre": "Block 7", "piso": "Piso 2", "num": "202", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10127, "torre": "Block 7", "piso": "Piso 2", "num": "203", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10128, "torre": "Block 7", "piso": "Piso 2", "num": "204", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10129, "torre": "Block 7", "piso": "Piso 3", "num": "301", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10130, "torre": "Block 7", "piso": "Piso 3", "num": "302", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10131, "torre": "Block 7", "piso": "Piso 3", "num": "303", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10132, "torre": "Block 7", "piso": "Piso 3", "num": "304", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10133, "torre": "Block 7", "piso": "Piso 4", "num": "401", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10134, "torre": "Block 7", "piso": "Piso 4", "num": "402", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10135, "torre": "Block 7", "piso": "Piso 4", "num": "403", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10136, "torre": "Block 7", "piso": "Piso 4", "num": "404", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10137, "torre": "Block 7", "piso": "Piso 5", "num": "501", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10138, "torre": "Block 7", "piso": "Piso 5", "num": "502", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10139, "torre": "Block 7", "piso": "Piso 5", "num": "503", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10140, "torre": "Block 7", "piso": "Piso 5", "num": "504", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10141, "torre": "Block 8", "piso": "Piso 1", "num": "101", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10142, "torre": "Block 8", "piso": "Piso 1", "num": "102", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10143, "torre": "Block 8", "piso": "Piso 1", "num": "103", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10144, "torre": "Block 8", "piso": "Piso 1", "num": "104", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10145, "torre": "Block 8", "piso": "Piso 2", "num": "201", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10146, "torre": "Block 8", "piso": "Piso 2", "num": "202", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10147, "torre": "Block 8", "piso": "Piso 2", "num": "203", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10148, "torre": "Block 8", "piso": "Piso 2", "num": "204", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10149, "torre": "Block 8", "piso": "Piso 3", "num": "301", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10150, "torre": "Block 8", "piso": "Piso 3", "num": "302", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10151, "torre": "Block 8", "piso": "Piso 3", "num": "303", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10152, "torre": "Block 8", "piso": "Piso 3", "num": "304", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10153, "torre": "Block 8", "piso": "Piso 4", "num": "401", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10154, "torre": "Block 8", "piso": "Piso 4", "num": "402", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10155, "torre": "Block 8", "piso": "Piso 4", "num": "403", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10156, "torre": "Block 8", "piso": "Piso 4", "num": "404", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10157, "torre": "Block 8", "piso": "Piso 5", "num": "501", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10158, "torre": "Block 8", "piso": "Piso 5", "num": "502", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10159, "torre": "Block 8", "piso": "Piso 5", "num": "503", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}, {"id": 10160, "torre": "Block 8", "piso": "Piso 5", "num": "504", "tipo": "Departamento", "prop": "(Por completar)", "rut": "", "email": "", "tel": "", "rol": "", "prorrateo": 0.625, "gcCustom": 0, "estado": "Al día", "notas": ""}],
+  cobros: [{"id": 20001, "mes": "2025-06", "unidadId": 10021, "unidadNum": "101", "prop": "Juan Pérez González", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20002, "mes": "2025-07", "unidadId": 10021, "unidadNum": "101", "prop": "Juan Pérez González", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20003, "mes": "2025-08", "unidadId": 10021, "unidadNum": "101", "prop": "Juan Pérez González", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20004, "mes": "2025-09", "unidadId": 10021, "unidadNum": "101", "prop": "Juan Pérez González", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20005, "mes": "2025-10", "unidadId": 10021, "unidadNum": "101", "prop": "Juan Pérez González", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20006, "mes": "2025-11", "unidadId": 10021, "unidadNum": "101", "prop": "Juan Pérez González", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20007, "mes": "2025-12", "unidadId": 10021, "unidadNum": "101", "prop": "Juan Pérez González", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20008, "mes": "2026-01", "unidadId": 10021, "unidadNum": "101", "prop": "Juan Pérez González", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20009, "mes": "2026-02", "unidadId": 10021, "unidadNum": "101", "prop": "Juan Pérez González", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20010, "mes": "2026-03", "unidadId": 10021, "unidadNum": "101", "prop": "Juan Pérez González", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20011, "mes": "2025-06", "unidadId": 10022, "unidadNum": "102", "prop": "Nancy Azabache B.", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20012, "mes": "2025-07", "unidadId": 10022, "unidadNum": "102", "prop": "Nancy Azabache B.", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20013, "mes": "2025-08", "unidadId": 10022, "unidadNum": "102", "prop": "Nancy Azabache B.", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20014, "mes": "2025-09", "unidadId": 10022, "unidadNum": "102", "prop": "Nancy Azabache B.", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20015, "mes": "2025-10", "unidadId": 10022, "unidadNum": "102", "prop": "Nancy Azabache B.", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20016, "mes": "2025-11", "unidadId": 10022, "unidadNum": "102", "prop": "Nancy Azabache B.", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20017, "mes": "2025-12", "unidadId": 10022, "unidadNum": "102", "prop": "Nancy Azabache B.", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20018, "mes": "2026-01", "unidadId": 10022, "unidadNum": "102", "prop": "Nancy Azabache B.", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20019, "mes": "2026-02", "unidadId": 10022, "unidadNum": "102", "prop": "Nancy Azabache B.", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20020, "mes": "2026-03", "unidadId": 10022, "unidadNum": "102", "prop": "Nancy Azabache B.", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20021, "mes": "2026-04", "unidadId": 10022, "unidadNum": "102", "prop": "Nancy Azabache B.", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20022, "mes": "2026-05", "unidadId": 10022, "unidadNum": "102", "prop": "Nancy Azabache B.", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 40000.0, "estado": "Abono", "fechaPago": "2026-05-07", "forma": "Transferencia", "ref": "REC-005", "obs": "ABONO a GG.CC atrasados — sin mes confirmado"}, {"id": 20023, "mes": "2025-06", "unidadId": 10023, "unidadNum": "103", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20024, "mes": "2025-07", "unidadId": 10023, "unidadNum": "103", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20025, "mes": "2025-08", "unidadId": 10023, "unidadNum": "103", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20026, "mes": "2025-09", "unidadId": 10023, "unidadNum": "103", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20027, "mes": "2025-10", "unidadId": 10023, "unidadNum": "103", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20028, "mes": "2025-11", "unidadId": 10023, "unidadNum": "103", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20029, "mes": "2025-12", "unidadId": 10023, "unidadNum": "103", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20030, "mes": "2026-01", "unidadId": 10023, "unidadNum": "103", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20031, "mes": "2026-02", "unidadId": 10023, "unidadNum": "103", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20032, "mes": "2026-03", "unidadId": 10023, "unidadNum": "103", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20033, "mes": "2025-06", "unidadId": 10024, "unidadNum": "104", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20034, "mes": "2025-07", "unidadId": 10024, "unidadNum": "104", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20035, "mes": "2025-08", "unidadId": 10024, "unidadNum": "104", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20036, "mes": "2025-09", "unidadId": 10024, "unidadNum": "104", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20037, "mes": "2025-10", "unidadId": 10024, "unidadNum": "104", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20038, "mes": "2025-11", "unidadId": 10024, "unidadNum": "104", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20039, "mes": "2025-12", "unidadId": 10024, "unidadNum": "104", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20040, "mes": "2026-01", "unidadId": 10024, "unidadNum": "104", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20041, "mes": "2026-02", "unidadId": 10024, "unidadNum": "104", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20042, "mes": "2026-03", "unidadId": 10024, "unidadNum": "104", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20043, "mes": "2025-06", "unidadId": 10025, "unidadNum": "201", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20044, "mes": "2025-07", "unidadId": 10025, "unidadNum": "201", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20045, "mes": "2025-08", "unidadId": 10025, "unidadNum": "201", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20046, "mes": "2025-09", "unidadId": 10025, "unidadNum": "201", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20047, "mes": "2025-10", "unidadId": 10025, "unidadNum": "201", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20048, "mes": "2025-11", "unidadId": 10025, "unidadNum": "201", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20049, "mes": "2025-12", "unidadId": 10025, "unidadNum": "201", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20050, "mes": "2026-01", "unidadId": 10025, "unidadNum": "201", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20051, "mes": "2026-02", "unidadId": 10025, "unidadNum": "201", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20052, "mes": "2026-03", "unidadId": 10025, "unidadNum": "201", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20053, "mes": "2025-06", "unidadId": 10026, "unidadNum": "202", "prop": "Carlos Gomez Gomez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20054, "mes": "2025-07", "unidadId": 10026, "unidadNum": "202", "prop": "Carlos Gomez Gomez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20055, "mes": "2025-08", "unidadId": 10026, "unidadNum": "202", "prop": "Carlos Gomez Gomez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20056, "mes": "2025-09", "unidadId": 10026, "unidadNum": "202", "prop": "Carlos Gomez Gomez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20057, "mes": "2025-10", "unidadId": 10026, "unidadNum": "202", "prop": "Carlos Gomez Gomez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20058, "mes": "2025-11", "unidadId": 10026, "unidadNum": "202", "prop": "Carlos Gomez Gomez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20059, "mes": "2025-12", "unidadId": 10026, "unidadNum": "202", "prop": "Carlos Gomez Gomez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20060, "mes": "2026-01", "unidadId": 10026, "unidadNum": "202", "prop": "Carlos Gomez Gomez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20061, "mes": "2026-02", "unidadId": 10026, "unidadNum": "202", "prop": "Carlos Gomez Gomez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20062, "mes": "2026-03", "unidadId": 10026, "unidadNum": "202", "prop": "Carlos Gomez Gomez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20063, "mes": "2026-04", "unidadId": 10026, "unidadNum": "202", "prop": "Carlos Gomez Gomez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "2026-05-18", "forma": "Transferencia", "ref": "REC-007", "obs": "Abono GG.CC Abril 2026"}, {"id": 20064, "mes": "2025-06", "unidadId": 10027, "unidadNum": "203", "prop": "Juan Orderique Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20065, "mes": "2025-07", "unidadId": 10027, "unidadNum": "203", "prop": "Juan Orderique Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20066, "mes": "2025-08", "unidadId": 10027, "unidadNum": "203", "prop": "Juan Orderique Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20067, "mes": "2025-09", "unidadId": 10027, "unidadNum": "203", "prop": "Juan Orderique Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20068, "mes": "2025-10", "unidadId": 10027, "unidadNum": "203", "prop": "Juan Orderique Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20069, "mes": "2025-11", "unidadId": 10027, "unidadNum": "203", "prop": "Juan Orderique Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20070, "mes": "2025-12", "unidadId": 10027, "unidadNum": "203", "prop": "Juan Orderique Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20071, "mes": "2026-01", "unidadId": 10027, "unidadNum": "203", "prop": "Juan Orderique Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20072, "mes": "2026-02", "unidadId": 10027, "unidadNum": "203", "prop": "Juan Orderique Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20073, "mes": "2026-03", "unidadId": 10027, "unidadNum": "203", "prop": "Juan Orderique Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20074, "mes": "2025-06", "unidadId": 10028, "unidadNum": "204", "prop": "Gaudy Martinez Yovera", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "REC-001", "obs": ""}, {"id": 20075, "mes": "2025-07", "unidadId": 10028, "unidadNum": "204", "prop": "Gaudy Martinez Yovera", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "REC-002", "obs": ""}, {"id": 20076, "mes": "2025-08", "unidadId": 10028, "unidadNum": "204", "prop": "Gaudy Martinez Yovera", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "REC-003", "obs": ""}, {"id": 20077, "mes": "2025-09", "unidadId": 10028, "unidadNum": "204", "prop": "Gaudy Martinez Yovera", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "REC-004", "obs": ""}, {"id": 20078, "mes": "2025-10", "unidadId": 10028, "unidadNum": "204", "prop": "Gaudy Martinez Yovera", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "REC-005", "obs": ""}, {"id": 20079, "mes": "2025-11", "unidadId": 10028, "unidadNum": "204", "prop": "Gaudy Martinez Yovera", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "REC-006", "obs": ""}, {"id": 20080, "mes": "2025-12", "unidadId": 10028, "unidadNum": "204", "prop": "Gaudy Martinez Yovera", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "REC-007", "obs": ""}, {"id": 20081, "mes": "2026-01", "unidadId": 10028, "unidadNum": "204", "prop": "Gaudy Martinez Yovera", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "REC-008", "obs": ""}, {"id": 20082, "mes": "2026-02", "unidadId": 10028, "unidadNum": "204", "prop": "Gaudy Martinez Yovera", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "REC-009", "obs": ""}, {"id": 20083, "mes": "2026-03", "unidadId": 10028, "unidadNum": "204", "prop": "Gaudy Martinez Yovera", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "REC-010", "obs": ""}, {"id": 20084, "mes": "2026-04", "unidadId": 10028, "unidadNum": "204", "prop": "Gaudy Martinez Yovera", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "REC-011", "obs": ""}, {"id": 20085, "mes": "2026-05", "unidadId": 10028, "unidadNum": "204", "prop": "Gaudy Martinez Yovera", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "REC-012", "obs": ""}, {"id": 20086, "mes": "2025-06", "unidadId": 10029, "unidadNum": "301", "prop": "Angela Bone Vargas", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20087, "mes": "2025-07", "unidadId": 10029, "unidadNum": "301", "prop": "Angela Bone Vargas", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20088, "mes": "2025-08", "unidadId": 10029, "unidadNum": "301", "prop": "Angela Bone Vargas", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20089, "mes": "2025-09", "unidadId": 10029, "unidadNum": "301", "prop": "Angela Bone Vargas", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20090, "mes": "2025-10", "unidadId": 10029, "unidadNum": "301", "prop": "Angela Bone Vargas", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20091, "mes": "2025-11", "unidadId": 10029, "unidadNum": "301", "prop": "Angela Bone Vargas", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20092, "mes": "2025-12", "unidadId": 10029, "unidadNum": "301", "prop": "Angela Bone Vargas", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20093, "mes": "2026-01", "unidadId": 10029, "unidadNum": "301", "prop": "Angela Bone Vargas", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20094, "mes": "2026-02", "unidadId": 10029, "unidadNum": "301", "prop": "Angela Bone Vargas", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "2026-05-20", "forma": "Transferencia", "ref": "COMP-8", "obs": "Abono Feb 2026"}, {"id": 20095, "mes": "2026-03", "unidadId": 10029, "unidadNum": "301", "prop": "Angela Bone Vargas", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "2026-05-20", "forma": "Transferencia", "ref": "COMP-8", "obs": "Abono Mar 2026"}, {"id": 20096, "mes": "2025-06", "unidadId": 10030, "unidadNum": "302", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20097, "mes": "2025-07", "unidadId": 10030, "unidadNum": "302", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20098, "mes": "2025-08", "unidadId": 10030, "unidadNum": "302", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20099, "mes": "2025-09", "unidadId": 10030, "unidadNum": "302", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20100, "mes": "2025-10", "unidadId": 10030, "unidadNum": "302", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20101, "mes": "2025-11", "unidadId": 10030, "unidadNum": "302", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20102, "mes": "2025-12", "unidadId": 10030, "unidadNum": "302", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20103, "mes": "2026-01", "unidadId": 10030, "unidadNum": "302", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20104, "mes": "2026-02", "unidadId": 10030, "unidadNum": "302", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20105, "mes": "2026-03", "unidadId": 10030, "unidadNum": "302", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20106, "mes": "2025-06", "unidadId": 10031, "unidadNum": "303", "prop": "Francisca Ossandón Fraga", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "", "obs": ""}, {"id": 20107, "mes": "2025-07", "unidadId": 10031, "unidadNum": "303", "prop": "Francisca Ossandón Fraga", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "", "obs": ""}, {"id": 20108, "mes": "2025-08", "unidadId": 10031, "unidadNum": "303", "prop": "Francisca Ossandón Fraga", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "", "obs": ""}, {"id": 20109, "mes": "2025-09", "unidadId": 10031, "unidadNum": "303", "prop": "Francisca Ossandón Fraga", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "", "obs": ""}, {"id": 20110, "mes": "2025-10", "unidadId": 10031, "unidadNum": "303", "prop": "Francisca Ossandón Fraga", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "", "obs": ""}, {"id": 20111, "mes": "2025-11", "unidadId": 10031, "unidadNum": "303", "prop": "Francisca Ossandón Fraga", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "REC-001", "obs": ""}, {"id": 20112, "mes": "2025-12", "unidadId": 10031, "unidadNum": "303", "prop": "Francisca Ossandón Fraga", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "REC-001", "obs": ""}, {"id": 20113, "mes": "2026-01", "unidadId": 10031, "unidadNum": "303", "prop": "Francisca Ossandón Fraga", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20114, "mes": "2026-02", "unidadId": 10031, "unidadNum": "303", "prop": "Francisca Ossandón Fraga", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20115, "mes": "2026-03", "unidadId": 10031, "unidadNum": "303", "prop": "Francisca Ossandón Fraga", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20116, "mes": "2026-04", "unidadId": 10031, "unidadNum": "303", "prop": "Francisca Ossandón Fraga", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20117, "mes": "2025-06", "unidadId": 10032, "unidadNum": "304", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20118, "mes": "2025-07", "unidadId": 10032, "unidadNum": "304", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20119, "mes": "2025-08", "unidadId": 10032, "unidadNum": "304", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20120, "mes": "2025-09", "unidadId": 10032, "unidadNum": "304", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20121, "mes": "2025-10", "unidadId": 10032, "unidadNum": "304", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20122, "mes": "2025-11", "unidadId": 10032, "unidadNum": "304", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20123, "mes": "2025-12", "unidadId": 10032, "unidadNum": "304", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20124, "mes": "2026-01", "unidadId": 10032, "unidadNum": "304", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20125, "mes": "2026-02", "unidadId": 10032, "unidadNum": "304", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20126, "mes": "2026-03", "unidadId": 10032, "unidadNum": "304", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20127, "mes": "2025-06", "unidadId": 10033, "unidadNum": "401", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20128, "mes": "2025-07", "unidadId": 10033, "unidadNum": "401", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20129, "mes": "2025-08", "unidadId": 10033, "unidadNum": "401", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20130, "mes": "2025-09", "unidadId": 10033, "unidadNum": "401", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20131, "mes": "2025-10", "unidadId": 10033, "unidadNum": "401", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20132, "mes": "2025-11", "unidadId": 10033, "unidadNum": "401", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20133, "mes": "2025-12", "unidadId": 10033, "unidadNum": "401", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20134, "mes": "2026-01", "unidadId": 10033, "unidadNum": "401", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20135, "mes": "2026-02", "unidadId": 10033, "unidadNum": "401", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20136, "mes": "2026-03", "unidadId": 10033, "unidadNum": "401", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20137, "mes": "2025-06", "unidadId": 10034, "unidadNum": "402", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20138, "mes": "2025-07", "unidadId": 10034, "unidadNum": "402", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20139, "mes": "2025-08", "unidadId": 10034, "unidadNum": "402", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20140, "mes": "2025-09", "unidadId": 10034, "unidadNum": "402", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20141, "mes": "2025-10", "unidadId": 10034, "unidadNum": "402", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20142, "mes": "2025-11", "unidadId": 10034, "unidadNum": "402", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20143, "mes": "2025-12", "unidadId": 10034, "unidadNum": "402", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20144, "mes": "2026-01", "unidadId": 10034, "unidadNum": "402", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20145, "mes": "2026-02", "unidadId": 10034, "unidadNum": "402", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20146, "mes": "2026-03", "unidadId": 10034, "unidadNum": "402", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20147, "mes": "2025-06", "unidadId": 10035, "unidadNum": "403", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20148, "mes": "2025-07", "unidadId": 10035, "unidadNum": "403", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20149, "mes": "2025-08", "unidadId": 10035, "unidadNum": "403", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20150, "mes": "2025-09", "unidadId": 10035, "unidadNum": "403", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20151, "mes": "2025-10", "unidadId": 10035, "unidadNum": "403", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20152, "mes": "2025-11", "unidadId": 10035, "unidadNum": "403", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20153, "mes": "2025-12", "unidadId": 10035, "unidadNum": "403", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20154, "mes": "2026-01", "unidadId": 10035, "unidadNum": "403", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20155, "mes": "2026-02", "unidadId": 10035, "unidadNum": "403", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20156, "mes": "2026-03", "unidadId": 10035, "unidadNum": "403", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20157, "mes": "2025-06", "unidadId": 10036, "unidadNum": "404", "prop": "Eucebio Yufra Garcia", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20158, "mes": "2025-07", "unidadId": 10036, "unidadNum": "404", "prop": "Eucebio Yufra Garcia", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20159, "mes": "2025-08", "unidadId": 10036, "unidadNum": "404", "prop": "Eucebio Yufra Garcia", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20160, "mes": "2025-09", "unidadId": 10036, "unidadNum": "404", "prop": "Eucebio Yufra Garcia", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20161, "mes": "2025-10", "unidadId": 10036, "unidadNum": "404", "prop": "Eucebio Yufra Garcia", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20162, "mes": "2025-11", "unidadId": 10036, "unidadNum": "404", "prop": "Eucebio Yufra Garcia", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20163, "mes": "2025-12", "unidadId": 10036, "unidadNum": "404", "prop": "Eucebio Yufra Garcia", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20164, "mes": "2026-01", "unidadId": 10036, "unidadNum": "404", "prop": "Eucebio Yufra Garcia", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20165, "mes": "2026-02", "unidadId": 10036, "unidadNum": "404", "prop": "Eucebio Yufra Garcia", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20166, "mes": "2026-03", "unidadId": 10036, "unidadNum": "404", "prop": "Eucebio Yufra Garcia", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "2026-05-06", "forma": "Transferencia", "ref": "REC-003", "obs": "Abono Mar+Abr 2026"}, {"id": 20167, "mes": "2026-04", "unidadId": 10036, "unidadNum": "404", "prop": "Eucebio Yufra Garcia", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "2026-05-06", "forma": "Transferencia", "ref": "REC-003", "obs": "Abono Mar+Abr 2026"}, {"id": 20168, "mes": "2025-06", "unidadId": 10037, "unidadNum": "501", "prop": "José Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20169, "mes": "2025-07", "unidadId": 10037, "unidadNum": "501", "prop": "José Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20170, "mes": "2025-08", "unidadId": 10037, "unidadNum": "501", "prop": "José Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20171, "mes": "2025-09", "unidadId": 10037, "unidadNum": "501", "prop": "José Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20172, "mes": "2025-10", "unidadId": 10037, "unidadNum": "501", "prop": "José Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20173, "mes": "2025-11", "unidadId": 10037, "unidadNum": "501", "prop": "José Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20174, "mes": "2025-12", "unidadId": 10037, "unidadNum": "501", "prop": "José Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20175, "mes": "2026-01", "unidadId": 10037, "unidadNum": "501", "prop": "José Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20176, "mes": "2026-02", "unidadId": 10037, "unidadNum": "501", "prop": "José Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20177, "mes": "2026-03", "unidadId": 10037, "unidadNum": "501", "prop": "José Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20178, "mes": "2026-05", "unidadId": 10037, "unidadNum": "501", "prop": "José Morales", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "2026-05-07", "forma": "Transferencia", "ref": "REC-006", "obs": "Abono Mayo 2026"}, {"id": 20179, "mes": "2025-06", "unidadId": 10038, "unidadNum": "502", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20180, "mes": "2025-07", "unidadId": 10038, "unidadNum": "502", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20181, "mes": "2025-08", "unidadId": 10038, "unidadNum": "502", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20182, "mes": "2025-09", "unidadId": 10038, "unidadNum": "502", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20183, "mes": "2025-10", "unidadId": 10038, "unidadNum": "502", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20184, "mes": "2025-11", "unidadId": 10038, "unidadNum": "502", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20185, "mes": "2025-12", "unidadId": 10038, "unidadNum": "502", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20186, "mes": "2026-01", "unidadId": 10038, "unidadNum": "502", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20187, "mes": "2026-02", "unidadId": 10038, "unidadNum": "502", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20188, "mes": "2026-03", "unidadId": 10038, "unidadNum": "502", "prop": "(Por completar)", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20189, "mes": "2025-06", "unidadId": 10039, "unidadNum": "503", "prop": "Carlos Gomez Roco", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20190, "mes": "2025-07", "unidadId": 10039, "unidadNum": "503", "prop": "Carlos Gomez Roco", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20191, "mes": "2025-08", "unidadId": 10039, "unidadNum": "503", "prop": "Carlos Gomez Roco", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20192, "mes": "2025-09", "unidadId": 10039, "unidadNum": "503", "prop": "Carlos Gomez Roco", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20193, "mes": "2025-10", "unidadId": 10039, "unidadNum": "503", "prop": "Carlos Gomez Roco", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20194, "mes": "2025-11", "unidadId": 10039, "unidadNum": "503", "prop": "Carlos Gomez Roco", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20195, "mes": "2025-12", "unidadId": 10039, "unidadNum": "503", "prop": "Carlos Gomez Roco", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20196, "mes": "2026-01", "unidadId": 10039, "unidadNum": "503", "prop": "Carlos Gomez Roco", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20197, "mes": "2026-02", "unidadId": 10039, "unidadNum": "503", "prop": "Carlos Gomez Roco", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20198, "mes": "2026-03", "unidadId": 10039, "unidadNum": "503", "prop": "Carlos Gomez Roco", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20199, "mes": "2026-04", "unidadId": 10039, "unidadNum": "503", "prop": "Carlos Gomez Roco", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "2026-05-06", "forma": "Transferencia", "ref": "REC-002", "obs": "Abono Abril 2026"}, {"id": 20200, "mes": "2025-06", "unidadId": 10040, "unidadNum": "504", "prop": "Maria Jose Rodriguez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20201, "mes": "2025-07", "unidadId": 10040, "unidadNum": "504", "prop": "Maria Jose Rodriguez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20202, "mes": "2025-08", "unidadId": 10040, "unidadNum": "504", "prop": "Maria Jose Rodriguez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20203, "mes": "2025-09", "unidadId": 10040, "unidadNum": "504", "prop": "Maria Jose Rodriguez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20204, "mes": "2025-10", "unidadId": 10040, "unidadNum": "504", "prop": "Maria Jose Rodriguez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20205, "mes": "2025-11", "unidadId": 10040, "unidadNum": "504", "prop": "Maria Jose Rodriguez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20206, "mes": "2025-12", "unidadId": 10040, "unidadNum": "504", "prop": "Maria Jose Rodriguez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 0, "saldo": 40000.0, "estado": "Moroso", "fechaPago": "", "forma": "", "ref": "", "obs": ""}, {"id": 20207, "mes": "2026-01", "unidadId": 10040, "unidadNum": "504", "prop": "Maria Jose Rodriguez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "—", "obs": "Al día"}, {"id": 20208, "mes": "2026-02", "unidadId": 10040, "unidadNum": "504", "prop": "Maria Jose Rodriguez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "—", "obs": "Al día"}, {"id": 20209, "mes": "2026-03", "unidadId": 10040, "unidadNum": "504", "prop": "Maria Jose Rodriguez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "—", "obs": "Al día"}, {"id": 20210, "mes": "2026-04", "unidadId": 10040, "unidadNum": "504", "prop": "Maria Jose Rodriguez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "—", "obs": "Al día"}, {"id": 20211, "mes": "2026-05", "unidadId": 10040, "unidadNum": "504", "prop": "Maria Jose Rodriguez", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 40000.0, "saldo": 0, "estado": "Pagado", "fechaPago": "", "forma": "Transferencia", "ref": "—", "obs": "Al día"}, {"id": 20212, "mes": "2026-05", "unidadId": 10097, "unidadNum": "501", "prop": "Aracely Duran", "gcOrd": 40000, "gcExtra": 0, "mora": 0, "total": 40000, "pagado": 74700.0, "saldo": 40000.0, "estado": "Abono", "fechaPago": "2026-05-06", "forma": "Transferencia", "ref": "REC-004", "obs": "ABONO a GG.CC atrasados — sin mes confirmado"}],
+  egresos: [{"id": 30001, "fecha": "2026-05-06", "cat": "Electricidad Áreas Comunes", "desc": "Pago deuda Boleta CGE — Block 2.2", "prov": "CGE", "monto": 154700.0, "doc": "N°9973", "estado": "Pagado"}, {"id": 30002, "fecha": "2026-05-13", "cat": "Electricidad Áreas Comunes", "desc": "Pago saldo deuda Boleta CGE — Garita", "prov": "CGE", "monto": 200000.0, "doc": "N°10105", "estado": "Pagado"}],
+  ots: [{"id": 40001, "num": "OT-001", "fecha": "2026-04-22", "area": "Block 2 - Garita", "desc": "Pago deuda boleta CGE Garita", "prioridad": "Alta", "prov": "CGE", "fprog": "2026-04-22", "fterm": "2026-04-29", "costo": 200000.0, "factura": "N°10105", "aprobado": "Admin", "estado": "Completado", "notas": "Pagado en 2 cuotas"}, {"id": 40002, "num": "OT-002", "fecha": "2026-04-22", "area": "Block 2 - Edificio", "desc": "Pago deuda boleta CGE Block 2.2", "prioridad": "Alta", "prov": "CGE", "fprog": "2026-04-22", "fterm": "2026-04-29", "costo": 154700.0, "factura": "N°9973", "aprobado": "Admin", "estado": "Completado", "notas": ""}],
+  torres: ["Block 1", "Block 2", "Block 3", "Block 4", "Block 5", "Block 6", "Block 7", "Block 8"]
+};
+function loadAll(){
+  try{
+    const cfgGuardado=localStorage.getItem(SK.cfg);
+    const unidadesGuardadas=localStorage.getItem(SK.unidades);
+    const cobrosGuardados=localStorage.getItem(SK.cobros);
+
+    // Si YA hay datos guardados para este condominio — usarlos
+    if(unidadesGuardadas!==null){
+      CONFIG=JSON.parse(cfgGuardado)||{...DEF_CONFIG};
+      UNIDADES=JSON.parse(unidadesGuardadas)||[];
+      COBROS=JSON.parse(cobrosGuardados)||[];
+      EGRESOS=JSON.parse(localStorage.getItem(SK.egresos)||'[]');
+      FONDO=JSON.parse(localStorage.getItem(SK.fondo)||'[]');
+      NOVEDADES=JSON.parse(localStorage.getItem(SK.novedades)||'[]');
+    } else {
+      // Primera vez que se abre — cargar datos de Pioneros 2 del Excel
+      CONFIG={...DATOS_PRECARGADOS.config};
+      UNIDADES=[...DATOS_PRECARGADOS.unidades];
+      COBROS=[...DATOS_PRECARGADOS.cobros];
+      EGRESOS=[...DATOS_PRECARGADOS.egresos];
+      FONDO=[];
+      NOVEDADES=[];
+      // Guardar en storage inmediatamente
+      localStorage.setItem(SK.cfg,JSON.stringify(CONFIG));
+      localStorage.setItem(SK.unidades,JSON.stringify(UNIDADES));
+      localStorage.setItem(SK.cobros,JSON.stringify(COBROS));
+      localStorage.setItem(SK.egresos,JSON.stringify(EGRESOS));
+      localStorage.setItem(SK.fondo,JSON.stringify(FONDO));
+      localStorage.setItem(SK.novedades,JSON.stringify(NOVEDADES));
+    }
+  }catch(e){
+    CONFIG={...DATOS_PRECARGADOS.config};
+    UNIDADES=[...DATOS_PRECARGADOS.unidades];
+    COBROS=[...DATOS_PRECARGADOS.cobros];
+    EGRESOS=[...DATOS_PRECARGADOS.egresos];
+    FONDO=[];NOVEDADES=[];
+  }
+}
+
+// ════════════════════
+// HELPERS
+// ════════════════════
+const clp=n=>new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Math.round(n||0));
+const df=d=>{try{return new Date(d+'T00:00:00').toLocaleDateString('es-CL');}catch{return d||'—';}};
+function badge(l,c){return`<span class="badge" style="background:${c}20;color:${c};border:1px solid ${c}40">${l}</span>`;}
+const ESTADO_C={Pagado:'#22C55E',Pendiente:'#F59E0B',Moroso:'#EF4444','Al día':'#22C55E',Inactivo:'#5A7090',Abierta:'#38BDF8','En Proceso':'#F59E0B',Cerrada:'#22C55E'};
+function gcUnidad(u){return u.gcCustom>0?u.gcCustom:(CONFIG.gcOrd||50000);}
+
+// ════════════════════
+// TABS
+// ════════════════════
+function showTab(id,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('#mainTabs .tab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('sec-'+id).classList.add('on');
+  btn.classList.add('on');
+  const R={dashboard:renderDashboard,unidades:renderUnidades,gastos:renderGastos,egresos:renderEgresos,morosidad:renderMorosidad,fondo:renderFondo,novedades:renderNovedades,config:loadConfig};
+  if(R[id])R[id]();
+}
+
+// ════════════════════
+// DASHBOARD
+// ════════════════════
+function renderDashboard(){
+  const mes=mesActual;
+  const cobMes=COBROS.filter(c=>c.mes===mes);
+  const totEsp=cobMes.reduce((s,c)=>s+c.total,0);
+  const totPag=cobMes.reduce((s,c)=>s+c.pagado,0);
+  const totMora=cobMes.filter(c=>c.estado==='Moroso').length;
+  const totEgr=EGRESOS.filter(e=>e.fecha.startsWith(mes)).reduce((s,e)=>s+e.monto,0);
+  const saldoFondo=FONDO.length?FONDO[FONDO.length-1].saldo:0;
+
+  document.getElementById('kpiDash').innerHTML=`
+    <div class="kc"><div class="kl">Unidades</div><div class="kv" style="color:var(--acc)">${UNIDADES.length}</div><div class="ks">${UNIDADES.filter(u=>u.estado==='Al día').length} al día</div></div>
+    <div class="kc"><div class="kl">GC Cobrado</div><div class="kv" style="color:var(--ok)">${clp(totPag)}</div><div class="ks">de ${clp(totEsp)} esperado</div></div>
+    <div class="kc"><div class="kl">Egresos Mes</div><div class="kv" style="color:var(--danger)">${clp(totEgr)}</div><div class="ks">Mayo 2025</div></div>
+    <div class="kc"><div class="kl">Morosos</div><div class="kv" style="color:${totMora>0?'var(--danger)':'var(--ok)'}">${totMora}</div><div class="ks">Unidades</div></div>
+    <div class="kc"><div class="kl">Fondo Reserva</div><div class="kv" style="color:${saldoFondo>=CONFIG.fondoMin?'var(--ok)':'var(--warn)'}">${clp(saldoFondo)}</div><div class="ks">Min: ${clp(CONFIG.fondoMin)}</div></div>
+    <div class="kc"><div class="kl">Balance Mes</div><div class="kv" style="color:${totPag-totEgr>=0?'var(--ok)':'var(--danger)'}">${clp(totPag-totEgr)}</div><div class="ks">Ingresos - Egresos</div></div>
+  `;
+
+  // Estado cobros
+  const pct=totEsp>0?Math.round(totPag/totEsp*100):0;
+  document.getElementById('dashCobros').innerHTML=`
+    <div style="font-size:28px;font-weight:900;color:var(--ok);margin-bottom:4px">${pct}%</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:12px">de recaudación del mes</div>
+    <div class="pw" style="height:10px;margin-bottom:14px"><div class="pb" style="width:${pct}%;background:var(--ok);height:10px"></div></div>
+    ${cobMes.map(c=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(16,185,129,0.05);font-size:11px;font-family:monospace">
+      <span>Unidad ${c.unidadNum} — ${c.prop.split(' ')[0]}</span>
+      ${badge(c.estado,ESTADO_C[c.estado]||'#5A7090')}
+    </div>`).join('')}
+  `;
+
+  // Movimientos recientes
+  const recientes=[
+    ...COBROS.filter(c=>c.fechaPago).map(c=>({fecha:c.fechaPago,desc:`Pago GC Unidad ${c.unidadNum}`,monto:c.pagado,tipo:'ingreso'})),
+    ...EGRESOS.map(e=>({fecha:e.fecha,desc:e.desc,monto:e.monto,tipo:'egreso'}))
+  ].sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,8);
+  document.getElementById('dashMovs').innerHTML=recientes.map(m=>`
+    <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(16,185,129,0.05);font-size:11px;font-family:monospace">
+      <div><div style="color:var(--white)">${m.desc.substring(0,28)}</div><div style="color:var(--muted);font-size:9px">${df(m.fecha)}</div></div>
+      <span style="color:${m.tipo==='ingreso'?'var(--ok)':'var(--danger)'};font-weight:700">${m.tipo==='ingreso'?'+':'-'}${clp(m.monto)}</span>
+    </div>`).join('');
+
+  // Alertas mora
+  const morosos=COBROS.filter(c=>c.estado==='Moroso');
+  document.getElementById('dashMora').innerHTML=morosos.length===0
+    ?'<div style="color:var(--ok);font-size:12px;font-family:monospace;padding:10px">✓ Sin morosos este período</div>'
+    :morosos.map(c=>`<div class="alert-mora">
+      <div><div style="font-size:12px;font-weight:700;font-family:monospace">Unidad ${c.unidadNum} — ${c.prop}</div>
+      <div style="font-size:10px;color:var(--muted)">Período ${c.mes} · Mora: ${clp(c.mora)}</div></div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span style="color:var(--danger);font-weight:700;font-family:monospace">${clp(c.saldo)}</span>
+        <button class="bsm be" onclick="openMo('moCobro')">Registrar pago</button>
+        <button class="bsm be" onclick="imprimirComprobante(${c.id})">🖨</button>
+      </div>
+    </div>`).join('');
+}
+
+// ════════════════════
+// UNIDADES
+// ════════════════════
+function renderUnidades(){
+  document.querySelector('#tblUnidades tbody').innerHTML=UNIDADES.map(u=>`<tr>
+    <td>${u.torre?`<span class="badge" style="background:rgba(16,185,129,0.15);color:#10B981;border:1px solid rgba(16,185,129,0.3)">${u.torre}</span>`:'<span style="color:var(--muted)">—</span>'}</td>
+    <td style="color:var(--muted);font-family:monospace">${u.piso||'—'}</td>
+    <td style="color:var(--acc);font-weight:800">${u.num}</td>
+    <td>${badge(u.tipo,'#38BDF8')}</td>
+    <td style="color:var(--white);font-weight:600">${u.prop}</td>
+    <td style="color:var(--muted);font-family:monospace">${u.rut}</td>
+    <td style="color:var(--muted)">${u.email}</td>
+    <td style="color:var(--muted)">${u.tel}</td>
+    <td style="color:var(--muted);font-family:monospace">${u.rol}</td>
+    <td style="color:var(--gold)">${clp(gcUnidad(u))}</td>
+    <td>${badge(u.estado,ESTADO_C[u.estado]||'#5A7090')}</td>
+    <td><div style="display:flex;gap:4px">
+      <button class="bsm be" onclick="editUnidad(${u.id})">✎</button>
+      <button class="bsm bd" onclick="delUnidad(${u.id})">✕</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function editUnidad(id){
+  const u=UNIDADES.find(x=>x.id===id);if(!u)return;
+  document.getElementById('tUnidad').textContent='Editar Unidad';
+  document.getElementById('uId').value=id;
+  document.getElementById('uTorre').value=u.torre||'';
+  document.getElementById('uPiso').value=u.piso||'';
+  document.getElementById('uNum').value=u.num;
+  document.getElementById('uTipo').value=u.tipo;
+  document.getElementById('uProp').value=u.prop;
+  document.getElementById('uRut').value=u.rut;
+  document.getElementById('uEmail').value=u.email;
+  document.getElementById('uTel').value=u.tel;
+  document.getElementById('uRol').value=u.rol;
+  document.getElementById('uProrrateo').value=u.prorrateo;
+  document.getElementById('uGCCustom').value=u.gcCustom;
+  document.getElementById('uEstado').value=u.estado;
+  openMo('moUnidad');
+}
+function saveUnidad(){
+  const id=document.getElementById('uId').value;
+  const obj={
+    torre:document.getElementById('uTorre').value,
+    piso:document.getElementById('uPiso').value,
+    num:document.getElementById('uNum').value.trim(),
+    tipo:document.getElementById('uTipo').value,
+    prop:document.getElementById('uProp').value.trim(),
+    rut:document.getElementById('uRut').value.trim(),
+    email:document.getElementById('uEmail').value.trim(),
+    tel:document.getElementById('uTel').value.trim(),
+    rol:document.getElementById('uRol').value.trim(),
+    prorrateo:parseFloat(document.getElementById('uProrrateo').value)||0,
+    gcCustom:parseFloat(document.getElementById('uGCCustom').value)||0,
+    estado:document.getElementById('uEstado').value
+  };
+  if(!obj.num||!obj.prop){alert('Número y propietario requeridos');return;}
+  if(id){const i=UNIDADES.findIndex(u=>u.id==id);if(i>=0)UNIDADES[i]={...UNIDADES[i],...obj};}
+  else UNIDADES.push({id:uid(),...obj});
+  saveAll();closeMo('moUnidad');renderUnidades();
+}
+function delUnidad(id){if(!confirm('¿Eliminar?'))return;UNIDADES=UNIDADES.filter(u=>u.id!==id);saveAll();renderUnidades();}
+
+// ════════════════════
+// GASTOS COMUNES
+// ════════════════════
+function renderGastos(){
+  const mes=document.getElementById('filtMesGC').value||mesActual;
+  const filtTorre=document.getElementById('filtTorre')?.value||'';
+  // Poblar selector torres
+  const torres=[...new Set(UNIDADES.map(u=>u.torre).filter(t=>t))];
+  const selTorre=document.getElementById('filtTorre');
+  if(selTorre){
+    const cur=selTorre.value;
+    selTorre.innerHTML='<option value="">Todas</option>'+torres.map(t=>`<option ${cur===t?'selected':''}>${t}</option>`).join('');
+  }
+  let cobMes=COBROS.filter(c=>c.mes===mes);
+  // Filtrar por torre si está seleccionada
+  if(filtTorre){
+    const uIds=UNIDADES.filter(u=>u.torre===filtTorre).map(u=>u.id);
+    cobMes=cobMes.filter(c=>uIds.includes(c.unidadId));
+  }
+  const totEsp=cobMes.reduce((s,c)=>s+c.total,0);
+  const totPag=cobMes.reduce((s,c)=>s+c.pagado,0);
+  const pct=totEsp>0?Math.round(totPag/totEsp*100):0;
+  document.getElementById('kpiGC').innerHTML=`
+    <div class="kc"><div class="kl">Esperado</div><div class="kv" style="color:var(--acc)">${clp(totEsp)}</div></div>
+    <div class="kc"><div class="kl">Recaudado</div><div class="kv" style="color:var(--ok)">${clp(totPag)}</div></div>
+    <div class="kc"><div class="kl">Pendiente</div><div class="kv" style="color:${totEsp-totPag>0?'var(--danger)':'var(--ok)'}">${clp(totEsp-totPag)}</div></div>
+    <div class="kc"><div class="kl">% Recaudado</div><div class="kv" style="color:${pct>=90?'var(--ok)':'var(--warn)'}">${pct}%</div></div>
+  `;
+  tbody.innerHTML=cobMes.map(c=>{
+    const u=UNIDADES.find(x=>x.id===c.unidadId);
+    return `<tr>
+    <td style="font-family:monospace">${c.mes}</td>
+    <td>${u?.torre?`<span class="badge" style="background:rgba(16,185,129,0.15);color:#10B981;border:1px solid rgba(16,185,129,0.3)">${u.torre}</span>`:'<span style="color:var(--muted)">—</span>'}</td>
+    <td style="color:var(--muted);font-size:10px">${u?.piso||'—'}</td>
+    <td style="color:var(--acc);font-weight:800">${c.unidadNum}</td>
+    <td style="color:var(--white)">${c.prop}</td>
+    <td style="text-align:right">${clp(c.gcOrd)}</td>
+    <td style="text-align:right;color:${c.gcExtra>0?'var(--warn)':'var(--muted)'}">${clp(c.gcExtra)}</td>
+    <td style="text-align:right;color:${c.mora>0?'var(--danger)':'var(--muted)'}">${clp(c.mora)}</td>
+    <td style="text-align:right;font-weight:700">${clp(c.total)}</td>
+    <td style="text-align:right;color:var(--ok)">${clp(c.pagado)}</td>
+    <td style="text-align:right;color:${c.saldo>0?'var(--danger)':'var(--ok)'};font-weight:700">${clp(c.saldo)}</td>
+    <td>${badge(c.estado,ESTADO_C[c.estado]||'#5A7090')}</td>
+    <td><div style="display:flex;gap:4px">
+      <button class="bsm be" onclick="imprimirComprobante(${c.id})">🖨</button>
+      ${c.estado!=='Pagado'?`<button class="bsm" style="background:transparent;border:1px solid rgba(34,197,94,0.3);color:var(--ok)" onclick="registrarPagoRapido(${c.id})">✓</button>`:''}
+    </div></td>
+  </tr>`;}).join('');
+  tfoot.innerHTML=`<tr><td colspan="3" style="color:var(--acc)">TOTALES</td><td style="text-align:right">${clp(cobMes.reduce((s,c)=>s+c.gcOrd,0))}</td><td style="text-align:right">${clp(cobMes.reduce((s,c)=>s+c.gcExtra,0))}</td><td style="text-align:right;color:var(--danger)">${clp(cobMes.reduce((s,c)=>s+c.mora,0))}</td><td style="text-align:right">${clp(totEsp)}</td><td style="text-align:right;color:var(--ok)">${clp(totPag)}</td><td style="text-align:right;color:var(--danger)">${clp(totEsp-totPag)}</td><td colspan="2"></td></tr>`;
+}
+
+function generarCobros(){
+  const mes=document.getElementById('filtMesGC').value||mesActual;
+  if(COBROS.find(c=>c.mes===mes)){if(!confirm('Ya existen cobros para este período. ¿Regenerar?'))return;COBROS=COBROS.filter(c=>c.mes!==mes);}
+  UNIDADES.forEach(u=>{
+    const gc=gcUnidad(u);
+    const mora=u.estado==='Moroso'?Math.round(gc*(CONFIG.mora/100)):0;
+    COBROS.push({id:uid(),mes,unidadId:u.id,unidadNum:u.num,prop:u.prop,gcOrd:gc,gcExtra:0,mora,total:gc+mora,pagado:0,saldo:gc+mora,estado:mora>0?'Moroso':'Pendiente',fechaPago:'',forma:'',ref:''});
+  });
+  saveAll();renderGastos();alert(`✓ ${UNIDADES.length} cobros generados para ${mes}`);
+}
+
+function registrarPagoRapido(id){
+  const c=COBROS.find(x=>x.id===id);if(!c)return;
+  document.getElementById('cobroMes').value=c.mes;
+  document.getElementById('cobroFecha').value=hoy;
+  document.getElementById('cobroMonto').value=c.saldo;
+  populateUnidadSelect();
+  document.getElementById('cobroUnidad').value=c.unidadId;
+  openMo('moCobro');
+}
+
+function saveCobro(){
+  const mes=document.getElementById('cobroMes').value;
+  const uId=parseInt(document.getElementById('cobroUnidad').value);
+  const monto=parseFloat(document.getElementById('cobroMonto').value)||0;
+  const fecha=document.getElementById('cobroFecha').value;
+  const forma=document.getElementById('cobroForma').value;
+  const ref=document.getElementById('cobroRef').value;
+  if(!monto){alert('Ingresa el monto');return;}
+  const cob=COBROS.find(c=>c.mes===mes&&c.unidadId===uId);
+  if(cob){
+    cob.pagado+=monto;
+    cob.saldo=Math.max(0,cob.total-cob.pagado);
+    cob.estado=cob.saldo===0?'Pagado':'Pendiente';
+    cob.fechaPago=fecha;cob.forma=forma;cob.ref=ref;
+    const u=UNIDADES.find(x=>x.id===uId);
+    if(u&&cob.saldo===0)u.estado='Al día';
+  } else {
+    const u=UNIDADES.find(x=>x.id===uId);
+    COBROS.push({id:uid(),mes,unidadId:uId,unidadNum:u?.num||'—',prop:u?.prop||'—',gcOrd:gcUnidad(u||{}),gcExtra:0,mora:0,total:monto,pagado:monto,saldo:0,estado:'Pagado',fechaPago:fecha,forma,ref});
+  }
+  saveAll();closeMo('moCobro');renderGastos();renderDashboard();
+}
+
+// ════════════════════
+// EGRESOS
+// ════════════════════
+function renderEgresos(){
+  const totEgr=EGRESOS.reduce((s,e)=>s+e.monto,0);
+  const cats={};EGRESOS.forEach(e=>{cats[e.cat]=(cats[e.cat]||0)+e.monto;});
+  const topCat=Object.entries(cats).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('kpiEgr').innerHTML=`
+    <div class="kc"><div class="kl">Total Egresos</div><div class="kv" style="color:var(--danger)">${clp(totEgr)}</div></div>
+    <div class="kc"><div class="kl">Registros</div><div class="kv" style="color:var(--acc)">${EGRESOS.length}</div></div>
+    <div class="kc"><div class="kl">Mayor Categoría</div><div class="kv" style="font-size:13px;color:var(--warn)">${topCat?topCat[0].split(' ')[0]:'—'}</div><div class="ks">${topCat?clp(topCat[1]):'$0'}</div></div>
+  `;
+  document.querySelector('#tblEgresos tbody').innerHTML=EGRESOS.sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(e=>`<tr>
+    <td>${df(e.fecha)}</td>
+    <td>${badge(e.cat.split(' ')[0],'#F59E0B')}</td>
+    <td style="color:var(--white)">${e.desc}</td>
+    <td style="color:var(--muted)">${e.prov}</td>
+    <td style="color:var(--danger);font-weight:700;text-align:right">${clp(e.monto)}</td>
+    <td style="color:var(--muted);font-family:monospace">${e.doc}</td>
+    <td>${badge(e.estado,ESTADO_C[e.estado]||'#5A7090')}</td>
+    <td><button class="bsm bd" onclick="delEgreso(${e.id})">✕</button></td>
+  </tr>`).join('');
+  document.querySelector('#tblEgresos tfoot').innerHTML=`<tr><td colspan="4" style="color:var(--danger)">TOTAL</td><td style="text-align:right;color:var(--danger)">${clp(totEgr)}</td><td colspan="3"></td></tr>`;
+}
+
+function saveEgreso(){
+  const obj={id:uid(),fecha:document.getElementById('egrFecha').value,cat:document.getElementById('egrCat').value,desc:document.getElementById('egrDesc').value,prov:document.getElementById('egrProv').value,monto:parseFloat(document.getElementById('egrMonto').value)||0,doc:document.getElementById('egrDoc').value,estado:document.getElementById('egrEstado').value};
+  if(!obj.desc||!obj.monto){alert('Descripción y monto requeridos');return;}
+  EGRESOS.push(obj);saveAll();closeMo('moEgreso');renderEgresos();
+}
+function delEgreso(id){if(!confirm('¿Eliminar?'))return;EGRESOS=EGRESOS.filter(e=>e.id!==id);saveAll();renderEgresos();}
+
+// ════════════════════
+// MOROSIDAD
+// ════════════════════
+function renderMorosidad(){
+  const morosos=COBROS.filter(c=>c.saldo>0);
+  const totMora=morosos.reduce((s,c)=>s+c.saldo,0);
+  document.getElementById('kpiMora').innerHTML=`
+    <div class="kc"><div class="kl">Unidades Morosas</div><div class="kv" style="color:${morosos.length>0?'var(--danger)':'var(--ok)'}">${morosos.length}</div></div>
+    <div class="kc"><div class="kl">Total Deuda</div><div class="kv" style="color:var(--danger)">${clp(totMora)}</div></div>
+    <div class="kc"><div class="kl">% Morosidad</div><div class="kv" style="color:var(--warn)">${COBROS.length>0?Math.round(morosos.length/UNIDADES.length*100):0}%</div></div>
+  `;
+  document.getElementById('listaMora').innerHTML=morosos.length===0
+    ?'<div class="card" style="text-align:center;padding:30px"><div style="font-size:28px">✅</div><div style="color:var(--ok);margin-top:8px">Sin morosos</div></div>'
+    :morosos.map(c=>`<div class="alert-mora">
+      <div>
+        <div style="font-size:13px;font-weight:800;font-family:monospace">Unidad ${c.unidadNum} — ${c.prop}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">Período: ${c.mes} · GC: ${clp(c.gcOrd)} · Mora: ${clp(c.mora)}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="text-align:right">
+          <div style="font-size:16px;font-weight:900;color:var(--danger)">${clp(c.saldo)}</div>
+          <div style="font-size:9px;color:var(--muted)">Deuda total</div>
+        </div>
+        <button class="bsm be" onclick="registrarPagoRapido(${c.id})">💰 Registrar Pago</button>
+        <button class="bsm be" onclick="imprimirComprobante(${c.id})">🖨 Comprobante</button>
+      </div>
+    </div>`).join('');
+}
+
+// ════════════════════
+// FONDO RESERVA
+// ════════════════════
+function renderFondo(){
+  const saldo=FONDO.length?FONDO[FONDO.length-1].saldo:0;
+  const pct=CONFIG.fondoMin>0?Math.min(100,Math.round(saldo/CONFIG.fondoMin*100)):0;
+  document.getElementById('kpiFondo').innerHTML=`
+    <div class="kc"><div class="kl">Saldo Actual</div><div class="kv" style="color:${saldo>=CONFIG.fondoMin?'var(--ok)':'var(--warn)'}">${clp(saldo)}</div><div class="ks">Mínimo legal: ${clp(CONFIG.fondoMin)}</div></div>
+    <div class="kc"><div class="kl">Cumplimiento</div><div class="kv" style="color:${pct>=100?'var(--ok)':'var(--warn)'}">${pct}%</div><div class="ks">${pct>=100?'✓ Cumple Ley 21.442':'⚠ Bajo el mínimo legal'}</div></div>
+    <div class="kc"><div class="kl">Movimientos</div><div class="kv" style="color:var(--acc)">${FONDO.length}</div></div>
+  `;
+  document.querySelector('#tblFondo tbody').innerHTML=FONDO.map(f=>`<tr>
+    <td>${df(f.fecha)}</td>
+    <td>${badge(f.tipo,f.tipo==='Aporte'?'#22C55E':'#EF4444')}</td>
+    <td style="color:var(--white)">${f.desc}</td>
+    <td style="color:${f.tipo==='Aporte'?'var(--ok)':'var(--danger)'};font-weight:700;text-align:right">${f.tipo==='Aporte'?'+':'-'}${clp(f.monto)}</td>
+    <td style="color:var(--acc);font-weight:700;text-align:right">${clp(f.saldo)}</td>
+    <td><button class="bsm bd" onclick="delFondo(${f.id})">✕</button></td>
+  </tr>`).join('');
+}
+
+function saveFondo(){
+  const tipo=document.getElementById('fndTipo').value;
+  const monto=parseFloat(document.getElementById('fndMonto').value)||0;
+  const saldoAnt=FONDO.length?FONDO[FONDO.length-1].saldo:0;
+  const nuevoSaldo=tipo==='Aporte'?saldoAnt+monto:Math.max(0,saldoAnt-monto);
+  FONDO.push({id:uid(),fecha:document.getElementById('fndFecha').value,tipo,desc:document.getElementById('fndDesc').value,monto,saldo:nuevoSaldo});
+  saveAll();closeMo('moFondo');renderFondo();
+}
+
+function delFondo(id){
+  if(!confirm('¿Eliminar este movimiento?'))return;
+  FONDO=FONDO.filter(f=>f.id!==id);
+  // Recalcular saldos
+  let saldoAc=0;
+  FONDO.forEach(f=>{
+    saldoAc=f.tipo==='Aporte'?saldoAc+f.monto:Math.max(0,saldoAc-f.monto);
+    f.saldo=saldoAc;
+  });
+  saveAll();renderFondo();
+}
+
+// ════════════════════
+// NOVEDADES
+// ════════════════════
+function renderNovedades(){
+  document.getElementById('listaNov').innerHTML=NOVEDADES.length===0
+    ?'<div class="card" style="text-align:center;padding:24px"><div style="font-size:11px;color:var(--muted)">Sin novedades registradas</div></div>'
+    :NOVEDADES.sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(n=>`
+      <div class="card" style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div style="font-size:13px;font-weight:800">${n.titulo}</div>
+            <div style="display:flex;gap:6px;margin-top:4px">${badge(n.tipo,'#38BDF8')}${badge(n.estado,ESTADO_C[n.estado]||'#5A7090')}</div>
+          </div>
+          <div style="text-align:right;font-size:10px;color:var(--muted);font-family:monospace">
+            <div>${df(n.fecha)}</div>
+            <div>${n.resp}</div>
+            <button class="bsm bd" style="margin-top:4px" onclick="delNovedad(${n.id})">✕</button>
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--mutedHi);line-height:1.7">${n.desc}</div>
+      </div>`).join('');
+}
+
+function saveNovedad(){
+  const obj={id:uid(),fecha:document.getElementById('novFecha').value,tipo:document.getElementById('novTipo').value,titulo:document.getElementById('novTitulo').value.trim(),desc:document.getElementById('novDesc').value,resp:document.getElementById('novResp').value,estado:document.getElementById('novEstado').value};
+  if(!obj.titulo){alert('Ingresa un título');return;}
+  NOVEDADES.push(obj);saveAll();closeMo('moNovedad');renderNovedades();
+}
+function delNovedad(id){if(!confirm('¿Eliminar?'))return;NOVEDADES=NOVEDADES.filter(n=>n.id!==id);saveAll();renderNovedades();}
+
+// ════════════════════
+// CONFIGURACIÓN
+// ════════════════════
+function loadConfig(){
+  document.getElementById('cfgNombre').value=CONFIG.nombre||'';
+  document.getElementById('cfgDireccion').value=CONFIG.direccion||'';
+  document.getElementById('cfgRut').value=CONFIG.rut||'';
+  document.getElementById('cfgRol').value=CONFIG.rol||'';
+  document.getElementById('cfgAdmin').value=CONFIG.admin||'';
+  document.getElementById('cfgTelAdmin').value=CONFIG.telAdmin||'';
+  document.getElementById('cfgEmail').value=CONFIG.email||'';
+  document.getElementById('cfgBanco').value=CONFIG.banco||'';
+  document.getElementById('cfgCuenta').value=CONFIG.cuenta||'';
+  document.getElementById('cfgGCOrd').value=CONFIG.gcOrd||50000;
+  document.getElementById('cfgMora').value=CONFIG.mora||1.5;
+  document.getElementById('cfgFondoMin').value=CONFIG.fondoMin||500000;
+  document.getElementById('cfgUnidades').value=UNIDADES.length;
+}
+function saveConfig(){
+  CONFIG={nombre:document.getElementById('cfgNombre').value,direccion:document.getElementById('cfgDireccion').value,rut:document.getElementById('cfgRut').value,rol:document.getElementById('cfgRol').value,admin:document.getElementById('cfgAdmin').value,telAdmin:document.getElementById('cfgTelAdmin').value,email:document.getElementById('cfgEmail').value,banco:document.getElementById('cfgBanco').value,cuenta:document.getElementById('cfgCuenta').value,gcOrd:parseFloat(document.getElementById('cfgGCOrd').value)||50000,mora:parseFloat(document.getElementById('cfgMora').value)||1.5,fondoMin:parseFloat(document.getElementById('cfgFondoMin').value)||500000};
+  saveAll();
+  document.getElementById('condNombre').textContent=CONFIG.nombre;
+  alert('✓ Configuración guardada');
+}
+
+// ════════════════════
+// COMPROBANTE DE PAGO
+// ════════════════════
+function imprimirComprobante(id){
+  const c=COBROS.find(x=>x.id===id);if(!c)return;
+  const u=UNIDADES.find(x=>x.id===c.unidadId);
+  const html=`<div class="comp">
+    <div class="comp-head">
+      <div>
+        <div style="font-size:16px;font-weight:900">${CONFIG.nombre||'Condominio'}</div>
+        <div style="font-size:10px;opacity:.85">${CONFIG.direccion||''}</div>
+        <div style="font-size:10px;opacity:.85">RUT: ${CONFIG.rut||'—'} · Administrador: ${CONFIG.admin}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;font-weight:700;opacity:.9">COMPROBANTE DE PAGO</div>
+        <div style="font-size:20px;font-weight:900">Nº ${String(c.id).slice(-4)}</div>
+        <div style="font-size:10px;opacity:.8">${df(c.fechaPago||hoy)}</div>
+      </div>
+    </div>
+    <div class="comp-body">
+      <div style="background:#f0fff8;padding:12px;border-radius:6px;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:700;color:#1a5c3a;margin-bottom:6px">DATOS DEL PROPIETARIO</div>
+        <div style="font-size:11px;margin-bottom:3px"><strong>Unidad:</strong> ${c.unidadNum}${u?.torre?' — '+u.torre:''}${u?.piso?' · '+u.piso:''}</div>
+        <div style="font-size:11px;margin-bottom:3px"><strong>Propietario:</strong> ${c.prop}</div>
+        <div style="font-size:11px"><strong>Período:</strong> ${c.mes}</div>
+      </div>
+      <div class="comp-row"><span>Gastos Comunes Ordinarios</span><span>${clp(c.gcOrd)}</span></div>
+      ${c.gcExtra>0?`<div class="comp-row"><span>Gastos Comunes Extraordinarios</span><span>${clp(c.gcExtra)}</span></div>`:''}
+      ${c.mora>0?`<div class="comp-row" style="color:#dc2626"><span>Interés por Mora (${CONFIG.mora}%)</span><span>${clp(c.mora)}</span></div>`:''}
+      <div class="comp-row"><span>Total Cobrado</span><span style="font-weight:700">${clp(c.total)}</span></div>
+      <div class="comp-row" style="color:#166534"><span>Monto Pagado</span><span style="font-weight:700">${clp(c.pagado)}</span></div>
+      ${c.saldo>0?`<div class="comp-row" style="color:#dc2626"><span>Saldo Pendiente</span><span style="font-weight:700">${clp(c.saldo)}</span></div>`:''}
+      ${c.forma?`<div class="comp-row"><span>Forma de Pago</span><span>${c.forma}</span></div>`:''}
+      ${c.ref?`<div class="comp-row"><span>Referencia</span><span>${c.ref}</span></div>`:''}
+    </div>
+    <div class="comp-total">
+      <span>${c.saldo===0?'✓ PAGADO COMPLETAMENTE':'SALDO PENDIENTE'}</span>
+      <span>${clp(c.saldo===0?c.pagado:c.saldo)}</span>
+    </div>
+    <div class="comp-footer">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span>${CONFIG.nombre} · ${CONFIG.direccion}</span>
+        <span>Tel: ${CONFIG.telAdmin}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span>Administrador: ${CONFIG.admin}</span>
+        <span>Este comprobante es válido como recibo de pago · Ley 21.442</span>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('printComp').innerHTML=html;
+  document.getElementById('printComp').style.display='block';
+  window.print();
+  document.getElementById('printComp').style.display='none';
+}
+
+// ════════════════════
+// MODALS Y HELPERS
+// ════════════════════
+function populateUnidadSelect(){
+  const sel=document.getElementById('cobroUnidad');
+  sel.innerHTML=UNIDADES.map(u=>`<option value="${u.id}">Unidad ${u.num} — ${u.prop}</option>`).join('');
+}
+function openMo(id){
+  if(id==='moCobro'){populateUnidadSelect();document.getElementById('cobroFecha').value=hoy;document.getElementById('cobroMes').value=mesActual;}
+  if(id==='moEgreso'){document.getElementById('egrFecha').value=hoy;}
+  if(id==='moFondo'){document.getElementById('fndFecha').value=hoy;}
+  if(id==='moNovedad'){document.getElementById('novFecha').value=hoy;}
+  if(id==='moUnidad'){document.getElementById('tUnidad').textContent='Nueva Unidad';document.getElementById('uId').value='';}
+  document.getElementById(id).classList.add('open');
+}
+function closeMo(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.mo').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
+
+// ════════════════════
+// TORRES DINÁMICAS
+// ════════════════════
+const SK_TORRES='mss'+getCondId()+'_torres';
+let TORRES=[];
+
+function loadTorres(){
+  try{
+    const t=localStorage.getItem(SK_TORRES);
+    if(t!==null){
+      TORRES=JSON.parse(t);
+    } else {
+      TORRES=[...DATOS_PRECARGADOS.torres];
+      try{localStorage.setItem(SK_TORRES,JSON.stringify(TORRES));}catch(e){}
+    }
+  }catch(e){TORRES=[...DATOS_PRECARGADOS.torres];}
+}
+function saveTorres(){
+  try{localStorage.setItem(SK_TORRES,JSON.stringify(TORRES));}catch(e){}
+}
+function agregarTorre(){
+  const nombre=prompt('Nombre del Block o Torre:\nEj: Block 1, Block 2, Torre A, Torre B...');
+  if(!nombre||!nombre.trim())return;
+  const n=nombre.trim();
+  if(TORRES.includes(n)){alert('Ya existe ese Block/Torre');return;}
+  TORRES.push(n);
+  saveTorres();
+  populateTorreSelect();
+  document.getElementById('uTorre').value=n;
+}
+function populateTorreSelect(){
+  const sel=document.getElementById('uTorre');
+  if(!sel)return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">Sin Torre/Block</option>'+
+    TORRES.map(t=>`<option value="${t}" ${cur===t?'selected':''}>${t}</option>`).join('');
+}
+
+// ════════════════════
+// LIMPIAR DATOS
+// ════════════════════
+function limpiarTodosDatos(){
+  if(!confirm('⚠️ ¿Estás segura? Esto eliminará TODOS los datos de este condominio — unidades, cobros, egresos, fondo y novedades. Esta acción no se puede deshacer.'))return;
+  if(!confirm('Segunda confirmación — ¿Eliminar todos los datos del condominio?'))return;
+  UNIDADES=[];COBROS=[];EGRESOS=[];FONDO=[];NOVEDADES=[];OT=[];TORRES=[];
+  saveAll();saveOT_();saveTorres();
+  alert('✓ Todos los datos eliminados. El sistema está limpio.');
+  renderDashboard();
+}
+function limpiarSeccion(seccion){
+  const nombres={cobros:'Gastos Comunes (cobros)',egresos:'Egresos',fondo:'Fondo de Reserva',unidades:'Unidades',ot:'Mantenimiento'};
+  if(!confirm('¿Eliminar todos los datos de '+nombres[seccion]+'?'))return;
+  if(seccion==='cobros')COBROS=[];
+  if(seccion==='egresos')EGRESOS=[];
+  if(seccion==='fondo')FONDO=[];
+  if(seccion==='unidades'){UNIDADES=[];COBROS=[];}
+  if(seccion==='ot')OT=[];
+  saveAll();saveOT_();
+  alert('✓ '+nombres[seccion]+' eliminados');
+  renderDashboard();
+}
+loadAll();
+loadTorres();
+loadOT();
+document.getElementById('condNombre').textContent=CONFIG.nombre||'Nuevo Condominio';
+document.getElementById('filtMesGC').value=mesActual;
+renderDashboard();
+
+// Mostrar botón de carga si no hay datos
+if(UNIDADES.length===0){
+  const aviso=document.createElement('div');
+  aviso.id='avisoImportar';
+  aviso.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#08101C;border:2px solid rgba(16,185,129,0.5);border-radius:16px;padding:32px;text-align:center;z-index:9999;max-width:420px;width:90%';
+  aviso.innerHTML=`
+    <div style="font-size:48px;margin-bottom:12px">🏢</div>
+    <div style="font-size:18px;font-weight:900;color:#F0FDF4;margin-bottom:8px">Condominio Pioneros 2</div>
+    <div style="font-size:12px;color:#6B9E8A;margin-bottom:20px;line-height:1.6">Haz clic para cargar todos los datos del Excel:<br/>160 unidades · 8 Blocks · 212 registros · 2 egresos</div>
+    <button onclick="cargarDatosPioneros2()" style="width:100%;padding:14px;border-radius:10px;border:none;cursor:pointer;font-size:15px;font-weight:800;font-family:monospace;background:linear-gradient(135deg,#10B981,#6EE7B7);color:#04080F;margin-bottom:10px">⬇ Cargar Datos Pioneros 2</button>
+    <button onclick="document.getElementById('avisoImportar').remove()" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(16,185,129,0.3);cursor:pointer;font-size:12px;font-weight:700;font-family:monospace;background:transparent;color:#10B981">Empezar vacío (nuevo condominio)</button>
+  `;
+  document.body.appendChild(aviso);
+}
+
+function cargarDatosPioneros2(){
+  // Limpiar storage de este condominio y cargar datos frescos
+  Object.keys(localStorage).filter(k=>k.includes(CID)).forEach(k=>localStorage.removeItem(k));
+  CONFIG={...DATOS_PRECARGADOS.config};
+  UNIDADES=[...DATOS_PRECARGADOS.unidades];
+  COBROS=[...DATOS_PRECARGADOS.cobros];
+  EGRESOS=[...DATOS_PRECARGADOS.egresos];
+  FONDO=[];NOVEDADES=[];
+  TORRES=[...DATOS_PRECARGADOS.torres];
+  OT=[...DATOS_PRECARGADOS.ots];
+  saveAll();
+  try{localStorage.setItem(SK_TORRES,JSON.stringify(TORRES));}catch(e){}
+  try{localStorage.setItem(SK_OT,JSON.stringify(OT));}catch(e){}
+  document.getElementById('avisoImportar')?.remove();
+  document.getElementById('condNombre').textContent=CONFIG.nombre;
+  renderDashboard();
+  alert('✓ Datos cargados — 160 unidades, 212 cobros, 8 Blocks');
+}
+
+// Poblar torres al abrir modal unidad
+const _origOpenMo=openMo;
+function openMo(id){
+  _origOpenMo(id);
+  if(id==='moUnidad')populateTorreSelect();
+}
+</script>
+</body>
+</html>
