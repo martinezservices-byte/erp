@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Arriendos & Fletes — Martinez Services Spa</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#04080F;--surf:#08101C;--surf2:#0D1826;--acc:#F59E0B;--accHi:#FCD34D;--white:#FFFBEB;--muted:#78716C;--mutedHi:#A8A29E;--ok:#22C55E;--danger:#EF4444;--info:#38BDF8;--green:#10B981;--gold:#C9A84C;--b1:rgba(245,158,11,0.15);--b2:rgba(245,158,11,0.07);}
+body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;min-height:100vh;}
+#hdr{background:var(--surf);border-bottom:1px solid var(--b2);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:42px;z-index:90;}
+#wrap{max-width:1200px;margin:0 auto;padding:16px 16px 60px;}
+.tabs{display:flex;gap:3px;background:var(--bg);padding:3px;border-radius:8px;margin-bottom:14px;flex-wrap:wrap;}
+.tab{padding:6px 12px;border-radius:6px;border:none;cursor:pointer;font-size:11px;font-weight:700;background:transparent;color:var(--muted);font-family:monospace;}
+.tab.on{background:var(--acc);color:var(--bg);}
+.sec{display:none;}.sec.on{display:block;}
+.krow{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.kc{flex:1;min-width:130px;background:var(--surf);border-radius:10px;padding:12px 14px;border:1px solid var(--b2);}
+.kl{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;font-family:monospace;}
+.kv{font-size:20px;font-weight:900;}
+.card{background:var(--surf);border-radius:11px;padding:16px;border:1px solid var(--b2);margin-bottom:12px;}
+.ct{font-size:13px;font-weight:800;margin-bottom:12px;}
+.tw{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:11px;font-family:monospace;}
+th{padding:7px 9px;text-align:left;color:var(--acc);font-weight:700;border-bottom:1px solid var(--b1);white-space:nowrap;}
+td{padding:6px 9px;border-bottom:1px solid var(--b2);}
+tfoot td{border-top:2px solid var(--b1);font-weight:800;}
+.badge{display:inline-flex;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;font-family:monospace;white-space:nowrap;}
+.fl label{font-size:10px;color:var(--muted);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:1px;font-family:monospace;}
+.fl input,.fl select,.fl textarea{width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-size:12px;font-family:monospace;outline:none;}
+.fl input:focus,.fl select:focus{border-color:var(--acc);}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.fg .f{grid-column:1/3;}
+.bg{padding:9px 18px;border-radius:7px;border:none;cursor:pointer;font-weight:700;font-size:12px;font-family:monospace;background:var(--acc);color:var(--bg);}
+.bgh{padding:9px 18px;border-radius:7px;cursor:pointer;font-weight:700;font-size:12px;font-family:monospace;background:transparent;border:1px solid var(--b1);color:var(--acc);}
+.bsm{padding:3px 8px;border-radius:5px;font-size:10px;cursor:pointer;font-family:monospace;}
+.be{background:transparent;border:1px solid rgba(245,158,11,0.3);color:var(--acc);}
+.bd{background:transparent;border:1px solid rgba(239,68,68,0.3);color:var(--danger);}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;padding:16px;overflow-y:auto;}
+.mo.open{display:flex;}
+.mb{background:var(--surf);border-radius:13px;padding:24px;border:1px solid rgba(245,158,11,0.3);width:540px;max-height:92vh;overflow-y:auto;}
+.mb h3{font-size:15px;font-weight:900;margin-bottom:16px;}
+/* ACTIVO CARD */
+.activo-card{background:var(--surf);border-radius:12px;border:1px solid var(--b2);overflow:hidden;transition:all .2s;}
+.activo-card:hover{border-color:var(--acc);}
+.ac-head{padding:14px;background:var(--surf2);border-bottom:1px solid var(--b2);}
+.ac-icon{font-size:32px;margin-bottom:6px;}
+.ac-nombre{font-size:13px;font-weight:800;}
+.ac-tipo{font-size:10px;color:var(--muted);font-family:monospace;}
+.ac-body{padding:14px;}
+.ac-row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;font-family:monospace;}
+/* CALENDARIO */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px;}
+.cal-day{background:var(--surf2);border-radius:5px;padding:6px;text-align:center;font-size:10px;font-family:monospace;}
+.cal-day.ocupado{background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.3);color:var(--danger);}
+.cal-day.libre{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);color:var(--ok);}
+.cal-day.hoy{border:2px solid var(--acc);}
+/* DOCUMENTOS IMPRIMIBLES */
+.doc-arr{background:white;color:#1a1a1a;font-family:Arial,sans-serif;font-size:11px;max-width:760px;margin:16px auto;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.3);overflow:hidden;}
+.doc-arr-head{border-bottom:3px solid #1a1a1a;padding:16px 22px;display:flex;justify-content:space-between;align-items:flex-start;}
+.doc-arr-logo{font-size:24px;font-weight:900;color:#F59E0B;}
+.doc-arr-body{padding:18px 22px;}
+.doc-arr-title{font-size:16px;font-weight:900;text-align:center;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;}
+.doc-arr-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:10px;}
+.doc-arr-table th{background:#1a1a1a;color:white;padding:6px 8px;text-align:left;}
+.doc-arr-table td{padding:6px 8px;border-bottom:1px solid #e0e0e0;border:1px solid #ccc;}
+.doc-arr-clausula{margin-bottom:10px;font-size:10px;line-height:1.7;text-align:justify;}
+.doc-arr-clausula strong{font-size:10px;}
+.doc-arr-firmas{display:flex;justify-content:space-between;margin-top:28px;padding-top:16px;border-top:2px solid #1a1a1a;}
+.doc-arr-firma{text-align:center;min-width:200px;}
+.doc-arr-firma-line{border-top:1px solid #1a1a1a;padding-top:6px;margin-top:32px;font-size:10px;}
+.doc-arr-footer{background:#f5f5f5;padding:8px 22px;font-size:9px;color:#666;border-top:1px solid #ddd;}
+@media print{
+  body>*{display:none!important;}
+  #docPrintArea{display:block!important;position:fixed;top:0;left:0;width:100%;background:white;}
+  .doc-arr{box-shadow:none!important;border-radius:0!important;max-width:100%!important;}
+  .doc-arr-head,.doc-arr-table th{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  @page{margin:10mm;size:A4;}
+}
+</style>
+</head>
+<body>
+
+<div id="nav-bar" style="background:#030609;border-bottom:1px solid rgba(201,168,76,0.1);padding:0 16px;display:flex;align-items:center;gap:4px;overflow-x:auto;height:42px;position:sticky;top:0;z-index:200;">
+<a href="index.html" style="display:flex;align-items:center;padding:5px 10px;border-radius:6px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">🏠 Hub</a>
+<div style="width:1px;height:20px;background:rgba(201,168,76,0.15);margin:0 2px;flex-shrink:0"></div>
+<a href="MSS-Finanzas.html" style="padding:5px 9px;border-radius:6px;color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Finanzas</a>
+<a href="MSS-Remuneraciones.html" style="padding:5px 9px;border-radius:6px;color:#22C55E;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Remuner.</a>
+<a href="MSS-Facturacion.html" style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Factur.</a>
+<a href="MSS-Cotizacion.html" style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Cotiz.</a>
+<a href="MSS-Contratos.html" style="padding:5px 9px;border-radius:6px;color:#A78BFA;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Contratos</a>
+<a href="MSS-Arriendos.html" style="padding:5px 9px;border-radius:6px;color:#F59E0B;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.4);">🚛 Arriendos</a>
+<a href="MSS-Condominio.html" style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">🏢 Condominio</a>
+<a href="MSS-Respaldo.html" style="padding:5px 9px;border-radius:6px;color:#64748B;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Respaldo</a>
+<div id="nav-emp" style="margin-left:auto;padding:3px 10px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);border-radius:20px;font-size:9px;color:#F59E0B;font-family:monospace;white-space:nowrap;flex-shrink:0;display:none"></div>
+</div>
+
+<div id="hdr">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--acc),var(--accHi));display:flex;align-items:center;justify-content:center;font-size:18px;">🚛</div>
+    <div>
+      <div style="font-size:14px;font-weight:800" id="empNombre">Empresa</div>
+      <div style="font-size:9px;color:var(--acc);font-family:monospace;letter-spacing:1px">ARRIENDOS · FLETES · EQUIPOS</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="bg" style="padding:6px 12px;font-size:11px" onclick="O('moArriendo')">+ Arriendo</button>
+    <button class="bgh" style="padding:6px 12px;font-size:11px" onclick="O('moFlete')">+ Flete</button>
+  </div>
+</div>
+
+<div id="wrap">
+  <div class="tabs" id="mainTabs">
+    <button class="tab on" onclick="T('dashboard',this)">📊 Dashboard</button>
+    <button class="tab" onclick="T('activos',this)">🔧 Activos</button>
+    <button class="tab" onclick="T('arriendos',this)">📋 Arriendos</button>
+    <button class="tab" onclick="T('fletes',this)">🚛 Fletes</button>
+    <button class="tab" onclick="T('documentos',this)">📄 Documentos</button>
+    <button class="tab" onclick="T('clientes',this)">👥 Clientes</button>
+    <button class="tab" onclick="T('disponibilidad',this)">📅 Disponibilidad</button>
+    <button class="tab" onclick="T('mantencion',this)">🔩 Mantención</button>
+    <button class="tab" onclick="T('config',this)">⚙ Config</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="sec on" id="sec-dashboard">
+    <div class="krow" id="kpiDash"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="card"><div class="ct">📋 Arriendos Activos</div><div id="dashArriendos"></div></div>
+      <div class="card"><div class="ct">🚛 Fletes del Mes</div><div id="dashFletes"></div></div>
+    </div>
+    <div class="card"><div class="ct">⚠ Alertas — Vencimientos y Mantención</div><div id="dashAlertas"></div></div>
+  </div>
+
+  <!-- ACTIVOS -->
+  <div class="sec" id="sec-activos">
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <button class="bg" onclick="O('moActivo')">+ Nuevo Activo</button>
+      <select id="filtTipoActivo" onchange="rActivos()" style="padding:7px 10px;background:var(--surf);border:1px solid var(--b2);border-radius:7px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+        <option value="">Todos</option>
+        <option>Vehículo</option><option>Equipo</option><option>Maquinaria</option><option>Otro</option>
+      </select>
+    </div>
+    <div id="activosGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px"></div>
+  </div>
+
+  <!-- ARRIENDOS -->
+  <div class="sec" id="sec-arriendos">
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <button class="bg" onclick="O('moArriendo')">+ Nuevo Arriendo</button>
+      <select id="filtEstadoArr" onchange="rArriendos()" style="padding:7px 10px;background:var(--surf);border:1px solid var(--b2);border-radius:7px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+        <option value="">Todos</option><option>Activo</option><option>Finalizado</option><option>Pendiente</option><option>Cancelado</option>
+      </select>
+    </div>
+    <div class="krow" id="kpiArr"></div>
+    <div class="card tw"><table id="tArr">
+      <thead><tr><th>N°</th><th>Activo</th><th>Cliente</th><th>Inicio</th><th>Término</th><th>Días</th><th>Tarifa/día</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th></th></tr></thead>
+      <tbody></tbody><tfoot></tfoot>
+    </table></div>
+  </div>
+
+  <!-- FLETES -->
+  <div class="sec" id="sec-fletes">
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <button class="bg" onclick="O('moFlete')">+ Nuevo Flete</button>
+      <select id="filtEstadoFl" onchange="rFletes()" style="padding:7px 10px;background:var(--surf);border:1px solid var(--b2);border-radius:7px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+        <option value="">Todos</option><option>Completado</option><option>En Ruta</option><option>Programado</option><option>Cancelado</option>
+      </select>
+    </div>
+    <div class="krow" id="kpiFl"></div>
+    <div class="card tw"><table id="tFl">
+      <thead><tr><th>N°</th><th>Fecha</th><th>Vehículo</th><th>Conductor</th><th>Origen</th><th>Destino</th><th>Carga</th><th>Km</th><th>Tarifa</th><th>Cliente</th><th>Estado</th><th></th></tr></thead>
+      <tbody></tbody><tfoot></tfoot>
+    </table></div>
+  </div>
+
+  <!-- CLIENTES -->
+  <div class="sec" id="sec-clientes">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+      <button class="bg" onclick="O('moCliente')">+ Nuevo Cliente</button>
+    </div>
+    <div class="card tw"><table id="tCli">
+      <thead><tr><th>Nombre / Razón Social</th><th>RUT</th><th>Contacto</th><th>Teléfono</th><th>Email</th><th>Arriendos</th><th>Fletes</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+  </div>
+
+  <!-- DISPONIBILIDAD -->
+  <div class="sec" id="sec-disponibilidad">
+    <div style="display:flex;gap:8px;margin-bottom:14px;align-items:flex-end;flex-wrap:wrap">
+      <div class="fl" style="min-width:160px"><label>Activo</label>
+        <select id="selActivoDisp" onchange="rDisponibilidad()" style="padding:7px 10px;background:var(--surf);border:1px solid var(--b2);border-radius:7px;color:var(--white);font-family:monospace;font-size:12px;outline:none"><option value="">Seleccionar...</option></select>
+      </div>
+      <div class="fl" style="min-width:130px"><label>Mes</label>
+        <input type="month" id="selMesDisp" onchange="rDisponibilidad()" style="padding:7px 10px;background:var(--surf);border:1px solid var(--b2);border-radius:7px;color:var(--white);font-family:monospace;font-size:12px;outline:none"/>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">📅 Calendario de Disponibilidad</div>
+      <div style="display:flex;gap:12px;margin-bottom:10px;font-size:11px">
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.4);display:inline-block"></span>Ocupado</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);display:inline-block"></span>Disponible</span>
+      </div>
+      <div id="calGrid"></div>
+      <div id="dispResumen" style="margin-top:10px"></div>
+    </div>
+    <div class="card">
+      <div class="ct">📊 Resumen de Todos los Activos</div>
+      <div id="dispTodos"></div>
+    </div>
+  </div>
+
+  <!-- DOCUMENTOS -->
+  <div class="sec" id="sec-documentos">
+    <div class="tabs" style="margin-bottom:14px">
+      <button class="tab on" onclick="showDocTab('contrato',this)" id="dtab1">📋 Contrato Arriendo</button>
+      <button class="tab" onclick="showDocTab('guia',this)" id="dtab2">📦 Guía de Entrega</button>
+      <button class="tab" onclick="showDocTab('devolucion',this)" id="dtab3">🔄 Comprobante Devolución</button>
+    </div>
+
+    <!-- FORMULARIO CONTRATO -->
+    <div id="doc-contrato">
+      <div class="card">
+        <div class="ct">📋 Datos del Contrato de Arriendo Maquinaria</div>
+        <div class="fg" style="margin-bottom:14px">
+          <div class="fl"><label>N° Contrato</label><input id="dcNum" type="text" placeholder="1005"/></div>
+          <div class="fl"><label>Fecha</label><input id="dcFecha" type="date"/></div>
+          <div class="fl f"><label>Arrendatario (Nombre completo)</label><input id="dcArrNombre" type="text"/></div>
+          <div class="fl"><label>RUT Arrendatario</label><input id="dcArrRut" type="text"/></div>
+          <div class="fl f"><label>Domicilio Arrendatario</label><input id="dcArrDir" type="text"/></div>
+          <div class="fl"><label>Fono Arrendatario</label><input id="dcArrTel" type="text"/></div>
+          <div class="fl f"><label>Ubicación de la Obra</label><input id="dcObra" type="text" placeholder="Ej: La Cantera N°2447, Iquique"/></div>
+          <div class="fl"><label>Equipo / Maquinaria</label><select id="dcActivo" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none"></select></div>
+          <div class="fl"><label>Marca</label><input id="dcMarca" type="text"/></div>
+          <div class="fl"><label>N° Serie</label><input id="dcSerie" type="text" value="S/S"/></div>
+          <div class="fl"><label>Valor Diario ($)</label><input id="dcValorDia" type="number" oninput="calcDocTotal()"/></div>
+          <div class="fl"><label>Garantía ($)</label><input id="dcGarantia" type="number"/></div>
+          <div class="fl"><label>Fecha Inicio</label><input id="dcInicio" type="date" oninput="calcDocTotal()"/></div>
+          <div class="fl"><label>Fecha Término</label><input id="dcTermino" type="date" oninput="calcDocTotal()"/></div>
+          <div class="fl"><label>Total Calculado ($)</label><input id="dcTotal" type="number" readonly style="color:var(--acc);font-weight:700"/></div>
+          <div class="fl"><label>Flete Despacho ($)</label><input id="dcFlete" type="number" value="10000"/></div>
+          <div class="fl"><label>Despacho</label><select id="dcDespacho" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none"><option>Con Costo Adicional</option><option>Retira Cliente</option></select></div>
+          <div class="fl"><label>Garantía — Forma de Pago</label><select id="dcGarForma" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none"><option>Efectivo</option><option>Transferencia</option></select></div>
+          <div class="fl"><label>Ciudad</label><input id="dcCiudad" type="text" value="Iquique"/></div>
+          <div class="fl"><label>Hora Entrega</label><input id="dcHoraEnt" type="time" value="10:00"/></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="bg" onclick="generarContrato()">👁 Ver Contrato</button>
+          <button class="bgh" onclick="window.print()">🖨 Imprimir</button>
+        </div>
+      </div>
+      <div id="prevContrato"></div>
+    </div>
+
+    <!-- FORMULARIO GUÍA -->
+    <div id="doc-guia" style="display:none">
+      <div class="card">
+        <div class="ct">📦 Datos Guía de Entrega</div>
+        <div class="fg" style="margin-bottom:14px">
+          <div class="fl"><label>N° Guía</label><input id="dgNum" type="text" placeholder="115"/></div>
+          <div class="fl"><label>Contrato Ref.</label><input id="dgContrato" type="text"/></div>
+          <div class="fl f"><label>Obra / Dirección Entrega</label><input id="dgObra" type="text"/></div>
+          <div class="fl"><label>Comuna</label><input id="dgComuna" type="text" value="Iquique"/></div>
+          <div class="fl f"><label>Equipo</label><input id="dgEquipo" type="text"/></div>
+          <div class="fl"><label>Marca/Modelo</label><input id="dgMarca" type="text"/></div>
+          <div class="fl"><label>Estado</label><input id="dgEstado" type="text" value="Eléctrica - Operativa"/></div>
+          <div class="fl"><label>Conductor</label><input id="dgConductor" type="text" value="Joseph Pajuelo Valderrama"/></div>
+          <div class="fl"><label>RUT Conductor</label><input id="dgRutCond" type="text" value="25.501.005-0"/></div>
+          <div class="fl"><label>Patente Vehículo</label><input id="dgPatente" type="text" value="RKJW59"/></div>
+          <div class="fl"><label>Hora Entrega</label><input id="dgHoraEnt" type="time" value="10:00"/></div>
+          <div class="fl"><label>Hora Retiro</label><input id="dgHoraRet" type="time"/></div>
+          <div class="fl f"><label>Cliente (Arrendatario)</label><input id="dgCliente" type="text"/></div>
+          <div class="fl"><label>RUT Cliente</label><input id="dgRutCli" type="text"/></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="bg" onclick="generarGuia()">👁 Ver Guía</button>
+          <button class="bgh" onclick="window.print()">🖨 Imprimir</button>
+        </div>
+      </div>
+      <div id="prevGuia"></div>
+    </div>
+
+    <!-- COMPROBANTE DEVOLUCIÓN -->
+    <div id="doc-devolucion" style="display:none">
+      <div class="card">
+        <div class="ct">🔄 Datos Comprobante de Devolución</div>
+        <div class="fg" style="margin-bottom:14px">
+          <div class="fl"><label>N° Comprobante</label><input id="ddNum" type="text"/></div>
+          <div class="fl"><label>Contrato Ref.</label><input id="ddContrato" type="text"/></div>
+          <div class="fl f"><label>Cliente</label><input id="ddCliente" type="text"/></div>
+          <div class="fl"><label>RUT Cliente</label><input id="ddRutCli" type="text"/></div>
+          <div class="fl"><label>Fecha Devolución</label><input id="ddFecha" type="date"/></div>
+          <div class="fl"><label>Hora Devolución</label><input id="ddHora" type="time"/></div>
+          <div class="fl f"><label>Equipo Devuelto</label><input id="ddEquipo" type="text"/></div>
+          <div class="fl"><label>N° Serie</label><input id="ddSerie" type="text"/></div>
+          <div class="fl"><label>Estado al Recibir</label><select id="ddEstado" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none"><option>Óptimo</option><option>Con Daño</option><option>Sucio</option></select></div>
+          <div class="fl f"><label>Observaciones</label><textarea id="ddObs" rows="2" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:12px;outline:none"></textarea></div>
+          <div class="fl"><label>Encargado Recepción</label><input id="ddEncargado" type="text" value="Gaudy Martínez"/></div>
+          <div class="fl"><label>RUT Encargado</label><input id="ddRutEnc" type="text" value="23.918.699-8"/></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="bg" onclick="generarDevolucion()">👁 Ver Comprobante</button>
+          <button class="bgh" onclick="window.print()">🖨 Imprimir</button>
+        </div>
+      </div>
+      <div id="prevDevolucion"></div>
+    </div>
+  </div>
+  <div class="sec" id="sec-mantencion">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+      <button class="bg" onclick="O('moMant')">+ Mantención</button>
+    </div>
+    <div class="krow" id="kpiMant"></div>
+    <div class="card tw"><table id="tMant">
+      <thead><tr><th>Activo</th><th>Tipo</th><th>Descripción</th><th>Fecha</th><th>Próx. Mantención</th><th>Costo</th><th>Taller</th><th>Estado</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+  </div>
+
+  <!-- CONFIG -->
+  <div class="sec" id="sec-config">
+    <div class="card">
+      <div class="ct">⚙ Configuración</div>
+      <div class="fg" style="margin-bottom:14px">
+        <div class="fl f"><label>Nombre Empresa</label><input id="cfgNombre" type="text"/></div>
+        <div class="fl"><label>Tarifa Flete por Km ($)</label><input id="cfgTarifaKm" type="number" value="500"/></div>
+        <div class="fl"><label>Tarifa Flete Base ($)</label><input id="cfgTarifaBase" type="number" value="50000"/></div>
+        <div class="fl"><label>Días aviso mantención</label><input id="cfgDiasMant" type="number" value="7"/></div>
+        <div class="fl"><label>Moneda</label><select id="cfgMoneda" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none"><option>CLP</option><option>UF</option></select></div>
+        <div class="fl"><label>IVA en tarifas</label><select id="cfgIva" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none"><option>Incluido</option><option>Sin IVA (+ 19%)</option></select></div>
+      </div>
+      <button class="bg" onclick="saveConfig()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ACTIVO -->
+<div class="mo" id="moActivo"><div class="mb">
+  <h3 id="tActivo">Nuevo Activo</h3><input type="hidden" id="aId"/>
+  <div class="fg">
+    <div class="fl f"><label>Nombre / Identificador</label><input id="aNombre" type="text" placeholder="Ej: Camión Plano, Excavadora CAT, Grúa Horquilla..."/></div>
+    <div class="fl"><label>Tipo</label><select id="aTipo" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+      <option>Vehículo</option><option>Equipo</option><option>Maquinaria</option><option>Herramienta</option><option>Otro</option>
+    </select></div>
+    <div class="fl"><label>Categoría</label><select id="aCat" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+      <option>Camión</option><option>Camioneta</option><option>Auto</option><option>Furgón</option>
+      <option>Excavadora</option><option>Retroexcavadora</option><option>Grúa</option>
+      <option>Generador</option><option>Compresor</option><option>Herramienta Eléctrica</option><option>Otro</option>
+    </select></div>
+    <div class="fl"><label>Marca</label><input id="aMarca" type="text"/></div>
+    <div class="fl"><label>Modelo</label><input id="aModelo" type="text"/></div>
+    <div class="fl"><label>Año</label><input id="aAnio" type="number" placeholder="2020"/></div>
+    <div class="fl"><label>Patente / Serie</label><input id="aPatente" type="text"/></div>
+    <div class="fl"><label>Tarifa Diaria ($)</label><input id="aTarifaDia" type="number" value="0"/></div>
+    <div class="fl"><label>Tarifa Semanal ($)</label><input id="aTarifaSem" type="number" value="0"/></div>
+    <div class="fl"><label>Tarifa Mensual ($)</label><input id="aTarifaMes" type="number" value="0"/></div>
+    <div class="fl"><label>Km/Horas Actuales</label><input id="aKm" type="number" value="0"/></div>
+    <div class="fl"><label>Próx. Mantención (km/horas)</label><input id="aProxMant" type="number" value="0"/></div>
+    <div class="fl"><label>Vencimiento Seguro</label><input id="aSeguro" type="date"/></div>
+    <div class="fl"><label>Vencimiento Revisión Técnica</label><input id="aRevision" type="date"/></div>
+    <div class="fl"><label>Estado</label><select id="aEstado" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+      <option>Disponible</option><option>Arrendado</option><option>Mantención</option><option>Fuera de Servicio</option>
+    </select></div>
+    <div class="fl f"><label>Observaciones</label><input id="aObs" type="text"/></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:12px">
+    <button class="bg" style="flex:1" onclick="saveActivo()">Guardar</button>
+    <button class="bgh" onclick="C('moActivo')">Cancelar</button>
+  </div>
+</div></div>
+
+<!-- MODAL ARRIENDO -->
+<div class="mo" id="moArriendo"><div class="mb">
+  <h3 id="tArriendo">Nuevo Arriendo</h3><input type="hidden" id="arId"/>
+  <div class="fg">
+    <div class="fl"><label>N° Contrato</label><input id="arNum" type="text" placeholder="ARR-001"/></div>
+    <div class="fl"><label>Activo</label><select id="arActivo" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none"></select></div>
+    <div class="fl"><label>Cliente</label><select id="arCliente" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none"></select></div>
+    <div class="fl"><label>Fecha Inicio</label><input id="arInicio" type="date"/></div>
+    <div class="fl"><label>Fecha Término</label><input id="arTermino" type="date" onchange="calcArriendo()"/></div>
+    <div class="fl"><label>Tipo Tarifa</label><select id="arTipoTarifa" onchange="calcArriendo()" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+      <option>Diaria</option><option>Semanal</option><option>Mensual</option><option>Fija</option>
+    </select></div>
+    <div class="fl"><label>Tarifa ($)</label><input id="arTarifa" type="number" oninput="calcArriendo()"/></div>
+    <div class="fl"><label>Total Calculado ($)</label><input id="arTotal" type="number" readonly style="color:var(--acc);font-weight:700"/></div>
+    <div class="fl"><label>Monto Pagado ($)</label><input id="arPagado" type="number" value="0"/></div>
+    <div class="fl"><label>Lugar de Uso</label><input id="arLugar" type="text"/></div>
+    <div class="fl"><label>Responsable Cliente</label><input id="arResp" type="text"/></div>
+    <div class="fl"><label>Estado</label><select id="arEstado" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+      <option>Activo</option><option>Pendiente</option><option>Finalizado</option><option>Cancelado</option>
+    </select></div>
+    <div class="fl f"><label>Observaciones</label><textarea id="arObs" rows="2" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:12px;outline:none"></textarea></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:12px">
+    <button class="bg" style="flex:1" onclick="saveArriendo()">Guardar</button>
+    <button class="bgh" onclick="C('moArriendo')">Cancelar</button>
+  </div>
+</div></div>
+
+<!-- MODAL FLETE -->
+<div class="mo" id="moFlete"><div class="mb">
+  <h3 id="tFlete">Nuevo Flete</h3><input type="hidden" id="flId"/>
+  <div class="fg">
+    <div class="fl"><label>N° Flete</label><input id="flNum" type="text" placeholder="FL-001"/></div>
+    <div class="fl"><label>Fecha</label><input id="flFecha" type="date"/></div>
+    <div class="fl"><label>Vehículo</label><select id="flVehiculo" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none"></select></div>
+    <div class="fl"><label>Conductor</label><input id="flConductor" type="text"/></div>
+    <div class="fl f"><label>Origen</label><input id="flOrigen" type="text"/></div>
+    <div class="fl f"><label>Destino</label><input id="flDestino" type="text"/></div>
+    <div class="fl f"><label>Descripción de Carga</label><input id="flCarga" type="text" placeholder="Ej: Materiales construcción, muebles, mercadería..."/></div>
+    <div class="fl"><label>Peso/Volumen</label><input id="flPeso" type="text" placeholder="Ej: 2 ton, 5m³"/></div>
+    <div class="fl"><label>Km Recorridos</label><input id="flKm" type="number" value="0" oninput="calcFlete()"/></div>
+    <div class="fl"><label>Tarifa ($)</label><input id="flTarifa" type="number" oninput="calcFlete()"/></div>
+    <div class="fl"><label>Total ($)</label><input id="flTotal" type="number" readonly style="color:var(--acc);font-weight:700"/></div>
+    <div class="fl"><label>Cliente</label><select id="flCliente" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none"></select></div>
+    <div class="fl"><label>Estado</label><select id="flEstado" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+      <option>Completado</option><option>En Ruta</option><option>Programado</option><option>Cancelado</option>
+    </select></div>
+    <div class="fl f"><label>Observaciones</label><input id="flObs" type="text"/></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:12px">
+    <button class="bg" style="flex:1" onclick="saveFlete()">Guardar</button>
+    <button class="bgh" onclick="C('moFlete')">Cancelar</button>
+  </div>
+</div></div>
+
+<!-- MODAL CLIENTE -->
+<div class="mo" id="moCliente"><div class="mb" style="width:460px">
+  <h3 id="tCliente">Nuevo Cliente</h3><input type="hidden" id="cliId"/>
+  <div class="fg">
+    <div class="fl f"><label>Nombre / Razón Social</label><input id="cliNombre" type="text"/></div>
+    <div class="fl"><label>RUT</label><input id="cliRut" type="text"/></div>
+    <div class="fl"><label>Giro</label><input id="cliGiro" type="text"/></div>
+    <div class="fl"><label>Contacto</label><input id="cliContacto" type="text"/></div>
+    <div class="fl"><label>Teléfono</label><input id="cliTel" type="text"/></div>
+    <div class="fl"><label>Email</label><input id="cliEmail" type="email"/></div>
+    <div class="fl f"><label>Dirección</label><input id="cliDir" type="text"/></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:12px">
+    <button class="bg" style="flex:1" onclick="saveCliente()">Guardar</button>
+    <button class="bgh" onclick="C('moCliente')">Cancelar</button>
+  </div>
+</div></div>
+
+<!-- MODAL MANTENCIÓN -->
+<div class="mo" id="moMant"><div class="mb">
+  <h3>Nueva Mantención</h3><input type="hidden" id="mId"/>
+  <div class="fg">
+    <div class="fl"><label>Activo</label><select id="mActivo" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none"></select></div>
+    <div class="fl"><label>Tipo</label><select id="mTipo" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+      <option>Preventiva</option><option>Correctiva</option><option>Revisión Técnica</option><option>Cambio Aceite</option><option>Neumáticos</option><option>Frenos</option><option>Otro</option>
+    </select></div>
+    <div class="fl f"><label>Descripción</label><input id="mDesc" type="text"/></div>
+    <div class="fl"><label>Fecha</label><input id="mFecha" type="date"/></div>
+    <div class="fl"><label>Próxima Mantención</label><input id="mProxima" type="date"/></div>
+    <div class="fl"><label>Costo ($)</label><input id="mCosto" type="number" value="0"/></div>
+    <div class="fl"><label>Taller / Proveedor</label><input id="mTaller" type="text"/></div>
+    <div class="fl"><label>Estado</label><select id="mEstado" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+      <option>Completada</option><option>Programada</option><option>En Proceso</option>
+    </select></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:12px">
+    <button class="bg" style="flex:1" onclick="saveMant()">Guardar</button>
+    <button class="bgh" onclick="C('moMant')">Cancelar</button>
+  </div>
+</div></div>
+
+<script>
+// Storage
+function eid(){try{const e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}');return e.id?'_arr'+e.id:'_arrDef';}catch(e){return'_arrDef';}}
+const EID=eid();
+const SK={a:'mss'+EID+'_activos',ar:'mss'+EID+'_arriendos',fl:'mss'+EID+'_fletes',cli:'mss'+EID+'_clientes',mant:'mss'+EID+'_mantencion',cfg:'mss'+EID+'_cfg'};
+let ACTIVOS=[],ARRIENDOS=[],FLETES=[],CLIENTES=[],MANTENCION=[],CFG={tarifaKm:500,tarifaBase:50000,diasMant:7};
+let _id=60000; const uid=()=>++_id;
+const HOY=new Date().toISOString().split('T')[0];
+const MES=HOY.substring(0,7);
+
+function load(){
+  try{
+    ACTIVOS=JSON.parse(localStorage.getItem(SK.a)||'[]');
+    ARRIENDOS=JSON.parse(localStorage.getItem(SK.ar)||'[]');
+    FLETES=JSON.parse(localStorage.getItem(SK.fl)||'[]');
+    CLIENTES=JSON.parse(localStorage.getItem(SK.cli)||'[]');
+    MANTENCION=JSON.parse(localStorage.getItem(SK.mant)||'[]');
+    CFG=JSON.parse(localStorage.getItem(SK.cfg)||JSON.stringify(CFG));
+  }catch(e){}
+}
+function save(){
+  try{
+    localStorage.setItem(SK.a,JSON.stringify(ACTIVOS));
+    localStorage.setItem(SK.ar,JSON.stringify(ARRIENDOS));
+    localStorage.setItem(SK.fl,JSON.stringify(FLETES));
+    localStorage.setItem(SK.cli,JSON.stringify(CLIENTES));
+    localStorage.setItem(SK.mant,JSON.stringify(MANTENCION));
+    localStorage.setItem(SK.cfg,JSON.stringify(CFG));
+  }catch(e){}
+}
+
+// Helpers
+const clp=n=>new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Math.round(n||0));
+const df=d=>{try{return new Date(d+'T12:00:00').toLocaleDateString('es-CL');}catch{return d||'—';}};
+const badge=(l,c)=>`<span class="badge" style="background:${c}20;color:${c};border:1px solid ${c}40">${l}</span>`;
+const EC={Disponible:'#22C55E',Arrendado:'#F59E0B',Mantención:'#EF4444','Fuera de Servicio':'#64748B',
+  Activo:'#22C55E',Finalizado:'#38BDF8',Pendiente:'#F59E0B',Cancelado:'#EF4444',
+  Completado:'#22C55E','En Ruta':'#F59E0B',Programado:'#38BDF8',Completada:'#22C55E','En Proceso':'#F59E0B'};
+const ICONOS={Vehículo:'🚗',Camión:'🚛',Camioneta:'🛻',Auto:'🚗',Furgón:'🚐',Equipo:'⚙️',Maquinaria:'🏗️',Excavadora:'⛏️',Grúa:'🏗️',Generador:'⚡',Compresor:'💨',Herramienta:'🔧',Otro:'📦'};
+
+// Tabs
+function T(id,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('#mainTabs .tab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('sec-'+id)?.classList.add('on');
+  btn.classList.add('on');
+  ({dashboard:rDash,activos:rActivos,arriendos:rArriendos,fletes:rFletes,
+    clientes:rClientes,disponibilidad:rDispInit,mantencion:rMantencion,config:rConfig}[id]||function(){})();
+}
+
+// DASHBOARD
+function rDash(){
+  const actActivos=ARRIENDOS.filter(a=>a.estado==='Activo').length;
+  const ingArr=ARRIENDOS.reduce((s,a)=>s+a.pagado,0);
+  const ingFl=FLETES.filter(f=>f.fecha&&f.fecha.startsWith(MES)).reduce((s,f)=>s+f.tarifa,0);
+  const dispCount=ACTIVOS.filter(a=>a.estado==='Disponible').length;
+  document.getElementById('kpiDash').innerHTML=`
+    <div class="kc"><div class="kl">Total Activos</div><div class="kv" style="color:var(--acc)">${ACTIVOS.length}</div><div style="font-size:9px;color:var(--ok)">${dispCount} disponibles</div></div>
+    <div class="kc"><div class="kl">Arriendos Activos</div><div class="kv" style="color:${actActivos>0?'var(--ok)':'var(--muted)'}">${actActivos}</div></div>
+    <div class="kc"><div class="kl">Ingresos Arriendos</div><div class="kv" style="color:var(--ok)">${clp(ingArr)}</div></div>
+    <div class="kc"><div class="kl">Fletes del Mes</div><div class="kv" style="color:var(--info)">${FLETES.filter(f=>f.fecha&&f.fecha.startsWith(MES)).length}</div><div style="font-size:9px;color:var(--ok)">${clp(ingFl)}</div></div>
+    <div class="kc"><div class="kl">Clientes</div><div class="kv" style="color:var(--acc)">${CLIENTES.length}</div></div>
+  `;
+  document.getElementById('dashArriendos').innerHTML=ARRIENDOS.filter(a=>a.estado==='Activo').length===0
+    ?'<div style="color:var(--muted);font-size:11px;padding:8px">Sin arriendos activos</div>'
+    :ARRIENDOS.filter(a=>a.estado==='Activo').map(a=>`
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b2);font-size:11px">
+        <div><div style="font-weight:700">${a.activoNombre}</div><div style="color:var(--muted)">${a.clienteNombre} · hasta ${df(a.termino)}</div></div>
+        <span style="color:var(--ok);font-weight:700">${clp(a.total)}</span>
+      </div>`).join('');
+  document.getElementById('dashFletes').innerHTML=FLETES.filter(f=>f.fecha&&f.fecha.startsWith(MES)).length===0
+    ?'<div style="color:var(--muted);font-size:11px;padding:8px">Sin fletes este mes</div>'
+    :FLETES.filter(f=>f.fecha&&f.fecha.startsWith(MES)).slice(0,5).map(f=>`
+      <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--b2);font-size:11px">
+        <div><div style="font-weight:700">${f.num} — ${f.origen} → ${f.destino}</div><div style="color:var(--muted)">${f.conductor} · ${df(f.fecha)}</div></div>
+        <span style="color:var(--info);font-weight:700">${clp(f.tarifa)}</span>
+      </div>`).join('');
+  // Alertas
+  const hoyDate=new Date(HOY);
+  const alertas=[];
+  ARRIENDOS.filter(a=>a.estado==='Activo').forEach(a=>{
+    const dias=Math.ceil((new Date(a.termino)-hoyDate)/(1000*60*60*24));
+    if(dias<=3&&dias>=0) alertas.push({tipo:'warning',msg:`Arriendo ${a.num} vence en ${dias} día(s) — ${a.activoNombre} · ${a.clienteNombre}`});
+    if(dias<0) alertas.push({tipo:'danger',msg:`Arriendo ${a.num} VENCIDO hace ${Math.abs(dias)} días — ${a.activoNombre} · ${a.clienteNombre}`});
+  });
+  ACTIVOS.forEach(a=>{
+    if(a.seguro&&new Date(a.seguro)<=new Date(new Date().setDate(hoyDate.getDate()+30)))
+      alertas.push({tipo:'warning',msg:`Seguro de ${a.nombre} vence el ${df(a.seguro)}`});
+    if(a.revision&&new Date(a.revision)<=new Date(new Date().setDate(hoyDate.getDate()+30)))
+      alertas.push({tipo:'warning',msg:`Revisión técnica de ${a.nombre} vence el ${df(a.revision)}`});
+  });
+  document.getElementById('dashAlertas').innerHTML=alertas.length===0
+    ?'<div style="color:var(--ok);font-size:12px;padding:8px">✓ Sin alertas pendientes</div>'
+    :alertas.map(a=>`<div style="padding:8px 12px;background:rgba(${a.tipo==='danger'?'239,68,68':'245,158,11'},0.08);border:1px solid rgba(${a.tipo==='danger'?'239,68,68':'245,158,11'},0.3);border-radius:8px;margin-bottom:6px;font-size:11px;color:${a.tipo==='danger'?'var(--danger)':'var(--warn)'}">⚠ ${a.msg}</div>`).join('');
+}
+
+// ACTIVOS
+function rActivos(){
+  const ft=document.getElementById('filtTipoActivo')?.value||'';
+  const lista=ft?ACTIVOS.filter(a=>a.tipo===ft):ACTIVOS;
+  document.getElementById('activosGrid').innerHTML=lista.length===0
+    ?'<div class="card" style="text-align:center;padding:24px;color:var(--muted)">Sin activos registrados — agrega equipos y vehículos</div>'
+    :lista.map(a=>`
+    <div class="activo-card">
+      <div class="ac-head">
+        <div class="ac-icon">${ICONOS[a.cat]||ICONOS[a.tipo]||'📦'}</div>
+        <div class="ac-nombre">${a.nombre}</div>
+        <div class="ac-tipo">${a.tipo} · ${a.cat}</div>
+        <div style="margin-top:6px">${badge(a.estado,EC[a.estado]||'#5A7090')}</div>
+      </div>
+      <div class="ac-body">
+        <div class="ac-row"><span style="color:var(--muted)">Marca/Modelo</span><span>${a.marca||'—'} ${a.modelo||''}</span></div>
+        <div class="ac-row"><span style="color:var(--muted)">Año</span><span>${a.anio||'—'}</span></div>
+        <div class="ac-row"><span style="color:var(--muted)">Patente/Serie</span><span style="color:var(--acc)">${a.patente||'—'}</span></div>
+        <div class="ac-row"><span style="color:var(--muted)">Tarifa/día</span><span style="color:var(--ok)">${clp(a.tarifaDia)}</span></div>
+        <div class="ac-row"><span style="color:var(--muted)">Km/Horas</span><span>${(a.km||0).toLocaleString('es-CL')}</span></div>
+        ${a.seguro?`<div class="ac-row"><span style="color:var(--muted)">Seguro</span><span style="color:${new Date(a.seguro)<new Date()?'var(--danger)':'var(--ok)'}">${df(a.seguro)}</span></div>`:''}
+        ${a.revision?`<div class="ac-row"><span style="color:var(--muted)">Rev. Técnica</span><span style="color:${new Date(a.revision)<new Date()?'var(--danger)':'var(--ok)'}">${df(a.revision)}</span></div>`:''}
+        <div style="display:flex;gap:5px;margin-top:10px">
+          <button class="bsm be" style="flex:1" onclick="editActivo(${a.id})">✎ Editar</button>
+          <button class="bsm" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--acc)" onclick="nuevoArriendoActivo(${a.id})">+ Arriendo</button>
+          <button class="bsm bd" onclick="delActivo(${a.id})">✕</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function saveActivo(){
+  const id=document.getElementById('aId').value;
+  const obj={nombre:document.getElementById('aNombre').value.trim(),tipo:document.getElementById('aTipo').value,cat:document.getElementById('aCat').value,marca:document.getElementById('aMarca').value,modelo:document.getElementById('aModelo').value,anio:document.getElementById('aAnio').value,patente:document.getElementById('aPatente').value,tarifaDia:parseFloat(document.getElementById('aTarifaDia').value)||0,tarifaSem:parseFloat(document.getElementById('aTarifaSem').value)||0,tarifaMes:parseFloat(document.getElementById('aTarifaMes').value)||0,km:parseFloat(document.getElementById('aKm').value)||0,proxMant:parseFloat(document.getElementById('aProxMant').value)||0,seguro:document.getElementById('aSeguro').value,revision:document.getElementById('aRevision').value,estado:document.getElementById('aEstado').value,obs:document.getElementById('aObs').value};
+  if(!obj.nombre)return alert('Nombre requerido');
+  if(id){const i=ACTIVOS.findIndex(a=>a.id==id);if(i>=0)ACTIVOS[i]={...ACTIVOS[i],...obj};}
+  else ACTIVOS.push({id:uid(),...obj});
+  save();C('moActivo');rActivos();
+}
+
+function editActivo(id){
+  const a=ACTIVOS.find(x=>x.id===id);if(!a)return;
+  document.getElementById('tActivo').textContent='Editar Activo';
+  document.getElementById('aId').value=id;
+  document.getElementById('aNombre').value=a.nombre;
+  document.getElementById('aTipo').value=a.tipo;
+  document.getElementById('aCat').value=a.cat;
+  document.getElementById('aMarca').value=a.marca||'';
+  document.getElementById('aModelo').value=a.modelo||'';
+  document.getElementById('aAnio').value=a.anio||'';
+  document.getElementById('aPatente').value=a.patente||'';
+  document.getElementById('aTarifaDia').value=a.tarifaDia||0;
+  document.getElementById('aTarifaSem').value=a.tarifaSem||0;
+  document.getElementById('aTarifaMes').value=a.tarifaMes||0;
+  document.getElementById('aKm').value=a.km||0;
+  document.getElementById('aProxMant').value=a.proxMant||0;
+  document.getElementById('aSeguro').value=a.seguro||'';
+  document.getElementById('aRevision').value=a.revision||'';
+  document.getElementById('aEstado').value=a.estado;
+  document.getElementById('aObs').value=a.obs||'';
+  O('moActivo');
+}
+function delActivo(id){if(!confirm('¿Eliminar?'))return;ACTIVOS=ACTIVOS.filter(a=>a.id!==id);save();rActivos();}
+
+function nuevoArriendoActivo(id){
+  poblarSelects();
+  document.getElementById('arActivo').value=id;
+  O('moArriendo');
+}
+
+// ARRIENDOS
+function calcArriendo(){
+  const ini=document.getElementById('arInicio').value;
+  const ter=document.getElementById('arTermino').value;
+  const tipo=document.getElementById('arTipoTarifa').value;
+  const tarifa=parseFloat(document.getElementById('arTarifa').value)||0;
+  if(!ini||!ter)return;
+  const dias=Math.ceil((new Date(ter)-new Date(ini))/(1000*60*60*24))+1;
+  let total=0;
+  if(tipo==='Diaria') total=dias*tarifa;
+  else if(tipo==='Semanal') total=Math.ceil(dias/7)*tarifa;
+  else if(tipo==='Mensual') total=Math.ceil(dias/30)*tarifa;
+  else total=tarifa;
+  document.getElementById('arTotal').value=Math.round(total);
+}
+
+function rArriendos(){
+  const ft=document.getElementById('filtEstadoArr')?.value||'';
+  const lista=ft?ARRIENDOS.filter(a=>a.estado===ft):ARRIENDOS;
+  const totTotal=lista.reduce((s,a)=>s+a.total,0);
+  const totPag=lista.reduce((s,a)=>s+a.pagado,0);
+  document.getElementById('kpiArr').innerHTML=`
+    <div class="kc"><div class="kl">Contratos</div><div class="kv" style="color:var(--acc)">${lista.length}</div></div>
+    <div class="kc"><div class="kl">Total Facturado</div><div class="kv" style="color:var(--ok)">${clp(totTotal)}</div></div>
+    <div class="kc"><div class="kl">Cobrado</div><div class="kv" style="color:var(--ok)">${clp(totPag)}</div></div>
+    <div class="kc"><div class="kl">Por Cobrar</div><div class="kv" style="color:${totTotal-totPag>0?'var(--danger)':'var(--ok)'}">${clp(totTotal-totPag)}</div></div>
+  `;
+  document.querySelector('#tArr tbody').innerHTML=lista.length===0
+    ?'<tr><td colspan="12" style="text-align:center;color:var(--muted);padding:14px">Sin arriendos registrados</td></tr>'
+    :lista.map(a=>{
+      const dias=Math.ceil((new Date(a.termino)-new Date(a.inicio))/(1000*60*60*24))+1;
+      return`<tr>
+        <td style="color:var(--acc);font-weight:700">${a.num}</td>
+        <td style="color:var(--white)">${a.activoNombre}</td>
+        <td>${a.clienteNombre}</td>
+        <td>${df(a.inicio)}</td>
+        <td style="color:${new Date(a.termino)<new Date()&&a.estado==='Activo'?'var(--danger)':'inherit'}">${df(a.termino)}</td>
+        <td style="text-align:center">${dias}</td>
+        <td style="text-align:right">${clp(a.tarifa)}</td>
+        <td style="text-align:right;font-weight:700">${clp(a.total)}</td>
+        <td style="text-align:right;color:var(--ok)">${clp(a.pagado)}</td>
+        <td style="text-align:right;color:${a.total-a.pagado>0?'var(--danger)':'var(--ok)'}">${clp(a.total-a.pagado)}</td>
+        <td>${badge(a.estado,EC[a.estado]||'#5A7090')}</td>
+        <td><div style="display:flex;gap:3px;flex-wrap:wrap">
+          <button class="bsm be" onclick="editArriendo(${a.id})">✎</button>
+          <button class="bsm" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--acc);padding:3px 7px;border-radius:5px;font-size:9px;cursor:pointer" onclick="emitirContrato(${a.id})" title="Contrato">📋</button>
+          <button class="bsm" style="background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.3);color:var(--info);padding:3px 7px;border-radius:5px;font-size:9px;cursor:pointer" onclick="emitirGuia(${a.id})" title="Guía Entrega">📦</button>
+          <button class="bsm" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:var(--ok);padding:3px 7px;border-radius:5px;font-size:9px;cursor:pointer" onclick="emitirDevolucion(${a.id})" title="Comprobante Devolución">🔄</button>
+          <button class="bsm bd" onclick="delArriendo(${a.id})">✕</button>
+        </div></td>
+      </tr>`;}).join('');
+  document.querySelector('#tArr tfoot').innerHTML=`<tr><td colspan="7" style="color:var(--acc)">TOTALES</td><td style="text-align:right">${clp(totTotal)}</td><td style="text-align:right;color:var(--ok)">${clp(totPag)}</td><td style="text-align:right;color:var(--danger)">${clp(totTotal-totPag)}</td><td colspan="2"></td></tr>`;
+}
+
+function saveArriendo(){
+  const id=document.getElementById('arId').value;
+  const aId=parseInt(document.getElementById('arActivo').value)||0;
+  const cId=parseInt(document.getElementById('arCliente').value)||0;
+  const activo=ACTIVOS.find(x=>x.id===aId);
+  const cliente=CLIENTES.find(x=>x.id===cId);
+  const obj={num:document.getElementById('arNum').value||'ARR-'+(ARRIENDOS.length+1).toString().padStart(3,'0'),activoId:aId,activoNombre:activo?.nombre||'—',clienteId:cId,clienteNombre:cliente?.nombre||'—',inicio:document.getElementById('arInicio').value,termino:document.getElementById('arTermino').value,tipoTarifa:document.getElementById('arTipoTarifa').value,tarifa:parseFloat(document.getElementById('arTarifa').value)||0,total:parseFloat(document.getElementById('arTotal').value)||0,pagado:parseFloat(document.getElementById('arPagado').value)||0,lugar:document.getElementById('arLugar').value,resp:document.getElementById('arResp').value,estado:document.getElementById('arEstado').value,obs:document.getElementById('arObs').value};
+  if(!obj.activoNombre||obj.activoNombre==='—')return alert('Selecciona un activo');
+  if(id){const i=ARRIENDOS.findIndex(a=>a.id==id);if(i>=0)ARRIENDOS[i]={...ARRIENDOS[i],...obj};}
+  else ARRIENDOS.push({id:uid(),...obj});
+  if(activo&&obj.estado==='Activo'){activo.estado='Arrendado';save();}
+  save();C('moArriendo');rArriendos();
+}
+
+function editArriendo(id){
+  const a=ARRIENDOS.find(x=>x.id===id);if(!a)return;
+  poblarSelects();
+  document.getElementById('tArriendo').textContent='Editar Arriendo';
+  document.getElementById('arId').value=id;
+  document.getElementById('arNum').value=a.num;
+  document.getElementById('arActivo').value=a.activoId;
+  document.getElementById('arCliente').value=a.clienteId;
+  document.getElementById('arInicio').value=a.inicio;
+  document.getElementById('arTermino').value=a.termino;
+  document.getElementById('arTipoTarifa').value=a.tipoTarifa;
+  document.getElementById('arTarifa').value=a.tarifa;
+  document.getElementById('arTotal').value=a.total;
+  document.getElementById('arPagado').value=a.pagado;
+  document.getElementById('arLugar').value=a.lugar||'';
+  document.getElementById('arResp').value=a.resp||'';
+  document.getElementById('arEstado').value=a.estado;
+  document.getElementById('arObs').value=a.obs||'';
+  O('moArriendo');
+}
+function delArriendo(id){if(!confirm('¿Eliminar?'))return;ARRIENDOS=ARRIENDOS.filter(a=>a.id!==id);save();rArriendos();}
+
+// ═══════════════════════════════════════════
+// EMISIÓN AUTOMÁTICA DESDE ARRIENDO
+// ═══════════════════════════════════════════
+function emitirContrato(id){
+  const a=ARRIENDOS.find(x=>x.id===id);if(!a)return;
+  const activo=ACTIVOS.find(x=>x.id===a.activoId)||{};
+  const cliente=CLIENTES.find(x=>x.id===a.clienteId)||{};
+  const emp=getEmpresa();
+  const logo=getLogo();
+  const logoHTML=logo?`<img src="${logo}" style="height:60px;object-fit:contain"/>`:`<div style="font-size:22px;font-weight:900;color:#F59E0B">${emp.nombre.charAt(0)}</div>`;
+  const dias=a.inicio&&a.termino?Math.ceil((new Date(a.termino)-new Date(a.inicio))/(1000*60*60*24))+1:1;
+  const fechaF=a.inicio?new Date(a.inicio+'T12:00:00').toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'}).toUpperCase():'—';
+  const garantia=activo.tarifaDia?activo.tarifaDia*3:0;
+
+  const html=`<div class="doc-arr">
+    <div class="doc-arr-head">
+      <div>${logoHTML}
+        <div style="font-size:13px;font-weight:900;margin-top:6px">${emp.nombre}</div>
+        <div style="font-size:10px;color:#444">${emp.direccion||''}</div>
+        <div style="font-size:10px;color:#444">Rut: ${emp.rut||''}</div>
+        <div style="font-size:10px;color:#444">Giro: ${emp.giro||'Servicios de Arriendos, Flete y Venta de productos para Construcción y Ferretería'}</div>
+        <div style="font-size:10px;color:#444">Tel: ${emp.tel||''} | Email: ${emp.email||''}</div>
+      </div>
+      <div style="text-align:right"><div style="font-size:9px;color:#666">N°</div><div style="font-size:22px;font-weight:900">${a.num}</div></div>
+    </div>
+    <div class="doc-arr-body">
+      <div class="doc-arr-title">CONTRATO DE ARRIENDO MAQUINARIA N° ${a.num}</div>
+      <p class="doc-arr-clausula">En <strong>IQUIQUE</strong>, a ${fechaF}, entre <strong>${emp.nombre}</strong>, RUT ${emp.rut||''}, representada por <strong>DOÑA ${((emp.contacto)||'GAUDY MARTINEZ YOVERA').toUpperCase()}</strong>, RUT ${emp.rut_rep||'23.918.699-8'}, domiciliada en ${emp.direccion||''}, en adelante <strong>"EL ARRENDADOR"</strong>; y Don(ña) <strong>${(cliente.nombre||'—').toUpperCase()}</strong>, RUT: ${cliente.rut||'—'}, domiciliado en ${cliente.dir||a.lugar||'—'}, Fono: ${cliente.tel||'—'}, en adelante <strong>"EL ARRENDATARIO"</strong>, se ha convenido el siguiente contrato:</p>
+      <p class="doc-arr-clausula"><strong>PRIMERO:</strong> EL ARRENDADOR es dueño de las especies individualizadas o aquellas descritas en la cláusula tercera.</p>
+      <p class="doc-arr-clausula"><strong>SEGUNDO:</strong> EL ARRENDADOR da en arriendo al ARRENDATARIO las especies señaladas, quien declara recibirlas en buen estado, con sus mantenciones al día y a su entera satisfacción. El equipo deberá mantenerse exclusivamente en la obra ubicada en <strong>${a.lugar||'—'}</strong>, y usarse según su naturaleza técnica.</p>
+      <p class="doc-arr-clausula"><strong>TERCERO:</strong> La renta de arrendamiento será la siguiente:</p>
+      <table class="doc-arr-table">
+        <thead><tr><th>Cant.</th><th>Descripción</th><th>Marca</th><th>Nro. Serie</th><th>Valor Diario</th><th>Garantía</th></tr></thead>
+        <tbody><tr><td style="text-align:center">1</td><td>${activo.nombre||a.activoNombre}</td><td>${activo.marca||'—'}</td><td>${activo.patente||'S/S'}</td><td style="text-align:right">${clp(a.tarifa)}</td><td style="text-align:right">${clp(garantia)}</td></tr></tbody>
+      </table>
+      <p class="doc-arr-clausula">La renta se pagará por mensualidad vencida dentro de los primeros 5 días (o al término del periodo descrito si es menor a un mes), el retardo generará el interés máximo convencional. La garantía será devuelta al término del contrato si el equipo es devuelto en buen estado.</p>
+      <p class="doc-arr-clausula"><strong>Se deja constancia que, se recibe GARANTIA mediante EFECTIVO [ X ] TRANSFERENCIA [  ] a la cuenta de nuestra empresa, la cual será devuelta de la misma forma.</strong></p>
+      <p class="doc-arr-clausula"><strong>CUARTO:</strong> El servicio de despacho y retiro de la maquinaria operará bajo las siguientes condiciones seleccionadas:<br/>
+      [ X ] <strong>CON COSTO ADICIONAL.</strong> El cliente cancelará la suma única de ${clp(10000)} por concepto de flete (ida y vuelta).<br/>
+      [  ] <strong>RETIRA CLIENTE.</strong> El arrendatario retira y devuelve el equipo por sus propios medios.</p>
+      <p class="doc-arr-clausula"><strong>QUINTO:</strong> El contrato rige por <strong>${dias} día(s)</strong> desde el <strong>${df(a.inicio)}</strong> hasta el <strong>${df(a.termino)}</strong>. Se entenderá renovado tácita y sucesivamente por periodos iguales, salvo que una parte avise el término por escrito con 3 días de anticipación.</p>
+      <p class="doc-arr-clausula"><strong>SEXTO:</strong> Se prohíbe el subarriendo, la cesión a terceros o el traslado de la maquinaria fuera de la obra indicada sin autorización escrita.</p>
+      <p class="doc-arr-clausula"><strong>SÉPTIMO:</strong> Ante incumplimiento, el Arrendatario faculta al Arrendador para retirar las especies desde donde se encuentren. Se aplicará el Art. 1945 del C. Civil respecto a indemnizaciones.</p>
+      <p class="doc-arr-clausula"><strong>OCTAVO:</strong> El contrato no se extingue por pérdida o destrucción del bien. El Arrendatario deberá indemnizar al Arrendador pagando el <strong>valor comercial de reposición</strong> del equipo.</p>
+      <p class="doc-arr-clausula"><strong>NOVENO:</strong> El Arrendatario asume la responsabilidad civil y penal por accidentes, daños a terceros o mal uso del equipo.</p>
+      <p class="doc-arr-clausula"><strong>DÉCIMO:</strong> Para todos los efectos legales, las partes fijan domicilio en la ciudad de <strong>IQUIQUE/ALTO HOSPICIO</strong> y se someten a sus tribunales ordinarios.</p>
+      <div class="doc-arr-firmas">
+        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">${emp.nombre}</div><div>RUT: ${emp.rut||''}</div><div>Arrendador</div></div></div>
+        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">${cliente.nombre||'—'}</div><div>RUT: ${cliente.rut||'—'}</div><div>Arrendatario</div></div></div>
+      </div>
+    </div>
+    <div class="doc-arr-footer"><span>${emp.nombre} · RUT ${emp.rut||''} · ${emp.direccion||''}</span></div>
+  </div>`;
+
+  const ventana=window.open('','_blank','width=900,height=700');
+  ventana.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Contrato ${a.num}</title>
+  <style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#f5f5f5;font-family:Arial,sans-serif;padding:20px;}
+  .doc-arr{background:white;max-width:760px;margin:0 auto;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.15);overflow:hidden;}
+  .doc-arr-head{border-bottom:3px solid #1a1a1a;padding:16px 22px;display:flex;justify-content:space-between;}
+  .doc-arr-body{padding:18px 22px;}
+  .doc-arr-title{font-size:15px;font-weight:900;text-align:center;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;}
+  .doc-arr-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:10px;}
+  .doc-arr-table th{background:#1a1a1a;color:white;padding:6px 8px;}
+  .doc-arr-table td{padding:6px 8px;border:1px solid #ccc;}
+  .doc-arr-clausula{margin-bottom:10px;font-size:10px;line-height:1.7;text-align:justify;}
+  .doc-arr-firmas{display:flex;justify-content:space-between;margin-top:28px;padding-top:16px;border-top:2px solid #1a1a1a;}
+  .doc-arr-firma{text-align:center;min-width:200px;}
+  .doc-arr-firma-line{border-top:1px solid #1a1a1a;padding-top:6px;margin-top:32px;font-size:10px;}
+  .doc-arr-footer{background:#f5f5f5;padding:8px 22px;font-size:9px;color:#666;border-top:1px solid #ddd;}
+  .btn-print{display:block;margin:16px auto;padding:12px 32px;background:#F59E0B;color:#1a1a1a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
+  @media print{.btn-print{display:none!important;}body{background:white;padding:0;}@page{margin:10mm;}}
+  </style></head><body>
+  <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
+  ${html}
+  <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
+  </body></html>`);
+  ventana.document.close();
+}
+
+function emitirGuia(id){
+  const a=ARRIENDOS.find(x=>x.id===id);if(!a)return;
+  const activo=ACTIVOS.find(x=>x.id===a.activoId)||{};
+  const cliente=CLIENTES.find(x=>x.id===a.clienteId)||{};
+  const emp=getEmpresa();
+  const logo=getLogo();
+  const logoHTML=logo?`<img src="${logo}" style="height:55px;object-fit:contain"/>`:`<div style="font-size:22px;font-weight:900;color:#F59E0B">${emp.nombre.charAt(0)}</div>`;
+  const numGuia=String(id).slice(-3);
+
+  const html=`<div class="doc-arr">
+    <div class="doc-arr-head">
+      <div>${logoHTML}</div>
+      <div style="text-align:center;flex:1;padding:0 20px">
+        <div style="font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:1px">GUÍA DE ENTREGA EQUIPOS N° ${numGuia}</div>
+      </div>
+    </div>
+    <div class="doc-arr-body">
+      <p style="margin-bottom:6px;font-size:11px"><strong>Obra:</strong> ${a.lugar||'—'}</p>
+      <p style="margin-bottom:14px;font-size:11px"><strong>Comuna:</strong> Iquique</p>
+      <table class="doc-arr-table" style="margin-bottom:16px">
+        <thead><tr><th>Cant.</th><th>Detalle de Equipo</th><th>Marca/Modelo</th><th>Observación Estado</th></tr></thead>
+        <tbody><tr><td style="text-align:center">1</td><td>${activo.nombre||a.activoNombre}</td><td>${activo.marca||'—'} ${activo.modelo||''}</td><td>Operativa</td></tr></tbody>
+      </table>
+      <p style="font-size:11px;font-weight:700;margin-bottom:8px">Datos Transporte:</p>
+      <ul style="font-size:11px;line-height:2.2;padding-left:18px">
+        <li>Nombre Conductor: <strong>_________________________________</strong></li>
+        <li>RUT: <strong>_________________________</strong></li>
+        <li>Patente Vehículo: <strong>_____________</strong></li>
+        <li>Hora de Entrega Estipulada: <strong>_____________</strong></li>
+        <li>Hora de Retiro Estimada: <strong>_____________</strong></li>
+      </ul>
+      <p style="margin-top:20px;font-size:11px">Recibe Conforme (Cliente): ___________________________</p>
+      <div class="doc-arr-firmas">
+        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">Arrendador</div><div>${emp.nombre}</div><div>RUT: ${emp.rut||''}</div></div></div>
+        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">Arrendatario</div><div>${cliente.nombre||'—'}</div><div>RUT: ${cliente.rut||'—'}</div></div></div>
+      </div>
+    </div>
+  </div>`;
+
+  const ventana=window.open('','_blank','width=800,height=600');
+  ventana.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Guía ${numGuia}</title>
+  <style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#f5f5f5;font-family:Arial,sans-serif;padding:20px;}
+  .doc-arr{background:white;max-width:760px;margin:0 auto;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.15);overflow:hidden;}
+  .doc-arr-head{border-bottom:3px solid #1a1a1a;padding:16px 22px;display:flex;align-items:center;}
+  .doc-arr-body{padding:18px 22px;}
+  .doc-arr-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:10px;}
+  .doc-arr-table th{background:#1a1a1a;color:white;padding:6px 8px;}
+  .doc-arr-table td{padding:6px 8px;border:1px solid #ccc;}
+  .doc-arr-firmas{display:flex;justify-content:space-between;margin-top:28px;padding-top:16px;border-top:2px solid #1a1a1a;}
+  .doc-arr-firma{text-align:center;min-width:200px;}
+  .doc-arr-firma-line{border-top:1px solid #1a1a1a;padding-top:6px;margin-top:32px;font-size:10px;}
+  .btn-print{display:block;margin:16px auto;padding:12px 32px;background:#F59E0B;color:#1a1a1a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
+  @media print{.btn-print{display:none!important;}body{background:white;padding:0;}@page{margin:10mm;}}
+  </style></head><body>
+  <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
+  ${html}
+  </body></html>`);
+  ventana.document.close();
+}
+
+function emitirDevolucion(id){
+  const a=ARRIENDOS.find(x=>x.id===id);if(!a)return;
+  const activo=ACTIVOS.find(x=>x.id===a.activoId)||{};
+  const cliente=CLIENTES.find(x=>x.id===a.clienteId)||{};
+  const emp=getEmpresa();
+  const logo=getLogo();
+  const logoHTML=logo?`<img src="${logo}" style="height:55px;object-fit:contain"/>`:`<div style="font-size:22px;font-weight:900;color:#F59E0B">${emp.nombre.charAt(0)}</div>`;
+
+  const html=`<div class="doc-arr">
+    <div class="doc-arr-head">
+      <div>${logoHTML}</div>
+      <div style="text-align:center;flex:1;padding:0 20px">
+        <div style="font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:1px">COMPROBANTE DE DEVOLUCIÓN</div>
+      </div>
+    </div>
+    <div class="doc-arr-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;font-size:11px">
+        <div><strong>Cliente:</strong> ${cliente.nombre||'—'}</div>
+        <div><strong>Contrato Ref:</strong> ${a.num}</div>
+        <div><strong>Fecha Devolución:</strong> _____ / _____ / 2026</div>
+        <div><strong>Hora:</strong> _____________</div>
+      </div>
+      <table class="doc-arr-table" style="margin-bottom:14px">
+        <thead><tr><th>Detalle de Equipos Devueltos</th><th>Nro. Serie</th><th>Estado al Recibir</th></tr></thead>
+        <tbody><tr>
+          <td>1. ${activo.nombre||a.activoNombre}</td>
+          <td>${activo.patente||'S/S'}</td>
+          <td>[  ] Óptimo &nbsp;&nbsp; [  ] Daño &nbsp;&nbsp; [  ] Sucio</td>
+        </tr></tbody>
+      </table>
+      <p style="font-size:11px;margin-bottom:4px"><strong>Observaciones de Recepción:</strong> _________________________________________________________________</p>
+      <p style="font-size:11px;margin-top:6px">__________________________________________________________________________________</p>
+      <p style="font-size:11px;margin-top:6px">__________________________________________________________________________________</p>
+      <div style="border-top:1px solid #ccc;margin:16px 0;padding-top:12px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;font-size:11px">
+          <div><p style="font-weight:700;margin-bottom:8px">ENTREGA</p>
+            <p>Cliente: ${cliente.nombre||'—'}</p><p>RUT: ${cliente.rut||'—'}</p></div>
+          <div><p style="font-weight:700;margin-bottom:8px">RECIBE</p>
+            <p>Encargado: ${emp.contacto||'Gaudy Martínez'}</p><p>RUT: ${emp.rut_rep||'23.918.699-8'}</p></div>
+        </div>
+      </div>
+      <div class="doc-arr-firmas">
+        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">${cliente.nombre||'—'}</div><div>RUT: ${cliente.rut||'—'}</div><div>Entrega</div></div></div>
+        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">${emp.contacto||'Gaudy Martínez'}</div><div>${emp.nombre}</div><div>RUT: ${emp.rut||''}</div></div></div>
+      </div>
+    </div>
+  </div>`;
+
+  const ventana=window.open('','_blank','width=800,height=600');
+  ventana.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Devolución ${a.num}</title>
+  <style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#f5f5f5;font-family:Arial,sans-serif;padding:20px;}
+  .doc-arr{background:white;max-width:760px;margin:0 auto;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.15);overflow:hidden;}
+  .doc-arr-head{border-bottom:3px solid #1a1a1a;padding:16px 22px;display:flex;align-items:center;}
+  .doc-arr-body{padding:18px 22px;}
+  .doc-arr-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:10px;}
+  .doc-arr-table th{background:#1a1a1a;color:white;padding:6px 8px;}
+  .doc-arr-table td{padding:6px 8px;border:1px solid #ccc;}
+  .doc-arr-firmas{display:flex;justify-content:space-between;margin-top:28px;padding-top:16px;border-top:2px solid #1a1a1a;}
+  .doc-arr-firma{text-align:center;min-width:200px;}
+  .doc-arr-firma-line{border-top:1px solid #1a1a1a;padding-top:6px;margin-top:32px;font-size:10px;}
+  .btn-print{display:block;margin:16px auto;padding:12px 32px;background:#F59E0B;color:#1a1a1a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
+  @media print{.btn-print{display:none!important;}body{background:white;padding:0;}@page{margin:10mm;}}
+  </style></head><body>
+  <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
+  ${html}
+  </body></html>`);
+  ventana.document.close();
+}
+
+// FLETES
+function calcFlete(){
+  const km=parseFloat(document.getElementById('flKm').value)||0;
+  const tarifa=parseFloat(document.getElementById('flTarifa').value)||0;
+  document.getElementById('flTotal').value=tarifa||Math.round(CFG.tarifaBase+(km*CFG.tarifaKm));
+}
+
+function rFletes(){
+  const ft=document.getElementById('filtEstadoFl')?.value||'';
+  const lista=ft?FLETES.filter(f=>f.estado===ft):FLETES;
+  const totTarifa=lista.reduce((s,f)=>s+f.tarifa,0);
+  const totKm=lista.reduce((s,f)=>s+(f.km||0),0);
+  document.getElementById('kpiFl').innerHTML=`
+    <div class="kc"><div class="kl">Total Fletes</div><div class="kv" style="color:var(--info)">${lista.length}</div></div>
+    <div class="kc"><div class="kl">Ingresos</div><div class="kv" style="color:var(--ok)">${clp(totTarifa)}</div></div>
+    <div class="kc"><div class="kl">Km Totales</div><div class="kv" style="color:var(--acc)">${totKm.toLocaleString('es-CL')}</div></div>
+    <div class="kc"><div class="kl">Completados</div><div class="kv" style="color:var(--ok)">${FLETES.filter(f=>f.estado==='Completado').length}</div></div>
+  `;
+  document.querySelector('#tFl tbody').innerHTML=lista.length===0
+    ?'<tr><td colspan="12" style="text-align:center;color:var(--muted);padding:14px">Sin fletes registrados</td></tr>'
+    :lista.map(f=>`<tr>
+      <td style="color:var(--acc);font-weight:700">${f.num}</td>
+      <td>${df(f.fecha)}</td>
+      <td style="color:var(--white)">${f.vehiculoNombre}</td>
+      <td>${f.conductor}</td>
+      <td style="color:var(--muted)">${f.origen}</td>
+      <td style="color:var(--muted)">${f.destino}</td>
+      <td>${f.carga}</td>
+      <td style="text-align:right">${(f.km||0).toLocaleString('es-CL')}</td>
+      <td style="text-align:right;color:var(--ok);font-weight:700">${clp(f.tarifa)}</td>
+      <td>${f.clienteNombre}</td>
+      <td>${badge(f.estado,EC[f.estado]||'#5A7090')}</td>
+      <td><div style="display:flex;gap:3px"><button class="bsm be" onclick="editFlete(${f.id})">✎</button><button class="bsm bd" onclick="delFlete(${f.id})">✕</button></div></td>
+    </tr>`).join('');
+  document.querySelector('#tFl tfoot').innerHTML=`<tr><td colspan="8" style="color:var(--info)">TOTALES</td><td style="text-align:right;color:var(--ok)">${clp(totTarifa)}</td><td colspan="3"></td></tr>`;
+}
+
+function saveFlete(){
+  const id=document.getElementById('flId').value;
+  const vId=parseInt(document.getElementById('flVehiculo').value)||0;
+  const cId=parseInt(document.getElementById('flCliente').value)||0;
+  const vehiculo=ACTIVOS.find(x=>x.id===vId);
+  const cliente=CLIENTES.find(x=>x.id===cId);
+  const obj={num:document.getElementById('flNum').value||'FL-'+(FLETES.length+1).toString().padStart(3,'0'),fecha:document.getElementById('flFecha').value,vehiculoId:vId,vehiculoNombre:vehiculo?.nombre||'—',conductor:document.getElementById('flConductor').value,origen:document.getElementById('flOrigen').value,destino:document.getElementById('flDestino').value,carga:document.getElementById('flCarga').value,peso:document.getElementById('flPeso').value,km:parseFloat(document.getElementById('flKm').value)||0,tarifa:parseFloat(document.getElementById('flTarifa').value)||parseFloat(document.getElementById('flTotal').value)||0,clienteId:cId,clienteNombre:cliente?.nombre||'Particular',estado:document.getElementById('flEstado').value,obs:document.getElementById('flObs').value};
+  if(id){const i=FLETES.findIndex(f=>f.id==id);if(i>=0)FLETES[i]={...FLETES[i],...obj};}
+  else FLETES.push({id:uid(),...obj});
+  save();C('moFlete');rFletes();
+}
+
+function editFlete(id){
+  const f=FLETES.find(x=>x.id===id);if(!f)return;
+  poblarSelects();
+  document.getElementById('tFlete').textContent='Editar Flete';
+  document.getElementById('flId').value=id;
+  document.getElementById('flNum').value=f.num;
+  document.getElementById('flFecha').value=f.fecha||'';
+  document.getElementById('flVehiculo').value=f.vehiculoId;
+  document.getElementById('flConductor').value=f.conductor||'';
+  document.getElementById('flOrigen').value=f.origen||'';
+  document.getElementById('flDestino').value=f.destino||'';
+  document.getElementById('flCarga').value=f.carga||'';
+  document.getElementById('flPeso').value=f.peso||'';
+  document.getElementById('flKm').value=f.km||0;
+  document.getElementById('flTarifa').value=f.tarifa||0;
+  document.getElementById('flTotal').value=f.tarifa||0;
+  document.getElementById('flCliente').value=f.clienteId||0;
+  document.getElementById('flEstado').value=f.estado;
+  document.getElementById('flObs').value=f.obs||'';
+  O('moFlete');
+}
+function delFlete(id){if(!confirm('¿Eliminar?'))return;FLETES=FLETES.filter(f=>f.id!==id);save();rFletes();}
+
+// CLIENTES
+function rClientes(){
+  document.querySelector('#tCli tbody').innerHTML=CLIENTES.length===0
+    ?'<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:14px">Sin clientes</td></tr>'
+    :CLIENTES.map(c=>`<tr>
+      <td style="color:var(--white);font-weight:700">${c.nombre}</td>
+      <td style="font-family:monospace">${c.rut||'—'}</td>
+      <td>${c.contacto||'—'}</td>
+      <td>${c.tel||'—'}</td>
+      <td>${c.email||'—'}</td>
+      <td style="color:var(--acc)">${ARRIENDOS.filter(a=>a.clienteId===c.id).length}</td>
+      <td style="color:var(--info)">${FLETES.filter(f=>f.clienteId===c.id).length}</td>
+      <td><div style="display:flex;gap:3px"><button class="bsm be" onclick="editCliente(${c.id})">✎</button><button class="bsm bd" onclick="delCliente(${c.id})">✕</button></div></td>
+    </tr>`).join('');
+}
+
+function saveCliente(){
+  const id=document.getElementById('cliId').value;
+  const obj={nombre:document.getElementById('cliNombre').value.trim(),rut:document.getElementById('cliRut').value,giro:document.getElementById('cliGiro').value,contacto:document.getElementById('cliContacto').value,tel:document.getElementById('cliTel').value,email:document.getElementById('cliEmail').value,dir:document.getElementById('cliDir').value};
+  if(!obj.nombre)return alert('Nombre requerido');
+  if(id){const i=CLIENTES.findIndex(c=>c.id==id);if(i>=0)CLIENTES[i]={...CLIENTES[i],...obj};}
+  else CLIENTES.push({id:uid(),...obj});
+  save();C('moCliente');rClientes();
+}
+
+function editCliente(id){
+  const c=CLIENTES.find(x=>x.id===id);if(!c)return;
+  document.getElementById('cliId').value=id;
+  document.getElementById('cliNombre').value=c.nombre;
+  document.getElementById('cliRut').value=c.rut||'';
+  document.getElementById('cliGiro').value=c.giro||'';
+  document.getElementById('cliContacto').value=c.contacto||'';
+  document.getElementById('cliTel').value=c.tel||'';
+  document.getElementById('cliEmail').value=c.email||'';
+  document.getElementById('cliDir').value=c.dir||'';
+  O('moCliente');
+}
+function delCliente(id){if(!confirm('¿Eliminar?'))return;CLIENTES=CLIENTES.filter(c=>c.id!==id);save();rClientes();}
+
+// DISPONIBILIDAD
+function rDispInit(){
+  const sel=document.getElementById('selActivoDisp');
+  sel.innerHTML='<option value="">Seleccionar...</option>'+ACTIVOS.map(a=>`<option value="${a.id}">${a.nombre}</option>`).join('');
+  const mi=document.getElementById('selMesDisp');
+  if(!mi.value) mi.value=MES;
+  rDispTodos();
+}
+
+function rDisponibilidad(){
+  const aId=parseInt(document.getElementById('selActivoDisp').value)||0;
+  const mes=document.getElementById('selMesDisp').value||MES;
+  if(!aId)return;
+  const [y,m]=mes.split('-');
+  const diasEnMes=new Date(y,m,0).getDate();
+  const diasSemana=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const arriendosMes=ARRIENDOS.filter(a=>a.activoId===aId);
+  const diasOcupados=new Set();
+  arriendosMes.forEach(a=>{
+    if(a.estado==='Cancelado')return;
+    let d=new Date(a.inicio+'T12:00:00');
+    const fin=new Date(a.termino+'T12:00:00');
+    while(d<=fin){diasOcupados.add(d.toISOString().split('T')[0]);d.setDate(d.getDate()+1);}
+  });
+  let calHtml='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px">';
+  diasSemana.forEach(d=>calHtml+=`<div style="text-align:center;font-size:9px;color:var(--muted);font-family:monospace;padding:3px">${d}</div>`);
+  calHtml+='</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">';
+  const primerDia=new Date(y,parseInt(m)-1,1).getDay();
+  for(let i=0;i<primerDia;i++) calHtml+='<div></div>';
+  for(let d=1;d<=diasEnMes;d++){
+    const fecha=`${y}-${m.toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+    const ocupado=diasOcupados.has(fecha);
+    const esHoy=fecha===HOY;
+    calHtml+=`<div style="background:${ocupado?'rgba(239,68,68,0.2)':'rgba(34,197,94,0.1)'};border:${esHoy?'2px solid var(--acc)':'1px solid '+(ocupado?'rgba(239,68,68,0.4)':'rgba(34,197,94,0.3)')};border-radius:6px;padding:6px;text-align:center;font-size:11px;font-family:monospace;color:${ocupado?'var(--danger)':'var(--ok)'}">
+      <div style="font-weight:700">${d}</div>
+      <div style="font-size:8px">${ocupado?'Ocup.':'Libre'}</div>
+    </div>`;
+  }
+  calHtml+='</div>';
+  document.getElementById('calGrid').innerHTML=calHtml;
+  const libres=diasEnMes-diasOcupados.size;
+  const pctOcup=Math.round(diasOcupados.size/diasEnMes*100);
+  document.getElementById('dispResumen').innerHTML=`
+    <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+      <div style="flex:1;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:20px;font-weight:900;color:var(--ok)">${libres}</div>
+        <div style="font-size:10px;color:var(--muted)">Días disponibles</div>
+      </div>
+      <div style="flex:1;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:20px;font-weight:900;color:var(--danger)">${diasOcupados.size}</div>
+        <div style="font-size:10px;color:var(--muted)">Días ocupados</div>
+      </div>
+      <div style="flex:1;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:20px;font-weight:900;color:var(--acc)">${pctOcup}%</div>
+        <div style="font-size:10px;color:var(--muted)">Ocupación</div>
+      </div>
+    </div>`;
+}
+
+function rDispTodos(){
+  document.getElementById('dispTodos').innerHTML=ACTIVOS.length===0
+    ?'<div style="color:var(--muted);font-size:11px;padding:8px">Sin activos registrados</div>'
+    :ACTIVOS.map(a=>{
+      const activo=ARRIENDOS.filter(ar=>ar.activoId===a.id&&ar.estado==='Activo').length>0;
+      return`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--b2)">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:20px">${ICONOS[a.cat]||'📦'}</span>
+          <div><div style="font-size:12px;font-weight:700">${a.nombre}</div><div style="font-size:10px;color:var(--muted)">${a.patente||a.cat}</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${badge(a.estado,EC[a.estado]||'#5A7090')}
+          ${activo?`<span style="font-size:10px;color:var(--warn)">${ARRIENDOS.find(ar=>ar.activoId===a.id&&ar.estado==='Activo')?.clienteNombre||''}</span>`:''}
+        </div>
+      </div>`;}).join('');
+}
+
+// MANTENCIÓN
+function rMantencion(){
+  const tot=MANTENCION.reduce((s,m)=>s+m.costo,0);
+  document.getElementById('kpiMant').innerHTML=`
+    <div class="kc"><div class="kl">Registros</div><div class="kv" style="color:var(--acc)">${MANTENCION.length}</div></div>
+    <div class="kc"><div class="kl">Costo Total</div><div class="kv" style="color:var(--danger)">${clp(tot)}</div></div>
+    <div class="kc"><div class="kl">Programadas</div><div class="kv" style="color:var(--warn)">${MANTENCION.filter(m=>m.estado==='Programada').length}</div></div>
+  `;
+  document.querySelector('#tMant tbody').innerHTML=MANTENCION.length===0
+    ?'<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:14px">Sin mantenciones registradas</td></tr>'
+    :MANTENCION.map(m=>`<tr>
+      <td style="color:var(--white)">${m.activoNombre}</td>
+      <td>${badge(m.tipo,'#F59E0B')}</td>
+      <td>${m.desc}</td>
+      <td>${df(m.fecha)}</td>
+      <td style="color:${m.proxima&&new Date(m.proxima)<new Date()?'var(--danger)':'var(--ok)'}">${m.proxima?df(m.proxima):'—'}</td>
+      <td style="color:var(--danger);text-align:right">${clp(m.costo)}</td>
+      <td style="color:var(--muted)">${m.taller||'—'}</td>
+      <td>${badge(m.estado,EC[m.estado]||'#5A7090')}</td>
+      <td><div style="display:flex;gap:3px"><button class="bsm bd" onclick="delMant(${m.id})">✕</button></div></td>
+    </tr>`).join('');
+}
+
+function saveMant(){
+  const aId=parseInt(document.getElementById('mActivo').value)||0;
+  const activo=ACTIVOS.find(x=>x.id===aId);
+  MANTENCION.push({id:uid(),activoId:aId,activoNombre:activo?.nombre||'—',tipo:document.getElementById('mTipo').value,desc:document.getElementById('mDesc').value,fecha:document.getElementById('mFecha').value,proxima:document.getElementById('mProxima').value,costo:parseFloat(document.getElementById('mCosto').value)||0,taller:document.getElementById('mTaller').value,estado:document.getElementById('mEstado').value});
+  save();C('moMant');rMantencion();
+}
+function delMant(id){if(!confirm('¿Eliminar?'))return;MANTENCION=MANTENCION.filter(m=>m.id!==id);save();rMantencion();}
+
+// CONFIG
+function rConfig(){
+  document.getElementById('cfgTarifaKm').value=CFG.tarifaKm||500;
+  document.getElementById('cfgTarifaBase').value=CFG.tarifaBase||50000;
+  document.getElementById('cfgDiasMant').value=CFG.diasMant||7;
+}
+function saveConfig(){
+  CFG={tarifaKm:parseFloat(document.getElementById('cfgTarifaKm').value)||500,tarifaBase:parseFloat(document.getElementById('cfgTarifaBase').value)||50000,diasMant:parseInt(document.getElementById('cfgDiasMant').value)||7};
+  save();alert('✓ Guardado');
+}
+
+// MODALES
+function poblarSelects(){
+  const sa=document.getElementById('arActivo');
+  if(sa) sa.innerHTML=ACTIVOS.map(a=>`<option value="${a.id}">${a.nombre} (${a.estado})</option>`).join('');
+  const sv=document.getElementById('flVehiculo');
+  if(sv) sv.innerHTML=ACTIVOS.filter(a=>a.tipo==='Vehículo').map(a=>`<option value="${a.id}">${a.nombre}</option>`).join('');
+  const sm=document.getElementById('mActivo');
+  if(sm) sm.innerHTML=ACTIVOS.map(a=>`<option value="${a.id}">${a.nombre}</option>`).join('');
+  ['arCliente','flCliente'].forEach(id=>{
+    const s=document.getElementById(id);
+    if(s) s.innerHTML='<option value="0">Particular / Sin cliente</option>'+CLIENTES.map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
+  });
+}
+
+function O(id){
+  if(['moArriendo','moFlete','moMant'].includes(id)) poblarSelects();
+  if(id==='moArriendo'){document.getElementById('arId').value='';document.getElementById('tArriendo').textContent='Nuevo Arriendo';document.getElementById('arInicio').value=HOY;document.getElementById('arNum').value='ARR-'+(ARRIENDOS.length+1).toString().padStart(3,'0');}
+  if(id==='moFlete'){document.getElementById('flId').value='';document.getElementById('tFlete').textContent='Nuevo Flete';document.getElementById('flFecha').value=HOY;document.getElementById('flNum').value='FL-'+(FLETES.length+1).toString().padStart(3,'0');document.getElementById('flTarifa').value=CFG.tarifaBase||50000;}
+  if(id==='moActivo'){document.getElementById('aId').value='';document.getElementById('tActivo').textContent='Nuevo Activo';}
+  if(id==='moCliente'){document.getElementById('cliId').value='';}
+  if(id==='moMant'){document.getElementById('mFecha').value=HOY;}
+  document.getElementById(id)?.classList.add('open');
+}
+function C(id){document.getElementById(id)?.classList.remove('open');}
+document.querySelectorAll('.mo').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+// NAV EMP
+try{const e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}');if(e&&e.nombre){document.getElementById('empNombre').textContent=e.nombre;const nd=document.getElementById('nav-emp');if(nd){nd.textContent='🏢 '+e.nombre;nd.style.display='block';}}}catch(ex){}
+
+// ═══════════════════════════════
+// EMPRESA EMISORA DINÁMICA
+// ═══════════════════════════════
+function getEmpresa(){
+  try{
+    const e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}');
+    if(e&&e.nombre) return e;
+  }catch(ex){}
+  return {
+    nombre:'Martinez y Pajuelo Arriendos y Servicios SpA',
+    rut:'78.361.479-0',
+    direccion:'Av. Unión Europea 3175, Alto Hospicio',
+    tel:'975157431',
+    email:'ventas@maquinariasmyp.com',
+    giro:'Servicios de Arriendos, Flete y Venta de productos para Construcción y Ferretería',
+    contacto:'Gaudy Martínez Yovera',
+    rut_rep:'23.918.699-8'
+  };
+}
+
+// AREA DE IMPRESIÓN
+function imprimirDoc(html){
+  let area=document.getElementById('docPrintArea');
+  if(!area){area=document.createElement('div');area.id='docPrintArea';area.style.display='none';document.body.appendChild(area);}
+  area.innerHTML=html;
+  area.style.display='block';
+  window.print();
+  area.style.display='none';
+}
+
+// TABS DOCUMENTOS
+function showDocTab(id,btn){
+  ['contrato','guia','devolucion'].forEach(d=>{
+    document.getElementById('doc-'+d).style.display=d===id?'block':'none';
+  });
+  document.querySelectorAll('#sec-documentos .tabs .tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  if(id==='contrato') poblarActivosDoc();
+}
+
+function poblarActivosDoc(){
+  const sel=document.getElementById('dcActivo');
+  if(sel) sel.innerHTML='<option value="">Seleccionar...</option>'+ACTIVOS.map(a=>`<option value="${a.id}" data-marca="${a.marca||''}" data-serie="${a.patente||'S/S'}" data-valor="${a.tarifaDia||0}" data-garantia="${a.tarifaDia*3||0}">${a.nombre}</option>`).join('');
+  if(sel) sel.onchange=function(){
+    const opt=this.options[this.selectedIndex];
+    document.getElementById('dcMarca').value=opt.dataset.marca||'';
+    document.getElementById('dcSerie').value=opt.dataset.serie||'S/S';
+    document.getElementById('dcValorDia').value=opt.dataset.valor||0;
+    document.getElementById('dcGarantia').value=opt.dataset.garantia||0;
+    calcDocTotal();
+  };
+}
+
+function calcDocTotal(){
+  const ini=document.getElementById('dcInicio').value;
+  const ter=document.getElementById('dcTermino').value;
+  const val=parseFloat(document.getElementById('dcValorDia').value)||0;
+  if(ini&&ter&&val){
+    const dias=Math.ceil((new Date(ter)-new Date(ini))/(1000*60*60*24))+1;
+    document.getElementById('dcTotal').value=dias*val;
+  }
+}
+
+// ═══════════════════════════════
+// GENERAR CONTRATO
+// ═══════════════════════════════
+function generarContrato(){
+  const emp=getEmpresa();
+  const num=document.getElementById('dcNum').value||'—';
+  const fecha=document.getElementById('dcFecha').value;
+  const fechaF=fecha?new Date(fecha+'T12:00:00').toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'}).toUpperCase():'—';
+  const arrNombre=document.getElementById('dcArrNombre').value||'—';
+  const arrRut=document.getElementById('dcArrRut').value||'—';
+  const arrDir=document.getElementById('dcArrDir').value||'—';
+  const arrTel=document.getElementById('dcArrTel').value||'—';
+  const obra=document.getElementById('dcObra').value||'—';
+  const equipo=document.getElementById('dcActivo').options[document.getElementById('dcActivo').selectedIndex]?.text||document.getElementById('dcActivo').value||'—';
+  const marca=document.getElementById('dcMarca').value||'—';
+  const serie=document.getElementById('dcSerie').value||'S/S';
+  const valorDia=parseFloat(document.getElementById('dcValorDia').value)||0;
+  const garantia=parseFloat(document.getElementById('dcGarantia').value)||0;
+  const inicio=document.getElementById('dcInicio').value;
+  const termino=document.getElementById('dcTermino').value;
+  const dias=inicio&&termino?Math.ceil((new Date(termino)-new Date(inicio))/(1000*60*60*24))+1:1;
+  const total=parseFloat(document.getElementById('dcTotal').value)||valorDia*dias;
+  const flete=parseFloat(document.getElementById('dcFlete').value)||0;
+  const despacho=document.getElementById('dcDespacho').value;
+  const garForma=document.getElementById('dcGarForma').value;
+  const ciudad=document.getElementById('dcCiudad').value||'IQUIQUE';
+  const horaEnt=document.getElementById('dcHoraEnt').value||'10:00';
+
+  const logo=getLogo();
+  const logoHTML=logo?`<img src="${logo}" style="height:60px;object-fit:contain"/>`:`<div style="font-size:22px;font-weight:900;color:#F59E0B">${emp.nombre.charAt(0)}</div>`;
+
+  const html=`<div class="doc-arr">
+    <div class="doc-arr-head">
+      <div>${logoHTML}<div style="font-size:13px;font-weight:900;margin-top:6px">${emp.nombre}</div>
+      <div style="font-size:10px;color:#444">${emp.direccion}</div>
+      <div style="font-size:10px;color:#444">Rut: ${emp.rut}</div>
+      <div style="font-size:10px;color:#444">Giro: ${emp.giro||'Servicios de Arriendos y Flete'}</div>
+      <div style="font-size:10px;color:#444">Tel: ${emp.tel} | Email: ${emp.email}</div></div>
+      <div style="text-align:right"><div style="font-size:9px;color:#666">N°</div><div style="font-size:22px;font-weight:900">${num}</div></div>
+    </div>
+    <div class="doc-arr-body">
+      <div class="doc-arr-title">CONTRATO DE ARRIENDO MAQUINARIA N° ${num}</div>
+      <p class="doc-arr-clausula">En <strong>${ciudad}</strong>, a ${fechaF}, entre <strong>${emp.nombre}</strong>, RUT ${emp.rut}, representada por <strong>DOÑA ${(emp.contacto||'Gaudy Martínez Yovera').toUpperCase()}</strong>, RUT ${emp.rut_rep||'23.918.699-8'}, domiciliada en ${emp.direccion}, en adelante <strong>"EL ARRENDADOR"</strong>; y Don(ña) <strong>${arrNombre.toUpperCase()}</strong>, RUT: ${arrRut}, domiciliado en ${arrDir}, Fono: ${arrTel}, en adelante <strong>"EL ARRENDATARIO"</strong>, se ha convenido el siguiente contrato:</p>
+
+      <p class="doc-arr-clausula"><strong>PRIMERO:</strong> EL ARRENDADOR es dueño de las especies individualizadas o aquellas descritas en la cláusula tercera.</p>
+      <p class="doc-arr-clausula"><strong>SEGUNDO:</strong> EL ARRENDADOR da en arriendo al ARRENDATARIO las especies señaladas, quien declara recibirlas en buen estado, con sus mantenciones al día y a su entera satisfacción. El equipo deberá mantenerse exclusivamente en la obra ubicada en <strong>${obra}</strong>, y usarse según su naturaleza técnica.</p>
+      <p class="doc-arr-clausula"><strong>TERCERO:</strong> La renta de arrendamiento será la siguiente:</p>
+      <table class="doc-arr-table">
+        <thead><tr><th>Cant.</th><th>Descripción</th><th>Marca</th><th>Nro. Serie</th><th>Valor Diario</th><th>Garantía</th></tr></thead>
+        <tbody><tr><td style="text-align:center">1</td><td>${equipo}</td><td>${marca}</td><td>${serie}</td><td style="text-align:right">${clp(valorDia)}</td><td style="text-align:right">${clp(garantia)}</td></tr></tbody>
+      </table>
+      <p class="doc-arr-clausula">La renta se pagará por mensualidad vencida dentro de los primeros 5 días (o al término del periodo descrito si es menor a un mes), el retardo generará el interés máximo convencional. La garantía será devuelta al término del contrato si el equipo es devuelto en buen estado.</p>
+      <p class="doc-arr-clausula"><strong>Se deja constancia que, se recibe GARANTIA mediante EFECTIVO [${garForma==='Efectivo'?' X ':' '}] TRANSFERENCIA [${garForma==='Transferencia'?' X ':' '}] a la cuenta de nuestra empresa, la cual será devuelta de la misma forma.</strong></p>
+      <p class="doc-arr-clausula"><strong>CUARTO:</strong> El servicio de despacho y retiro de la maquinaria operará bajo las siguientes condiciones seleccionadas:<br/>
+      [${despacho==='Con Costo Adicional'?' X ':' '}] <strong>CON COSTO ADICIONAL.</strong> El cliente cancelará la suma única de ${clp(flete)} por concepto de flete (ida y vuelta).<br/>
+      [${despacho==='Retira Cliente'?' X ':' '}] <strong>RETIRA CLIENTE.</strong> El arrendatario retira y devuelve el equipo por sus propios medios, asumiendo total responsabilidad por daños durante el transporte.</p>
+      <p class="doc-arr-clausula"><strong>QUINTO:</strong> El contrato rige por <strong>${dias} día(s)</strong> desde el <strong>${df(inicio)}</strong> hasta el <strong>${df(termino)}</strong>. Se entenderá renovado tácita y sucesivamente por periodos iguales, salvo que una parte avise el término por escrito con 3 días de anticipación. El Arrendador podrá poner término inmediato en caso de urgencia según Art. 1967 del Código Civil.<br/><em>Se deja constancia que la maquinaria será entregada en la obra el día de inicio a las ${horaEnt} AM y será retirada por el arrendador el mismo día en horario nocturno, dándose por terminado el periodo de arriendo de mutuo acuerdo.</em></p>
+      <p class="doc-arr-clausula"><strong>SEXTO:</strong> Se prohíbe el subarriendo, la cesión a terceros o el traslado de la maquinaria fuera de la obra indicada sin autorización escrita. El incumplimiento de esto o la insolvencia del arrendatario facultan la terminación inmediata del contrato.</p>
+      <p class="doc-arr-clausula"><strong>SÉPTIMO:</strong> Ante incumplimiento, el Arrendatario faculta al Arrendador para retirar las especies desde donde se encuentren, renunciando a cualquier acción de oposición. Se aplicará el Art. 1945 del C. Civil respecto a indemnizaciones.</p>
+      <p class="doc-arr-clausula"><strong>OCTAVO:</strong> El contrato no se extingue por pérdida o destrucción del bien. El Arrendatario deberá indemnizar al Arrendador pagando el <strong>valor comercial de reposición</strong> del equipo.</p>
+      <p class="doc-arr-clausula"><strong>NOVENO:</strong> El Arrendatario asume la responsabilidad civil y penal por accidentes, daños a terceros o mal uso del equipo por parte de su personal.</p>
+      <p class="doc-arr-clausula"><strong>DÉCIMO:</strong> Para todos los efectos legales, las partes fijan domicilio en la ciudad de <strong>IQUIQUE/ALTO HOSPICIO</strong> y se someten a sus tribunales ordinarios.</p>
+
+      <div class="doc-arr-firmas">
+        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">${emp.nombre}</div><div>RUT: ${emp.rut}</div><div style="margin-top:2px">Arrendador</div></div></div>
+        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">${arrNombre}</div><div>RUT: ${arrRut}</div><div style="margin-top:2px">Arrendatario</div></div></div>
+      </div>
+    </div>
+    <div class="doc-arr-footer"><span>${emp.nombre} · RUT ${emp.rut} · ${emp.direccion}</span></div>
+  </div>`;
+
+  document.getElementById('prevContrato').innerHTML=`<div style="margin-top:12px"><div style="font-size:11px;color:var(--acc);font-family:monospace;margin-bottom:8px;display:flex;justify-content:space-between"><span>CONTRATO GENERADO — N° ${num}</span><button class="bgh" style="padding:5px 12px;font-size:11px" onclick="imprimirDoc(document.getElementById('prevContrato').innerHTML)">🖨 Imprimir</button></div>${html}</div>`;
+}
+
+// ═══════════════════════════════
+// GENERAR GUÍA DE ENTREGA
+// ═══════════════════════════════
+function generarGuia(){
+  const emp=getEmpresa();
+  const logo=getLogo();
+  const logoHTML=logo?`<img src="${logo}" style="height:55px;object-fit:contain"/>`:`<div style="font-size:22px;font-weight:900;color:#F59E0B">${emp.nombre.charAt(0)}</div>`;
+  const num=document.getElementById('dgNum').value||'—';
+  const contrato=document.getElementById('dgContrato').value||'—';
+  const obra=document.getElementById('dgObra').value||'—';
+  const comuna=document.getElementById('dgComuna').value||'—';
+  const equipo=document.getElementById('dgEquipo').value||'—';
+  const marca=document.getElementById('dgMarca').value||'—';
+  const estadoEq=document.getElementById('dgEstado').value||'—';
+  const conductor=document.getElementById('dgConductor').value||'—';
+  const rutCond=document.getElementById('dgRutCond').value||'—';
+  const patente=document.getElementById('dgPatente').value||'—';
+  const horaEnt=document.getElementById('dgHoraEnt').value||'—';
+  const horaRet=document.getElementById('dgHoraRet').value||'';
+  const cliente=document.getElementById('dgCliente').value||'—';
+  const rutCli=document.getElementById('dgRutCli').value||'—';
+
+  const html=`<div class="doc-arr">
+    <div class="doc-arr-head">
+      <div>${logoHTML}</div>
+      <div style="text-align:center;flex:1"><div class="doc-arr-title" style="margin:0">GUÍA DE ENTREGA EQUIPOS N° ${num}</div></div>
+      <div></div>
+    </div>
+    <div class="doc-arr-body">
+      <p style="margin-bottom:6px;font-size:11px"><strong>Obra:</strong> ${obra}</p>
+      <p style="margin-bottom:14px;font-size:11px"><strong>Comuna:</strong> ${comuna}</p>
+      <table class="doc-arr-table" style="margin-bottom:16px">
+        <thead><tr><th>Cant.</th><th>Detalle de Equipo</th><th>Marca/Modelo</th><th>Observación Estado</th></tr></thead>
+        <tbody><tr><td style="text-align:center">1</td><td>${equipo}</td><td>${marca}</td><td>${estadoEq}</td></tr></tbody>
+      </table>
+      <p style="font-size:11px;font-weight:700;margin-bottom:8px">Datos Transporte:</p>
+      <ul style="font-size:11px;line-height:2;padding-left:18px">
+        <li>Nombre Conductor: <strong>${conductor}</strong></li>
+        <li>RUT: <strong>${rutCond}</strong></li>
+        <li>Patente Vehículo: <strong>${patente}</strong></li>
+        <li>Hora de Entrega Estipulada: <strong>${horaEnt}</strong></li>
+        <li>Hora de Retiro Estimada: <strong>${horaRet||'_____________'}</strong></li>
+      </ul>
+      <p style="margin-top:20px;font-size:11px">Recibe Conforme (Cliente): ___________________________</p>
+      <div class="doc-arr-firmas">
+        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">Arrendador</div><div>${emp.nombre}</div><div>RUT: ${emp.rut}</div></div></div>
+        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">Arrendatario</div><div>${cliente}</div><div>RUT: ${rutCli}</div></div></div>
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById('prevGuia').innerHTML=`<div style="margin-top:12px"><div style="font-size:11px;color:var(--acc);font-family:monospace;margin-bottom:8px;display:flex;justify-content:space-between"><span>GUÍA N° ${num}</span><button class="bgh" style="padding:5px 12px;font-size:11px" onclick="imprimirDoc(document.getElementById('prevGuia').innerHTML)">🖨 Imprimir</button></div>${html}</div>`;
+}
+
+// ═══════════════════════════════
+// GENERAR COMPROBANTE DEVOLUCIÓN
+// ═══════════════════════════════
+function generarDevolucion(){
+  const emp=getEmpresa();
+  const logo=getLogo();
+  const logoHTML=logo?`<img src="${logo}" style="height:55px;object-fit:contain"/>`:`<div style="font-size:22px;font-weight:900;color:#F59E0B">${emp.nombre.charAt(0)}</div>`;
+  const num=document.getElementById('ddNum').value||'—';
+  const contrato=document.getElementById('ddContrato').value||'—';
+  const cliente=document.getElementById('ddCliente').value||'—';
+  const rutCli=document.getElementById('ddRutCli').value||'—';
+  const fecha=document.getElementById('ddFecha').value;
+  const hora=document.getElementById('ddHora').value||'—';
+  const equipo=document.getElementById('ddEquipo').value||'—';
+  const serie=document.getElementById('ddSerie').value||'—';
+  const estado=document.getElementById('ddEstado').value;
+  const obs=document.getElementById('ddObs').value||'—';
+  const encargado=document.getElementById('ddEncargado').value||'—';
+  const rutEnc=document.getElementById('ddRutEnc').value||'—';
+
+  const html=`<div class="doc-arr">
+    <div class="doc-arr-head">
+      <div>${logoHTML}</div>
+      <div style="text-align:center;flex:1"><div class="doc-arr-title" style="margin:0">COMPROBANTE DE DEVOLUCIÓN N° ${num}</div></div>
+    </div>
+    <div class="doc-arr-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;font-size:11px">
+        <div><strong>Cliente:</strong> ${cliente}</div>
+        <div><strong>Contrato Ref:</strong> ${contrato}</div>
+        <div><strong>Fecha Devolución:</strong> ${df(fecha)}</div>
+        <div><strong>Hora:</strong> ${hora}</div>
+      </div>
+      <table class="doc-arr-table" style="margin-bottom:14px">
+        <thead><tr><th>Detalle de Equipos Devueltos</th><th>Nro. Serie</th><th>Estado al Recibir</th></tr></thead>
+        <tbody><tr>
+          <td>1. ${equipo}</td>
+          <td>${serie}</td>
+          <td>[${estado==='Óptimo'?' X ':' '}] Óptimo &nbsp; [${estado==='Con Daño'?' X ':' '}] Daño &nbsp; [${estado==='Sucio'?' X ':' '}] Sucio</td>
+        </tr></tbody>
+      </table>
+      <p style="font-size:11px;margin-bottom:4px"><strong>Observaciones de Recepción:</strong> ${obs}</p>
+      <div style="border-top:1px solid #ccc;margin:16px 0;padding-top:12px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;font-size:11px">
+          <div><p style="font-weight:700;margin-bottom:6px">ENTREGA</p><p>Cliente: ${cliente}</p><p>RUT: ${rutCli}</p></div>
+          <div><p style="font-weight:700;margin-bottom:6px">RECIBE</p><p>Encargado: ${encargado}</p><p>RUT: ${rutEnc}</p></div>
+        </div>
+      </div>
+      <div class="doc-arr-firmas">
+        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">${cliente}</div><div>RUT: ${rutCli}</div><div>Entrega</div></div></div>
+        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">${encargado}</div><div>RUT: ${rutEnc}</div><div>${emp.nombre}</div></div></div>
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById('prevDevolucion').innerHTML=`<div style="margin-top:12px"><div style="font-size:11px;color:var(--acc);font-family:monospace;margin-bottom:8px;display:flex;justify-content:space-between"><span>COMPROBANTE DEVOLUCIÓN N° ${num}</span><button class="bgh" style="padding:5px 12px;font-size:11px" onclick="imprimirDoc(document.getElementById('prevDevolucion').innerHTML)">🖨 Imprimir</button></div>${html}</div>`;
+}
+
+function getLogo(){
+  try{const logos=JSON.parse(localStorage.getItem('mss_logos_v1')||'{}');const e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}');const k=e.id?String(e.id):Object.keys(logos)[0];return logos[k]||null;}catch(ex){return null;}
+}
+
+// Agregar documentos al tab handler
+const _origT=T;
+function T(id,btn){
+  _origT(id,btn);
+  if(id==='documentos'){
+    poblarActivosDoc();
+    document.getElementById('dcFecha').value=HOY;
+    document.getElementById('dcInicio').value=HOY;
+    document.getElementById('ddFecha').value=HOY;
+  }
+}
+
+// INIT
+load();
+rDash();
+</script>
+</body>
+</html>
