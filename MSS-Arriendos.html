@@ -154,7 +154,7 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
     </div>
     <div class="krow" id="kpiArr"></div>
     <div class="card tw"><table id="tArr">
-      <thead><tr><th>N°</th><th>Activo</th><th>Cliente</th><th>Inicio</th><th>Término</th><th>Días</th><th>Tarifa/día</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th></th></tr></thead>
+      <thead><tr><th>N°</th><th>Activo</th><th>Cliente</th><th>Inicio</th><th>Término</th><th>Días</th><th>Tarifa</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Garantía</th><th>Pago</th><th>Documento</th><th>Estado</th><th></th></tr></thead>
       <tbody></tbody><tfoot></tfoot>
     </table></div>
   </div>
@@ -384,14 +384,58 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
     <div class="fl"><label>Tarifa ($)</label><input id="arTarifa" type="number" oninput="calcArriendo()"/></div>
     <div class="fl"><label>Total Calculado ($)</label><input id="arTotal" type="number" readonly style="color:var(--acc);font-weight:700"/></div>
     <div class="fl"><label>Monto Pagado ($)</label><input id="arPagado" type="number" value="0"/></div>
-    <div class="fl"><label>Lugar de Uso</label><input id="arLugar" type="text"/></div>
+    <div class="fl"><label>Lugar de Uso / Obra</label><input id="arLugar" type="text"/></div>
     <div class="fl"><label>Responsable Cliente</label><input id="arResp" type="text"/></div>
     <div class="fl"><label>Estado</label><select id="arEstado" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
       <option>Activo</option><option>Pendiente</option><option>Finalizado</option><option>Cancelado</option>
     </select></div>
     <div class="fl f"><label>Observaciones</label><textarea id="arObs" rows="2" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:12px;outline:none"></textarea></div>
   </div>
-  <div style="display:flex;gap:8px;margin-top:12px">
+
+  <!-- SECCIÓN GARANTÍA -->
+  <div style="border-top:1px solid var(--b1);margin-top:14px;padding-top:14px">
+    <div style="font-size:10px;color:var(--ok);font-weight:700;font-family:monospace;letter-spacing:1px;margin-bottom:10px">🔒 GARANTÍA</div>
+    <div class="fg">
+      <div class="fl"><label>Monto Garantía ($)</label><input id="arGarantia" type="number" value="0" placeholder="0 = Sin garantía"/></div>
+      <div class="fl"><label>Forma Pago Garantía</label><select id="arFormaPagoGarantia" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+        <option value="">— Sin garantía —</option>
+        <option>Efectivo</option>
+        <option>Transferencia</option>
+      </select></div>
+      <div class="fl"><label>Estado Garantía</label><select id="arEstadoGarantia" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+        <option value="">—</option>
+        <option>Recibida</option>
+        <option>Devuelta</option>
+        <option>Retenida</option>
+      </select></div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN PAGO ARRIENDO -->
+  <div style="border-top:1px solid var(--b1);margin-top:14px;padding-top:14px">
+    <div style="font-size:10px;color:var(--acc);font-weight:700;font-family:monospace;letter-spacing:1px;margin-bottom:10px">💳 PAGO ARRIENDO Y DOCUMENTO</div>
+    <div class="fg">
+      <div class="fl"><label>Forma de Pago</label><select id="arFormaPago" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+        <option value="">— Sin registrar —</option>
+        <option>Efectivo</option><option>Transferencia</option>
+        <option>Tarjeta Débito</option><option>Tarjeta Crédito</option>
+        <option>Cheque</option><option>MercadoPago</option><option>Pendiente</option>
+      </select></div>
+      <div class="fl"><label>Estado Pago</label><select id="arEstadoPago" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+        <option value="">— Sin registrar —</option>
+        <option>Pagado</option><option>Pendiente</option><option>Parcial</option>
+      </select></div>
+      <div class="fl"><label>Tipo Documento</label><select id="arTipoDoc" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+        <option value="">— Sin documento —</option>
+        <option>Boleta</option><option>Boleta Electrónica</option>
+        <option>Factura</option><option>Factura Electrónica</option>
+        <option>Sin Documento</option>
+      </select></div>
+      <div class="fl"><label>N° Boleta / Factura</label><input id="arNumDoc" type="text" placeholder="Ej: 7007, F-0045"/></div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-top:14px">
     <button class="bg" style="flex:1" onclick="saveArriendo()">Guardar</button>
     <button class="bgh" onclick="C('moArriendo')">Cancelar</button>
   </div>
@@ -422,15 +466,22 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
     <div style="font-size:10px;color:var(--acc);font-weight:700;font-family:monospace;letter-spacing:1px;margin-bottom:10px">💳 REGISTRO DE PAGO Y DOCUMENTO</div>
     <div class="fg">
       <div class="fl"><label>Forma de Pago</label><select id="flFormaPago" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
-        <option value="">— Sin registrar —</option><option>Efectivo</option><option>Transferencia</option><option>Cheque</option><option>Tarjeta</option><option>Pendiente de Pago</option>
+        <option value="">— Sin registrar —</option>
+        <option>Efectivo</option><option>Transferencia</option>
+        <option>Tarjeta Débito</option><option>Tarjeta Crédito</option>
+        <option>Cheque</option><option>MercadoPago</option><option>Pendiente de Pago</option>
       </select></div>
       <div class="fl"><label>Estado Pago</label><select id="flEstadoPago" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
-        <option value="">— Sin registrar —</option><option>Pagado</option><option>Pendiente</option><option>Parcial</option>
+        <option value="">— Sin registrar —</option>
+        <option>Pagado</option><option>Pendiente</option><option>Parcial</option>
       </select></div>
       <div class="fl"><label>Tipo Documento</label><select id="flTipoDoc" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
-        <option value="">— Sin documento —</option><option>Boleta</option><option>Factura</option><option>Boleta Electrónica</option><option>Factura Electrónica</option><option>Sin Documento</option>
+        <option value="">— Sin documento —</option>
+        <option>Boleta</option><option>Boleta Electrónica</option>
+        <option>Factura</option><option>Factura Electrónica</option>
+        <option>Sin Documento</option>
       </select></div>
-      <div class="fl"><label>N° Boleta / Factura</label><input id="flNumDoc" type="text" placeholder="Ej: 001, F-0045"/></div>
+      <div class="fl"><label>N° Boleta / Factura</label><input id="flNumDoc" type="text" placeholder="Ej: 7001, F-0045"/></div>
     </div>
   </div>
   <div style="display:flex;gap:8px;margin-top:12px">
@@ -481,6 +532,81 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
 </div></div>
 
 <script>
+// ═══════════════════════════════════════════════════
+// CARGA FORZADA DATOS REALES — M&P ARRIENDOS SPA
+// Versión: 2026-06-01 — Sobreescribe datos anteriores
+// ═══════════════════════════════════════════════════
+(function(){
+  const VERSION = 'MYP_v20260601c';
+  // Si ya está cargada esta versión exacta, no volver a cargar
+  if(localStorage.getItem('mss_data_version') === VERSION) return;
+
+  const empresa = {"id":1,"nombre":"Martinez y Pajuelo Arriendos y Servicios SpA","rut":"78.361.479-0","direccion":"Av. Unión Europea 3175, Alto Hospicio","comuna":"Alto Hospicio","ciudad":"Iquique","giro":"Servicios de Arriendos, Flete y Venta de productos para Construcción y Ferretería","tel":"975157431","email":"ventas@maquinariasmyp.com","contacto":"Gaudy Martínez Yovera","rut_rep":"23.918.699-8"};
+  localStorage.setItem('mss_empresa_actual', JSON.stringify(empresa));
+
+  const pre = 'mss_arr1';
+
+  const activos = [
+    {"id":1,"nombre":"Camioneta Porter II","tipo":"Vehículo","cat":"Camioneta","marca":"Hyundai","modelo":"Porter II DCAB 2.5","anio":2011,"patente":"RKJW59","motor":"D4CB5961734","chasis":"KMFZCY7JBBU753503","color":"Blanco","combustible":"Diesel","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedida por Gaudy Martínez Yovera, Declaración Jurada notarial 25/02/2026"},
+    {"id":2,"nombre":"Betonera 200L 900W BONICA","tipo":"Equipo","cat":"Maquinaria","marca":"BONICA","modelo":"200L 900W","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":15000,"obs":"Comprada 05/03/2026. Contratos 1001, 1003, 1005"},
+    {"id":3,"nombre":"Demoledor 3000W TASBEL","tipo":"Equipo","cat":"Maquinaria","marca":"TASBEL","modelo":"3000W","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":15000,"obs":"Comprado 24/02/2026. Contrato 1006"},
+    {"id":4,"nombre":"Generador c/s Extensión","tipo":"Equipo","cat":"Equipo","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido por Gaudy Martínez, escritura notarial 25/02/2026"},
+    {"id":5,"nombre":"Compresor","tipo":"Equipo","cat":"Equipo","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido por Gaudy Martínez, escritura notarial 25/02/2026"},
+    {"id":6,"nombre":"Rotomartillo","tipo":"Equipo","cat":"Herramienta","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido por Gaudy Martínez, escritura notarial 25/02/2026"},
+    {"id":7,"nombre":"Sierra de Banco","tipo":"Equipo","cat":"Herramienta","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido por Gaudy Martínez, escritura notarial 25/02/2026"},
+    {"id":8,"nombre":"Ingletadora","tipo":"Equipo","cat":"Herramienta","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido por Gaudy Martínez, escritura notarial 25/02/2026"},
+    {"id":9,"nombre":"Sierra Circular","tipo":"Equipo","cat":"Herramienta","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido por Gaudy Martínez, escritura notarial 25/02/2026"},
+    {"id":10,"nombre":"Moto Suzuki Lets 4 50cc","tipo":"Vehículo","cat":"Vehículo","marca":"Suzuki","modelo":"Lets 4 50cc","anio":2008,"patente":"MGP-76","motor":"A404589303","km":0,"estado":"Disponible","tarifaDia":25000,"obs":"Ctto 1004 — Nelson Lien Catrilaf 14/05/2026"}
+  ];
+
+  const clientes = [
+    {"id":1,"nombre":"Rubén Darío Núñez Rocha","rut":"27.967.415-4","tel":"+56983961043","dir":"Juan Martínez N°1757, Iquique","contacto":"Rubén Núñez","email":"","giro":""},
+    {"id":2,"nombre":"Nelson Enrique Lien Catrilaf","rut":"13.632.114-5","tel":"+56994929624","dir":"Cala Cala N°619, Pozo Almonte","contacto":"Nelson Lien","email":"","giro":""},
+    {"id":3,"nombre":"Miguel Ángel Morales Villalobos","rut":"19.975.831-4","tel":"+56986576978","dir":"La Cantera N°2447, Iquique","contacto":"Miguel Morales","email":"","giro":""},
+    {"id":4,"nombre":"José Alfredo Avilés Varela","rut":"18.493.333-0","tel":"+56954834612","dir":"Santa Marta 4237, Alto Hospicio","contacto":"José Avilés","email":"","giro":""},
+    {"id":5,"nombre":"Lázaro (Particular)","rut":"","tel":"","dir":"","contacto":"Lázaro","email":"","giro":"Particular"}
+  ];
+
+  const arriendos = [
+    {"id":1001,"num":"ARR-1001","activoId":2,"activoNombre":"Betonera 200L 900W BONICA","clienteId":1,"clienteNombre":"Rubén Darío Núñez Rocha","inicio":"2026-04-08","termino":"2026-04-08","tipoTarifa":"Diaria","tarifa":15000,"total":15000,"pagado":15000,"lugar":"Feria Navideña Frente al Jumbo, Iquique","resp":"Rubén Núñez","estado":"Finalizado","garantia":0,"formaPagoGarantia":"","estadoGarantia":"","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"7007","obs":"Sin garantía — exención única vez. Guía 111."},
+    {"id":1003,"num":"ARR-1003","activoId":2,"activoNombre":"Betonera 200L 900W BONICA","clienteId":1,"clienteNombre":"Rubén Darío Núñez Rocha","inicio":"2026-04-10","termino":"2026-04-10","tipoTarifa":"Diaria","tarifa":15000,"total":15000,"pagado":15000,"lugar":"China con Proyectada, Alto Hospicio","resp":"Rubén Núñez","estado":"Finalizado","garantia":50000,"formaPagoGarantia":"Transferencia","estadoGarantia":"Devuelta","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"7008","obs":"Guía 113. Conductor: Joseph Pajuelo, patente RKJW59."},
+    {"id":1004,"num":"ARR-1004","activoId":10,"activoNombre":"Moto Suzuki Lets 4 50cc","clienteId":2,"clienteNombre":"Nelson Enrique Lien Catrilaf","inicio":"2026-05-14","termino":"2026-05-15","tipoTarifa":"Diaria","tarifa":25000,"total":25000,"pagado":25000,"lugar":"Pozo Almonte","resp":"Nelson Lien","estado":"Finalizado","garantia":100000,"formaPagoGarantia":"Efectivo","estadoGarantia":"Devuelta","formaPago":"Efectivo","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"7011","obs":"Garantía devuelta 15/05/2026 17:15 hrs. Sin daños."},
+    {"id":1005,"num":"ARR-1005","activoId":2,"activoNombre":"Betonera 200L 900W BONICA","clienteId":3,"clienteNombre":"Miguel Ángel Morales Villalobos","inicio":"2026-05-20","termino":"2026-05-20","tipoTarifa":"Diaria","tarifa":15000,"total":15000,"pagado":15000,"lugar":"La Cantera N°2447, Iquique","resp":"Miguel Morales","estado":"Finalizado","garantia":50000,"formaPagoGarantia":"Efectivo","estadoGarantia":"Devuelta","formaPago":"Efectivo","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"9006","obs":"Guía 115. Flete $10.000."},
+    {"id":1006,"num":"ARR-1006","activoId":3,"activoNombre":"Demoledor 3000W TASBEL","clienteId":4,"clienteNombre":"José Alfredo Avilés Varela","inicio":"2026-05-28","termino":"2026-05-29","tipoTarifa":"Diaria","tarifa":15000,"total":15000,"pagado":15000,"lugar":"Santa Marta 4237, Alto Hospicio","resp":"José Avilés","estado":"Finalizado","garantia":50000,"formaPagoGarantia":"Transferencia","estadoGarantia":"Recibida","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"","obs":"Guía 116. Retira cliente. Entrega 18:00 PM 28/05."}
+  ];
+
+  const fletes = [
+    {"id":2001,"num":"FL-001","fecha":"2026-03-06","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Mudanza","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Particular","estado":"Completado","formaPago":"Efectivo","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"2","obs":""},
+    {"id":2002,"num":"FL-002","fecha":"2026-04-15","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Hospicio","carga":"Mudanza","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Particular","estado":"Completado","formaPago":"Tarjeta Débito","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"154885222544","obs":""},
+    {"id":2003,"num":"FL-003","fecha":"2026-04-16","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Hospicio","carga":"Mudanza","peso":"","km":0,"tarifa":15000,"clienteId":5,"clienteNombre":"Particular","estado":"Completado","formaPago":"Tarjeta Débito","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"155066556404","obs":""},
+    {"id":2004,"num":"FL-004","fecha":"2026-04-30","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Iquique","destino":"Iquique","carga":"Flete","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Particular","estado":"Completado","formaPago":"Tarjeta Débito","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"156350052399","obs":""},
+    {"id":2005,"num":"FL-005","fecha":"2026-05-15","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete","peso":"","km":0,"tarifa":5000,"clienteId":5,"clienteNombre":"Particular","estado":"Completado","formaPago":"Tarjeta Débito","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"158633275697","obs":""},
+    {"id":2006,"num":"FL-006","fecha":"2026-03-08","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete/Arriendo","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Lázaro","estado":"Completado","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"9003","obs":""},
+    {"id":2007,"num":"FL-007","fecha":"2026-03-09","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete/Arriendo","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Lázaro","estado":"Completado","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"7004","obs":""},
+    {"id":2008,"num":"FL-008","fecha":"2026-03-12","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete/Arriendo","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Lázaro","estado":"Completado","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"7005","obs":""},
+    {"id":2009,"num":"FL-009","fecha":"2026-03-12","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete/Arriendo","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Lázaro","estado":"Completado","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"9004","obs":""},
+    {"id":2010,"num":"FL-010","fecha":"2026-03-13","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete/Arriendo","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Lázaro","estado":"Completado","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"9005","obs":""},
+    {"id":2011,"num":"FL-011","fecha":"2026-03-14","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete/Arriendo","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Lázaro","estado":"Completado","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"89142086","obs":""}
+  ];
+
+  const mantencion = [
+    {"id":3001,"activoId":1,"activoNombre":"Camioneta Porter II","tipo":"Cambio Aceite","desc":"Lubricentro Ohiggins - Cambio de Aceite","fecha":"2026-03-20","proxima":"","costo":55000,"taller":"Lubricentro Ohiggins","estado":"Completada"},
+    {"id":3002,"activoId":1,"activoNombre":"Camioneta Porter II","tipo":"Correctiva","desc":"La Casa Del Encendido - Componentes Eléctricos","fecha":"2026-03-20","proxima":"","costo":48490,"taller":"La Casa Del Encendido","estado":"Completada"},
+    {"id":3003,"activoId":1,"activoNombre":"Camioneta Porter II","tipo":"Correctiva","desc":"Servicios Mecánicos Ronald Mamani","fecha":"2026-03-20","proxima":"","costo":20000,"taller":"Ronald Mamani","estado":"Completada"},
+    {"id":3004,"activoId":1,"activoNombre":"Camioneta Porter II","tipo":"Correctiva","desc":"Rs Diesel Ltda - Filtros y Repuestos","fecha":"2026-03-24","proxima":"","costo":52360,"taller":"Rs Diesel Ltda","estado":"Completada"},
+    {"id":3005,"activoId":1,"activoNombre":"Camioneta Porter II","tipo":"Correctiva","desc":"Arreglo Camión Porter II","fecha":"2026-05-14","proxima":"","costo":65000,"taller":"Taller externo","estado":"Completada"}
+  ];
+
+  localStorage.setItem(pre+'_activos',    JSON.stringify(activos));
+  localStorage.setItem(pre+'_arriendos',  JSON.stringify(arriendos));
+  localStorage.setItem(pre+'_fletes',     JSON.stringify(fletes));
+  localStorage.setItem(pre+'_clientes',   JSON.stringify(clientes));
+  localStorage.setItem(pre+'_mantencion', JSON.stringify(mantencion));
+  localStorage.setItem(pre+'_cfg',        JSON.stringify({"tarifaKm":500,"tarifaBase":50000,"diasMant":7}));
+  localStorage.setItem('mss_data_version', VERSION);
+  console.log('✅ Datos M&P cargados — versión '+VERSION);
+})();
+
 // Storage
 function eid(){try{const e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}');return e.id?'_arr'+e.id:'_arrDef';}catch(e){return'_arrDef';}}
 const EID=eid();
@@ -694,16 +820,19 @@ function rArriendos(){
         <td style="text-align:right;font-weight:700">${clp(a.total)}</td>
         <td style="text-align:right;color:var(--ok)">${clp(a.pagado)}</td>
         <td style="text-align:right;color:${a.total-a.pagado>0?'var(--danger)':'var(--ok)'}">${clp(a.total-a.pagado)}</td>
+        <td style="text-align:right">${a.garantia?`<span style="font-size:9px;color:var(--acc)">${clp(a.garantia)}${a.formaPagoGarantia?' · '+a.formaPagoGarantia:''}${a.estadoGarantia?'<br><span style=\'color:'+(a.estadoGarantia==='Devuelta'?'var(--ok)':a.estadoGarantia==='Retenida'?'var(--danger)':'var(--info)')+'\'>'+a.estadoGarantia+'</span>':''}</span>`:'<span style="color:var(--muted);font-size:9px">Sin gta.</span>'}</td>
+        <td>${a.formaPago?`<span style="font-size:9px;color:${a.estadoPago==='Pagado'?'var(--ok)':a.estadoPago==='Pendiente'?'var(--danger)':'var(--acc)'}">${a.formaPago}${a.estadoPago?' · '+a.estadoPago:''}</span>`:'<span style="color:var(--muted);font-size:9px">—</span>'}</td>
+        <td>${a.tipoDoc?`<span style="font-size:9px;color:var(--info)">${a.tipoDoc}${a.numDoc?' N°'+a.numDoc:''}</span>`:'<span style="color:var(--muted);font-size:9px">—</span>'}</td>
         <td>${badge(a.estado,EC[a.estado]||'#5A7090')}</td>
         <td><div style="display:flex;gap:3px;flex-wrap:wrap">
-          <button class="bsm be" onclick="editArriendo(${a.id})">✎</button>
+          <button class="bsm be" onclick="editArriendo(${a.id})" title="Editar">✎</button>
           <button class="bsm" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--acc);padding:3px 7px;border-radius:5px;font-size:9px;cursor:pointer" onclick="emitirContrato(${a.id})" title="Contrato">📋</button>
           <button class="bsm" style="background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.3);color:var(--info);padding:3px 7px;border-radius:5px;font-size:9px;cursor:pointer" onclick="emitirGuia(${a.id})" title="Guía Entrega">📦</button>
           <button class="bsm" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:var(--ok);padding:3px 7px;border-radius:5px;font-size:9px;cursor:pointer" onclick="emitirDevolucion(${a.id})" title="Comprobante Devolución">🔄</button>
-          <button class="bsm bd" onclick="delArriendo(${a.id})">✕</button>
+          <button class="bsm bd" onclick="delArriendo(${a.id})" title="Eliminar">✕</button>
         </div></td>
       </tr>`;}).join('');
-  document.querySelector('#tArr tfoot').innerHTML=`<tr><td colspan="7" style="color:var(--acc)">TOTALES</td><td style="text-align:right">${clp(totTotal)}</td><td style="text-align:right;color:var(--ok)">${clp(totPag)}</td><td style="text-align:right;color:var(--danger)">${clp(totTotal-totPag)}</td><td colspan="2"></td></tr>`;
+  document.querySelector('#tArr tfoot').innerHTML=`<tr><td colspan="7" style="color:var(--acc)">TOTALES</td><td style="text-align:right">${clp(totTotal)}</td><td style="text-align:right;color:var(--ok)">${clp(totPag)}</td><td style="text-align:right;color:var(--danger)">${clp(totTotal-totPag)}</td><td colspan="5"></td></tr>`;
 }
 
 function saveArriendo(){
@@ -712,7 +841,7 @@ function saveArriendo(){
   const cId=parseInt(document.getElementById('arCliente').value)||0;
   const activo=ACTIVOS.find(x=>x.id===aId);
   const cliente=CLIENTES.find(x=>x.id===cId);
-  const obj={num:document.getElementById('arNum').value||'ARR-'+(ARRIENDOS.length+1).toString().padStart(3,'0'),activoId:aId,activoNombre:activo?.nombre||'—',clienteId:cId,clienteNombre:cliente?.nombre||'—',inicio:document.getElementById('arInicio').value,termino:document.getElementById('arTermino').value,tipoTarifa:document.getElementById('arTipoTarifa').value,tarifa:parseFloat(document.getElementById('arTarifa').value)||0,total:parseFloat(document.getElementById('arTotal').value)||0,pagado:parseFloat(document.getElementById('arPagado').value)||0,lugar:document.getElementById('arLugar').value,resp:document.getElementById('arResp').value,estado:document.getElementById('arEstado').value,obs:document.getElementById('arObs').value};
+  const obj={num:document.getElementById('arNum').value||'ARR-'+(ARRIENDOS.length+1).toString().padStart(3,'0'),activoId:aId,activoNombre:activo?.nombre||'—',clienteId:cId,clienteNombre:cliente?.nombre||'—',inicio:document.getElementById('arInicio').value,termino:document.getElementById('arTermino').value,tipoTarifa:document.getElementById('arTipoTarifa').value,tarifa:parseFloat(document.getElementById('arTarifa').value)||0,total:parseFloat(document.getElementById('arTotal').value)||0,pagado:parseFloat(document.getElementById('arPagado').value)||0,lugar:document.getElementById('arLugar').value,resp:document.getElementById('arResp').value,estado:document.getElementById('arEstado').value,obs:document.getElementById('arObs').value,garantia:parseFloat(document.getElementById('arGarantia').value)||0,formaPagoGarantia:document.getElementById('arFormaPagoGarantia').value,estadoGarantia:document.getElementById('arEstadoGarantia').value,formaPago:document.getElementById('arFormaPago').value,estadoPago:document.getElementById('arEstadoPago').value,tipoDoc:document.getElementById('arTipoDoc').value,numDoc:document.getElementById('arNumDoc').value};
   if(!obj.activoNombre||obj.activoNombre==='—')return alert('Selecciona un activo');
   if(id){const i=ARRIENDOS.findIndex(a=>a.id==id);if(i>=0)ARRIENDOS[i]={...ARRIENDOS[i],...obj};}
   else ARRIENDOS.push({id:uid(),...obj});
@@ -738,14 +867,376 @@ function editArriendo(id){
   document.getElementById('arResp').value=a.resp||'';
   document.getElementById('arEstado').value=a.estado;
   document.getElementById('arObs').value=a.obs||'';
+  document.getElementById('arGarantia').value=a.garantia||0;
+  document.getElementById('arFormaPagoGarantia').value=a.formaPagoGarantia||'';
+  document.getElementById('arEstadoGarantia').value=a.estadoGarantia||'';
+  document.getElementById('arFormaPago').value=a.formaPago||'';
+  document.getElementById('arEstadoPago').value=a.estadoPago||'';
+  document.getElementById('arTipoDoc').value=a.tipoDoc||'';
+  document.getElementById('arNumDoc').value=a.numDoc||'';
   O('moArriendo');
 }
 function delArriendo(id){if(!confirm('¿Eliminar?'))return;ARRIENDOS=ARRIENDOS.filter(a=>a.id!==id);save();rArriendos();}
 
-// ═══════════════════════════════════════════
-// EMISIÓN AUTOMÁTICA DESDE ARRIENDO
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// DOCUMENTOS PROFESIONALES — M&P ARRIENDOS SPA
+// Contrato · Guía de Entrega · Comprobante de Devolución
+// Todos vinculados al mismo arriendo automáticamente
+// ═══════════════════════════════════════════════════════════════
+
+const DOC_STYLES=`
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#f0f0f0;font-family:Arial,Helvetica,sans-serif;padding:20px;font-size:11px;}
+.doc{background:white;max-width:780px;margin:0 auto;box-shadow:0 2px 20px rgba(0,0,0,.18);page-break-after:always;}
+.doc-head{display:flex;justify-content:space-between;align-items:flex-start;padding:16px 22px 12px;border-bottom:3px solid #1a1a1a;}
+.doc-logo-area{display:flex;flex-direction:column;gap:2px;}
+.doc-logo-area img{height:58px;object-fit:contain;margin-bottom:4px;}
+.doc-logo-inicial{width:58px;height:58px;background:#F59E0B;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#1a1a1a;margin-bottom:4px;}
+.emp-nombre{font-size:12px;font-weight:900;color:#1a1a1a;}
+.emp-data{font-size:9px;color:#555;line-height:1.6;}
+.doc-num-box{text-align:right;min-width:120px;}
+.doc-num-label{font-size:8px;color:#888;text-transform:uppercase;letter-spacing:1px;}
+.doc-num-val{font-size:24px;font-weight:900;color:#1a1a1a;line-height:1;}
+.doc-num-sub{font-size:9px;color:#888;margin-top:2px;}
+.doc-title{font-size:14px;font-weight:900;text-align:center;text-transform:uppercase;letter-spacing:1.5px;padding:12px 22px 6px;border-bottom:1px solid #ddd;color:#1a1a1a;}
+.doc-body{padding:14px 22px 18px;}
+.clausula{margin-bottom:9px;font-size:10px;line-height:1.75;text-align:justify;color:#222;}
+.clausula strong{font-weight:700;}
+.tbl{width:100%;border-collapse:collapse;margin:8px 0 12px;font-size:10px;}
+.tbl th{background:#1a1a1a;color:white;padding:6px 8px;text-align:left;font-weight:700;}
+.tbl td{padding:6px 8px;border:1px solid #ccc;vertical-align:top;}
+.tbl tr:nth-child(even) td{background:#f9f9f9;}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:12px;font-size:10px;}
+.info-item{display:flex;flex-direction:column;gap:1px;}
+.info-label{font-size:8px;color:#888;text-transform:uppercase;letter-spacing:.8px;}
+.info-val{font-weight:700;color:#1a1a1a;border-bottom:1px solid #e0e0e0;padding-bottom:2px;}
+.section-title{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:#1a1a1a;border-bottom:2px solid #1a1a1a;padding-bottom:3px;margin:14px 0 8px;}
+.firmas{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:30px;padding-top:14px;border-top:2px solid #1a1a1a;}
+.firma-box{text-align:center;}
+.firma-line{border-top:1px solid #1a1a1a;padding-top:5px;margin-top:38px;}
+.firma-nombre{font-weight:700;font-size:10px;}
+.firma-dato{font-size:9px;color:#555;}
+.doc-footer{background:#f5f5f5;padding:7px 22px;font-size:8px;color:#666;border-top:1px solid #ddd;display:flex;justify-content:space-between;}
+.badge-ok{display:inline-block;background:#d4edda;color:#155724;border:1px solid #c3e6cb;border-radius:3px;padding:1px 6px;font-size:9px;font-weight:700;}
+.badge-warn{display:inline-block;background:#fff3cd;color:#856404;border:1px solid #ffeeba;border-radius:3px;padding:1px 6px;font-size:9px;font-weight:700;}
+.chk{display:inline-block;width:12px;height:12px;border:1px solid #333;text-align:center;line-height:12px;font-size:9px;font-weight:700;margin-right:3px;}
+.aviso{background:#fff8e1;border:1px solid #ffe082;border-radius:4px;padding:7px 10px;font-size:10px;color:#5d4037;margin:8px 0;}
+.btn-print{display:block;margin:14px auto;padding:11px 32px;background:#F59E0B;color:#1a1a1a;border:none;border-radius:8px;font-size:13px;font-weight:900;cursor:pointer;letter-spacing:.5px;}
+@media print{
+  .btn-print{display:none!important;}
+  body{background:white;padding:0;}
+  .doc{box-shadow:none;}
+  @page{margin:10mm;size:A4;}
+}`;
+
+function _logoHTML(logo,emp){
+  return logo
+    ? `<img src="${logo}" style="height:58px;object-fit:contain;margin-bottom:4px;"/>`
+    : `<div class="doc-logo-inicial">${(emp.nombre||'M').charAt(0)}</div>`;
+}
+function _empHead(logo,emp){
+  return `<div class="doc-logo-area">
+    ${_logoHTML(logo,emp)}
+    <div class="emp-nombre">${emp.nombre||''}</div>
+    <div class="emp-data">
+      RUT: ${emp.rut||''}<br>
+      Giro: ${emp.giro||'Servicios de Arriendos, Flete y Venta productos Construcción y Ferretería'}<br>
+      ${emp.direccion||''}<br>
+      Tel: ${emp.tel||''} | ${emp.email||''}
+    </div>
+  </div>`;
+}
+function _openVentana(titulo,html){
+  const v=window.open('','_blank','width=860,height=750');
+  v.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>${titulo}</title><style>${DOC_STYLES}</style></head><body>
+  <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar PDF</button>
+  ${html}
+  <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar PDF</button>
+  </body></html>`);
+  v.document.close();
+}
+
+// ─────────────────────────────────────────────
+// 1. CONTRATO DE ARRIENDO — MAQUINARIA O VEHÍCULO
+// Detecta automáticamente el tipo de activo
+// ─────────────────────────────────────────────
 function emitirContrato(id){
+  const a=ARRIENDOS.find(x=>x.id===id);if(!a)return;
+  const activo=ACTIVOS.find(x=>x.id===a.activoId)||{};
+  const cliente=CLIENTES.find(x=>x.id===a.clienteId)||{};
+  const emp=getEmpresa();
+  const logo=getLogo();
+  const dias=a.inicio&&a.termino?Math.ceil((new Date(a.termino+'T12:00:00')-new Date(a.inicio+'T12:00:00'))/(1000*60*60*24))+1:1;
+  const fechaLarga=a.inicio?new Date(a.inicio+'T12:00:00').toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'}).toUpperCase():'—';
+  const ciudadDoc=emp.ciudad||'ALTO HOSPICIO';
+  const esVehiculo=activo.tipo==='Vehículo'||(activo.cat||'').toLowerCase().includes('moto')||(activo.cat||'').toLowerCase().includes('camion')||(activo.cat||'').toLowerCase().includes('auto');
+  const tipoTitulo=esVehiculo?'VEHÍCULOS':'MAQUINARIA Y EQUIPOS';
+  const garantiaReal=a.garantia||0;
+  const fgReal=a.formaPagoGarantia||'';
+  const chkEfec=fgReal.toLowerCase()==='efectivo'?'✓':' ';
+  const chkTrf=fgReal.toLowerCase()==='transferencia'?'✓':' ';
+  const chkCosto=a.obs&&a.obs.toLowerCase().includes('retira')?'  ':'✓';
+  const chkRetira=a.obs&&a.obs.toLowerCase().includes('retira')?'✓':'  ';
+  const numGuia=a.numGuia||String(a.id).slice(-3).padStart(3,'0');
+
+  const html=`<div class="doc">
+  <div class="doc-head">
+    ${_empHead(logo,emp)}
+    <div class="doc-num-box">
+      <div class="doc-num-label">Contrato N°</div>
+      <div class="doc-num-val">${a.num}</div>
+      <div class="doc-num-sub">${df(a.inicio)}</div>
+      ${a.tipoDoc&&a.numDoc?`<div class="doc-num-sub" style="color:#155724;font-weight:700">${a.tipoDoc} N°${a.numDoc}</div>`:''}
+    </div>
+  </div>
+  <div class="doc-title">CONTRATO DE ARRIENDO ${tipoTitulo} N° ${a.num}</div>
+  <div class="doc-body">
+    <p class="clausula">En <strong>${ciudadDoc}</strong>, a ${fechaLarga}, entre <strong>${emp.nombre.toUpperCase()}</strong>, RUT ${emp.rut||''}, representada por <strong>DOÑA ${(emp.contacto||'GAUDY MARTINEZ YOVERA').toUpperCase()}</strong>, RUT ${emp.rut_rep||'23.918.699-8'}, domiciliada en ${emp.direccion||''}, en adelante <strong>"EL ARRENDADOR"</strong>; y Don(ña) <strong>${(cliente.nombre||'—').toUpperCase()}</strong>, RUT: ${cliente.rut||'—'}, domiciliado en ${cliente.dir||a.lugar||'—'}, Fono: ${cliente.tel||'—'}, en adelante <strong>"EL ARRENDATARIO"</strong>, se ha convenido el siguiente Contrato de Arriendo:</p>
+
+    <p class="clausula"><strong>PRIMERO — TITULARIDAD:</strong> EL ARRENDADOR declara ser dueño o tener plenas facultades de disposición sobre el bien que se entrega en arriendo, el cual se encuentra en perfecto estado de funcionamiento y con sus mantenciones al día.</p>
+
+    <p class="clausula"><strong>SEGUNDO — OBJETO DEL CONTRATO:</strong> EL ARRENDADOR da en arriendo al ARRENDATARIO ${esVehiculo?'el vehículo':'las especies y equipos'} individualizados en la cláusula tercera, quien declara recibirlo(s) en buen estado, operativo(s) y a su entera satisfacción. ${esVehiculo?'El vehículo se destinará exclusivamente al uso pactado.':'El equipo deberá mantenerse exclusivamente en la obra ubicada en <strong>'+( a.lugar||'—')+'</strong> y usarse según su naturaleza técnica.'}</p>
+
+    <p class="clausula"><strong>TERCERO — DESCRIPCIÓN Y RENTA:</strong></p>
+    <table class="tbl">
+      <thead><tr><th>Cant.</th><th>Descripción</th><th>Marca / Modelo</th><th>N° Serie / Patente</th><th style="text-align:right">Valor ${a.tipoTarifa||'Diario'}</th><th style="text-align:right">Garantía</th></tr></thead>
+      <tbody><tr>
+        <td style="text-align:center">1</td>
+        <td><strong>${activo.nombre||a.activoNombre}</strong>${activo.anio?' ('+activo.anio+')':''}</td>
+        <td>${activo.marca||'—'}${activo.modelo?' '+activo.modelo:''}</td>
+        <td>${activo.patente||'S/S'}</td>
+        <td style="text-align:right"><strong>${clp(a.tarifa)}</strong></td>
+        <td style="text-align:right"><strong>${garantiaReal?clp(garantiaReal):'Sin garantía'}</strong></td>
+      </tr></tbody>
+    </table>
+    <p class="clausula">La renta se pagará al término del período pactado o dentro de los primeros 5 días corridos de cada período si el contrato se renueva. El retardo generará el interés máximo convencional vigente. La garantía será restituida íntegramente al término del contrato, siempre que el bien sea devuelto en las mismas condiciones de entrega.</p>
+    ${garantiaReal?`<div class="aviso"><strong>GARANTÍA:</strong> Se recibe garantía de <strong>${clp(garantiaReal)}</strong> mediante: <span class="chk">${chkEfec}</span><strong>EFECTIVO</strong> &nbsp; <span class="chk">${chkTrf}</span><strong>TRANSFERENCIA</strong>. Será devuelta de la misma forma al cierre del contrato.</div>`:'<div class="aviso">Sin garantía para este arriendo.</div>'}
+
+    <p class="clausula"><strong>CUARTO — DESPACHO Y RETIRO:</strong> El servicio de despacho y retiro del bien operará según la siguiente condición:<br/>
+    <span class="chk">${chkCosto}</span><strong>CON COSTO ADICIONAL.</strong> El cliente cancelará ${clp(10000)} por concepto de flete (ida y vuelta), suma independiente al arriendo.<br/>
+    <span class="chk">${chkRetira}</span><strong>RETIRA EL CLIENTE.</strong> El arrendatario retira y devuelve el bien por sus propios medios, asumiendo total responsabilidad por daños durante el transporte.</p>
+
+    <p class="clausula"><strong>QUINTO — PLAZO:</strong> El presente contrato rige por <strong>${dias} día(s)</strong>, desde el <strong>${df(a.inicio)}</strong> hasta el <strong>${df(a.termino)}</strong> inclusive. Se entenderá renovado tácita y sucesivamente por períodos iguales, salvo que una de las partes comunique su término con al menos <strong>3 días de anticipación</strong>. El Arrendador podrá poner término inmediato en casos de urgencia conforme al Art. 1967 del Código Civil.</p>
+
+    <p class="clausula"><strong>SEXTO — USO Y RESTRICCIONES:</strong> Queda estrictamente prohibido el subarriendo, la cesión a terceros o el traslado del bien fuera del lugar indicado sin autorización escrita del Arrendador. El incumplimiento de esta cláusula faculta la terminación inmediata del contrato, sin perjuicio de las acciones legales que correspondan.</p>
+
+    <p class="clausula"><strong>SÉPTIMO — INCUMPLIMIENTO:</strong> Ante cualquier incumplimiento, el Arrendatario faculta irrevocablemente al Arrendador para retirar el bien desde donde se encuentre, sin necesidad de requerimiento judicial previo. Se aplicarán las disposiciones del Art. 1945 del Código Civil respecto a indemnizaciones y deterioros.</p>
+
+    <p class="clausula"><strong>OCTAVO — PÉRDIDA O DESTRUCCIÓN:</strong> El presente contrato no se extingue por pérdida, robo, destrucción parcial o total del bien arrendado. En tales casos, el Arrendatario deberá indemnizar al Arrendador pagando el <strong>valor comercial de reposición</strong> del bien, independientemente de la causa que originó el siniestro.</p>
+
+    <p class="clausula"><strong>NOVENO — RESPONSABILIDAD:</strong> El Arrendatario asume plena responsabilidad civil y penal por accidentes, daños a terceros, infracciones de tránsito, multas, y cualquier hecho derivado del uso del bien arrendado por parte suya o de su personal. ${esVehiculo?'Cualquier multa de tránsito o TAG notificada con posterioridad a la devolución será de cargo exclusivo del Arrendatario.':''}</p>
+
+    <p class="clausula"><strong>DÉCIMO — DOMICILIO Y JURISDICCIÓN:</strong> Para todos los efectos legales del presente instrumento, las partes fijan domicilio en la ciudad de <strong>IQUIQUE / ALTO HOSPICIO</strong> y se someten expresamente a la competencia de sus tribunales ordinarios de justicia, renunciando a cualquier otro fuero que pudiera corresponderles.</p>
+
+    <div class="firmas">
+      <div class="firma-box"><div class="firma-line"><div class="firma-nombre">${emp.nombre}</div><div class="firma-dato">RUT: ${emp.rut||''}</div><div class="firma-dato">Arrendador</div></div></div>
+      <div class="firma-box"><div class="firma-line"><div class="firma-nombre">${cliente.nombre||'—'}</div><div class="firma-dato">RUT: ${cliente.rut||'—'}</div><div class="firma-dato">Arrendatario</div></div></div>
+      <div class="firma-box"><div class="firma-line"><div class="firma-nombre">Testigo</div><div class="firma-dato">RUT: _______________</div><div class="firma-dato">&nbsp;</div></div></div>
+    </div>
+  </div>
+  <div class="doc-footer">
+    <span>${emp.nombre} · RUT ${emp.rut||''} · ${emp.direccion||''}</span>
+    <span>Tel: ${emp.tel||''} · ${emp.email||''}</span>
+  </div>
+</div>`;
+  _openVentana(`Contrato ${a.num}`,html);
+}
+
+// ─────────────────────────────────────────────
+// 2. GUÍA DE ENTREGA DE EQUIPOS
+// Vinculada automáticamente al contrato
+// ─────────────────────────────────────────────
+function emitirGuia(id){
+  const a=ARRIENDOS.find(x=>x.id===id);if(!a)return;
+  const activo=ACTIVOS.find(x=>x.id===a.activoId)||{};
+  const cliente=CLIENTES.find(x=>x.id===a.clienteId)||{};
+  const emp=getEmpresa();
+  const logo=getLogo();
+  const numGuia=a.numGuia||String(a.id).slice(-3).padStart(3,'0');
+  const esVehiculo=activo.tipo==='Vehículo';
+
+  const html=`<div class="doc">
+  <div class="doc-head">
+    ${_empHead(logo,emp)}
+    <div class="doc-num-box">
+      <div class="doc-num-label">Guía N°</div>
+      <div class="doc-num-val">${numGuia}</div>
+      <div class="doc-num-sub">Contrato Ref: ${a.num}</div>
+      <div class="doc-num-sub">${df(a.inicio)}</div>
+    </div>
+  </div>
+  <div class="doc-title">GUÍA DE ENTREGA ${esVehiculo?'VEHÍCULO':'EQUIPOS'} N° ${numGuia}</div>
+  <div class="doc-body">
+
+    <div class="section-title">1. Datos del Contrato</div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">Contrato Referencia</div><div class="info-val">${a.num}</div></div>
+      <div class="info-item"><div class="info-label">Fecha de Entrega</div><div class="info-val">${df(a.inicio)}</div></div>
+      <div class="info-item"><div class="info-label">Cliente / Arrendatario</div><div class="info-val">${cliente.nombre||'—'}</div></div>
+      <div class="info-item"><div class="info-label">RUT</div><div class="info-val">${cliente.rut||'—'}</div></div>
+      <div class="info-item"><div class="info-label">${esVehiculo?'Destino / Uso':'Obra / Lugar de Uso'}</div><div class="info-val">${a.lugar||'—'}</div></div>
+      <div class="info-item"><div class="info-label">Fecha Término Pactada</div><div class="info-val">${df(a.termino)}</div></div>
+    </div>
+
+    <div class="section-title">2. ${esVehiculo?'Vehículo Entregado':'Equipos Entregados'}</div>
+    <table class="tbl">
+      <thead><tr><th>Cant.</th><th>${esVehiculo?'Vehículo':'Detalle de Equipo'}</th><th>Marca / Modelo</th><th>N° Serie / Patente</th><th>Estado al Entregar</th></tr></thead>
+      <tbody><tr>
+        <td style="text-align:center">1</td>
+        <td><strong>${activo.nombre||a.activoNombre}</strong></td>
+        <td>${activo.marca||'—'}${activo.modelo?' '+activo.modelo:''}</td>
+        <td>${activo.patente||'S/S'}</td>
+        <td><span class="badge-ok">Operativo / Buen Estado</span></td>
+      </tr></tbody>
+    </table>
+    ${esVehiculo?`
+    <div class="section-title">Estado del Vehículo al Entregar</div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">Nivel Combustible</div><div class="info-val">________________________________</div></div>
+      <div class="info-item"><div class="info-label">Kilometraje</div><div class="info-val">________________________________</div></div>
+      <div class="info-item"><div class="info-label">Accesorios / Casco</div><div class="info-val">________________________________</div></div>
+      <div class="info-item"><div class="info-label">Observaciones Daños Previos</div><div class="info-val">________________________________</div></div>
+    </div>`:''}
+
+    <div class="section-title">3. Datos del Despacho</div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">Nombre Conductor / Despachador</div><div class="info-val">________________________________</div></div>
+      <div class="info-item"><div class="info-label">RUT Conductor</div><div class="info-val">________________________________</div></div>
+      <div class="info-item"><div class="info-label">Patente Vehículo Transporte</div><div class="info-val">________________________________</div></div>
+      <div class="info-item"><div class="info-label">Hora de Entrega Estipulada</div><div class="info-val">________________________________</div></div>
+      <div class="info-item"><div class="info-label">Hora de Retiro Estimada</div><div class="info-val">________________________________</div></div>
+      <div class="info-item"><div class="info-label">Modo de Traslado</div><div class="info-val">________________________________</div></div>
+    </div>
+
+    <div class="aviso" style="margin-top:8px"><strong>IMPORTANTE:</strong> El Arrendatario declara recibir el bien en las condiciones descritas y se obliga a devolverlo en el mismo estado. Cualquier daño ocurrido durante el uso será de su exclusiva responsabilidad. El incumplimiento del plazo de devolución generará cobro adicional por los días de atraso a la tarifa pactada.</div>
+
+    <div style="margin-top:14px;font-size:10px"><strong>Recibe Conforme (Cliente):</strong> _______________________________________________ &nbsp;&nbsp; Fecha: ____ / ____ / 2026 &nbsp;&nbsp; Hora: ________</div>
+
+    <div class="firmas">
+      <div class="firma-box"><div class="firma-line"><div class="firma-nombre">${emp.nombre}</div><div class="firma-dato">RUT: ${emp.rut||''}</div><div class="firma-dato">Arrendador</div></div></div>
+      <div class="firma-box"><div class="firma-line"><div class="firma-nombre">${cliente.nombre||'—'}</div><div class="firma-dato">RUT: ${cliente.rut||'—'}</div><div class="firma-dato">Arrendatario · Recibe Conforme</div></div></div>
+      <div class="firma-box"><div class="firma-line"><div class="firma-nombre">Conductor / Despachador</div><div class="firma-dato">RUT: _______________</div><div class="firma-dato">&nbsp;</div></div></div>
+    </div>
+  </div>
+  <div class="doc-footer">
+    <span>Guía N° ${numGuia} · Ref. Contrato ${a.num} · ${emp.nombre}</span>
+    <span>${df(a.inicio)}</span>
+  </div>
+</div>`;
+  _openVentana(`Guía Entrega ${numGuia} — Ctto ${a.num}`,html);
+}
+
+// ─────────────────────────────────────────────
+// 3. COMPROBANTE DE DEVOLUCIÓN
+// Con liquidación de garantía y estado del bien
+// ─────────────────────────────────────────────
+function emitirDevolucion(id){
+  const a=ARRIENDOS.find(x=>x.id===id);if(!a)return;
+  const activo=ACTIVOS.find(x=>x.id===a.activoId)||{};
+  const cliente=CLIENTES.find(x=>x.id===a.clienteId)||{};
+  const emp=getEmpresa();
+  const logo=getLogo();
+  const numGuia=a.numGuia||String(a.id).slice(-3).padStart(3,'0');
+  const garantiaReal=a.garantia||0;
+  const fgReal=a.formaPagoGarantia||'';
+  const egReal=a.estadoGarantia||'';
+  const esVehiculo=activo.tipo==='Vehículo';
+
+  const html=`<div class="doc">
+  <div class="doc-head">
+    ${_empHead(logo,emp)}
+    <div class="doc-num-box">
+      <div class="doc-num-label">Devolución N°</div>
+      <div class="doc-num-val">${a.num}</div>
+      <div class="doc-num-sub">Guía Ref: ${numGuia}</div>
+      <div class="doc-num-sub">Ctto: ${a.num}</div>
+    </div>
+  </div>
+  <div class="doc-title">COMPROBANTE DE DEVOLUCIÓN N° ${a.num}</div>
+  <div class="doc-body">
+
+    <div class="section-title">1. Datos del Cliente y Contrato</div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">Cliente / Arrendatario</div><div class="info-val">${cliente.nombre||'—'}</div></div>
+      <div class="info-item"><div class="info-label">RUT</div><div class="info-val">${cliente.rut||'—'}</div></div>
+      <div class="info-item"><div class="info-label">Contrato Referencia</div><div class="info-val">${a.num}</div></div>
+      <div class="info-item"><div class="info-label">Guía de Entrega N°</div><div class="info-val">${numGuia}</div></div>
+      <div class="info-item"><div class="info-label">Fecha Devolución</div><div class="info-val">______ / ______ / 2026</div></div>
+      <div class="info-item"><div class="info-label">Hora Devolución</div><div class="info-val">____________ hrs.</div></div>
+    </div>
+
+    <div class="section-title">2. ${esVehiculo?'Vehículo Devuelto':'Equipos Devueltos'}</div>
+    <table class="tbl">
+      <thead><tr><th>${esVehiculo?'Vehículo':'Detalle de Equipo'}</th><th>Marca / Modelo</th><th>N° Serie / Patente</th><th>Estado al Recibir</th></tr></thead>
+      <tbody><tr>
+        <td><strong>${activo.nombre||a.activoNombre}</strong></td>
+        <td>${activo.marca||'—'}${activo.modelo?' '+activo.modelo:''}</td>
+        <td>${activo.patente||'S/S'}</td>
+        <td>
+          <span class="chk"> </span> Óptimo &nbsp;
+          <span class="chk"> </span> Con Daño &nbsp;
+          <span class="chk"> </span> Sucio
+        </td>
+      </tr></tbody>
+    </table>
+    ${esVehiculo?`
+    <div class="info-grid" style="margin-top:6px;">
+      <div class="info-item"><div class="info-label">Nivel Combustible al Devolver</div><div class="info-val"><span class="chk"> </span> Nivel Medio (OK) &nbsp; <span class="chk"> </span> Otro: _____________</div></div>
+      <div class="info-item"><div class="info-label">Kilometraje al Devolver</div><div class="info-val">________________________________</div></div>
+      <div class="info-item"><div class="info-label">Documentación Vehicular</div><div class="info-val"><span class="chk"> </span> Perm. Circulación &nbsp; <span class="chk"> </span> SOAP &nbsp; <span class="chk"> </span> Rev. Técnica</div></div>
+      <div class="info-item"><div class="info-label">Accesorios / Casco</div><div class="info-val">________________________________</div></div>
+    </div>`:''}
+    <div style="margin-top:8px;font-size:10px">
+      <strong>Observaciones de Daños Nuevos:</strong><br>
+      <div style="border:1px solid #ccc;min-height:40px;margin-top:4px;padding:5px;border-radius:3px;">&nbsp;</div>
+    </div>
+
+    ${garantiaReal?`
+    <div class="section-title">3. Liquidación de Garantía</div>
+    <table class="tbl">
+      <thead><tr><th>Concepto</th><th style="text-align:right">Monto</th><th>Forma Devolución</th><th>Estado</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Garantía recibida</td>
+          <td style="text-align:right"><strong>${clp(garantiaReal)}</strong></td>
+          <td>${fgReal||'—'}</td>
+          <td>${egReal?`<span class="badge-${egReal==='Devuelta'?'ok':'warn'}">${egReal}</span>`:'<span class="chk"> </span> Devuelta &nbsp; <span class="chk"> </span> Retenida'}</td>
+        </tr>
+        <tr>
+          <td>Monto Devuelto</td>
+          <td style="text-align:right">${egReal==='Devuelta'?clp(garantiaReal):'$ ___________'}</td>
+          <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+          <td>Monto Retenido (descuentos por daños)</td>
+          <td style="text-align:right">${egReal==='Retenida'?clp(garantiaReal):'$ ___________'}</td>
+          <td colspan="2">&nbsp;</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="aviso"><strong>CLÁUSULA DE RESPONSABILIDAD POSTERIOR:</strong> El Arrendatario declara recibir su garantía a conformidad. No obstante, acepta que su responsabilidad económica por multas de tránsito, TAG o infracciones cursadas durante el período de uso NO FINALIZA con esta devolución. ${emp.nombre} podrá exigir el pago de dichas multas cuando sean notificadas.</div>`:''}
+
+    <div class="section-title">${garantiaReal?'4':'3'}. Personas que Intervienen</div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">Entrega (Cliente)</div><div class="info-val">${cliente.nombre||'—'}</div></div>
+      <div class="info-item"><div class="info-label">RUT</div><div class="info-val">${cliente.rut||'—'}</div></div>
+      <div class="info-item"><div class="info-label">Recibe (Encargado M&P)</div><div class="info-val">${emp.contacto||'Gaudy Martínez Yovera'}</div></div>
+      <div class="info-item"><div class="info-label">RUT Encargado</div><div class="info-val">${emp.rut_rep||'23.918.699-8'}</div></div>
+    </div>
+
+    <div class="firmas">
+      <div class="firma-box"><div class="firma-line"><div class="firma-nombre">${cliente.nombre||'—'}</div><div class="firma-dato">RUT: ${cliente.rut||'—'}</div><div class="firma-dato">Arrendatario · Entrega</div></div></div>
+      <div class="firma-box"><div class="firma-line"><div class="firma-nombre">${emp.contacto||'Gaudy Martínez Yovera'}</div><div class="firma-dato">RUT: ${emp.rut_rep||'23.918.699-8'}</div><div class="firma-dato">${emp.nombre} · Recibe</div></div></div>
+      <div class="firma-box"><div class="firma-line"><div class="firma-nombre">Testigo</div><div class="firma-dato">RUT: _______________</div><div class="firma-dato">&nbsp;</div></div></div>
+    </div>
+  </div>
+  <div class="doc-footer">
+    <span>Comprobante Devolución · Ctto ${a.num} · Guía ${numGuia} · ${emp.nombre}</span>
+    <span>RUT ${emp.rut||''}</span>
+  </div>
+</div>`;
+  _openVentana(`Devolución ${a.num}`,html);
+}
   const a=ARRIENDOS.find(x=>x.id===id);if(!a)return;
   const activo=ACTIVOS.find(x=>x.id===a.activoId)||{};
   const cliente=CLIENTES.find(x=>x.id===a.clienteId)||{};
@@ -778,7 +1269,7 @@ function emitirContrato(id){
         <tbody><tr><td style="text-align:center">1</td><td>${activo.nombre||a.activoNombre}</td><td>${activo.marca||'—'}</td><td>${activo.patente||'S/S'}</td><td style="text-align:right">${clp(a.tarifa)}</td><td style="text-align:right">${clp(garantia)}</td></tr></tbody>
       </table>
       <p class="doc-arr-clausula">La renta se pagará por mensualidad vencida dentro de los primeros 5 días (o al término del periodo descrito si es menor a un mes), el retardo generará el interés máximo convencional. La garantía será devuelta al término del contrato si el equipo es devuelto en buen estado.</p>
-      <p class="doc-arr-clausula"><strong>Se deja constancia que, se recibe GARANTIA mediante EFECTIVO [ X ] TRANSFERENCIA [  ] a la cuenta de nuestra empresa, la cual será devuelta de la misma forma.</strong></p>
+      <p class="doc-arr-clausula"><strong>Se deja constancia que, se recibe GARANTIA mediante EFECTIVO [${(a.formaPagoGarantia||'').toLowerCase()==='efectivo'?' X ':' '}] TRANSFERENCIA [${(a.formaPagoGarantia||'').toLowerCase()==='transferencia'?' X ':' '}] a la cuenta de nuestra empresa${a.garantia?', por un monto de '+clp(a.garantia):''}. La garantía será devuelta al término del contrato si el equipo es devuelto en buen estado.</strong></p>
       <p class="doc-arr-clausula"><strong>CUARTO:</strong> El servicio de despacho y retiro de la maquinaria operará bajo las siguientes condiciones seleccionadas:<br/>
       [ X ] <strong>CON COSTO ADICIONAL.</strong> El cliente cancelará la suma única de ${clp(10000)} por concepto de flete (ida y vuelta).<br/>
       [  ] <strong>RETIRA CLIENTE.</strong> El arrendatario retira y devuelve el equipo por sus propios medios.</p>
@@ -817,135 +1308,6 @@ function emitirContrato(id){
   <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
   ${html}
   <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
-  </body></html>`);
-  ventana.document.close();
-}
-
-function emitirGuia(id){
-  const a=ARRIENDOS.find(x=>x.id===id);if(!a)return;
-  const activo=ACTIVOS.find(x=>x.id===a.activoId)||{};
-  const cliente=CLIENTES.find(x=>x.id===a.clienteId)||{};
-  const emp=getEmpresa();
-  const logo=getLogo();
-  const logoHTML=logo?`<img src="${logo}" style="height:55px;object-fit:contain"/>`:`<div style="font-size:22px;font-weight:900;color:#F59E0B">${emp.nombre.charAt(0)}</div>`;
-  const numGuia=String(id).slice(-3);
-
-  const html=`<div class="doc-arr">
-    <div class="doc-arr-head">
-      <div>${logoHTML}</div>
-      <div style="text-align:center;flex:1;padding:0 20px">
-        <div style="font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:1px">GUÍA DE ENTREGA EQUIPOS N° ${numGuia}</div>
-      </div>
-    </div>
-    <div class="doc-arr-body">
-      <p style="margin-bottom:6px;font-size:11px"><strong>Obra:</strong> ${a.lugar||'—'}</p>
-      <p style="margin-bottom:14px;font-size:11px"><strong>Comuna:</strong> Iquique</p>
-      <table class="doc-arr-table" style="margin-bottom:16px">
-        <thead><tr><th>Cant.</th><th>Detalle de Equipo</th><th>Marca/Modelo</th><th>Observación Estado</th></tr></thead>
-        <tbody><tr><td style="text-align:center">1</td><td>${activo.nombre||a.activoNombre}</td><td>${activo.marca||'—'} ${activo.modelo||''}</td><td>Operativa</td></tr></tbody>
-      </table>
-      <p style="font-size:11px;font-weight:700;margin-bottom:8px">Datos Transporte:</p>
-      <ul style="font-size:11px;line-height:2.2;padding-left:18px">
-        <li>Nombre Conductor: <strong>_________________________________</strong></li>
-        <li>RUT: <strong>_________________________</strong></li>
-        <li>Patente Vehículo: <strong>_____________</strong></li>
-        <li>Hora de Entrega Estipulada: <strong>_____________</strong></li>
-        <li>Hora de Retiro Estimada: <strong>_____________</strong></li>
-      </ul>
-      <p style="margin-top:20px;font-size:11px">Recibe Conforme (Cliente): ___________________________</p>
-      <div class="doc-arr-firmas">
-        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">Arrendador</div><div>${emp.nombre}</div><div>RUT: ${emp.rut||''}</div></div></div>
-        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">Arrendatario</div><div>${cliente.nombre||'—'}</div><div>RUT: ${cliente.rut||'—'}</div></div></div>
-      </div>
-    </div>
-  </div>`;
-
-  const ventana=window.open('','_blank','width=800,height=600');
-  ventana.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Guía ${numGuia}</title>
-  <style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#f5f5f5;font-family:Arial,sans-serif;padding:20px;}
-  .doc-arr{background:white;max-width:760px;margin:0 auto;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.15);overflow:hidden;}
-  .doc-arr-head{border-bottom:3px solid #1a1a1a;padding:16px 22px;display:flex;align-items:center;}
-  .doc-arr-body{padding:18px 22px;}
-  .doc-arr-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:10px;}
-  .doc-arr-table th{background:#1a1a1a;color:white;padding:6px 8px;}
-  .doc-arr-table td{padding:6px 8px;border:1px solid #ccc;}
-  .doc-arr-firmas{display:flex;justify-content:space-between;margin-top:28px;padding-top:16px;border-top:2px solid #1a1a1a;}
-  .doc-arr-firma{text-align:center;min-width:200px;}
-  .doc-arr-firma-line{border-top:1px solid #1a1a1a;padding-top:6px;margin-top:32px;font-size:10px;}
-  .btn-print{display:block;margin:16px auto;padding:12px 32px;background:#F59E0B;color:#1a1a1a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
-  @media print{.btn-print{display:none!important;}body{background:white;padding:0;}@page{margin:10mm;}}
-  </style></head><body>
-  <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
-  ${html}
-  </body></html>`);
-  ventana.document.close();
-}
-
-function emitirDevolucion(id){
-  const a=ARRIENDOS.find(x=>x.id===id);if(!a)return;
-  const activo=ACTIVOS.find(x=>x.id===a.activoId)||{};
-  const cliente=CLIENTES.find(x=>x.id===a.clienteId)||{};
-  const emp=getEmpresa();
-  const logo=getLogo();
-  const logoHTML=logo?`<img src="${logo}" style="height:55px;object-fit:contain"/>`:`<div style="font-size:22px;font-weight:900;color:#F59E0B">${emp.nombre.charAt(0)}</div>`;
-
-  const html=`<div class="doc-arr">
-    <div class="doc-arr-head">
-      <div>${logoHTML}</div>
-      <div style="text-align:center;flex:1;padding:0 20px">
-        <div style="font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:1px">COMPROBANTE DE DEVOLUCIÓN</div>
-      </div>
-    </div>
-    <div class="doc-arr-body">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;font-size:11px">
-        <div><strong>Cliente:</strong> ${cliente.nombre||'—'}</div>
-        <div><strong>Contrato Ref:</strong> ${a.num}</div>
-        <div><strong>Fecha Devolución:</strong> _____ / _____ / 2026</div>
-        <div><strong>Hora:</strong> _____________</div>
-      </div>
-      <table class="doc-arr-table" style="margin-bottom:14px">
-        <thead><tr><th>Detalle de Equipos Devueltos</th><th>Nro. Serie</th><th>Estado al Recibir</th></tr></thead>
-        <tbody><tr>
-          <td>1. ${activo.nombre||a.activoNombre}</td>
-          <td>${activo.patente||'S/S'}</td>
-          <td>[  ] Óptimo &nbsp;&nbsp; [  ] Daño &nbsp;&nbsp; [  ] Sucio</td>
-        </tr></tbody>
-      </table>
-      <p style="font-size:11px;margin-bottom:4px"><strong>Observaciones de Recepción:</strong> _________________________________________________________________</p>
-      <p style="font-size:11px;margin-top:6px">__________________________________________________________________________________</p>
-      <p style="font-size:11px;margin-top:6px">__________________________________________________________________________________</p>
-      <div style="border-top:1px solid #ccc;margin:16px 0;padding-top:12px">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;font-size:11px">
-          <div><p style="font-weight:700;margin-bottom:8px">ENTREGA</p>
-            <p>Cliente: ${cliente.nombre||'—'}</p><p>RUT: ${cliente.rut||'—'}</p></div>
-          <div><p style="font-weight:700;margin-bottom:8px">RECIBE</p>
-            <p>Encargado: ${emp.contacto||'Gaudy Martínez'}</p><p>RUT: ${emp.rut_rep||'23.918.699-8'}</p></div>
-        </div>
-      </div>
-      <div class="doc-arr-firmas">
-        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">${cliente.nombre||'—'}</div><div>RUT: ${cliente.rut||'—'}</div><div>Entrega</div></div></div>
-        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">${emp.contacto||'Gaudy Martínez'}</div><div>${emp.nombre}</div><div>RUT: ${emp.rut||''}</div></div></div>
-      </div>
-    </div>
-  </div>`;
-
-  const ventana=window.open('','_blank','width=800,height=600');
-  ventana.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Devolución ${a.num}</title>
-  <style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#f5f5f5;font-family:Arial,sans-serif;padding:20px;}
-  .doc-arr{background:white;max-width:760px;margin:0 auto;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.15);overflow:hidden;}
-  .doc-arr-head{border-bottom:3px solid #1a1a1a;padding:16px 22px;display:flex;align-items:center;}
-  .doc-arr-body{padding:18px 22px;}
-  .doc-arr-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:10px;}
-  .doc-arr-table th{background:#1a1a1a;color:white;padding:6px 8px;}
-  .doc-arr-table td{padding:6px 8px;border:1px solid #ccc;}
-  .doc-arr-firmas{display:flex;justify-content:space-between;margin-top:28px;padding-top:16px;border-top:2px solid #1a1a1a;}
-  .doc-arr-firma{text-align:center;min-width:200px;}
-  .doc-arr-firma-line{border-top:1px solid #1a1a1a;padding-top:6px;margin-top:32px;font-size:10px;}
-  .btn-print{display:block;margin:16px auto;padding:12px 32px;background:#F59E0B;color:#1a1a1a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
-  @media print{.btn-print{display:none!important;}body{background:white;padding:0;}@page{margin:10mm;}}
-  </style></head><body>
-  <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
-  ${html}
   </body></html>`);
   ventana.document.close();
 }
@@ -1201,7 +1563,7 @@ function poblarSelects(){
 
 function O(id){
   if(['moArriendo','moFlete','moMant'].includes(id)) poblarSelects();
-  if(id==='moArriendo'){document.getElementById('arId').value='';document.getElementById('tArriendo').textContent='Nuevo Arriendo';document.getElementById('arInicio').value=HOY;document.getElementById('arNum').value='ARR-'+(ARRIENDOS.length+1).toString().padStart(3,'0');}
+  if(id==='moArriendo'){document.getElementById('arId').value='';document.getElementById('tArriendo').textContent='Nuevo Arriendo';document.getElementById('arInicio').value=HOY;document.getElementById('arNum').value='ARR-'+(ARRIENDOS.length+1).toString().padStart(3,'0');document.getElementById('arGarantia').value=0;document.getElementById('arFormaPagoGarantia').value='';document.getElementById('arEstadoGarantia').value='';document.getElementById('arFormaPago').value='';document.getElementById('arEstadoPago').value='';document.getElementById('arTipoDoc').value='';document.getElementById('arNumDoc').value='';}
   if(id==='moFlete'){document.getElementById('flId').value='';document.getElementById('tFlete').textContent='Nuevo Flete';document.getElementById('flFecha').value=HOY;document.getElementById('flNum').value='FL-'+(FLETES.length+1).toString().padStart(3,'0');document.getElementById('flTarifa').value=CFG.tarifaBase||50000;document.getElementById('flFormaPago').value='';document.getElementById('flEstadoPago').value='';document.getElementById('flTipoDoc').value='';document.getElementById('flNumDoc').value='';}
   if(id==='moActivo'){document.getElementById('aId').value='';document.getElementById('tActivo').textContent='Nuevo Activo';}
   if(id==='moCliente'){document.getElementById('cliId').value='';}
@@ -1469,84 +1831,6 @@ function getLogo(){
 // Agregar documentos al tab handler
 // Agregar documentos al tab handler — ya integrado en T principal
 
-
-// ═══════════════════════════════════════════════════════
-// AUTOCARGA DATOS REALES — M&P ARRIENDOS SPA
-// Se ejecuta solo si el ERP está vacío (primera vez)
-// ═══════════════════════════════════════════════════════
-function autocargarDatos(){
-  // Solo carga si no hay empresa configurada aún
-  const yaConfigurado = localStorage.getItem('mss_empresa_actual');
-  if(yaConfigurado) return; // Ya tiene datos, no sobreescribir
-
-  const empresa = {"id":1,"nombre":"Martinez y Pajuelo Arriendos y Servicios SpA","rut":"78.361.479-0","direccion":"Av. Unión Europea 3175, Alto Hospicio","comuna":"Alto Hospicio","ciudad":"Iquique","giro":"Servicios de Arriendos, Flete y Venta de productos para Construcción y Ferretería","tel":"975157431","email":"ventas@maquinariasmyp.com","contacto":"Gaudy Martínez Yovera","rut_rep":"23.918.699-8"};
-
-  const activos = [
-    {"id":1,"nombre":"Camioneta Porter II","tipo":"Vehículo","cat":"Camioneta","marca":"Hyundai","modelo":"Porter II DCAB 2.5","anio":2011,"patente":"RKJW59","motor":"D4CB5961734","chasis":"KMFZCY7JBBU753503","color":"Blanco","combustible":"Diesel","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedida a título gratuito por Gaudy Martínez Yovera, Declaración Jurada notarial 25/02/2026"},
-    {"id":2,"nombre":"Betonera 200L 900W BONICA","tipo":"Equipo","cat":"Maquinaria","marca":"BONICA","modelo":"200L 900W","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":15000,"obs":"Comprada 05/03/2026. Contratos 1001, 1003, 1005"},
-    {"id":3,"nombre":"Demoledor 3000W TASBEL","tipo":"Equipo","cat":"Maquinaria","marca":"TASBEL","modelo":"3000W","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":15000,"obs":"Comprado 24/02/2026 vía MercadoPago. Contrato 1006"},
-    {"id":4,"nombre":"Generador c/s Extensión","tipo":"Equipo","cat":"Equipo","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido por Gaudy Martínez, escritura notarial 25/02/2026"},
-    {"id":5,"nombre":"Compresor","tipo":"Equipo","cat":"Equipo","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido por Gaudy Martínez, escritura notarial 25/02/2026"},
-    {"id":6,"nombre":"Rotomartillo","tipo":"Equipo","cat":"Herramienta","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido por Gaudy Martínez, escritura notarial 25/02/2026"},
-    {"id":7,"nombre":"Sierra de Banco","tipo":"Equipo","cat":"Herramienta","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido por Gaudy Martínez, escritura notarial 25/02/2026"},
-    {"id":8,"nombre":"Ingletadora","tipo":"Equipo","cat":"Herramienta","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido por Gaudy Martínez, escritura notarial 25/02/2026"},
-    {"id":9,"nombre":"Sierra Circular","tipo":"Equipo","cat":"Herramienta","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido por Gaudy Martínez, escritura notarial 25/02/2026"},
-    {"id":10,"nombre":"Moto Suzuki Lets 4 50cc","tipo":"Vehículo","cat":"Vehículo","marca":"Suzuki","modelo":"Lets 4 50cc","anio":2008,"patente":"MGP-76","motor":"A404589303","km":0,"estado":"Disponible","tarifaDia":25000,"obs":"Arrendada Ctto 1004 a Nelson Lien Catrilaf 14/05/2026"}
-  ];
-
-  const clientes = [
-    {"id":1,"nombre":"Rubén Darío Núñez Rocha","rut":"27.967.415-4","tel":"+56983961043","dir":"Juan Martínez N°1757, Iquique","contacto":"Rubén Núñez","email":"","giro":""},
-    {"id":2,"nombre":"Nelson Enrique Lien Catrilaf","rut":"13.632.114-5","tel":"+56994929624","dir":"Cala Cala N°619, Pozo Almonte","contacto":"Nelson Lien","email":"","giro":""},
-    {"id":3,"nombre":"Miguel Ángel Morales Villalobos","rut":"19.975.831-4","tel":"+56986576978","dir":"La Cantera N°2447, Iquique","contacto":"Miguel Morales","email":"","giro":""},
-    {"id":4,"nombre":"José Alfredo Avilés Varela","rut":"18.493.333-0","tel":"+56954834612","dir":"Santa Marta 4237, Alto Hospicio","contacto":"José Avilés","email":"","giro":""},
-    {"id":5,"nombre":"Lázaro (Particular)","rut":"","tel":"","dir":"","contacto":"Lázaro","email":"","giro":"Particular"}
-  ];
-
-  const arriendos = [
-    {"id":1001,"num":"ARR-1001","activoId":2,"activoNombre":"Betonera 200L 900W BONICA","clienteId":1,"clienteNombre":"Rubén Darío Núñez Rocha","inicio":"2026-04-08","termino":"2026-04-08","tipoTarifa":"Diaria","tarifa":15000,"total":15000,"pagado":15000,"lugar":"Feria Navideña Frente al Jumbo, Iquique","resp":"Rubén Núñez","estado":"Finalizado","garantia":0,"formaPago":"Transferencia","tipoDoc":"Boleta","numDoc":"7007","obs":"Sin garantía por error administrativo — exención única vez. Guía 111."},
-    {"id":1003,"num":"ARR-1003","activoId":2,"activoNombre":"Betonera 200L 900W BONICA","clienteId":1,"clienteNombre":"Rubén Darío Núñez Rocha","inicio":"2026-04-10","termino":"2026-04-10","tipoTarifa":"Diaria","tarifa":15000,"total":15000,"pagado":15000,"lugar":"China con Proyectada, Alto Hospicio","resp":"Rubén Núñez","estado":"Finalizado","garantia":50000,"formaPago":"Transferencia","tipoDoc":"Boleta","numDoc":"7008","obs":"Garantía $50.000 transferencia. Guía 113. Conductor Joseph Pajuelo, patente RKJW59."},
-    {"id":1004,"num":"ARR-1004","activoId":10,"activoNombre":"Moto Suzuki Lets 4 50cc","clienteId":2,"clienteNombre":"Nelson Enrique Lien Catrilaf","inicio":"2026-05-14","termino":"2026-05-15","tipoTarifa":"Diaria","tarifa":25000,"total":25000,"pagado":25000,"lugar":"Pozo Almonte","resp":"Nelson Lien","estado":"Finalizado","garantia":100000,"formaPago":"Efectivo","tipoDoc":"Boleta","numDoc":"7011","obs":"Garantía $100.000 efectivo. Devuelta 15/05/2026 17:15 hrs. Devolución sin daños."},
-    {"id":1005,"num":"ARR-1005","activoId":2,"activoNombre":"Betonera 200L 900W BONICA","clienteId":3,"clienteNombre":"Miguel Ángel Morales Villalobos","inicio":"2026-05-20","termino":"2026-05-20","tipoTarifa":"Diaria","tarifa":15000,"total":15000,"pagado":15000,"lugar":"La Cantera N°2447, Iquique","resp":"Miguel Morales","estado":"Finalizado","garantia":50000,"formaPago":"Efectivo","tipoDoc":"Boleta","numDoc":"9006","obs":"Garantía $50.000 efectivo. Guía 115. Conductor Joseph Pajuelo, patente RKJW59. Flete $10.000."},
-    {"id":1006,"num":"ARR-1006","activoId":3,"activoNombre":"Demoledor 3000W TASBEL","clienteId":4,"clienteNombre":"José Alfredo Avilés Varela","inicio":"2026-05-28","termino":"2026-05-29","tipoTarifa":"Diaria","tarifa":15000,"total":15000,"pagado":15000,"lugar":"Santa Marta 4237, Alto Hospicio","resp":"José Avilés","estado":"Finalizado","garantia":50000,"formaPago":"Transferencia","tipoDoc":"Boleta","numDoc":"","obs":"Garantía $50.000 transferencia. Guía 116. Retira cliente. Entrega 18:00 PM 28/05."}
-  ];
-
-  const fletes = [
-    {"id":2001,"num":"FL-001","fecha":"2026-03-06","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Mudanza","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Particular","estado":"Completado","formaPago":"Efectivo","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"2","obs":""},
-    {"id":2002,"num":"FL-002","fecha":"2026-04-15","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Hospicio","destino":"Hospicio","carga":"Mudanza","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Particular","estado":"Completado","formaPago":"Tarjeta","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"154885222544","obs":""},
-    {"id":2003,"num":"FL-003","fecha":"2026-04-16","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Hospicio","destino":"Hospicio","carga":"Mudanza","peso":"","km":0,"tarifa":15000,"clienteId":5,"clienteNombre":"Particular","estado":"Completado","formaPago":"Tarjeta","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"155066556404","obs":""},
-    {"id":2004,"num":"FL-004","fecha":"2026-04-30","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Iquique","destino":"Iquique","carga":"Flete","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Particular","estado":"Completado","formaPago":"Tarjeta","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"156350052399","obs":""},
-    {"id":2005,"num":"FL-005","fecha":"2026-05-15","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete","peso":"","km":0,"tarifa":5000,"clienteId":5,"clienteNombre":"Particular","estado":"Completado","formaPago":"Tarjeta","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"158633275697","obs":""},
-    {"id":2006,"num":"FL-006","fecha":"2026-03-08","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete/Arriendo","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Lázaro","estado":"Completado","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"9003","obs":"Lázaro"},
-    {"id":2007,"num":"FL-007","fecha":"2026-03-09","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete/Arriendo","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Lázaro","estado":"Completado","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"7004","obs":"Lázaro"},
-    {"id":2008,"num":"FL-008","fecha":"2026-03-12","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete/Arriendo","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Lázaro","estado":"Completado","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"7005","obs":"Lázaro"},
-    {"id":2009,"num":"FL-009","fecha":"2026-03-12","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete/Arriendo","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Lázaro","estado":"Completado","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"9004","obs":"Lázaro"},
-    {"id":2010,"num":"FL-010","fecha":"2026-03-13","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete/Arriendo","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Lázaro","estado":"Completado","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"9005","obs":"Lázaro"},
-    {"id":2011,"num":"FL-011","fecha":"2026-03-14","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete/Arriendo","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Lázaro","estado":"Completado","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"89142086","obs":"Lázaro"}
-  ];
-
-  const mantencion = [
-    {"id":3001,"activoId":1,"activoNombre":"Camioneta Porter II","tipo":"Cambio Aceite","desc":"Lubricentro Ohiggins - Cambio de Aceite","fecha":"2026-03-20","proxima":"","costo":55000,"taller":"Lubricentro Ohiggins","estado":"Completada"},
-    {"id":3002,"activoId":1,"activoNombre":"Camioneta Porter II","tipo":"Correctiva","desc":"La Casa Del Encendido - Componentes Eléctricos","fecha":"2026-03-20","proxima":"","costo":48490,"taller":"La Casa Del Encendido","estado":"Completada"},
-    {"id":3003,"activoId":1,"activoNombre":"Camioneta Porter II","tipo":"Correctiva","desc":"Servicios Mecánicos Ronald Mamani","fecha":"2026-03-20","proxima":"","costo":20000,"taller":"Ronald Mamani","estado":"Completada"},
-    {"id":3004,"activoId":1,"activoNombre":"Camioneta Porter II","tipo":"Correctiva","desc":"Rs Diesel Ltda - Filtros y Repuestos","fecha":"2026-03-24","proxima":"","costo":52360,"taller":"Rs Diesel Ltda","estado":"Completada"},
-    {"id":3005,"activoId":1,"activoNombre":"Camioneta Porter II","tipo":"Correctiva","desc":"Arreglo Camión Porter II","fecha":"2026-05-14","proxima":"","costo":65000,"taller":"Taller externo","estado":"Completada"}
-  ];
-
-  const cfg = {"tarifaKm":500,"tarifaBase":50000,"diasMant":7};
-  const eid = '_arr1';
-
-  localStorage.setItem('mss_empresa_actual', JSON.stringify(empresa));
-  localStorage.setItem('mss'+eid+'_activos',    JSON.stringify(activos));
-  localStorage.setItem('mss'+eid+'_arriendos',  JSON.stringify(arriendos));
-  localStorage.setItem('mss'+eid+'_fletes',     JSON.stringify(fletes));
-  localStorage.setItem('mss'+eid+'_clientes',   JSON.stringify(clientes));
-  localStorage.setItem('mss'+eid+'_mantencion', JSON.stringify(mantencion));
-  localStorage.setItem('mss'+eid+'_cfg',        JSON.stringify(cfg));
-
-  console.log('✅ Datos M&P cargados automáticamente');
-}
-
-autocargarDatos();
 
 // INIT
 load();
