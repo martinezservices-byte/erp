@@ -616,6 +616,8 @@ const OT_C={Completado:'#22C55E',Programado:'#38BDF8','En Proceso':'#F59E0B',Can
 // PANEL RESIDENTE
 // ════════════════════
 function initPanel(){
+  // Asegurar datos cargados
+  if(UNIDADES.length===0){loadAll();loadTorres();}
   // Leer torres directamente de las unidades actuales
   const torres=[...new Set(UNIDADES.map(u=>u.torre).filter(t=>t))].sort((a,b)=>{
     return (parseInt(a.replace(/\D/g,''))||0)-(parseInt(b.replace(/\D/g,''))||0);
@@ -791,8 +793,11 @@ function initRendicion(){
 }
 
 function renderRendicion(){
-  const torre=document.getElementById('rendBlock').value;
-  const mes=document.getElementById('rendMes').value||mesActual;
+  // Asegurar datos cargados
+  if(UNIDADES.length===0){loadAll();loadTorres();}
+  const mesHoy=new Date().toISOString().substring(0,7);
+  const torre=document.getElementById('rendBlock')?.value||'';
+  const mes=document.getElementById('rendMes')?.value||mesHoy;
   const [y,m]=mes.split('-');
   const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const mesLabel=meses[parseInt(m)-1]+' '+y;
