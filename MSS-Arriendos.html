@@ -356,8 +356,10 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
     <div class="fl"><label>Tarifa Mensual ($)</label><input id="aTarifaMes" type="number" value="0"/></div>
     <div class="fl"><label>Km/Horas Actuales</label><input id="aKm" type="number" value="0"/></div>
     <div class="fl"><label>Próx. Mantención (km/horas)</label><input id="aProxMant" type="number" value="0"/></div>
-    <div class="fl"><label>Vencimiento Seguro</label><input id="aSeguro" type="date"/></div>
+    <div class="fl"><label>Vencimiento Seguro (SOAP)</label><input id="aSeguro" type="date"/></div>
     <div class="fl"><label>Vencimiento Revisión Técnica</label><input id="aRevision" type="date"/></div>
+    <div class="fl"><label>Vencimiento Permiso Circulación</label><input id="aPermiso" type="date"/></div>
+    <div class="fl"><label>Valor Comercial / Costo ($)</label><input id="aValor" type="number" value="0" placeholder="Valor de reposición"/></div>
     <div class="fl"><label>Estado</label><select id="aEstado" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
       <option>Disponible</option><option>Arrendado</option><option>Mantención</option><option>Fuera de Servicio</option>
     </select></div>
@@ -537,7 +539,7 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
 // Versión: 2026-06-01 — Sobreescribe datos anteriores
 // ═══════════════════════════════════════════════════
 (function(){
-  const VERSION = 'MYP_v20260601c';
+  const VERSION = 'MYP_v20260601d';
   // Si ya está cargada esta versión exacta, no volver a cargar
   if(localStorage.getItem('mss_data_version') === VERSION) return;
 
@@ -547,16 +549,16 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
   const pre = 'mss_arr1';
 
   const activos = [
-    {"id":1,"nombre":"Camioneta Porter II","tipo":"Vehículo","cat":"Camioneta","marca":"Hyundai","modelo":"Porter II DCAB 2.5","anio":2011,"patente":"RKJW59","motor":"D4CB5961734","chasis":"KMFZCY7JBBU753503","color":"Blanco","combustible":"Diesel","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedida por Gaudy Martínez Yovera, Declaración Jurada notarial 25/02/2026"},
-    {"id":2,"nombre":"Betonera 200L 900W BONICA","tipo":"Equipo","cat":"Maquinaria","marca":"BONICA","modelo":"200L 900W","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":15000,"obs":"Comprada 05/03/2026. Contratos 1001, 1003, 1005"},
-    {"id":3,"nombre":"Demoledor 3000W TASBEL","tipo":"Equipo","cat":"Maquinaria","marca":"TASBEL","modelo":"3000W","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":15000,"obs":"Comprado 24/02/2026. Contrato 1006"},
+    {"id":1,"nombre":"Camioneta Porter II","tipo":"Vehículo","cat":"Camioneta","marca":"Hyundai","modelo":"Porter II DCAB 2.5","anio":2011,"patente":"RKJW59","motor":"D4CB5961734","chasis":"KMFZCY7JBBU753503","color":"Blanco","combustible":"Diesel","km":0,"estado":"Disponible","tarifaDia":0,"valor":3500000,"seguro":"2027-03-05","revision":"2027-03-05","permiso":"2027-03-06","obs":"Cedida por Gaudy Martínez Yovera, Declaración Jurada notarial 25/02/2026. SOAP y Permiso Circulación pagados 05-06/03/2026"},
+    {"id":2,"nombre":"Betonera 200L 900W BONICA","tipo":"Equipo","cat":"Maquinaria","marca":"BONICA","modelo":"200L 900W","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":15000,"valor":271915,"obs":"Comprada 05/03/2026. Contratos 1001, 1003, 1005"},
+    {"id":3,"nombre":"Demoledor 3000W TASBEL","tipo":"Equipo","cat":"Maquinaria","marca":"TASBEL","modelo":"3000W","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":15000,"valor":85990,"obs":"Comprado 24/02/2026. Contrato 1006"},
     {"id":4,"nombre":"Generador c/s Extensión","tipo":"Equipo","cat":"Equipo","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido por Gaudy Martínez, escritura notarial 25/02/2026"},
     {"id":5,"nombre":"Compresor","tipo":"Equipo","cat":"Equipo","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido por Gaudy Martínez, escritura notarial 25/02/2026"},
     {"id":6,"nombre":"Rotomartillo","tipo":"Equipo","cat":"Herramienta","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido por Gaudy Martínez, escritura notarial 25/02/2026"},
     {"id":7,"nombre":"Sierra de Banco","tipo":"Equipo","cat":"Herramienta","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido por Gaudy Martínez, escritura notarial 25/02/2026"},
     {"id":8,"nombre":"Ingletadora","tipo":"Equipo","cat":"Herramienta","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido por Gaudy Martínez, escritura notarial 25/02/2026"},
     {"id":9,"nombre":"Sierra Circular","tipo":"Equipo","cat":"Herramienta","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido por Gaudy Martínez, escritura notarial 25/02/2026"},
-    {"id":10,"nombre":"Moto Suzuki Lets 4 50cc","tipo":"Vehículo","cat":"Vehículo","marca":"Suzuki","modelo":"Lets 4 50cc","anio":2008,"patente":"MGP-76","motor":"A404589303","km":0,"estado":"Disponible","tarifaDia":25000,"obs":"Ctto 1004 — Nelson Lien Catrilaf 14/05/2026"}
+    {"id":10,"nombre":"Moto Suzuki Lets 4 50cc","tipo":"Vehículo","cat":"Vehículo","marca":"Suzuki","modelo":"Lets 4 50cc","anio":2008,"patente":"MGP-76","motor":"A404589303","km":0,"estado":"Disponible","tarifaDia":25000,"valor":350000,"obs":"Ctto 1004 — Nelson Lien Catrilaf 14/05/2026"}
   ];
 
   const clientes = [
@@ -698,10 +700,25 @@ function rDash(){
     if(dias<0) alertas.push({tipo:'danger',msg:`Arriendo ${a.num} VENCIDO hace ${Math.abs(dias)} días — ${a.activoNombre} · ${a.clienteNombre}`});
   });
   ACTIVOS.forEach(a=>{
-    if(a.seguro&&new Date(a.seguro)<=new Date(new Date().setDate(hoyDate.getDate()+30)))
-      alertas.push({tipo:'warning',msg:`Seguro de ${a.nombre} vence el ${df(a.seguro)}`});
-    if(a.revision&&new Date(a.revision)<=new Date(new Date().setDate(hoyDate.getDate()+30)))
-      alertas.push({tipo:'warning',msg:`Revisión técnica de ${a.nombre} vence el ${df(a.revision)}`});
+    const lim30=new Date(new Date().setDate(hoyDate.getDate()+30));
+    const lim7=new Date(new Date().setDate(hoyDate.getDate()+7));
+    if(a.seguro){
+      const fs=new Date(a.seguro);
+      if(fs<hoyDate) alertas.push({tipo:'danger',msg:`🚨 SOAP VENCIDO — ${a.nombre} (Patente ${a.patente||'—'}) · Venció el ${df(a.seguro)}`});
+      else if(fs<=lim30) alertas.push({tipo:'warning',msg:`⚠ SOAP por vencer — ${a.nombre} (${a.patente||'—'}) · Vence el ${df(a.seguro)}`});
+    }
+    if(a.revision){
+      const fr=new Date(a.revision);
+      if(fr<hoyDate) alertas.push({tipo:'danger',msg:`🚨 REVISIÓN TÉCNICA VENCIDA — ${a.nombre} (${a.patente||'—'}) · Venció el ${df(a.revision)}`});
+      else if(fr<=lim30) alertas.push({tipo:'warning',msg:`⚠ Revisión Técnica por vencer — ${a.nombre} (${a.patente||'—'}) · Vence el ${df(a.revision)}`});
+    }
+    if(a.permiso){
+      const fp=new Date(a.permiso);
+      if(fp<hoyDate) alertas.push({tipo:'danger',msg:`🚨 PERMISO CIRCULACIÓN VENCIDO — ${a.nombre} (${a.patente||'—'}) · Venció el ${df(a.permiso)}`});
+      else if(fp<=lim30) alertas.push({tipo:'warning',msg:`⚠ Permiso de Circulación por vencer — ${a.nombre} (${a.patente||'—'}) · Vence el ${df(a.permiso)}`});
+    }
+    if(a.proxMant&&a.km&&a.km>=a.proxMant)
+      alertas.push({tipo:'warning',msg:`🔧 Mantención pendiente — ${a.nombre} · Km actuales: ${a.km.toLocaleString('es-CL')} / Próxima: ${a.proxMant.toLocaleString('es-CL')}`});
   });
   document.getElementById('dashAlertas').innerHTML=alertas.length===0
     ?'<div style="color:var(--ok);font-size:12px;padding:8px">✓ Sin alertas pendientes</div>'
@@ -725,12 +742,15 @@ function rActivos(){
       <div class="ac-body">
         <div class="ac-row"><span style="color:var(--muted)">Marca/Modelo</span><span>${a.marca||'—'} ${a.modelo||''}</span></div>
         <div class="ac-row"><span style="color:var(--muted)">Año</span><span>${a.anio||'—'}</span></div>
-        <div class="ac-row"><span style="color:var(--muted)">Patente/Serie</span><span style="color:var(--acc)">${a.patente||'—'}</span></div>
+        <div class="ac-row"><span style="color:var(--muted)">Patente/Serie</span><span style="color:var(--acc);font-weight:700">${a.patente||'—'}</span></div>
         <div class="ac-row"><span style="color:var(--muted)">Tarifa/día</span><span style="color:var(--ok)">${clp(a.tarifaDia)}</span></div>
+        ${a.valor?`<div class="ac-row"><span style="color:var(--muted)">Valor Comercial</span><span>${clp(a.valor)}</span></div>`:''}
         <div class="ac-row"><span style="color:var(--muted)">Km/Horas</span><span>${(a.km||0).toLocaleString('es-CL')}</span></div>
-        ${a.seguro?`<div class="ac-row"><span style="color:var(--muted)">Seguro</span><span style="color:${new Date(a.seguro)<new Date()?'var(--danger)':'var(--ok)'}">${df(a.seguro)}</span></div>`:''}
-        ${a.revision?`<div class="ac-row"><span style="color:var(--muted)">Rev. Técnica</span><span style="color:${new Date(a.revision)<new Date()?'var(--danger)':'var(--ok)'}">${df(a.revision)}</span></div>`:''}
-        <div style="display:flex;gap:5px;margin-top:10px">
+        <div style="border-top:1px solid var(--b2);margin-top:7px;padding-top:7px">
+        ${a.seguro?`<div class="ac-row"><span style="color:var(--muted)">🛡 SOAP</span><span style="color:${new Date(a.seguro)<new Date()?'var(--danger)':new Date(a.seguro)<new Date(new Date().setDate(new Date().getDate()+30))?'var(--acc)':'var(--ok)'};font-weight:700">${df(a.seguro)}${new Date(a.seguro)<new Date()?' ⚠VENCIDO':''}</span></div>`:'<div class="ac-row"><span style="color:var(--muted)">🛡 SOAP</span><span style="color:var(--muted);font-size:9px">Sin registrar</span></div>'}
+        ${a.revision?`<div class="ac-row"><span style="color:var(--muted)">🔍 Rev. Técnica</span><span style="color:${new Date(a.revision)<new Date()?'var(--danger)':new Date(a.revision)<new Date(new Date().setDate(new Date().getDate()+30))?'var(--acc)':'var(--ok)'};font-weight:700">${df(a.revision)}${new Date(a.revision)<new Date()?' ⚠VENCIDA':''}</span></div>`:'<div class="ac-row"><span style="color:var(--muted)">🔍 Rev. Técnica</span><span style="color:var(--muted);font-size:9px">Sin registrar</span></div>'}
+        ${a.permiso?`<div class="ac-row"><span style="color:var(--muted)">📋 Perm. Circulación</span><span style="color:${new Date(a.permiso)<new Date()?'var(--danger)':new Date(a.permiso)<new Date(new Date().setDate(new Date().getDate()+30))?'var(--acc)':'var(--ok)'};font-weight:700">${df(a.permiso)}${new Date(a.permiso)<new Date()?' ⚠VENCIDO':''}</span></div>`:'<div class="ac-row"><span style="color:var(--muted)">📋 Perm. Circulación</span><span style="color:var(--muted);font-size:9px">Sin registrar</span></div>'}
+        </div>
           <button class="bsm be" style="flex:1" onclick="editActivo(${a.id})">✎ Editar</button>
           <button class="bsm" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--acc)" onclick="nuevoArriendoActivo(${a.id})">+ Arriendo</button>
           <button class="bsm bd" onclick="delActivo(${a.id})">✕</button>
@@ -741,7 +761,7 @@ function rActivos(){
 
 function saveActivo(){
   const id=document.getElementById('aId').value;
-  const obj={nombre:document.getElementById('aNombre').value.trim(),tipo:document.getElementById('aTipo').value,cat:document.getElementById('aCat').value,marca:document.getElementById('aMarca').value,modelo:document.getElementById('aModelo').value,anio:document.getElementById('aAnio').value,patente:document.getElementById('aPatente').value,tarifaDia:parseFloat(document.getElementById('aTarifaDia').value)||0,tarifaSem:parseFloat(document.getElementById('aTarifaSem').value)||0,tarifaMes:parseFloat(document.getElementById('aTarifaMes').value)||0,km:parseFloat(document.getElementById('aKm').value)||0,proxMant:parseFloat(document.getElementById('aProxMant').value)||0,seguro:document.getElementById('aSeguro').value,revision:document.getElementById('aRevision').value,estado:document.getElementById('aEstado').value,obs:document.getElementById('aObs').value};
+  const obj={nombre:document.getElementById('aNombre').value.trim(),tipo:document.getElementById('aTipo').value,cat:document.getElementById('aCat').value,marca:document.getElementById('aMarca').value,modelo:document.getElementById('aModelo').value,anio:document.getElementById('aAnio').value,patente:document.getElementById('aPatente').value,tarifaDia:parseFloat(document.getElementById('aTarifaDia').value)||0,tarifaSem:parseFloat(document.getElementById('aTarifaSem').value)||0,tarifaMes:parseFloat(document.getElementById('aTarifaMes').value)||0,km:parseFloat(document.getElementById('aKm').value)||0,proxMant:parseFloat(document.getElementById('aProxMant').value)||0,seguro:document.getElementById('aSeguro').value,revision:document.getElementById('aRevision').value,permiso:document.getElementById('aPermiso').value,valor:parseFloat(document.getElementById('aValor').value)||0,estado:document.getElementById('aEstado').value,obs:document.getElementById('aObs').value};
   if(!obj.nombre)return alert('Nombre requerido');
   if(id){const i=ACTIVOS.findIndex(a=>a.id==id);if(i>=0)ACTIVOS[i]={...ACTIVOS[i],...obj};}
   else ACTIVOS.push({id:uid(),...obj});
@@ -766,6 +786,8 @@ function editActivo(id){
   document.getElementById('aProxMant').value=a.proxMant||0;
   document.getElementById('aSeguro').value=a.seguro||'';
   document.getElementById('aRevision').value=a.revision||'';
+  document.getElementById('aPermiso').value=a.permiso||'';
+  document.getElementById('aValor').value=a.valor||0;
   document.getElementById('aEstado').value=a.estado;
   document.getElementById('aObs').value=a.obs||'';
   O('moActivo');
