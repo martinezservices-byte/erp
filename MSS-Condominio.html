@@ -214,9 +214,10 @@ try{
         <div class="ct">Movimientos Fondo de Reserva</div>
         <div style="display:flex;gap:8px;margin-bottom:12px">
           <button class="bg" style="padding:6px 14px;font-size:11px" onclick="openMo('moFondo')">+ Movimiento</button>
+          <button class="bgh" style="padding:6px 14px;font-size:11px;color:var(--danger);border-color:rgba(239,68,68,0.3)" onclick="limpiarSeccion('fondo')">🗑 Limpiar Todo</button>
         </div>
         <div class="tw"><table id="tblFondo">
-          <thead><tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Monto</th><th>Saldo</th></tr></thead>
+          <thead><tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Monto</th><th>Saldo</th><th></th></tr></thead>
           <tbody></tbody>
         </table></div>
       </div>
@@ -1260,6 +1261,7 @@ function renderFondo(){
     <td style="color:var(--white)">${f.desc}</td>
     <td style="color:${f.tipo==='Aporte'?'var(--ok)':'var(--danger)'};font-weight:700;text-align:right">${f.tipo==='Aporte'?'+':'-'}${clp(f.monto)}</td>
     <td style="color:var(--acc);font-weight:700;text-align:right">${clp(f.saldo)}</td>
+    <td><button class="bsm bd" onclick="delFondo(${f.id})">✕</button></td>
   </tr>`).join('');
 }
 
@@ -1270,6 +1272,18 @@ function saveFondo(){
   const nuevoSaldo=tipo==='Aporte'?saldoAnt+monto:Math.max(0,saldoAnt-monto);
   FONDO.push({id:uid(),fecha:document.getElementById('fndFecha').value,tipo,desc:document.getElementById('fndDesc').value,monto,saldo:nuevoSaldo});
   saveAll();closeMo('moFondo');renderFondo();
+}
+
+function delFondo(id){
+  if(!confirm('¿Eliminar este movimiento?'))return;
+  FONDO=FONDO.filter(f=>f.id!==id);
+  // Recalcular saldos
+  let saldoAc=0;
+  FONDO.forEach(f=>{
+    saldoAc=f.tipo==='Aporte'?saldoAc+f.monto:Math.max(0,saldoAc-f.monto);
+    f.saldo=saldoAc;
+  });
+  saveAll();renderFondo();
 }
 
 // ════════════════════
