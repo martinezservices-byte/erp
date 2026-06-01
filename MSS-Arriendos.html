@@ -539,14 +539,15 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
 // Versión: 2026-06-01 — Sobreescribe datos anteriores
 // ═══════════════════════════════════════════════════
 (function(){
-  const VERSION = 'MYP_v20260601d';
-  // Si ya está cargada esta versión exacta, no volver a cargar
-  if(localStorage.getItem('mss_data_version') === VERSION) return;
+  // Siempre fija la empresa correcta
+  // Solo carga activos/arriendos/fletes si están vacíos o dañados
+  const empKey = 'mss_empresa_actual';
+  const pre    = 'mss_arr1';
 
   const empresa = {"id":1,"nombre":"Martinez y Pajuelo Arriendos y Servicios SpA","rut":"78.361.479-0","direccion":"Av. Unión Europea 3175, Alto Hospicio","comuna":"Alto Hospicio","ciudad":"Iquique","giro":"Servicios de Arriendos, Flete y Venta de productos para Construcción y Ferretería","tel":"975157431","email":"ventas@maquinariasmyp.com","contacto":"Gaudy Martínez Yovera","rut_rep":"23.918.699-8"};
-  localStorage.setItem('mss_empresa_actual', JSON.stringify(empresa));
 
-  const pre = 'mss_arr1';
+  // SIEMPRE actualiza la empresa (esto nunca debe estar vacío)
+  localStorage.setItem(empKey, JSON.stringify(empresa));
 
   const activos = [
     {"id":1,"nombre":"Camioneta Porter II","tipo":"Vehículo","cat":"Camioneta","marca":"Hyundai","modelo":"Porter II DCAB 2.5","anio":2011,"patente":"RKJW59","motor":"D4CB5961734","chasis":"KMFZCY7JBBU753503","color":"Blanco","combustible":"Diesel","km":0,"estado":"Disponible","tarifaDia":0,"valor":3500000,"seguro":"2027-03-05","revision":"2027-03-05","permiso":"2027-03-06","obs":"Cedida por Gaudy Martínez Yovera, Declaración Jurada notarial 25/02/2026. SOAP y Permiso Circulación pagados 05-06/03/2026"},
@@ -599,14 +600,19 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
     {"id":3005,"activoId":1,"activoNombre":"Camioneta Porter II","tipo":"Correctiva","desc":"Arreglo Camión Porter II","fecha":"2026-05-14","proxima":"","costo":65000,"taller":"Taller externo","estado":"Completada"}
   ];
 
-  localStorage.setItem(pre+'_activos',    JSON.stringify(activos));
-  localStorage.setItem(pre+'_arriendos',  JSON.stringify(arriendos));
-  localStorage.setItem(pre+'_fletes',     JSON.stringify(fletes));
-  localStorage.setItem(pre+'_clientes',   JSON.stringify(clientes));
-  localStorage.setItem(pre+'_mantencion', JSON.stringify(mantencion));
-  localStorage.setItem(pre+'_cfg',        JSON.stringify({"tarifaKm":500,"tarifaBase":50000,"diasMant":7}));
-  localStorage.setItem('mss_data_version', VERSION);
-  console.log('✅ Datos M&P cargados — versión '+VERSION);
+  // Solo carga activos/clientes/etc si están vacíos o dañados
+  const activosActuales = JSON.parse(localStorage.getItem(pre+'_activos')||'[]');
+  if(!activosActuales || activosActuales.length === 0){
+    localStorage.setItem(pre+'_activos',    JSON.stringify(activos));
+    localStorage.setItem(pre+'_arriendos',  JSON.stringify(arriendos));
+    localStorage.setItem(pre+'_fletes',     JSON.stringify(fletes));
+    localStorage.setItem(pre+'_clientes',   JSON.stringify(clientes));
+    localStorage.setItem(pre+'_mantencion', JSON.stringify(mantencion));
+    localStorage.setItem(pre+'_cfg',        JSON.stringify({"tarifaKm":500,"tarifaBase":50000,"diasMant":7}));
+    console.log('✅ Datos M&P cargados por primera vez');
+  } else {
+    console.log('ℹ️ Datos existentes conservados — empresa actualizada');
+  }
 })();
 
 // Storage
