@@ -511,6 +511,12 @@ function T(id,btn){
   document.querySelectorAll('#mainTabs .tab').forEach(b=>b.classList.remove('on'));
   document.getElementById('sec-'+id)?.classList.add('on');
   btn.classList.add('on');
+  if(id==='documentos'){
+    poblarActivosDoc();
+    document.getElementById('dcFecha').value=HOY;
+    document.getElementById('dcInicio').value=HOY;
+    document.getElementById('ddFecha').value=HOY;
+  }
   ({dashboard:rDash,activos:rActivos,arriendos:rArriendos,fletes:rFletes,
     clientes:rClientes,disponibilidad:rDispInit,mantencion:rMantencion,config:rConfig}[id]||function(){})();
 }
@@ -1440,16 +1446,8 @@ function getLogo(){
 }
 
 // Agregar documentos al tab handler
-const _origT=T;
-function T(id,btn){
-  _origT(id,btn);
-  if(id==='documentos'){
-    poblarActivosDoc();
-    document.getElementById('dcFecha').value=HOY;
-    document.getElementById('dcInicio').value=HOY;
-    document.getElementById('ddFecha').value=HOY;
-  }
-}
+// Agregar documentos al tab handler — ya integrado en T principal
+
 
 // INIT
 load();
