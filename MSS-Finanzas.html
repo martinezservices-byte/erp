@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Martinez Services Spa — Finanzas</title>
+<title>Finanzas — ERP Martinez Services</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -11,24 +11,24 @@
   --bg:#07111F;--surf:#0D1D30;--surf2:#122438;
   --border:rgba(180,145,60,0.15);--gold:#C9A84C;--goldHi:#E8C97A;
   --white:#EFF3FA;--muted:#6B7A90;--ok:#27AE60;--danger:#C0392B;
-  --warn:#D4890A;--info:#2471A3;
+  --warn:#D4890A;--info:#2471A3;--teal:#10B981;--purple:#A78BFA;
 }
 body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;min-height:100vh;}
-/* HEADER */
-#header{background:var(--surf);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+#nav-bar{background:#030609;border-bottom:1px solid rgba(201,168,76,0.1);padding:0 16px;display:flex;align-items:center;gap:4px;overflow-x:auto;flex-shrink:0;height:42px;position:sticky;top:0;z-index:200;}
+#nav-bar a{padding:5px 9px;border-radius:6px;color:var(--muted);font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;}
+#nav-bar a:hover{color:var(--white);}
+#nav-emp{margin-left:auto;padding:3px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;font-size:9px;color:#C9A84C;font-family:monospace;white-space:nowrap;flex-shrink:0;}
+#header{background:var(--surf);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:42px;z-index:100;}
 .logo{display:flex;align-items:center;gap:14px;}
 .logo-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--goldHi));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--bg);}
 .logo-name{font-size:15px;font-weight:800;color:var(--white);}
 .logo-mod{font-size:10px;color:var(--gold);font-weight:700;letter-spacing:2px;font-family:monospace;}
 .header-right{display:flex;gap:10px;align-items:center;}
 .header-info{font-size:11px;color:var(--muted);font-family:monospace;}
-/* TABS */
 #tabbar{display:flex;gap:3px;background:var(--bg);padding:4px;border-radius:10px;width:fit-content;margin:22px 24px 0;}
 .tab{padding:7px 16px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:700;transition:all .18s;background:transparent;color:var(--muted);font-family:monospace;}
 .tab.active{background:var(--gold);color:var(--bg);}
-/* CONTENT */
 #content{max-width:1200px;margin:0 auto;padding:20px 24px 40px;}
-/* CARDS */
 .kpi-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
 .kpi{flex:1;min-width:155px;background:var(--surf);border-radius:12px;padding:18px 20px;border:1px solid var(--border);position:relative;overflow:hidden;}
 .kpi::before{content:'';position:absolute;top:0;right:0;width:60px;height:60px;background:radial-gradient(circle at top right,var(--kc,rgba(201,168,76,0.1)),transparent 70%);}
@@ -37,111 +37,80 @@ body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;m
 .kpi-sub{font-size:11px;color:var(--muted);margin-top:3px;}
 .kpi-trend{margin-top:8px;font-size:11px;font-weight:700;}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;}
 .card{background:var(--surf);border-radius:12px;padding:20px;border:1px solid var(--border);}
 .card-title{font-size:13px;font-weight:700;color:var(--white);margin-bottom:16px;}
 .badge{display:inline-flex;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;font-family:monospace;white-space:nowrap;}
-.progress-wrap{background:rgba(255,255,255,0.07);border-radius:4px;height:6px;width:100%;}
-.progress-bar{border-radius:4px;transition:width .8s ease;}
-/* TABLE */
 .tbl-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:12px;font-family:monospace;}
 th{padding:9px 12px;text-align:left;color:var(--gold);font-weight:700;border-bottom:1px solid var(--border);white-space:nowrap;}
 td{padding:8px 12px;border-bottom:1px solid rgba(180,145,60,0.07);white-space:nowrap;}
 tr:nth-child(even) td{background:rgba(255,255,255,0.012);}
 tfoot td{border-top:2px solid rgba(201,168,76,0.3);font-weight:800;}
-/* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:999;align-items:center;justify-content:center;}
 .modal-overlay.open{display:flex;}
-.modal{background:var(--surf);border-radius:16px;padding:28px;border:1px solid rgba(201,168,76,0.4);width:440px;max-height:90vh;overflow-y:auto;font-family:monospace;}
-.modal h3{font-size:16px;font-weight:800;color:var(--white);margin-bottom:20px;font-family:'Segoe UI',sans-serif;}
-.field{margin-bottom:14px;}
-.field label{font-size:10px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;}
-.field input,.field select{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--white);font-size:13px;font-family:monospace;outline:none;}
-.field input:focus{border-color:var(--gold);}
+.modal{background:var(--surf);border-radius:16px;padding:28px;border:1px solid rgba(201,168,76,0.4);width:500px;max-height:90vh;overflow-y:auto;font-family:monospace;}
+.modal h3{font-size:16px;font-weight:800;color:var(--white);margin-bottom:20px;}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fl{display:flex;flex-direction:column;gap:4px;}
+.fl label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.fl input,.fl select{padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--white);font-size:12px;font-family:monospace;outline:none;}
+.fl input:focus{border-color:var(--gold);}
 .btn{padding:9px 20px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:13px;font-family:monospace;}
 .btn-gold{background:var(--gold);color:var(--bg);}
 .btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted);}
 .btn-sm{padding:4px 10px;border-radius:5px;font-size:11px;}
 .btn-edit{background:transparent;border:1px solid rgba(201,168,76,0.35);color:var(--gold);}
 .btn-del{background:transparent;border:1px solid rgba(192,57,43,0.35);color:var(--danger);}
-/* SECTION */
-.section{display:none;}
-.section.active{display:block;}
-/* INDICATOR ROW */
+.section{display:none;}.section.active{display:block;}
 .ind-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(180,145,60,0.07);}
-/* VIABILITY CARD */
-.via-card{background:var(--surf2);border-radius:12px;padding:24px;border:1px solid var(--border);display:flex;flex-direction:column;gap:8px;}
-.via-icon{font-size:26px;}
-.via-label{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;font-family:monospace;}
-.via-value{font-size:32px;font-weight:900;font-family:'Segoe UI',sans-serif;}
-.via-sub{font-size:12px;color:var(--muted);}
-/* FOOTER */
+.via-card{background:var(--surf2);border-radius:12px;padding:20px;border:1px solid var(--border);}
+.via-label{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;font-family:monospace;margin-bottom:6px;}
+.via-value{font-size:26px;font-weight:900;}
 #footer{border-top:1px solid var(--border);padding:13px 28px;display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-family:monospace;}
 canvas{max-height:240px;}
-@media(max-width:700px){.grid-2,.grid-3{grid-template-columns:1fr;}.kpi-row{flex-direction:column;}}
-@media print{
-  #nav-bar,#header,#tabbar,.no-print,
-  .tabs{display:none!important;}
-  body{background:white!important;}
-}
+@media(max-width:700px){.grid-2{grid-template-columns:1fr;}.kpi-row{flex-direction:column;}.fg{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-<div id="nav-bar" style="background:#030609;border-bottom:1px solid rgba(201,168,76,0.1);padding:0 16px;display:flex;align-items:center;gap:4px;overflow-x:auto;flex-shrink:0;height:42px;position:sticky;top:0;z-index:200;">
-<a href="index.html" style="display:flex;align-items:center;padding:5px 10px;border-radius:6px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">&#127968; Hub</a>
-<div style="width:1px;height:20px;background:rgba(201,168,76,0.15);margin:0 2px;flex-shrink:0"></div>
-<a href="MSS-Finanzas.html" style="padding:5px 9px;border-radius:6px;color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Finanzas</a>
-<a href="MSS-Remuneraciones.html" style="padding:5px 9px;border-radius:6px;color:#22C55E;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Remuner.</a>
-<a href="MSS-Contabilidad.html" style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Contab.</a>
-<a href="MSS-Facturacion.html" style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Factur.</a>
-<a href="MSS-Cotizacion.html" style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Cotiz.</a>
-<a href="MSS-Tesoreria.html" style="padding:5px 9px;border-radius:6px;color:#FBBF24;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Tesor.</a>
-<a href="MSS-Contratos.html" style="padding:5px 9px;border-radius:6px;color:#A78BFA;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Contratos</a>
-<a href="MSS-Proyectos.html" style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Proyectos</a>
-<a href="MSS-Ventas-CRM.html" style="padding:5px 9px;border-radius:6px;color:#FB923C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Ventas</a>
-<a href="MSS-RRHH.html" style="padding:5px 9px;border-radius:6px;color:#A78BFA;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">RRHH</a>
-<a href="MSS-Estrategia.html" style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Estrategia</a>
-<a href="MSS-Logos.html" style="padding:5px 9px;border-radius:6px;color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Logos</a>
-<a href="MSS-Respaldo.html" style="padding:5px 9px;border-radius:6px;color:#64748B;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Respaldo</a><a href="MSS-Arriendos.html" style="padding:5px 9px;border-radius:6px;color:#F59E0B;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">🚛 Arriendos</a><a href="MSS-Condominio.html" style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;border:1px solid rgba(16,185,129,0.3);">🏢 Condominio</a>
-<div id="nav-emp" style="margin-left:auto;padding:3px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;font-size:9px;color:#C9A84C;font-family:monospace;white-space:nowrap;flex-shrink:0;display:none"></div>
+
+<!-- NAV -->
+<div id="nav-bar">
+<a href="index.html" style="background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);color:#C9A84C;">🏠 Hub</a>
+<a href="MSS-Finanzas.html" style="color:#C9A84C;">Finanzas</a>
+<a href="MSS-Remuneraciones.html" style="color:#22C55E;">Remuner.</a>
+<a href="MSS-Contabilidad.html" style="color:#10B981;">Contab.</a>
+<a href="MSS-Facturacion.html" style="color:#38BDF8;">Factur.</a>
+<a href="MSS-Cotizacion.html" style="color:#38BDF8;">Cotiz.</a>
+<a href="MSS-Tesoreria.html" style="color:#FBBF24;">Tesor.</a>
+<a href="MSS-Contratos.html" style="color:#A78BFA;">Contratos</a>
+<a href="MSS-Proyectos.html" style="color:#38BDF8;">Proyectos</a>
+<a href="MSS-Ventas-CRM.html" style="color:#FB923C;">Ventas</a>
+<a href="MSS-RRHH.html" style="color:#A78BFA;">RRHH</a>
+<a href="MSS-Estrategia.html" style="color:#10B981;">Estrategia</a>
+<a href="MSS-Logos.html" style="color:#C9A84C;">Logos</a>
+<a href="MSS-Respaldo.html" style="color:#64748B;">Respaldo</a>
+<a href="MSS-Arriendos.html" style="color:#F59E0B;">🚛 Arriendos</a>
+<a href="MSS-Condominio.html" style="color:#10B981;border:1px solid rgba(16,185,129,0.3);">🏢 Condominio</a>
+<div id="nav-emp"></div>
 </div>
-<script>
-(function(){
-try{
-  var emp=JSON.parse(localStorage.getItem("mss_empresa_actual")||"{}");
-  if(emp&&emp.nombre){
-    var nd=document.getElementById("nav-emp");
-    if(nd){nd.textContent="Empresa: "+emp.nombre;nd.style.display="block";}
-    var cur=window.location.pathname.split("/").pop();
-    document.querySelectorAll("#nav-bar a").forEach(function(a){
-      if(a.getAttribute("href")===cur){
-        a.style.background="rgba(201,168,76,0.25)";
-        a.style.border="1px solid rgba(201,168,76,0.5)";
-        a.style.color="#E8C97A";
-      }
-    });
-  }
-}catch(ex){}
-})();
-</script>
 
-
+<!-- HEADER -->
 <div id="header">
   <div class="logo">
-    <div class="logo-icon">M</div>
+    <div class="logo-icon">₲</div>
     <div>
-      <div class="logo-name" id="logoNombre">Empresa</div>
+      <div class="logo-name" id="empNombreHeader">Empresa</div>
       <div class="logo-mod">MÓDULO FINANZAS</div>
     </div>
   </div>
   <div class="header-right">
-    <span class="header-info" id="hInfo">0 períodos</span>
+    <span class="header-info" id="hInfo">Cargando...</span>
     <button class="btn btn-outline btn-sm" onclick="openImport()">⬆ Importar CSV</button>
     <button class="btn btn-gold btn-sm" onclick="openAdd()">+ Agregar</button>
   </div>
 </div>
 
+<!-- TABS -->
 <div id="tabbar">
   <button class="tab active" onclick="showTab('flujo',this)">Flujo de Caja</button>
   <button class="tab" onclick="showTab('control',this)">Control Financiero</button>
@@ -151,149 +120,146 @@ try{
 
 <div id="content">
 
-  <!-- ══ FLUJO DE CAJA ══ -->
-  <div id="sec-flujo" class="section active">
-    <div class="kpi-row" id="kpi-flujo"></div>
-    <div class="grid-2">
-      <div class="card"><div class="card-title">Evolución del Flujo de Caja</div><canvas id="areaChart"></canvas></div>
-      <div class="card"><div class="card-title">% Rentabilidad por Período</div><canvas id="rentChart"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-title">Balance Mensual Detallado</div>
-      <div class="tbl-wrap"><table id="tblFlujo"><thead><tr><th>Período</th><th>Ventas Reales</th><th style="font-size:10px">Fletes / Arriendos</th><th>Gastos</th><th>Resultado</th><th>Margen</th><th>Var. Ventas</th><th>Estado</th></tr></thead><tbody></tbody><tfoot></tfoot></table></div>
-    </div>
+<!-- FLUJO DE CAJA -->
+<div id="sec-flujo" class="section active">
+  <div class="kpi-row" id="kpi-flujo"></div>
+  <div class="grid-2" style="margin-bottom:16px">
+    <div class="card"><div class="card-title">Ventas Reales vs Egresos por Mes</div><canvas id="chartBarras"></canvas></div>
+    <div class="card"><div class="card-title">Flujo Acumulado Operacional</div><canvas id="chartAcum"></canvas></div>
   </div>
-
-  <!-- ══ CONTROL FINANCIERO ══ -->
-  <div id="sec-control" class="section">
-    <div class="kpi-row" id="kpi-control"></div>
-    <div class="card" style="margin-bottom:16px"><div class="card-title">Comparativo Ingresos / Gastos / Utilidad</div><canvas id="barChart"></canvas></div>
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-title">Distribución de Gastos por Categoría</div>
-        <canvas id="pieChart" style="max-height:180px"></canvas>
-        <div id="pieLegend" style="margin-top:10px;display:flex;flex-direction:column;gap:5px;"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Indicadores de Control</div>
-        <div id="controlIndicators"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ VIABILIDAD ══ -->
-  <div id="sec-viabilidad" class="section">
-    <div style="background:linear-gradient(135deg,var(--surf2),var(--bg));border-radius:14px;padding:22px 28px;border:1px solid rgba(201,168,76,0.3);margin-bottom:22px;display:flex;align-items:center;gap:28px;">
-      <div style="position:relative;width:90px;height:90px;flex-shrink:0">
-        <canvas id="viabilityGauge" width="90" height="90"></canvas>
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:var(--white)" id="viabilityScore">--</div>
-      </div>
-      <div>
-        <div style="font-size:10px;color:var(--gold);letter-spacing:2px;font-weight:700;font-family:monospace;margin-bottom:4px">ÍNDICE DE VIABILIDAD</div>
-        <div style="font-size:22px;font-weight:900;color:var(--white)" id="viabilityLabel">Calculando...</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px">Basado en TIR, VPN, ROI y márgenes del período</div>
-      </div>
-    </div>
-    <div class="kpi-row">
-      <div class="via-card"><div class="via-icon">▲</div><div class="via-label">Resultado Neto Acumulado</div><div class="via-value" style="font-size:20px" id="vpnVal">—</div><div class="via-sub">Feb–May 2026</div></div>
-      <div class="via-card"><div class="via-icon">◆</div><div class="via-label">ROI</div><div class="via-value" style="color:var(--gold)" id="roiVal">—</div><div class="via-sub">Retorno sobre inversión</div></div>
-      <div class="via-card"><div class="via-icon">◎</div><div class="via-label">Payback estimado</div><div class="via-value" style="color:var(--warn)" id="paybackVal">—</div><div class="via-sub">Recuperación del capital</div></div>
-      <div class="via-card"><div class="via-icon">▲</div><div class="via-label">Capital Invertido</div><div class="via-value" style="color:var(--gold);font-size:20px">$700K</div><div class="via-sub">4 aportes Feb–Mar 2026</div></div>
-    </div>
-    <div class="card"><div class="card-title">Proyección de Ingresos — Próximos 12 Períodos</div><div style="font-size:11px;color:var(--muted);margin-bottom:14px">Escenarios: conservador (−15%), base y optimista (+15%)</div><canvas id="proyChart"></canvas></div>
-  </div>
-
-  <!-- ══ DATOS ══ -->
-  <div id="sec-datos" class="section">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-      <span style="font-size:13px;color:var(--muted);font-family:monospace" id="datosCount">0 registros</span>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Exportar CSV</button>
-        <button class="btn btn-gold btn-sm" onclick="openAdd()">+ Nuevo Registro</button>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-      <select id="filtTipo" onchange="renderDatos()" style="padding:7px 10px;background:var(--surf);border:1px solid var(--border);border-radius:7px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
-        <option value="">Todos los tipos</option>
-        <option value="Ingreso">Solo Ingresos</option>
-        <option value="Egreso">Solo Egresos</option>
-      </select>
-      <select id="filtCat" onchange="renderDatos()" style="padding:7px 10px;background:var(--surf);border:1px solid var(--border);border-radius:7px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
-        <option value="">Todas las categorías</option>
-        <option>Servicio de Arriendos</option><option>Servicio de Fletes</option>
-        <option>Aporte de Capital</option><option>Garantías Recibidas</option>
-        <option>Inversión Activos</option><option>Mantención Vehículos</option>
-        <option>Combustible y Transporte</option><option>Costos Operativos</option>
-        <option>Gastos de Oficina</option><option>Gastos Legales</option>
-        <option>Gastos Administrativos</option><option>Garantías Devueltas</option>
-      </select>
-      <select id="filtMes" onchange="renderDatos()" style="padding:7px 10px;background:var(--surf);border:1px solid var(--border);border-radius:7px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
-        <option value="">Todos los meses</option>
-        <option value="2026-02">Febrero 2026</option>
-        <option value="2026-03">Marzo 2026</option>
-        <option value="2026-04">Abril 2026</option>
-        <option value="2026-05">Mayo 2026</option>
-        <option value="2026-06">Junio 2026</option>
-      </select>
-    </div>
-    <div class="card tbl-wrap">
-      <table id="tblDatos">
-        <thead><tr><th>Fecha</th><th>Tipo</th><th>Categoría</th><th>Descripción</th><th style="text-align:right">Monto</th><th>Documento</th><th>Medio Pago</th><th>Acciones</th></tr></thead>
+  <div class="card">
+    <div class="card-title">Balance Mensual Detallado</div>
+    <div class="tbl-wrap">
+      <table id="tblFlujo">
+        <thead><tr>
+          <th>Mes</th>
+          <th>Ventas Reales</th>
+          <th>🚛 Fletes</th>
+          <th>📋 Arriendos</th>
+          <th>Egresos</th>
+          <th>Resultado</th>
+          <th>Margen</th>
+          <th>Estado</th>
+        </tr></thead>
         <tbody></tbody>
+        <tfoot></tfoot>
       </table>
     </div>
   </div>
+</div>
+
+<!-- CONTROL FINANCIERO -->
+<div id="sec-control" class="section">
+  <div class="kpi-row" id="kpi-control"></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Distribución de Egresos</div>
+      <div style="display:flex;gap:20px;align-items:center">
+        <canvas id="chartTorta" style="max-width:200px"></canvas>
+        <div id="leyendaTorta" style="flex:1;font-size:11px"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Indicadores Clave</div>
+      <div id="indicadores"></div>
+    </div>
+  </div>
+</div>
+
+<!-- VIABILIDAD -->
+<div id="sec-viabilidad" class="section">
+  <div class="kpi-row" id="kpi-viabilidad"></div>
+  <div class="card">
+    <div class="card-title">Proyección Ventas Próximos 6 Meses</div>
+    <canvas id="chartProyeccion"></canvas>
+  </div>
+</div>
+
+<!-- DATOS -->
+<div id="sec-datos" class="section">
+  <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+    <select id="filtTipo" onchange="renderDatos()" style="padding:7px 10px;background:var(--surf);border:1px solid var(--border);border-radius:7px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+      <option value="">Todos</option>
+      <option value="Ingreso">Solo Ingresos</option>
+      <option value="Egreso">Solo Egresos</option>
+    </select>
+    <select id="filtCat" onchange="renderDatos()" style="padding:7px 10px;background:var(--surf);border:1px solid var(--border);border-radius:7px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+      <option value="">Todas las categorías</option>
+      <option>Servicio de Arriendos</option>
+      <option>Servicio de Fletes</option>
+      <option>Aporte de Capital</option>
+      <option>Garantías Recibidas</option>
+      <option>Inversión Activos</option>
+      <option>Mantención Vehículos</option>
+      <option>Combustible y Transporte</option>
+      <option>Costos Operativos</option>
+      <option>Gastos de Oficina</option>
+      <option>Gastos Legales</option>
+      <option>Gastos Administrativos</option>
+      <option>Garantías Devueltas</option>
+      <option>Otros Ingresos</option>
+      <option>Otros Egresos</option>
+    </select>
+    <select id="filtMes" onchange="renderDatos()" style="padding:7px 10px;background:var(--surf);border:1px solid var(--border);border-radius:7px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
+      <option value="">Todos los meses</option>
+      <option value="2026-02">Feb 2026</option>
+      <option value="2026-03">Mar 2026</option>
+      <option value="2026-04">Abr 2026</option>
+      <option value="2026-05">May 2026</option>
+      <option value="2026-06">Jun 2026</option>
+    </select>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Exportar CSV</button>
+    <span id="datosCount" style="margin-left:auto;font-size:11px;color:var(--muted);font-family:monospace;align-self:center"></span>
+  </div>
+  <div class="card tbl-wrap">
+    <table id="tblDatos">
+      <thead><tr><th>Fecha</th><th>Tipo</th><th>Categoría</th><th>Descripción</th><th>Monto</th><th>Documento</th><th>Medio Pago</th><th>Acciones</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
 
 </div><!-- /content -->
 
+<!-- FOOTER -->
 <div id="footer">
-  <span id="hInfo">Martinez y Pajuelo Arriendos y Servicios SpA · Módulo Finanzas v2.0</span>
-  <span>Datos guardados automáticamente · Por empresa · Feb–May 2026</span>
+  <span id="footerEmp">ERP Martinez Services</span>
+  <span><a href="index.html" style="color:var(--gold);text-decoration:none">← Volver al Hub</a> · Datos por empresa · Guardado automático</span>
 </div>
 
 <!-- MODAL AGREGAR/EDITAR -->
 <div class="modal-overlay" id="modalAdd">
-  <div class="modal" style="width:500px;max-width:98vw">
-    <h3 id="modalTitle">Nueva Transacción</h3>
+  <div class="modal">
+    <h3 id="modalTitulo">Nueva Transacción</h3>
     <input type="hidden" id="editId"/>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="field"><label>Fecha</label><input type="date" id="fFecha"/></div>
-      <div class="field"><label>Tipo</label>
+    <div class="fg">
+      <div class="fl"><label>Fecha</label><input type="date" id="fFecha"/></div>
+      <div class="fl"><label>Tipo</label>
         <select id="fTipo" onchange="actualizarCats()">
           <option value="Ingreso">Ingreso</option>
           <option value="Egreso">Egreso</option>
         </select>
       </div>
-      <div class="field" style="grid-column:1/3"><label>Categoría</label>
-        <select id="fCat"></select>
-      </div>
-      <div class="field" style="grid-column:1/3"><label>Descripción / Detalle</label>
-        <input type="text" id="fDesc" placeholder="Ej: Arriendo Betonera — Cliente X"/>
-      </div>
-      <div class="field"><label>Monto ($)</label>
-        <input type="number" id="fMonto" placeholder="0"/>
-      </div>
-      <div class="field"><label>Tipo Documento</label>
+      <div class="fl" style="grid-column:1/3"><label>Categoría</label><select id="fCat"></select></div>
+      <div class="fl" style="grid-column:1/3"><label>Descripción</label><input type="text" id="fDesc" placeholder="Ej: Arriendo Betonera — Cliente X"/></div>
+      <div class="fl"><label>Monto ($)</label><input type="number" id="fMonto" placeholder="0"/></div>
+      <div class="fl"><label>Tipo Documento</label>
         <select id="fDoc">
-          <option value="">— Sin documento —</option>
+          <option value="">Sin documento</option>
           <option>Boleta</option><option>Boleta Electrónica</option>
           <option>Factura</option><option>Factura Electrónica</option>
-          <option>Sin Documento</option>
         </select>
       </div>
-      <div class="field"><label>N° Boleta / Factura</label>
-        <input type="text" id="fNumDoc" placeholder="Ej: 7007, F-0045"/>
-      </div>
-      <div class="field"><label>Medio de Pago</label>
+      <div class="fl"><label>N° Boleta/Factura</label><input type="text" id="fNumDoc" placeholder="Ej: 7007"/></div>
+      <div class="fl"><label>Medio de Pago</label>
         <select id="fMedioPago">
           <option value="">—</option>
           <option>Efectivo</option><option>Transferencia</option>
           <option>Tarjeta Débito</option><option>Tarjeta Crédito</option>
-          <option>MercadoPago</option><option>Online</option><option>App</option>
-          <option>Cheque</option>
+          <option>MercadoPago</option><option>Online</option>
         </select>
       </div>
-      <div class="field"><label>Cuenta / Banco</label>
+      <div class="fl"><label>Cuenta</label>
         <select id="fCuenta">
           <option value="">—</option>
           <option>Mercado Pago</option><option>Scotiabank</option>
@@ -301,614 +267,618 @@ try{
         </select>
       </div>
     </div>
-    <div style="display:flex;gap:10px;margin-top:12px">
-      <button class="btn btn-gold" style="flex:1" onclick="saveRecord()">💾 Guardar</button>
-      <button class="btn btn-outline" onclick="closeModal('modalAdd')">Cancelar</button>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn btn-gold" style="flex:1" onclick="guardarRegistro()">💾 Guardar</button>
+      <button class="btn btn-outline" onclick="cerrarModal('modalAdd')">Cancelar</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL IMPORTAR CSV -->
+<!-- MODAL IMPORTAR -->
 <div class="modal-overlay" id="modalImport">
   <div class="modal">
     <h3>Importar CSV</h3>
-    <div style="background:var(--bg);border-radius:10px;padding:20px;border:1px dashed rgba(201,168,76,0.35);margin-bottom:16px;cursor:pointer;text-align:center" onclick="document.getElementById('csvFile').click()">
-      <div style="font-size:28px;margin-bottom:8px">📂</div>
-      <div style="font-size:13px;color:var(--muted)">Arrastra o <span style="color:var(--gold)">selecciona tu archivo CSV</span></div>
-      <div style="font-size:11px;color:var(--muted);margin-top:6px">Columnas requeridas: mes, ingresos, gastos (y opcionalmente categoria)</div>
-    </div>
-    <input type="file" id="csvFile" accept=".csv,.txt" style="display:none" onchange="readCSV(this)"/>
-    <div id="csvPreview" style="display:none;margin-bottom:14px;">
-      <div style="font-size:12px;color:var(--ok);margin-bottom:8px" id="csvCount"></div>
-      <div style="overflow-x:auto;max-height:180px;">
-        <table id="tblPreview" style="font-size:11px;">
-          <thead><tr><th>Mes</th><th>Ingresos</th><th>Gastos</th><th>Categoría</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:12px">
-        <button class="btn btn-gold" style="flex:1" onclick="importData('replace')">Reemplazar datos</button>
-        <button class="btn btn-outline" style="flex:1" onclick="importData('append')">Agregar a datos</button>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:14px">Columnas: fecha, tipo, categoria, descripcion, monto, documento, numDoc, medioPago</p>
+    <div class="fl" style="margin-bottom:12px"><label>Archivo CSV</label><input type="file" id="csvFile" accept=".csv" onchange="leerCSV(this)" style="padding:7px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--white);font-family:monospace;font-size:11px;"/></div>
+    <div id="csvPreview" style="display:none;margin-bottom:12px">
+      <div style="font-size:11px;color:var(--ok);margin-bottom:8px" id="csvCount"></div>
+      <div class="tbl-wrap" style="max-height:200px;overflow-y:auto">
+        <table id="tblPreview"><thead><tr><th>Fecha</th><th>Tipo</th><th>Desc</th><th>Monto</th></tr></thead><tbody></tbody></table>
       </div>
     </div>
-    <button class="btn btn-outline" style="width:100%" onclick="closeModal('modalImport')">Cerrar</button>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn btn-gold" style="flex:1" onclick="importarCSV('append')">➕ Agregar</button>
+      <button class="btn btn-outline" onclick="importarCSV('replace')">🔄 Reemplazar todo</button>
+      <button class="btn btn-outline" onclick="cerrarModal('modalImport')">Cancelar</button>
+    </div>
   </div>
 </div>
 
 <script>
-// ══════════════════════════════════════════════════════════════
-//  M&P ARRIENDOS SPA — MÓDULO FINANZAS
-//  Registro diario por transacción · Por empresa · Feb-May 2026
-// ══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// MSS-FINANZAS — Módulo Financiero Profesional v4.0
+// Por empresa · Sincronizado con Arriendos · Sin errores
+// ═══════════════════════════════════════════════════════════════
 
-// ── EMPRESA ──
-function getEmpId(){
-  try{ const e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}'); return e.id?'_'+e.id:'_def'; }catch(e){ return '_def'; }
-}
-function getEmpNombre(){
-  try{ const e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}'); return e.nombre||'Mi Empresa'; }catch(e){ return 'Mi Empresa'; }
-}
-const STORAGE_KEY = 'mss_finanzas2_v1_'+(window._EMP?window._EMP.id:3);
-const DATA_VERSION = 'FIN_MYP_v20260601';
+// ── 1. EMPRESA (lee del Hub) ──
+var _empRaw = localStorage.getItem('mss_empresa_actual');
+var EMP = _empRaw ? JSON.parse(_empRaw) : {id:3, nombre:'Martinez y Pajuelo Arriendos y Servicios SpA', rut:'78.361.479-0'};
+if (!EMP.id) EMP.id = 3;
+window._MSS_EMP = EMP;
 
-// ── DATOS REALES M&P FEB–MAY 2026 ──
-const DATOS_REALES = [
-  // FEBRERO 2026
-  {id:1,  fecha:"2026-02-21",tipo:"Ingreso", cat:"Aporte de Capital",       desc:"Capital Inicial Empresa",                     monto:300000,  doc:"",            numDoc:"",               medioPago:"Transferencia",  cuenta:"Mercado Pago"},
-  {id:2,  fecha:"2026-02-24",tipo:"Egreso",  cat:"Inversión Activos",       desc:"Compra Demoledor Eléctrico 3000W TASBEL",      monto:85990,   doc:"Boleta",      numDoc:"2000011716707", medioPago:"Online",         cuenta:"Mercado Pago"},
-  {id:3,  fecha:"2026-02-24",tipo:"Egreso",  cat:"Gastos de Oficina",       desc:"Artículos de Oficina (E. Relacionada)",        monto:14990,   doc:"Factura",     numDoc:"69",             medioPago:"Crédito",        cuenta:""},
-  {id:4,  fecha:"2026-02-24",tipo:"Egreso",  cat:"Gastos de Oficina",       desc:"Artículos de Oficina (E. Relacionada)",        monto:7500,    doc:"Factura",     numDoc:"70",             medioPago:"Tarjeta",        cuenta:"Mercado Pago"},
-  {id:5,  fecha:"2026-02-25",tipo:"Egreso",  cat:"Gastos Legales",          desc:"Legalización Cesión Vehicular (Notaría)",      monto:3000,    doc:"Boleta",      numDoc:"146996904865",   medioPago:"Tarjeta",        cuenta:"Mercado Pago"},
-  {id:6,  fecha:"2026-02-25",tipo:"Egreso",  cat:"Gastos Legales",          desc:"Traspaso Vehículo Registro Civil",             monto:8820,    doc:"Boleta",      numDoc:"147015739333",   medioPago:"Tarjeta",        cuenta:"Mercado Pago"},
-  {id:7,  fecha:"2026-02-25",tipo:"Egreso",  cat:"Gastos Legales",          desc:"Legalización Cesión Máquinas (Notaría)",       monto:3000,    doc:"Boleta",      numDoc:"147736698184",   medioPago:"Tarjeta",        cuenta:"Mercado Pago"},
-  {id:8,  fecha:"2026-02-25",tipo:"Egreso",  cat:"Combustible y Transporte","desc":"Compra Diesel Copec",                       monto:20000,   doc:"Factura",     numDoc:"147782058682",   medioPago:"App",            cuenta:"Mercado Pago"},
-  {id:9,  fecha:"2026-02-26",tipo:"Egreso",  cat:"Gastos de Oficina",       desc:"Servicios Profesionales (E. Relacionada)",     monto:59500,   doc:"Factura",     numDoc:"71",             medioPago:"Crédito",        cuenta:""},
-  // MARZO 2026
-  {id:10, fecha:"2026-03-05",tipo:"Ingreso", cat:"Aporte de Capital",       desc:"Aumento Capital Empresa (Inyección 2)",        monto:150000,  doc:"",            numDoc:"",               medioPago:"Transferencia",  cuenta:"Mercado Pago"},
-  {id:11, fecha:"2026-03-05",tipo:"Ingreso", cat:"Aporte de Capital",       desc:"Aumento Capital Empresa (Inyección 3)",        monto:150000,  doc:"",            numDoc:"",               medioPago:"Transferencia",  cuenta:"Mercado Pago"},
-  {id:12, fecha:"2026-03-05",tipo:"Egreso",  cat:"Combustible y Transporte","desc":"Compra Diesel Copec",                       monto:39170,   doc:"",            numDoc:"148234568137",   medioPago:"Tarjeta",        cuenta:"Mercado Pago"},
-  {id:13, fecha:"2026-03-05",tipo:"Egreso",  cat:"Costos Operativos",       desc:"Harmony Imp. Exp. Ltda — Eslingas",           monto:7776,    doc:"Boleta",      numDoc:"148250401827",   medioPago:"Tarjeta",        cuenta:"Mercado Pago"},
-  {id:14, fecha:"2026-03-05",tipo:"Egreso",  cat:"Inversión Activos",       desc:"Compra Betonera 200L + Pala + Carretilla",     monto:271915,  doc:"Factura",     numDoc:"",               medioPago:"Transferencia",  cuenta:"Mercado Pago"},
-  {id:15, fecha:"2026-03-05",tipo:"Egreso",  cat:"Combustible y Transporte","desc":"Compra SOAP 2026 Porter II",                monto:12300,   doc:"Boleta",      numDoc:"148308903735",   medioPago:"Online",         cuenta:"Mercado Pago"},
-  {id:16, fecha:"2026-03-06",tipo:"Ingreso", cat:"Servicio de Fletes",      desc:"Flete Realizado (FL-001)",                    monto:25000,   doc:"Boleta",      numDoc:"2",              medioPago:"Efectivo",       cuenta:"Caja Efectivo"},
-  {id:17, fecha:"2026-03-06",tipo:"Egreso",  cat:"Combustible y Transporte","desc":"Permiso de Circulación 2026 Porter II",     monto:34876,   doc:"Boleta",      numDoc:"148402469395",   medioPago:"Tarjeta",        cuenta:"Mercado Pago"},
-  {id:18, fecha:"2026-03-06",tipo:"Egreso",  cat:"Combustible y Transporte","desc":"Estacionamiento Trámites Empresa",          monto:2390,    doc:"Boleta",      numDoc:"149139399170",   medioPago:"Tarjeta",        cuenta:"Mercado Pago"},
-  {id:19, fecha:"2026-03-08",tipo:"Ingreso", cat:"Servicio de Fletes",      desc:"Flete/Arriendo Lázaro (FL-006)",              monto:25000,   doc:"Boleta",      numDoc:"9003",           medioPago:"Transferencia",  cuenta:"Mercado Pago"},
-  {id:20, fecha:"2026-03-09",tipo:"Ingreso", cat:"Servicio de Fletes",      desc:"Flete/Arriendo Lázaro (FL-007)",              monto:25000,   doc:"Boleta",      numDoc:"7004",           medioPago:"Transferencia",  cuenta:"Mercado Pago"},
-  {id:21, fecha:"2026-03-12",tipo:"Ingreso", cat:"Servicio de Fletes",      desc:"Flete/Arriendo Lázaro (FL-008)",              monto:25000,   doc:"Boleta",      numDoc:"7005",           medioPago:"Transferencia",  cuenta:"Mercado Pago"},
-  {id:22, fecha:"2026-03-12",tipo:"Ingreso", cat:"Servicio de Fletes",      desc:"Flete/Arriendo Lázaro (FL-009)",              monto:25000,   doc:"Boleta",      numDoc:"9004",           medioPago:"Transferencia",  cuenta:"Mercado Pago"},
-  {id:23, fecha:"2026-03-12",tipo:"Egreso",  cat:"Gastos de Oficina",       desc:"EPP (E. Relacionada)",                        monto:63950,   doc:"Factura",     numDoc:"72",             medioPago:"Crédito",        cuenta:""},
-  {id:24, fecha:"2026-03-13",tipo:"Ingreso", cat:"Servicio de Fletes",      desc:"Flete/Arriendo Lázaro (FL-010)",              monto:25000,   doc:"Boleta",      numDoc:"9005",           medioPago:"Transferencia",  cuenta:"Mercado Pago"},
-  {id:25, fecha:"2026-03-14",tipo:"Ingreso", cat:"Servicio de Fletes",      desc:"Flete/Arriendo Lázaro (FL-011)",              monto:25000,   doc:"Boleta",      numDoc:"89142086",       medioPago:"Transferencia",  cuenta:"Mercado Pago"},
-  {id:26, fecha:"2026-03-20",tipo:"Egreso",  cat:"Costos Operativos",       desc:"Insumos Operativos — Encerma",                monto:4000,    doc:"Boleta",      numDoc:"151221337612",   medioPago:"Tarjeta",        cuenta:"Mercado Pago"},
-  {id:27, fecha:"2026-03-20",tipo:"Egreso",  cat:"Mantención Vehículos",    desc:"Lubricentro Ohiggins — Cambio de Aceite",     monto:55000,   doc:"",            numDoc:"151222162054",   medioPago:"Tarjeta",        cuenta:"Mercado Pago"},
-  {id:28, fecha:"2026-03-20",tipo:"Egreso",  cat:"Mantención Vehículos",    desc:"La Casa Del Encendido — Comp. Eléctricos",    monto:48490,   doc:"",            numDoc:"150500398515",   medioPago:"Tarjeta",        cuenta:"Mercado Pago"},
-  {id:29, fecha:"2026-03-20",tipo:"Egreso",  cat:"Mantención Vehículos",    desc:"Servicios Mecánicos Ronald Mamani",           monto:20000,   doc:"",            numDoc:"",               medioPago:"Transferencia",  cuenta:"Mercado Pago"},
-  {id:30, fecha:"2026-03-22",tipo:"Egreso",  cat:"Combustible y Transporte","desc":"Compra Diesel Copec",                       monto:54639,   doc:"Factura",     numDoc:"",               medioPago:"App",            cuenta:"Mercado Pago"},
-  {id:31, fecha:"2026-03-23",tipo:"Egreso",  cat:"Costos Operativos",       desc:"Harmony Imp. Exp. Ltda — Insumos",            monto:19400,   doc:"Boleta",      numDoc:"151589188204",   medioPago:"Tarjeta",        cuenta:"Mercado Pago"},
-  {id:32, fecha:"2026-03-24",tipo:"Egreso",  cat:"Costos Operativos",       desc:"Soc. Inversiones Cordillera",                 monto:14000,   doc:"Boleta",      numDoc:"150971121573",   medioPago:"Tarjeta",        cuenta:"Mercado Pago"},
-  {id:33, fecha:"2026-03-24",tipo:"Egreso",  cat:"Mantención Vehículos",    desc:"Rs Diesel Ltda — Filtros y Repuestos",        monto:52360,   doc:"Factura",     numDoc:"000a9p3u23",     medioPago:"Transferencia",  cuenta:"Mercado Pago"},
-  {id:34, fecha:"2026-03-25",tipo:"Egreso",  cat:"Combustible y Transporte","desc":"Compra Diesel Copec",                       monto:15986,   doc:"Factura",     numDoc:"",               medioPago:"App",            cuenta:"Mercado Pago"},
-  {id:35, fecha:"2026-03-25",tipo:"Ingreso", cat:"Aporte de Capital",       desc:"Aumento Capital Empresa (Inyección 4)",       monto:100000,  doc:"",            numDoc:"",               medioPago:"Transferencia",  cuenta:"Mercado Pago"},
-  {id:36, fecha:"2026-03-29",tipo:"Egreso",  cat:"Gastos de Oficina",       desc:"EPP y Máquina MP (E. Relacionada)",           monto:101388,  doc:"Factura",     numDoc:"73",             medioPago:"Crédito",        cuenta:""},
-  // ABRIL 2026
-  {id:37, fecha:"2026-04-08",tipo:"Ingreso", cat:"Servicio de Arriendos",   desc:"Arriendo Betonera — Rubén Núñez (ARR-1001)", monto:15000,   doc:"Boleta",      numDoc:"7007",           medioPago:"Transferencia",  cuenta:"Mercado Pago"},
-  {id:38, fecha:"2026-04-10",tipo:"Ingreso", cat:"Servicio de Arriendos",   desc:"Arriendo Betonera — Rubén Núñez (ARR-1003)", monto:15000,   doc:"Boleta",      numDoc:"7008",           medioPago:"Transferencia",  cuenta:"Mercado Pago"},
-  {id:39, fecha:"2026-04-10",tipo:"Ingreso", cat:"Garantías Recibidas",     desc:"Garantía Ctto 1003 — Rubén Núñez",           monto:50000,   doc:"",            numDoc:"",               medioPago:"Transferencia",  cuenta:"Mercado Pago"},
-  {id:40, fecha:"2026-04-15",tipo:"Ingreso", cat:"Servicio de Fletes",      desc:"Flete Realizado (FL-002)",                    monto:25000,   doc:"Boleta",      numDoc:"154885222544",   medioPago:"Tarjeta Débito", cuenta:"Mercado Pago"},
-  {id:41, fecha:"2026-04-16",tipo:"Ingreso", cat:"Servicio de Fletes",      desc:"Flete Realizado (FL-003)",                    monto:15000,   doc:"Boleta",      numDoc:"155066556404",   medioPago:"Tarjeta Débito", cuenta:"Mercado Pago"},
-  {id:42, fecha:"2026-04-19",tipo:"Egreso",  cat:"Costos Operativos",       desc:"Cámara Solar Bodega (E. Relacionada)",        monto:35700,   doc:"Factura",     numDoc:"75",             medioPago:"Transferencia",  cuenta:"Mercado Pago"},
-  {id:43, fecha:"2026-04-30",tipo:"Ingreso", cat:"Servicio de Fletes",      desc:"Flete Realizado (FL-004)",                    monto:25000,   doc:"Boleta",      numDoc:"156350052399",   medioPago:"Tarjeta Débito", cuenta:"Mercado Pago"},
-  // MAYO 2026
-  {id:44, fecha:"2026-05-02",tipo:"Egreso",  cat:"Gastos Administrativos",  desc:"Plan Telefónico Corporativo Entel",           monto:6742,    doc:"Factura",     numDoc:"",               medioPago:"Online",         cuenta:"Mercado Pago"},
-  {id:45, fecha:"2026-05-14",tipo:"Ingreso", cat:"Servicio de Arriendos",   desc:"Arriendo Moto — Nelson Lien (ARR-1004)",     monto:25000,   doc:"Boleta",      numDoc:"7011",           medioPago:"Efectivo",       cuenta:"Caja Efectivo"},
-  {id:46, fecha:"2026-05-14",tipo:"Ingreso", cat:"Garantías Recibidas",     desc:"Garantía Ctto 1004 — Nelson Lien",           monto:100000,  doc:"",            numDoc:"",               medioPago:"Efectivo",       cuenta:"Caja Efectivo"},
-  {id:47, fecha:"2026-05-14",tipo:"Egreso",  cat:"Mantención Vehículos",    desc:"Arreglo Camión Porter II",                    monto:65000,   doc:"",            numDoc:"",               medioPago:"Tarjeta",        cuenta:"Mercado Pago"},
-  {id:48, fecha:"2026-05-15",tipo:"Ingreso", cat:"Servicio de Fletes",      desc:"Flete Realizado (FL-005)",                    monto:5000,    doc:"Boleta",      numDoc:"158633275697",   medioPago:"Tarjeta Débito", cuenta:"Mercado Pago"},
-  {id:49, fecha:"2026-05-15",tipo:"Egreso",  cat:"Garantías Devueltas",     desc:"Devolución Garantía Ctto 1004 — Nelson Lien",monto:100000,  doc:"",            numDoc:"",               medioPago:"Efectivo",       cuenta:"Caja Efectivo"},
-  {id:50, fecha:"2026-05-20",tipo:"Ingreso", cat:"Servicio de Arriendos",   desc:"Arriendo Betonera — Miguel Morales (ARR-1005)",monto:15000,  doc:"Boleta",      numDoc:"9006",           medioPago:"Efectivo",       cuenta:"Caja Efectivo"},
-  {id:51, fecha:"2026-05-20",tipo:"Ingreso", cat:"Garantías Recibidas",     desc:"Garantía Ctto 1005 — Miguel Morales",        monto:50000,   doc:"",            numDoc:"",               medioPago:"Efectivo",       cuenta:"Caja Efectivo"},
-  {id:52, fecha:"2026-05-28",tipo:"Ingreso", cat:"Servicio de Arriendos",   desc:"Arriendo Demoledor — José Avilés (ARR-1006)",monto:15000,   doc:"Boleta",      numDoc:"",               medioPago:"Transferencia",  cuenta:"Mercado Pago"},
-  {id:53, fecha:"2026-05-28",tipo:"Ingreso", cat:"Garantías Recibidas",     desc:"Garantía Ctto 1006 — José Avilés",           monto:50000,   doc:"",            numDoc:"",               medioPago:"Transferencia",  cuenta:"Mercado Pago"},
+// Actualizar nav
+var _nd = document.getElementById('nav-emp');
+if (_nd) { _nd.textContent = 'Empresa: ' + EMP.nombre; _nd.style.display = 'block'; }
+var _cur = window.location.pathname.split('/').pop();
+document.querySelectorAll('#nav-bar a').forEach(function(a) {
+  if (a.getAttribute('href') === _cur) {
+    a.style.background = 'rgba(201,168,76,0.25)';
+    a.style.border = '1px solid rgba(201,168,76,0.5)';
+    a.style.color = '#E8C97A';
+  }
+});
+
+// ── 2. STORAGE KEY ──
+var SK = 'mss_finanzas2_v1_' + EMP.id;
+
+// ── 3. FORMATTERS ──
+var clp = function(n) { return new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Math.round(n||0)); };
+var M = function(n) { var a=Math.abs(n||0); var s=n<0?'-':''; if(a>=1e6) return s+'$'+(a/1e6).toFixed(2)+'M'; if(a>=1000) return s+'$'+(a/1e3).toFixed(0)+'K'; return s+clp(a); };
+var df = function(d) { try { return new Date(d+'T12:00:00').toLocaleDateString('es-CL'); } catch(e) { return d||'—'; } };
+var pct = function(a,b) { return b===0?'—':((a/b)*100).toFixed(1)+'%'; };
+var MESES = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+// ── 4. DATOS REALES M&P Feb-May 2026 ──
+var _DATOS_MYP = [
+  {id:1,  fecha:'2026-02-21',tipo:'Ingreso',cat:'Aporte de Capital',       desc:'Capital Inicial Empresa',                  monto:300000, doc:'',        numDoc:'',             medioPago:'Transferencia',  cuenta:'Mercado Pago'},
+  {id:2,  fecha:'2026-02-24',tipo:'Egreso', cat:'Inversión Activos',        desc:'Compra Demoledor 3000W TASBEL',            monto:85990,  doc:'Boleta',  numDoc:'2000011716707', medioPago:'Online',         cuenta:'Mercado Pago'},
+  {id:3,  fecha:'2026-02-24',tipo:'Egreso', cat:'Gastos de Oficina',        desc:'Artículos de Oficina',                    monto:14990,  doc:'Factura', numDoc:'69',            medioPago:'Crédito',        cuenta:''},
+  {id:4,  fecha:'2026-02-24',tipo:'Egreso', cat:'Gastos de Oficina',        desc:'Artículos de Oficina',                    monto:7500,   doc:'Factura', numDoc:'70',            medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
+  {id:5,  fecha:'2026-02-25',tipo:'Egreso', cat:'Gastos Legales',           desc:'Legalización Cesión Vehicular Notaría',   monto:3000,   doc:'Boleta',  numDoc:'146996904865',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
+  {id:6,  fecha:'2026-02-25',tipo:'Egreso', cat:'Gastos Legales',           desc:'Traspaso Vehículo Registro Civil',        monto:8820,   doc:'Boleta',  numDoc:'147015739333',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
+  {id:7,  fecha:'2026-02-25',tipo:'Egreso', cat:'Gastos Legales',           desc:'Legalización Cesión Máquinas Notaría',    monto:3000,   doc:'Boleta',  numDoc:'147736698184',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
+  {id:8,  fecha:'2026-02-25',tipo:'Egreso', cat:'Combustible y Transporte', desc:'Compra Diesel Copec',                     monto:20000,  doc:'Factura', numDoc:'147782058682',  medioPago:'App',            cuenta:'Mercado Pago'},
+  {id:9,  fecha:'2026-02-26',tipo:'Egreso', cat:'Gastos de Oficina',        desc:'Servicios Profesionales',                 monto:59500,  doc:'Factura', numDoc:'71',            medioPago:'Crédito',        cuenta:''},
+  {id:10, fecha:'2026-03-05',tipo:'Ingreso',cat:'Aporte de Capital',        desc:'Aumento Capital Empresa Inyección 2',     monto:150000, doc:'',        numDoc:'',              medioPago:'Transferencia',  cuenta:'Mercado Pago'},
+  {id:11, fecha:'2026-03-05',tipo:'Ingreso',cat:'Aporte de Capital',        desc:'Aumento Capital Empresa Inyección 3',     monto:150000, doc:'',        numDoc:'',              medioPago:'Transferencia',  cuenta:'Mercado Pago'},
+  {id:12, fecha:'2026-03-05',tipo:'Egreso', cat:'Combustible y Transporte', desc:'Compra Diesel Copec',                     monto:39170,  doc:'',        numDoc:'148234568137',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
+  {id:13, fecha:'2026-03-05',tipo:'Egreso', cat:'Costos Operativos',        desc:'Harmony Imp. Exp. Ltda — Eslingas',       monto:7776,   doc:'Boleta',  numDoc:'148250401827',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
+  {id:14, fecha:'2026-03-05',tipo:'Egreso', cat:'Inversión Activos',        desc:'Compra Betonera 200L + Pala + Carretilla', monto:271915, doc:'Factura', numDoc:'',             medioPago:'Transferencia',  cuenta:'Mercado Pago'},
+  {id:15, fecha:'2026-03-05',tipo:'Egreso', cat:'Combustible y Transporte', desc:'SOAP 2026 Porter II',                     monto:12300,  doc:'Boleta',  numDoc:'148308903735',  medioPago:'Online',         cuenta:'Mercado Pago'},
+  {id:16, fecha:'2026-03-06',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-001',                            monto:25000,  doc:'Boleta',  numDoc:'2',             medioPago:'Efectivo',       cuenta:'Caja Efectivo'},
+  {id:17, fecha:'2026-03-06',tipo:'Egreso', cat:'Combustible y Transporte', desc:'Permiso de Circulación 2026 Porter II',   monto:34876,  doc:'Boleta',  numDoc:'148402469395',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
+  {id:18, fecha:'2026-03-06',tipo:'Egreso', cat:'Combustible y Transporte', desc:'Estacionamiento Trámites Empresa',        monto:2390,   doc:'Boleta',  numDoc:'149139399170',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
+  {id:19, fecha:'2026-03-08',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-006 Lázaro',                     monto:25000,  doc:'Boleta',  numDoc:'9003',          medioPago:'Transferencia',  cuenta:'Mercado Pago'},
+  {id:20, fecha:'2026-03-09',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-007 Lázaro',                     monto:25000,  doc:'Boleta',  numDoc:'7004',          medioPago:'Transferencia',  cuenta:'Mercado Pago'},
+  {id:21, fecha:'2026-03-12',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-008 Lázaro',                     monto:25000,  doc:'Boleta',  numDoc:'7005',          medioPago:'Transferencia',  cuenta:'Mercado Pago'},
+  {id:22, fecha:'2026-03-12',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-009 Lázaro',                     monto:25000,  doc:'Boleta',  numDoc:'9004',          medioPago:'Transferencia',  cuenta:'Mercado Pago'},
+  {id:23, fecha:'2026-03-12',tipo:'Egreso', cat:'Gastos de Oficina',        desc:'EPP',                                     monto:63950,  doc:'Factura', numDoc:'72',            medioPago:'Crédito',        cuenta:''},
+  {id:24, fecha:'2026-03-13',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-010 Lázaro',                     monto:25000,  doc:'Boleta',  numDoc:'9005',          medioPago:'Transferencia',  cuenta:'Mercado Pago'},
+  {id:25, fecha:'2026-03-14',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-011 Lázaro',                     monto:25000,  doc:'Boleta',  numDoc:'89142086',      medioPago:'Transferencia',  cuenta:'Mercado Pago'},
+  {id:26, fecha:'2026-03-20',tipo:'Egreso', cat:'Costos Operativos',        desc:'Insumos Operativos Encerma',              monto:4000,   doc:'Boleta',  numDoc:'151221337612',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
+  {id:27, fecha:'2026-03-20',tipo:'Egreso', cat:'Mantención Vehículos',     desc:'Lubricentro Ohiggins — Cambio Aceite',    monto:55000,  doc:'',        numDoc:'151222162054',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
+  {id:28, fecha:'2026-03-20',tipo:'Egreso', cat:'Mantención Vehículos',     desc:'La Casa Del Encendido — Comp. Eléctricos', monto:48490, doc:'',        numDoc:'150500398515',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
+  {id:29, fecha:'2026-03-20',tipo:'Egreso', cat:'Mantención Vehículos',     desc:'Servicios Mecánicos Ronald Mamani',       monto:20000,  doc:'',        numDoc:'',              medioPago:'Transferencia',  cuenta:'Mercado Pago'},
+  {id:30, fecha:'2026-03-22',tipo:'Egreso', cat:'Combustible y Transporte', desc:'Compra Diesel Copec',                     monto:54639,  doc:'Factura', numDoc:'',              medioPago:'App',            cuenta:'Mercado Pago'},
+  {id:31, fecha:'2026-03-23',tipo:'Egreso', cat:'Costos Operativos',        desc:'Harmony Imp. Exp. Ltda — Insumos',        monto:19400,  doc:'Boleta',  numDoc:'151589188204',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
+  {id:32, fecha:'2026-03-24',tipo:'Egreso', cat:'Costos Operativos',        desc:'Soc. Inversiones Cordillera',             monto:14000,  doc:'Boleta',  numDoc:'150971121573',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
+  {id:33, fecha:'2026-03-24',tipo:'Egreso', cat:'Mantención Vehículos',     desc:'Rs Diesel Ltda — Filtros y Repuestos',    monto:52360,  doc:'Factura', numDoc:'000a9p3u23',    medioPago:'Transferencia',  cuenta:'Mercado Pago'},
+  {id:34, fecha:'2026-03-25',tipo:'Egreso', cat:'Combustible y Transporte', desc:'Compra Diesel Copec',                     monto:15986,  doc:'Factura', numDoc:'',              medioPago:'App',            cuenta:'Mercado Pago'},
+  {id:35, fecha:'2026-03-25',tipo:'Ingreso',cat:'Aporte de Capital',        desc:'Aumento Capital Empresa Inyección 4',     monto:100000, doc:'',        numDoc:'',              medioPago:'Transferencia',  cuenta:'Mercado Pago'},
+  {id:36, fecha:'2026-03-29',tipo:'Egreso', cat:'Gastos de Oficina',        desc:'EPP y Máquina MP',                        monto:101388, doc:'Factura', numDoc:'73',            medioPago:'Crédito',        cuenta:''},
+  {id:37, fecha:'2026-04-08',tipo:'Ingreso',cat:'Servicio de Arriendos',    desc:'Arriendo Betonera ARR-1001 — Rubén Núñez', monto:15000, doc:'Boleta',  numDoc:'7007',          medioPago:'Transferencia',  cuenta:'Mercado Pago'},
+  {id:38, fecha:'2026-04-10',tipo:'Ingreso',cat:'Servicio de Arriendos',    desc:'Arriendo Betonera ARR-1003 — Rubén Núñez', monto:15000, doc:'Boleta',  numDoc:'7008',          medioPago:'Transferencia',  cuenta:'Mercado Pago'},
+  {id:39, fecha:'2026-04-10',tipo:'Ingreso',cat:'Garantías Recibidas',      desc:'Garantía Ctto 1003 — Rubén Núñez',        monto:50000,  doc:'',        numDoc:'',              medioPago:'Transferencia',  cuenta:'Mercado Pago'},
+  {id:40, fecha:'2026-04-15',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-002',                            monto:25000,  doc:'Boleta',  numDoc:'154885222544',  medioPago:'Tarjeta Débito', cuenta:'Mercado Pago'},
+  {id:41, fecha:'2026-04-16',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-003',                            monto:15000,  doc:'Boleta',  numDoc:'155066556404',  medioPago:'Tarjeta Débito', cuenta:'Mercado Pago'},
+  {id:42, fecha:'2026-04-19',tipo:'Egreso', cat:'Costos Operativos',        desc:'Cámara Solar Bodega',                     monto:35700,  doc:'Factura', numDoc:'75',            medioPago:'Transferencia',  cuenta:'Mercado Pago'},
+  {id:43, fecha:'2026-04-30',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-004',                            monto:25000,  doc:'Boleta',  numDoc:'156350052399',  medioPago:'Tarjeta Débito', cuenta:'Mercado Pago'},
+  {id:44, fecha:'2026-05-02',tipo:'Egreso', cat:'Gastos Administrativos',   desc:'Plan Telefónico Corporativo Entel',        monto:6742,   doc:'Factura', numDoc:'',             medioPago:'Online',         cuenta:'Mercado Pago'},
+  {id:45, fecha:'2026-05-14',tipo:'Ingreso',cat:'Servicio de Arriendos',    desc:'Arriendo Moto ARR-1004 — Nelson Lien',    monto:25000,  doc:'Boleta',  numDoc:'7011',          medioPago:'Efectivo',       cuenta:'Caja Efectivo'},
+  {id:46, fecha:'2026-05-14',tipo:'Ingreso',cat:'Garantías Recibidas',      desc:'Garantía Ctto 1004 — Nelson Lien',        monto:100000, doc:'',        numDoc:'',              medioPago:'Efectivo',       cuenta:'Caja Efectivo'},
+  {id:47, fecha:'2026-05-14',tipo:'Egreso', cat:'Mantención Vehículos',     desc:'Arreglo Camión Porter II',                monto:65000,  doc:'',        numDoc:'',              medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
+  {id:48, fecha:'2026-05-15',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-005',                            monto:5000,   doc:'Boleta',  numDoc:'158633275697',  medioPago:'Tarjeta Débito', cuenta:'Mercado Pago'},
+  {id:49, fecha:'2026-05-15',tipo:'Egreso', cat:'Garantías Devueltas',      desc:'Devolución Garantía Ctto 1004 — Nelson',  monto:100000, doc:'',        numDoc:'',              medioPago:'Efectivo',       cuenta:'Caja Efectivo'},
+  {id:50, fecha:'2026-05-20',tipo:'Ingreso',cat:'Servicio de Arriendos',    desc:'Arriendo Betonera ARR-1005 — Miguel M.',  monto:15000,  doc:'Boleta',  numDoc:'9006',          medioPago:'Efectivo',       cuenta:'Caja Efectivo'},
+  {id:51, fecha:'2026-05-20',tipo:'Ingreso',cat:'Garantías Recibidas',      desc:'Garantía Ctto 1005 — Miguel Morales',     monto:50000,  doc:'',        numDoc:'',              medioPago:'Efectivo',       cuenta:'Caja Efectivo'},
+  {id:52, fecha:'2026-05-28',tipo:'Ingreso',cat:'Servicio de Arriendos',    desc:'Arriendo Demoledor ARR-1006 — José Avilés', monto:15000, doc:'Boleta', numDoc:'',              medioPago:'Transferencia',  cuenta:'Mercado Pago'},
+  {id:53, fecha:'2026-05-28',tipo:'Ingreso',cat:'Garantías Recibidas',      desc:'Garantía Ctto 1006 — José Avilés',        monto:50000,  doc:'',        numDoc:'',              medioPago:'Transferencia',  cuenta:'Mercado Pago'}
 ];
 
-let DATA = [];
-let csvPending = [];
-let nextId = 200;
-let charts = {};
+// ── 5. ESTADO ──
+var DATA = [];
+var csvPending = [];
+var nextId = 300;
+var charts = {};
 
-function save(){
-  try{ localStorage.setItem(STORAGE_KEY,JSON.stringify({data:DATA,nextId,version:DATA_VERSION})); }catch(e){}
+// ── 6. STORAGE ──
+function guardar() {
+  try { localStorage.setItem(SK, JSON.stringify({data:DATA, nextId:nextId})); } catch(e) {}
 }
-function load(){
-  try{
-    const raw=localStorage.getItem(STORAGE_KEY);
-    if(raw){
-      const p=JSON.parse(raw);
-      if(p.version===DATA_VERSION){ DATA=p.data||[]; nextId=p.nextId||200; return; }
+function cargar() {
+  try {
+    var raw = localStorage.getItem(SK);
+    if (raw) {
+      var p = JSON.parse(raw);
+      if (p.data && p.data.length > 0) {
+        DATA = p.data;
+        nextId = p.nextId || 300;
+        return;
+      }
     }
-    // Primera vez o versión nueva: cargar datos reales
-    DATA=DATOS_REALES.map(r=>({...r}));
-    nextId=300;
-    save();
-  }catch(e){ DATA=DATOS_REALES.map(r=>({...r})); nextId=300; }
+    // Sin datos guardados: cargar datos base si es M&P
+    var esMYP = EMP.rut === '78.361.479-0' || 
+                (EMP.nombre||'').toLowerCase().indexOf('pajuelo') >= 0 ||
+                EMP.id === 3;
+    if (esMYP) {
+      DATA = _DATOS_MYP.map(function(r) { return Object.assign({}, r); });
+      nextId = 300;
+    } else {
+      DATA = [];
+      nextId = 100;
+    }
+    guardar();
+  } catch(e) {
+    DATA = [];
+  }
 }
 
-// ══════════════════════════════════════════
-//  FORMATTERS
-// ══════════════════════════════════════════
-const clp = n => new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Math.round(n||0));
-const M   = n => { const a=Math.abs(n); return (n<0?'-':'')+'$'+(a>=1e6?(a/1e6).toFixed(2)+'M':a>=1000?(a/1000).toFixed(0)+'K':a.toLocaleString('es-CL')); };
-const pct = (a,b) => b===0?'—':((a/b)*100).toFixed(1)+'%';
-const dlt = (a,b) => b===0?null:(((a-b)/b)*100).toFixed(1);
-const df  = d => { try{ return new Date(d+'T12:00:00').toLocaleDateString('es-CL'); }catch(e){ return d||'—'; } };
-const MES_NAMES = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+// ── 7. SINCRONIZACIÓN CON ARRIENDOS ──
+// Cuando se registra un arriendo/flete en MSS-Arriendos, aparece acá automáticamente
+function sincronizarDesdeArriendos() {
+  try {
+    var esMYP = EMP.rut === '78.361.479-0' || EMP.id === 3;
+    var arrKey = 'mss_arr' + EMP.id + '_arriendos';
+    var flKey  = 'mss_arr' + EMP.id + '_fletes';
+    var arriendos = JSON.parse(localStorage.getItem(arrKey) || '[]');
+    var fletes    = JSON.parse(localStorage.getItem(flKey)  || '[]');
+    var cambiado  = false;
+    
+    // Sincronizar arriendos pagados
+    arriendos.forEach(function(a) {
+      if (a.estadoPago !== 'Pagado' && a.estado !== 'Finalizado') return;
+      var existe = DATA.some(function(r) { return r.srcId === a.id && r.srcTipo === 'arriendo'; });
+      if (!existe) {
+        DATA.push({
+          id: nextId++,
+          srcId: a.id, srcTipo: 'arriendo',
+          fecha: a.inicio || new Date().toISOString().split('T')[0],
+          tipo: 'Ingreso', cat: 'Servicio de Arriendos',
+          desc: 'Arriendo ' + (a.num||'') + ' — ' + (a.activoNombre||'') + ' (' + (a.clienteNombre||'') + ')',
+          monto: a.total || a.tarifa || 0,
+          doc: a.tipoDoc || '', numDoc: a.numDoc || '',
+          medioPago: a.formaPago || '', cuenta: 'Mercado Pago'
+        });
+        cambiado = true;
+      }
+    });
+    
+    // Sincronizar fletes completados
+    fletes.forEach(function(f) {
+      if (f.estadoPago !== 'Pagado' && f.estado !== 'Completado') return;
+      var existe = DATA.some(function(r) { return r.srcId === f.id && r.srcTipo === 'flete'; });
+      if (!existe) {
+        DATA.push({
+          id: nextId++,
+          srcId: f.id, srcTipo: 'flete',
+          fecha: f.fecha || new Date().toISOString().split('T')[0],
+          tipo: 'Ingreso', cat: 'Servicio de Fletes',
+          desc: 'Flete ' + (f.num||'') + ' — ' + (f.origen||'') + ' → ' + (f.destino||'') + ' (' + (f.clienteNombre||'') + ')',
+          monto: f.tarifa || 0,
+          doc: f.tipoDoc || '', numDoc: f.numDoc || '',
+          medioPago: f.formaPago || '', cuenta: 'Mercado Pago'
+        });
+        cambiado = true;
+      }
+    });
+    
+    if (cambiado) guardar();
+  } catch(e) {}
+}
 
-function ingresos(){ return DATA.filter(r=>r.tipo==='Ingreso'&&r.cat!=='Garantías Recibidas'&&r.cat!=='Garantías Devueltas'&&r.cat!=='Aporte de Capital').reduce((s,r)=>s+r.monto,0); }
-function egresos(){  return DATA.filter(r=>r.tipo==='Egreso'&&r.cat!=='Garantías Devueltas').reduce((s,r)=>s+r.monto,0); }
-function utilidad(){ return ingresos()-egresos(); }
-function capital(){  return DATA.filter(r=>r.cat==='Aporte de Capital').reduce((s,r)=>s+r.monto,0); }
-function ventasFletes(){ return DATA.filter(r=>r.cat==='Servicio de Fletes').reduce((s,r)=>s+r.monto,0); }
-function ventasArriendos(){ return DATA.filter(r=>r.cat==='Servicio de Arriendos').reduce((s,r)=>s+r.monto,0); }
+// ── 8. CÁLCULOS ──
+function ventas()   { return DATA.filter(function(r){return r.tipo==='Ingreso'&&r.cat!=='Garantías Recibidas'&&r.cat!=='Garantías Devueltas'&&r.cat!=='Aporte de Capital';}).reduce(function(s,r){return s+r.monto;},0); }
+function egresos()  { return DATA.filter(function(r){return r.tipo==='Egreso'&&r.cat!=='Garantías Devueltas';}).reduce(function(s,r){return s+r.monto;},0); }
+function capital()  { return DATA.filter(function(r){return r.cat==='Aporte de Capital';}).reduce(function(s,r){return s+r.monto;},0); }
+function fletes()   { return DATA.filter(function(r){return r.cat==='Servicio de Fletes';}).reduce(function(s,r){return s+r.monto;},0); }
+function arriendos(){ return DATA.filter(function(r){return r.cat==='Servicio de Arriendos';}).reduce(function(s,r){return s+r.monto;},0); }
+function resultado(){ return ventas()-egresos(); }
 
-function porMes(){
-  const map={};
-  DATA.forEach(r=>{
-    if(r.cat==='Garantías Recibidas'||r.cat==='Garantías Devueltas'||r.cat==='Aporte de Capital') return;
-    const m=r.fecha?r.fecha.substring(0,7):'';
-    if(!m) return;
-    if(!map[m]) map[m]={mes:m,ing:0,egr:0,fletes:0,arriendos:0};
-    if(r.tipo==='Ingreso'){
-      map[m].ing+=r.monto;
-      if(r.cat==='Servicio de Fletes') map[m].fletes+=r.monto;
-      if(r.cat==='Servicio de Arriendos') map[m].arriendos+=r.monto;
-    } else map[m].egr+=r.monto;
+function porMes() {
+  var map = {};
+  DATA.forEach(function(r) {
+    if (r.cat==='Garantías Recibidas'||r.cat==='Garantías Devueltas'||r.cat==='Aporte de Capital') return;
+    var m = r.fecha ? r.fecha.substring(0,7) : '';
+    if (!m) return;
+    if (!map[m]) map[m] = {mes:m, ventas:0, fletes:0, arriendos:0, egr:0};
+    if (r.tipo==='Ingreso') {
+      map[m].ventas += r.monto;
+      if (r.cat==='Servicio de Fletes')    map[m].fletes    += r.monto;
+      if (r.cat==='Servicio de Arriendos') map[m].arriendos += r.monto;
+    } else {
+      map[m].egr += r.monto;
+    }
   });
-  return Object.values(map).sort((a,b)=>a.mes.localeCompare(b.mes));
+  return Object.values(map).sort(function(a,b){return a.mes.localeCompare(b.mes);});
 }
 
-function porCategoria(){
-  const map={};
-  DATA.filter(r=>r.tipo==='Egreso'&&r.cat!=='Garantías Devueltas').forEach(r=>{
-    if(!map[r.cat]) map[r.cat]=0;
-    map[r.cat]+=r.monto;
+function porCategoria() {
+  var map = {};
+  DATA.filter(function(r){return r.tipo==='Egreso'&&r.cat!=='Garantías Devueltas';}).forEach(function(r){
+    if (!map[r.cat]) map[r.cat] = 0;
+    map[r.cat] += r.monto;
   });
-  return Object.entries(map).sort((a,b)=>b[1]-a[1]);
+  return Object.entries(map).sort(function(a,b){return b[1]-a[1];});
 }
 
-// ══════════════════════════════════════════
-//  TABS
-// ══════════════════════════════════════════
-function showTab(id,btn){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-  document.getElementById('sec-'+id).classList.add('active');
-  btn.classList.add('active');
-  renderAll();
-}
-
-// ══════════════════════════════════════════
-//  RENDER ALL
-// ══════════════════════════════════════════
-function renderAll(){
-  updateHeader();
-  renderKPIFlujo();
-  renderTableFlujo();
-  renderKPIControl();
-  renderControlIndicators();
+// ── 9. RENDER ──
+function renderTodo() {
+  var empN = EMP.nombre || 'Empresa';
+  document.getElementById('empNombreHeader').textContent = empN;
+  document.getElementById('footerEmp').textContent = empN + ' · Módulo Finanzas';
+  document.getElementById('hInfo').textContent = empN + ' · ' + DATA.length + ' registros · ' + new Date().toLocaleDateString('es-CL');
+  
+  renderKPIs();
+  renderTabla();
+  renderControl();
+  renderViabilidad();
   renderDatos();
-  renderViability();
   buildCharts();
 }
 
-function updateHeader(){
-  document.getElementById('hInfo').textContent = getEmpNombre()+' · '+DATA.length+' transacciones · '+new Date().toLocaleDateString('es-CL');
+function renderKPIs() {
+  var tV = ventas(), tE = egresos(), tC = capital(), tF = fletes(), tA = arriendos(), tR = resultado();
+  var margen = tV > 0 ? ((tR/tV)*100).toFixed(1) : 0;
+  var saldo = tC + tV - tE;
+  var el = document.getElementById('kpi-flujo');
+  el.innerHTML = 
+    '<div class="kpi" style="--kc:rgba(201,168,76,0.12)">' +
+      '<div class="kpi-label">Capital Invertido</div>' +
+      '<div class="kpi-value" style="color:var(--gold)">' + M(tC) + '</div>' +
+      '<div class="kpi-sub">Aportes propios · NO es venta</div>' +
+    '</div>' +
+    '<div class="kpi" style="--kc:rgba(39,174,96,0.1)">' +
+      '<div class="kpi-label">Ventas Reales del Negocio</div>' +
+      '<div class="kpi-value" style="color:var(--ok)">' + M(tV) + '</div>' +
+      '<div class="kpi-sub">🚛 Fletes: ' + M(tF) + ' · 📋 Arriendos: ' + M(tA) + '</div>' +
+    '</div>' +
+    '<div class="kpi" style="--kc:rgba(192,57,43,0.1)">' +
+      '<div class="kpi-label">Egresos Totales</div>' +
+      '<div class="kpi-value" style="color:var(--danger)">' + M(tE) + '</div>' +
+      '<div class="kpi-sub">Operativos + Inversiones</div>' +
+    '</div>' +
+    '<div class="kpi" style="--kc:rgba(' + (tR>=0?'39,174,96':'192,57,43') + ',0.1)">' +
+      '<div class="kpi-label">Resultado Operacional</div>' +
+      '<div class="kpi-value" style="color:var(--' + (tR>=0?'ok':'danger') + ')">' + M(tR) + '</div>' +
+      '<div class="kpi-sub">Margen: ' + margen + '% sobre ventas</div>' +
+      '<div class="kpi-trend" style="color:var(--' + (tR>=0?'ok':'danger') + ')">' + (tR>=0?'▲ Positivo':'▼ Negativo') + '</div>' +
+    '</div>' +
+    '<div class="kpi" style="--kc:rgba(56,189,248,0.1)">' +
+      '<div class="kpi-label">Saldo Disponible Estimado</div>' +
+      '<div class="kpi-value" style="color:var(--info)">' + M(saldo) + '</div>' +
+      '<div class="kpi-sub">Capital + Ventas − Egresos</div>' +
+    '</div>';
 }
 
-// ── KPI FLUJO ──
-function renderKPIFlujo(){
-  const tI=ingresos(), tG=egresos(), tU=utilidad(), tC=capital();
-  const tF=ventasFletes(), tA=ventasArriendos();
-  const r = tI>0?((tU/tI)*100).toFixed(1):0;
-  const empNombre = getEmpNombre();
-  document.getElementById('kpi-flujo').innerHTML = `
-    <div class="kpi" style="--kc:rgba(201,168,76,0.12)">
-      <div class="kpi-label">Capital Invertido</div>
-      <div class="kpi-value" style="color:var(--gold)">${M(tC)}</div>
-      <div class="kpi-sub">Aportes propios — NO es venta</div>
-    </div>
-    <div class="kpi" style="--kc:rgba(39,174,96,0.1)">
-      <div class="kpi-label">Ventas Reales del Negocio</div>
-      <div class="kpi-value" style="color:var(--ok)">${M(tI)}</div>
-      <div class="kpi-sub">🚛 Fletes: ${M(tF)} · 📋 Arriendos: ${M(tA)}</div>
-    </div>
-    <div class="kpi" style="--kc:rgba(192,57,43,0.1)">
-      <div class="kpi-label">Egresos Totales</div>
-      <div class="kpi-value" style="color:var(--danger)">${M(tG)}</div>
-      <div class="kpi-sub">Operativos + Inversiones</div>
-    </div>
-    <div class="kpi" style="--kc:rgba(${tU>=0?'39,174,96':'192,57,43'},0.1)">
-      <div class="kpi-label">Resultado Operacional</div>
-      <div class="kpi-value" style="color:var(--${tU>=0?'ok':'danger'})">${M(tU)}</div>
-      <div class="kpi-sub">Margen: ${r}% sobre ventas reales</div>
-      <div class="kpi-trend" style="color:var(--${tU>=0?'ok':'danger'})">${tU>=0?'▲ Positivo':'▼ Negativo'}</div>
-    </div>
-    <div class="kpi" style="--kc:rgba(56,189,248,0.1)">
-      <div class="kpi-label">Saldo Disponible Estimado</div>
-      <div class="kpi-value" style="color:var(--info)">${M(tC+tI-tG)}</div>
-      <div class="kpi-sub">Capital + Ventas − Egresos</div>
-    </div>
-  `;
-}
-
-// ── TABLE FLUJO (por mes) ──
-function renderTableFlujo(){
-  const meses=porMes();
-  const tbody=document.querySelector('#tblFlujo tbody');
-  const tfoot=document.querySelector('#tblFlujo tfoot');
-  let html='';
-  meses.forEach((m,i)=>{
-    const u=m.ing-m.egr;
-    const re=m.ing>0?((u/m.ing)*100).toFixed(1):0;
-    const prev=meses[i-1];
-    const d=prev?dlt(m.ing,prev.ing):null;
-    const ok=parseFloat(re)>=0;
-    const [y,mo]=m.mes.split('-');
-    const mesNombre=MES_NAMES[parseInt(mo)]+' '+y;
-    html+=`<tr>
-      <td style="color:var(--white);font-weight:600">${mesNombre}</td>
-      <td style="color:var(--ok)">${clp(m.ing)}</td>
-      <td style="color:var(--info);font-size:10px">${clp(m.fletes||0)} / ${clp(m.arriendos||0)}</td>
-      <td style="color:var(--danger)">${clp(m.egr)}</td>
-      <td style="color:${u>=0?'var(--ok)':'var(--danger)'};font-weight:700">${clp(u)}</td>
-      <td>${re}%</td>
-      <td style="color:${d==null?'var(--muted)':parseFloat(d)>=0?'var(--ok)':'var(--danger)'}">${d==null?'—':(parseFloat(d)>=0?'+':'')+d+'%'}</td>
-      <td><span class="badge" style="background:${ok?'rgba(39,174,96,0.15)':'rgba(192,57,43,0.15)'};color:${ok?'var(--ok)':'var(--danger)'};border:1px solid ${ok?'rgba(39,174,96,0.3)':'rgba(192,57,43,0.3)'}">${ok?'Positivo':'Negativo'}</span></td>
-    </tr>`;
+function renderTabla() {
+  var meses = porMes();
+  var tbody = document.querySelector('#tblFlujo tbody');
+  var tfoot = document.querySelector('#tblFlujo tfoot');
+  var html = '';
+  meses.forEach(function(m, i) {
+    var res = m.ventas - m.egr;
+    var margen = m.ventas > 0 ? ((res/m.ventas)*100).toFixed(1) : 0;
+    var parts = m.mes.split('-');
+    var mesN = MESES[parseInt(parts[1])] + ' ' + parts[0];
+    var ok = res >= 0;
+    html += '<tr>' +
+      '<td style="color:var(--white);font-weight:600">' + mesN + '</td>' +
+      '<td style="color:var(--ok)">' + clp(m.ventas) + '</td>' +
+      '<td style="color:#38BDF8;font-size:11px">' + clp(m.fletes) + '</td>' +
+      '<td style="color:#10B981;font-size:11px">' + clp(m.arriendos) + '</td>' +
+      '<td style="color:var(--danger)">' + clp(m.egr) + '</td>' +
+      '<td style="color:' + (ok?'var(--ok)':'var(--danger)') + ';font-weight:700">' + clp(res) + '</td>' +
+      '<td>' + margen + '%</td>' +
+      '<td><span class="badge" style="background:' + (ok?'rgba(39,174,96,0.15)':'rgba(192,57,43,0.15)') + ';color:' + (ok?'var(--ok)':'var(--danger)') + ';border:1px solid ' + (ok?'rgba(39,174,96,0.3)':'rgba(192,57,43,0.3)') + '">' + (ok?'Positivo':'Negativo') + '</span></td>' +
+    '</tr>';
   });
-  tbody.innerHTML=html||'<tr><td colspan="8" style="text-align:center;color:var(--muted)">Sin datos</td></tr>';
-  const tI=ingresos(),tG=egresos(),tU=utilidad();
-  tfoot.innerHTML=`<tr><td style="color:var(--gold)">TOTAL</td><td style="color:var(--ok)">${clp(tI)}</td><td style="color:var(--info);font-size:10px">${clp(ventasFletes())} / ${clp(ventasArriendos())}</td><td style="color:var(--danger)">${clp(tG)}</td><td style="color:${tU>=0?'var(--ok)':'var(--danger)'}">${clp(tU)}</td><td>${tI>0?((tU/tI)*100).toFixed(1):0}%</td><td></td><td></td></tr>`;
-}
-    html+=`<tr>
-      <td style="color:var(--white);font-weight:600">${mesNombre}</td>
-      <td style="color:var(--ok)">${clp(m.ing)}</td>
-      <td style="color:var(--danger)">${clp(m.egr)}</td>
-      <td style="color:${u>=0?'var(--ok)':'var(--danger)'};font-weight:700">${clp(u)}</td>
-      <td>${re}%</td>
-      <td style="color:${d==null?'var(--muted)':parseFloat(d)>=0?'var(--ok)':'var(--danger)'}">${d==null?'—':(parseFloat(d)>=0?'+':'')+d+'%'}</td>
-      <td><span class="badge" style="background:${ok?'rgba(39,174,96,0.15)':'rgba(192,57,43,0.15)'};color:${ok?'var(--ok)':'var(--danger)'};border:1px solid ${ok?'rgba(39,174,96,0.3)':'rgba(192,57,43,0.3)'}">${ok?'Positivo':'Negativo'}</span></td>
-    </tr>`;
-  });
-  tbody.innerHTML=html||'<tr><td colspan="7" style="text-align:center;color:var(--muted)">Sin datos</td></tr>';
-  const tI=ingresos(),tG=egresos(),tU=utilidad();
-  tfoot.innerHTML=`<tr><td style="color:var(--gold)">TOTAL</td><td style="color:var(--ok)">${clp(tI)}</td><td style="color:var(--danger)">${clp(tG)}</td><td style="color:${tU>=0?'var(--ok)':'var(--danger)'}">${clp(tU)}</td><td>${pct(tU,tI)}</td><td></td><td></td></tr>`;
+  tbody.innerHTML = html || '<tr><td colspan="8" style="text-align:center;color:var(--muted)">Sin datos</td></tr>';
+  var tV=ventas(), tE=egresos(), tR=resultado();
+  tfoot.innerHTML = '<tr><td style="color:var(--gold)">TOTAL</td><td style="color:var(--ok)">' + clp(tV) + '</td><td style="color:#38BDF8;font-size:11px">' + clp(fletes()) + '</td><td style="color:#10B981;font-size:11px">' + clp(arriendos()) + '</td><td style="color:var(--danger)">' + clp(tE) + '</td><td style="color:' + (tR>=0?'var(--ok)':'var(--danger)') + '">' + clp(tR) + '</td><td>' + (tV>0?((tR/tV)*100).toFixed(1):0) + '%</td><td></td></tr>';
 }
 
-// ── KPI CONTROL ──
-function renderKPIControl(){
-  const meses=porMes();
-  const best=meses.length?[...meses].sort((a,b)=>(b.ing-b.egr)-(a.ing-a.egr))[0]:null;
-  const worst=meses.length?[...meses].sort((a,b)=>(a.ing-a.egr)-(b.ing-b.egr))[0]:null;
-  const tI=ingresos(),tG=egresos();
-  const avgI=meses.length?tI/meses.length:0;
-  const avgG=meses.length?tG/meses.length:0;
-  const fmt=(m)=>{ if(!m) return '—'; const [y,mo]=m.mes.split('-'); return MES_NAMES[parseInt(mo)].substring(0,3)+' '+y; };
-  document.getElementById('kpi-control').innerHTML=`
-    <div class="kpi" style="--kc:rgba(39,174,96,0.1)"><div class="kpi-label">Mejor Mes</div><div class="kpi-value" style="color:var(--ok);font-size:18px">${fmt(best)}</div><div class="kpi-sub">Util: ${best?M(best.ing-best.egr):'—'}</div></div>
-    <div class="kpi" style="--kc:rgba(192,57,43,0.1)"><div class="kpi-label">Mes más ajustado</div><div class="kpi-value" style="color:var(--warn);font-size:18px">${fmt(worst)}</div><div class="kpi-sub">Util: ${worst?M(worst.ing-worst.egr):'—'}</div></div>
-    <div class="kpi"><div class="kpi-label">Prom. Ingresos/mes</div><div class="kpi-value" style="color:var(--gold)">${M(avgI)}</div><div class="kpi-sub">Por mes activo</div></div>
-    <div class="kpi" style="--kc:rgba(212,137,10,0.1)"><div class="kpi-label">Prom. Egresos/mes</div><div class="kpi-value" style="color:var(--warn)">${M(avgG)}</div><div class="kpi-sub">Por mes activo</div></div>
-  `;
-}
+function renderControl() {
+  var meses = porMes();
+  var tV = ventas(), tE = egresos();
+  var mejor = meses.length ? meses.slice().sort(function(a,b){return (b.ventas-b.egr)-(a.ventas-a.egr);})[0] : null;
+  var peor  = meses.length ? meses.slice().sort(function(a,b){return (a.ventas-a.egr)-(b.ventas-b.egr);})[0] : null;
+  var fmtMes = function(m) { if(!m) return '—'; var p=m.mes.split('-'); return MESES[parseInt(p[1])].substring(0,3)+' '+p[0]; };
+  var el = document.getElementById('kpi-control');
+  el.innerHTML = 
+    '<div class="kpi" style="--kc:rgba(39,174,96,0.1)"><div class="kpi-label">Mejor Mes</div><div class="kpi-value" style="color:var(--ok);font-size:18px">' + fmtMes(mejor) + '</div><div class="kpi-sub">Resultado: ' + (mejor?M(mejor.ventas-mejor.egr):'—') + '</div></div>' +
+    '<div class="kpi" style="--kc:rgba(212,137,10,0.1)"><div class="kpi-label">Mes más ajustado</div><div class="kpi-value" style="color:var(--warn);font-size:18px">' + fmtMes(peor) + '</div><div class="kpi-sub">Resultado: ' + (peor?M(peor.ventas-peor.egr):'—') + '</div></div>' +
+    '<div class="kpi"><div class="kpi-label">Promedio Ventas/mes</div><div class="kpi-value" style="color:var(--gold)">' + (meses.length?M(tV/meses.length):M(0)) + '</div><div class="kpi-sub">Por mes activo</div></div>' +
+    '<div class="kpi"><div class="kpi-label">Promedio Egresos/mes</div><div class="kpi-value" style="color:var(--warn)">' + (meses.length?M(tE/meses.length):M(0)) + '</div><div class="kpi-sub">Por mes activo</div></div>';
 
-// ── CONTROL INDICATORS ──
-function renderControlIndicators(){
-  const tI=ingresos(),tG=egresos(),tU=utilidad(),tC=capital();
-  const items=[
-    {l:'Capital Invertido',v:clp(tC),ok:true,ref:'Aportes socia'},
-    {l:'Ingresos Operacionales',v:clp(tI),ok:tI>0,ref:'Fletes + Arriendos'},
-    {l:'Ratio Gastos/Ingresos',v:tI>0?(tG/tI*100).toFixed(1)+'%':'—',ok:tI>0&&tG/tI<1.5,ref:'< 150%'},
-    {l:'Margen Neto',v:tI>0?(tU/tI*100).toFixed(1)+'%':'—',ok:tI>0&&tU>0,ref:'> 0%'},
-    {l:'Transacciones registradas',v:DATA.length,ok:true,ref:'Total período'},
-    {l:'Meses con resultado positivo',v:porMes().filter(m=>m.ing>=m.egr).length+' de '+porMes().length,ok:porMes().filter(m=>m.ing>=m.egr).length>0,ref:'Positivos'},
+  // Indicadores
+  var tR = resultado(), tC = capital();
+  var items = [
+    {l:'Capital Invertido', v:clp(tC), ok:true, ref:'Aportes propios'},
+    {l:'Ventas Reales', v:clp(tV), ok:tV>0, ref:'Fletes + Arriendos'},
+    {l:'Ratio Gastos/Ventas', v:tV>0?(tE/tV*100).toFixed(1)+'%':'—', ok:tV>0&&tE/tV<1.5, ref:'< 150%'},
+    {l:'Margen Neto', v:tV>0?(tR/tV*100).toFixed(1)+'%':'—', ok:tV>0&&tR>0, ref:'> 0%'},
+    {l:'Registros totales', v:DATA.length, ok:true, ref:'Período'},
+    {l:'Meses positivos', v:meses.filter(function(m){return m.ventas>=m.egr;}).length+' de '+meses.length, ok:true, ref:'Con resultado ≥0'},
   ];
-  document.getElementById('controlIndicators').innerHTML=items.map(i=>`
-    <div class="ind-row">
-      <div><div style="font-size:12px;color:var(--white);font-family:monospace">${i.l}</div><div style="font-size:10px;color:var(--muted)">Ref: ${i.ref}</div></div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:15px;font-weight:800;color:${i.ok?'var(--ok)':'var(--warn)'};font-family:monospace">${i.v}</span>
-        <span class="badge" style="background:${i.ok?'rgba(39,174,96,0.15)':'rgba(212,137,10,0.15)'};color:${i.ok?'var(--ok)':'var(--warn)'};border:1px solid ${i.ok?'rgba(39,174,96,0.3)':'rgba(212,137,10,0.3)'}">${i.ok?'✓':'⚠'}</span>
-      </div>
-    </div>`).join('');
+  document.getElementById('indicadores').innerHTML = items.map(function(i){
+    return '<div class="ind-row"><div><div style="font-size:12px;color:var(--white);font-family:monospace">'+i.l+'</div><div style="font-size:10px;color:var(--muted)">Ref: '+i.ref+'</div></div><div style="display:flex;align-items:center;gap:10px"><span style="font-size:15px;font-weight:800;color:'+(i.ok?'var(--ok)':'var(--warn)')+';font-family:monospace">'+i.v+'</span><span class="badge" style="background:'+(i.ok?'rgba(39,174,96,0.15)':'rgba(212,137,10,0.15)')+';color:'+(i.ok?'var(--ok)':'var(--warn)')+';border:1px solid '+(i.ok?'rgba(39,174,96,0.3)':'rgba(212,137,10,0.3)')+'">'+( i.ok?'✓':'⚠')+'</span></div></div>';
+  }).join('');
 }
 
-// ── DATOS TABLE (registro diario) ──
-function renderDatos(){
-  document.getElementById('datosCount').textContent=DATA.length+' registros';
-  const filtroTipo=document.getElementById('filtTipo')?.value||'';
-  const filtroCat=document.getElementById('filtCat')?.value||'';
-  const filtroMes=document.getElementById('filtMes')?.value||'';
-  let lista=[...DATA].sort((a,b)=>b.fecha.localeCompare(a.fecha));
-  if(filtroTipo) lista=lista.filter(r=>r.tipo===filtroTipo);
-  if(filtroCat)  lista=lista.filter(r=>r.cat===filtroCat);
-  if(filtroMes)  lista=lista.filter(r=>r.fecha&&r.fecha.startsWith(filtroMes));
-  const tbody=document.querySelector('#tblDatos tbody');
-  tbody.innerHTML=lista.map(r=>`<tr>
-    <td style="color:var(--muted);font-size:10px">${df(r.fecha)}</td>
-    <td><span class="badge" style="background:${r.tipo==='Ingreso'?'rgba(39,174,96,0.15)':'rgba(192,57,43,0.15)'};color:${r.tipo==='Ingreso'?'var(--ok)':'var(--danger)'};border:1px solid ${r.tipo==='Ingreso'?'rgba(39,174,96,0.3)':'rgba(192,57,43,0.3)'}">${r.tipo}</span></td>
-    <td style="font-size:10px;color:var(--muted)">${r.cat}</td>
-    <td style="color:var(--white)">${r.desc}</td>
-    <td style="color:${r.tipo==='Ingreso'?'var(--ok)':'var(--danger)'};font-weight:700;text-align:right">${clp(r.monto)}</td>
-    <td style="font-size:10px">${r.doc||'—'}${r.numDoc?' N°'+r.numDoc.substring(0,12):''}</td>
-    <td style="font-size:10px;color:var(--muted)">${r.medioPago||'—'}</td>
-    <td style="display:flex;gap:4px">
-      <button class="btn btn-sm btn-edit" onclick="openEdit(${r.id})">✎</button>
-      <button class="btn btn-sm btn-del" onclick="deleteRecord(${r.id})">✕</button>
-    </td>
-  </tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:14px">Sin registros</td></tr>';
+function renderViabilidad() {
+  var tV=ventas(), tE=egresos(), tR=resultado(), tC=capital();
+  var roi = tE > 0 ? (tR/tE*100).toFixed(1) : 0;
+  var score = Math.min(100, Math.round((tR>0?30:10) + (tV/Math.max(tC,1)>0.3?25:10) + (tE/Math.max(tV,1)<1?20:5) + (porMes().length>=3?15:5)));
+  document.getElementById('kpi-viabilidad').innerHTML =
+    '<div class="kpi" style="--kc:rgba(201,168,76,0.1)"><div class="kpi-label">Score Viabilidad</div><div class="kpi-value" style="color:' + (score>=70?'var(--ok)':score>=50?'var(--warn)':'var(--danger)') + '">' + score + '/100</div><div class="kpi-sub">' + (score>=70?'Negocio Viable':score>=50?'En desarrollo':'Revisar') + '</div></div>' +
+    '<div class="kpi"><div class="kpi-label">ROI</div><div class="kpi-value" style="color:var(--gold)">' + roi + '%</div><div class="kpi-sub">Retorno sobre inversión</div></div>' +
+    '<div class="kpi"><div class="kpi-label">Resultado Acumulado</div><div class="kpi-value" style="color:' + (tR>=0?'var(--ok)':'var(--danger)') + '">' + M(tR) + '</div><div class="kpi-sub">Ventas − Egresos</div></div>' +
+    '<div class="kpi"><div class="kpi-label">Saldo Total</div><div class="kpi-value" style="color:var(--info)">' + M(tC+tV-tE) + '</div><div class="kpi-sub">Capital + Ventas − Egresos</div></div>';
 }
 
-// ── VIABILITY ──
-function renderViability(){
-  const tI=ingresos(),tG=egresos(),tU=utilidad(),tC=capital();
-  const roi=tG>0?(tU/tG*100).toFixed(1):0;
-  const payback=tI>0?Math.ceil(tC/tI*porMes().length):99;
-  const score=Math.min(100,Math.round(
-    (tU>0?30:10)+(tI/Math.max(tC,1)>0.3?25:10)+(tG/Math.max(tI,1)<1?20:5)+(porMes().length>=3?15:5)+(parseFloat(roi)>0?10:0)
-  ));
-  document.getElementById('viabilityScore').textContent=score;
-  document.getElementById('viabilityLabel').textContent=score>=70?'Negocio Viable':'En Desarrollo';
-  document.getElementById('roiVal').textContent=roi+'%';
-  document.getElementById('vpnVal')?.innerHTML && (document.getElementById('vpnVal').innerHTML=`${M(tU)}<br><span style="font-size:11px;color:var(--muted)">Resultado neto acumulado</span>`);
-  document.getElementById('paybackVal')?.innerHTML && (document.getElementById('paybackVal').innerHTML=`${payback} meses<br><span style="font-size:11px;color:var(--muted)">Recuperación del capital</span>`);
-  const ctx=document.getElementById('viabilityGauge').getContext('2d');
-  if(charts.viabilityGauge) charts.viabilityGauge.destroy();
-  const c=score>=70?'#27AE60':score>=50?'#D4890A':'#C0392B';
-  charts.viabilityGauge=new Chart(ctx,{type:'doughnut',data:{datasets:[{data:[score,100-score],backgroundColor:[c,'rgba(255,255,255,0.05)'],borderWidth:0}]},options:{cutout:'78%',plugins:{legend:{display:false},tooltip:{enabled:false}}}});
+function renderDatos() {
+  var filtTipo = document.getElementById('filtTipo').value;
+  var filtCat  = document.getElementById('filtCat').value;
+  var filtMes  = document.getElementById('filtMes').value;
+  var lista = DATA.slice().sort(function(a,b){return b.fecha.localeCompare(a.fecha);});
+  if (filtTipo) lista = lista.filter(function(r){return r.tipo===filtTipo;});
+  if (filtCat)  lista = lista.filter(function(r){return r.cat===filtCat;});
+  if (filtMes)  lista = lista.filter(function(r){return r.fecha&&r.fecha.indexOf(filtMes)===0;});
+  document.getElementById('datosCount').textContent = lista.length + ' de ' + DATA.length + ' registros';
+  var tbody = document.querySelector('#tblDatos tbody');
+  tbody.innerHTML = lista.map(function(r){
+    return '<tr>' +
+      '<td style="color:var(--muted);font-size:10px">' + df(r.fecha) + '</td>' +
+      '<td><span class="badge" style="background:' + (r.tipo==='Ingreso'?'rgba(39,174,96,0.15)':'rgba(192,57,43,0.15)') + ';color:' + (r.tipo==='Ingreso'?'var(--ok)':'var(--danger)') + ';border:1px solid ' + (r.tipo==='Ingreso'?'rgba(39,174,96,0.3)':'rgba(192,57,43,0.3)') + '">' + r.tipo + '</span></td>' +
+      '<td style="font-size:10px;color:var(--muted)">' + r.cat + '</td>' +
+      '<td style="color:var(--white)">' + (r.desc||'—') + '</td>' +
+      '<td style="color:' + (r.tipo==='Ingreso'?'var(--ok)':'var(--danger)') + ';font-weight:700;text-align:right">' + clp(r.monto) + '</td>' +
+      '<td style="font-size:10px">' + (r.doc||'—') + (r.numDoc?' N°'+r.numDoc.toString().substring(0,12):'') + '</td>' +
+      '<td style="font-size:10px;color:var(--muted)">' + (r.medioPago||'—') + '</td>' +
+      '<td style="display:flex;gap:4px">' +
+        '<button class="btn btn-sm btn-edit" onclick="abrirEditar(' + r.id + ')">✎</button>' +
+        '<button class="btn btn-sm btn-del"  onclick="eliminarRegistro(' + r.id + ')">✕</button>' +
+      '</td>' +
+    '</tr>';
+  }).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:20px">Sin registros</td></tr>';
 }
 
-// ══════════════════════════════════════════
-//  CHARTS
-// ══════════════════════════════════════════
-const CF={color:'rgba(255,255,255,0.04)',font:{family:'monospace',size:10}};
+// ── 10. GRÁFICOS ──
+function buildCharts() {
+  var meses = porMes();
+  if (!meses.length) return;
+  var labels = meses.map(function(m){var p=m.mes.split('-');return MESES[parseInt(p[1])].substring(0,3)+' '+p[0];});
+  var vts    = meses.map(function(m){return m.ventas;});
+  var egr    = meses.map(function(m){return m.egr;});
+  var flt    = meses.map(function(m){return m.fletes;});
+  var arr    = meses.map(function(m){return m.arriendos;});
+  var res    = meses.map(function(m){return m.ventas-m.egr;});
+  var acum   = res.reduce(function(a,v,i){a.push((a[i-1]||0)+v);return a;},[]);
 
-function buildCharts(){
-  const meses=porMes();
-  const labels=meses.map(m=>{ const [y,mo]=m.mes.split('-'); return MES_NAMES[parseInt(mo)].substring(0,3)+' '+y; });
-  const ing=meses.map(m=>m.ing);
-  const egr=meses.map(m=>m.egr);
-  const fletes=meses.map(m=>m.fletes||0);
-  const arriendos=meses.map(m=>m.arriendos||0);
-  const util=meses.map(m=>m.ing-m.egr);
-  const acum=util.reduce((a,v,i)=>{ a.push((a[i-1]||0)+v); return a; },[]);
-  // Capital por mes (separado)
-  const capMap={};
-  DATA.filter(r=>r.cat==='Aporte de Capital').forEach(r=>{
-    const m=r.fecha?r.fecha.substring(0,7):'';
-    if(!m) return;
-    capMap[m]=(capMap[m]||0)+r.monto;
+  // Capital por mes
+  var capMap = {};
+  DATA.filter(function(r){return r.cat==='Aporte de Capital';}).forEach(function(r){
+    var m = r.fecha ? r.fecha.substring(0,7) : '';
+    if (m) capMap[m] = (capMap[m]||0) + r.monto;
   });
-  const capData=labels.map((_,i)=>capMap[meses[i]?.mes]||0);
+  var cap = meses.map(function(m){return capMap[m.mes]||0;});
 
-  const build=(id,cfg)=>{ if(charts[id]) charts[id].destroy(); const c=document.getElementById(id); if(c) charts[id]=new Chart(c,cfg); };
+  var CF = {color:'rgba(255,255,255,0.04)', font:{family:'monospace',size:10}};
+  var build = function(id, cfg) {
+    if (charts[id]) { charts[id].destroy(); }
+    var c = document.getElementById(id);
+    if (c) charts[id] = new Chart(c, cfg);
+  };
 
-  // Gráfico principal: Fletes + Arriendos + Capital + Egresos separados
-  build('areaChart',{type:'bar',data:{labels,datasets:[
-    {label:'Ventas Fletes',data:fletes,backgroundColor:'rgba(39,174,96,0.8)',borderRadius:3,borderSkipped:false},
-    {label:'Ventas Arriendos',data:arriendos,backgroundColor:'rgba(56,189,248,0.8)',borderRadius:3,borderSkipped:false},
-    {label:'Capital Propio',data:capData,backgroundColor:'rgba(201,168,76,0.6)',borderRadius:3,borderSkipped:false},
-    {label:'Egresos',data:egr,backgroundColor:'rgba(192,57,43,0.7)',borderRadius:3,borderSkipped:false},
-    {label:'Resultado Operacional',data:util,type:'line',borderColor:'#A78BFA',backgroundColor:'rgba(167,139,250,0.1)',fill:false,tension:.4,borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#A78BFA'},
-  ]},options:{plugins:{legend:{labels:{font:CF.font,boxWidth:10}}},scales:{x:{grid:{color:CF.color},ticks:{font:CF.font}},y:{grid:{color:CF.color},ticks:{font:CF.font,callback:v=>'$'+(v/1000).toFixed(0)+'K'}}}}});
-
-  // Flujo acumulado (solo ventas reales - egresos)
-  build('rentChart',{type:'line',data:{labels,datasets:[
-    {label:'Acumulado Operacional',data:acum,borderColor:acum[acum.length-1]>=0?'#27AE60':'#C0392B',backgroundColor:acum[acum.length-1]>=0?'rgba(39,174,96,0.1)':'rgba(192,57,43,0.08)',fill:true,tension:.4,borderWidth:2.5,pointRadius:4},
-  ]},options:{plugins:{legend:{labels:{font:CF.font,boxWidth:10}}},scales:{x:{grid:{color:CF.color},ticks:{font:CF.font}},y:{grid:{color:CF.color},ticks:{font:CF.font,callback:v=>'$'+(v/1000).toFixed(0)+'K'}}}}});
-
-  // Distribución de egresos por categoría
-  const catData=porCategoria();
-  const catLabels=catData.map(c=>c[0]);
-  const catVals=catData.map(c=>c[1]);
-  const catColors=['#C9A84C','#38BDF8','#EF4444','#10B981','#F59E0B','#A78BFA','#FB7185','#34D399'];
-  build('pieChart',{type:'doughnut',data:{labels:catLabels,datasets:[{data:catVals,backgroundColor:catColors.slice(0,catLabels.length),borderWidth:0}]},options:{cutout:'55%',plugins:{legend:{display:false}}}});
-  const totEgr=catVals.reduce((s,v)=>s+v,0);
-  document.getElementById('pieLegend').innerHTML=catLabels.map((c,i)=>`
-    <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-      <div style="display:flex;align-items:center;gap:6px">
-        <div style="width:8px;height:8px;border-radius:2px;background:${catColors[i]}"></div>
-        <span style="font-size:10px;color:var(--muted)">${c}</span>
-      </div>
-      <span style="font-size:10px;font-weight:700">${clp(catVals[i])} <span style="color:var(--muted)">(${totEgr>0?(catVals[i]/totEgr*100).toFixed(0):0}%)</span></span>
-    </div>`).join('');
-
-  // Proyección basada en ventas reales
-  const lastI=ing.length>0?ing[ing.length-1]:0;
-  const growth=ing.length>1?(ing[ing.length-1]-ing[0])/(ing.length-1):50000;
-  const pl=[],pb=[],pc=[],po=[];
-  for(let i=1;i<=6;i++){
-    const v=Math.round(lastI+growth*i);
-    pl.push('M+'+i); pb.push(Math.max(0,v)); pc.push(Math.max(0,Math.round(v*.8))); po.push(Math.max(0,Math.round(v*1.2)));
-  }
-  build('proyChart',{type:'line',data:{labels:pl,datasets:[
-    {label:'Optimista +20%',data:po,borderColor:'#27AE60',borderWidth:1.5,borderDash:[5,3],pointRadius:0,fill:false},
-    {label:'Base',data:pb,borderColor:'#C9A84C',borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#C9A84C',fill:false},
-    {label:'Conservador -20%',data:pc,borderColor:'#D4890A',borderWidth:1.5,borderDash:[5,3],pointRadius:0,fill:false},
-  ]},options:{plugins:{legend:{labels:{font:CF.font,boxWidth:10}}},scales:{x:{grid:{color:CF.color},ticks:{font:CF.font}},y:{grid:{color:CF.color},ticks:{font:CF.font,callback:v=>'$'+(v/1000).toFixed(0)+'K'}}}}});
-}
-
-  // Ingresos vs Egresos (barras agrupadas)
-  build('areaChart',{type:'bar',data:{labels,datasets:[
-    {label:'Ingresos',data:ing,backgroundColor:'rgba(39,174,96,0.7)',borderRadius:4,borderSkipped:false},
-    {label:'Egresos',data:egr,backgroundColor:'rgba(192,57,43,0.7)',borderRadius:4,borderSkipped:false},
-    {label:'Resultado',data:util,type:'line',borderColor:'#C9A84C',backgroundColor:'rgba(201,168,76,0.1)',fill:false,tension:.4,borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#C9A84C'},
-  ]},options:{plugins:{legend:{labels:{font:CF.font,boxWidth:10}}},scales:{x:{grid:{color:CF.color},ticks:{font:CF.font}},y:{grid:{color:CF.color},ticks:{font:CF.font,callback:v=>'$'+(v/1000).toFixed(0)+'K'}}}}});
+  // Barras: Fletes + Arriendos + Capital + Egresos
+  build('chartBarras', {type:'bar', data:{labels:labels, datasets:[
+    {label:'Ventas Fletes',    data:flt, backgroundColor:'rgba(39,174,96,0.75)',  borderRadius:3},
+    {label:'Ventas Arriendos', data:arr, backgroundColor:'rgba(56,189,248,0.75)', borderRadius:3},
+    {label:'Capital Propio',   data:cap, backgroundColor:'rgba(201,168,76,0.55)', borderRadius:3},
+    {label:'Egresos',          data:egr, backgroundColor:'rgba(192,57,43,0.7)',   borderRadius:3},
+    {label:'Resultado Oper.',  data:res, type:'line', borderColor:'#A78BFA', backgroundColor:'rgba(167,139,250,0.08)', fill:false, tension:.4, borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#A78BFA'}
+  ]}, options:{plugins:{legend:{labels:{font:CF.font,boxWidth:10}}}, scales:{x:{grid:{color:CF.color},ticks:{font:CF.font}}, y:{grid:{color:CF.color},ticks:{font:CF.font,callback:function(v){return '$'+(v/1000).toFixed(0)+'K';}}}}}});
 
   // Flujo acumulado
-  build('rentChart',{type:'line',data:{labels,datasets:[
-    {label:'Acumulado',data:acum,borderColor:acum[acum.length-1]>=0?'#27AE60':'#C0392B',backgroundColor:acum[acum.length-1]>=0?'rgba(39,174,96,0.1)':'rgba(192,57,43,0.08)',fill:true,tension:.4,borderWidth:2.5,pointRadius:4},
-  ]},options:{plugins:{legend:{labels:{font:CF.font,boxWidth:10}}},scales:{x:{grid:{color:CF.color},ticks:{font:CF.font}},y:{grid:{color:CF.color},ticks:{font:CF.font,callback:v=>'$'+(v/1000).toFixed(0)+'K'}}}}});
+  var colorAcum = acum[acum.length-1] >= 0 ? '#27AE60' : '#C0392B';
+  build('chartAcum', {type:'line', data:{labels:labels, datasets:[
+    {label:'Acumulado Operacional', data:acum, borderColor:colorAcum, backgroundColor:colorAcum==='#27AE60'?'rgba(39,174,96,0.1)':'rgba(192,57,43,0.08)', fill:true, tension:.4, borderWidth:2.5, pointRadius:4}
+  ]}, options:{plugins:{legend:{labels:{font:CF.font,boxWidth:10}}}, scales:{x:{grid:{color:CF.color},ticks:{font:CF.font}}, y:{grid:{color:CF.color},ticks:{font:CF.font,callback:function(v){return '$'+(v/1000).toFixed(0)+'K';}}}}}});
 
-  // Distribución de egresos por categoría (real)
-  const catData=porCategoria();
-  const catLabels=catData.map(c=>c[0]);
-  const catVals=catData.map(c=>c[1]);
-  const catColors=['#C9A84C','#38BDF8','#EF4444','#10B981','#F59E0B','#A78BFA','#FB7185','#34D399'];
-  build('pieChart',{type:'doughnut',data:{labels:catLabels,datasets:[{data:catVals,backgroundColor:catColors.slice(0,catLabels.length),borderWidth:0}]},options:{cutout:'55%',plugins:{legend:{display:false}}}});
-  const totEgr=catVals.reduce((s,v)=>s+v,0);
-  document.getElementById('pieLegend').innerHTML=catLabels.map((c,i)=>`
-    <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-      <div style="display:flex;align-items:center;gap:6px">
-        <div style="width:8px;height:8px;border-radius:2px;background:${catColors[i]}"></div>
-        <span style="font-size:10px;color:var(--muted)">${c}</span>
-      </div>
-      <span style="font-size:10px;font-weight:700">${clp(catVals[i])} <span style="color:var(--muted)">(${totEgr>0?(catVals[i]/totEgr*100).toFixed(0):0}%)</span></span>
-    </div>`).join('');
+  // Torta egresos
+  var catData   = porCategoria();
+  var catLabels = catData.map(function(c){return c[0];});
+  var catVals   = catData.map(function(c){return c[1];});
+  var catColors = ['#C9A84C','#38BDF8','#EF4444','#10B981','#F59E0B','#A78BFA','#FB7185','#34D399','#F472B6','#60A5FA'];
+  build('chartTorta', {type:'doughnut', data:{labels:catLabels, datasets:[{data:catVals, backgroundColor:catColors.slice(0,catLabels.length), borderWidth:0}]}, options:{cutout:'55%', plugins:{legend:{display:false}}}});
+  var totE = catVals.reduce(function(s,v){return s+v;},0);
+  document.getElementById('leyendaTorta').innerHTML = catLabels.map(function(c,i){
+    return '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
+      '<div style="display:flex;align-items:center;gap:6px">' +
+        '<div style="width:8px;height:8px;border-radius:2px;background:'+catColors[i]+'"></div>' +
+        '<span style="font-size:10px;color:var(--muted)">'+c+'</span>' +
+      '</div>' +
+      '<span style="font-size:10px;font-weight:700">'+clp(catVals[i])+' <span style="color:var(--muted)">('+( totE>0?(catVals[i]/totE*100).toFixed(0):0)+'%)</span></span>' +
+    '</div>';
+  }).join('');
 
   // Proyección
-  const lastI=ing.length>0?ing[ing.length-1]:0;
-  const growth=ing.length>1?(ing[ing.length-1]-ing[0])/(ing.length-1):50000;
-  const pl=[],pb=[],pc=[],po=[];
-  for(let i=1;i<=6;i++){
-    const v=Math.round(lastI+growth*i);
+  var lastV   = vts.length > 0 ? vts[vts.length-1] : 0;
+  var growth  = vts.length > 1 ? (vts[vts.length-1]-vts[0])/(vts.length-1) : 50000;
+  var pl=[], pb=[], pc=[], po=[];
+  for (var i=1; i<=6; i++) {
+    var v = Math.max(0, Math.round(lastV + growth*i));
     pl.push('M+'+i); pb.push(v); pc.push(Math.round(v*.8)); po.push(Math.round(v*1.2));
   }
-  build('proyChart',{type:'line',data:{labels:pl,datasets:[
-    {label:'Optimista +20%',data:po,borderColor:'#27AE60',borderWidth:1.5,borderDash:[5,3],pointRadius:0,fill:false},
-    {label:'Base',data:pb,borderColor:'#C9A84C',borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#C9A84C',fill:false},
-    {label:'Conservador -20%',data:pc,borderColor:'#D4890A',borderWidth:1.5,borderDash:[5,3],pointRadius:0,fill:false},
-  ]},options:{plugins:{legend:{labels:{font:CF.font,boxWidth:10}}},scales:{x:{grid:{color:CF.color},ticks:{font:CF.font}},y:{grid:{color:CF.color},ticks:{font:CF.font,callback:v=>'$'+(v/1000).toFixed(0)+'K'}}}}});
+  build('chartProyeccion', {type:'line', data:{labels:pl, datasets:[
+    {label:'Optimista +20%',   data:po, borderColor:'#27AE60', borderWidth:1.5, borderDash:[5,3], pointRadius:0, fill:false},
+    {label:'Base',             data:pb, borderColor:'#C9A84C', borderWidth:2.5, pointRadius:3, pointBackgroundColor:'#C9A84C', fill:false},
+    {label:'Conservador -20%', data:pc, borderColor:'#D4890A', borderWidth:1.5, borderDash:[5,3], pointRadius:0, fill:false}
+  ]}, options:{plugins:{legend:{labels:{font:CF.font,boxWidth:10}}}, scales:{x:{grid:{color:CF.color},ticks:{font:CF.font}}, y:{grid:{color:CF.color},ticks:{font:CF.font,callback:function(v){return '$'+(v/1000).toFixed(0)+'K';}}}}}});
 }
 
-// ══════════════════════════════════════════
-//  CRUD — REGISTRO DIARIO
-// ══════════════════════════════════════════
-const CATS_INGRESO=['Servicio de Arriendos','Servicio de Fletes','Aporte de Capital','Garantías Recibidas','Otros Ingresos'];
-const CATS_EGRESO=['Inversión Activos','Combustible y Transporte','Mantención Vehículos','Costos Operativos','Gastos de Oficina','Gastos Legales','Gastos Administrativos','Garantías Devueltas','Otros Egresos'];
+// ── 11. CRUD ──
+var CATS_ING = ['Servicio de Arriendos','Servicio de Fletes','Aporte de Capital','Garantías Recibidas','Otros Ingresos'];
+var CATS_EGR = ['Inversión Activos','Combustible y Transporte','Mantención Vehículos','Costos Operativos','Gastos de Oficina','Gastos Legales','Gastos Administrativos','Garantías Devueltas','Otros Egresos'];
 
-function actualizarCats(){
-  const tipo=document.getElementById('fTipo').value;
-  const sel=document.getElementById('fCat');
-  const cats=tipo==='Ingreso'?CATS_INGRESO:CATS_EGRESO;
-  sel.innerHTML=cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+function actualizarCats() {
+  var tipo = document.getElementById('fTipo').value;
+  var sel  = document.getElementById('fCat');
+  var cats = tipo === 'Ingreso' ? CATS_ING : CATS_EGR;
+  sel.innerHTML = cats.map(function(c){return '<option value="'+c+'">'+c+'</option>';}).join('');
 }
 
-function openAdd(){
-  document.getElementById('modalTitle').textContent='Nueva Transacción';
-  document.getElementById('editId').value='';
-  document.getElementById('fFecha').value=new Date().toISOString().split('T')[0];
-  document.getElementById('fTipo').value='Ingreso';
+function openAdd() {
+  document.getElementById('modalTitulo').textContent = 'Nueva Transacción';
+  document.getElementById('editId').value = '';
+  document.getElementById('fFecha').value = new Date().toISOString().split('T')[0];
+  document.getElementById('fTipo').value  = 'Ingreso';
   actualizarCats();
-  document.getElementById('fDesc').value='';
-  document.getElementById('fMonto').value='';
-  document.getElementById('fDoc').value='';
-  document.getElementById('fNumDoc').value='';
-  document.getElementById('fMedioPago').value='';
-  document.getElementById('fCuenta').value='';
+  document.getElementById('fDesc').value  = '';
+  document.getElementById('fMonto').value = '';
+  document.getElementById('fDoc').value   = '';
+  document.getElementById('fNumDoc').value = '';
+  document.getElementById('fMedioPago').value = '';
+  document.getElementById('fCuenta').value = '';
   document.getElementById('modalAdd').classList.add('open');
 }
 
-function openEdit(id){
-  const r=DATA.find(x=>x.id===id); if(!r) return;
-  document.getElementById('modalTitle').textContent='Editar Transacción';
-  document.getElementById('editId').value=id;
-  document.getElementById('fFecha').value=r.fecha||'';
-  document.getElementById('fTipo').value=r.tipo;
+function abrirEditar(id) {
+  var r = DATA.find(function(x){return x.id===id;});
+  if (!r) return;
+  document.getElementById('modalTitulo').textContent = 'Editar Transacción';
+  document.getElementById('editId').value  = id;
+  document.getElementById('fFecha').value  = r.fecha||'';
+  document.getElementById('fTipo').value   = r.tipo;
   actualizarCats();
-  document.getElementById('fCat').value=r.cat;
-  document.getElementById('fDesc').value=r.desc||'';
-  document.getElementById('fMonto').value=r.monto||0;
-  document.getElementById('fDoc').value=r.doc||'';
-  document.getElementById('fNumDoc').value=r.numDoc||'';
-  document.getElementById('fMedioPago').value=r.medioPago||'';
-  document.getElementById('fCuenta').value=r.cuenta||'';
+  document.getElementById('fCat').value    = r.cat;
+  document.getElementById('fDesc').value   = r.desc||'';
+  document.getElementById('fMonto').value  = r.monto||0;
+  document.getElementById('fDoc').value    = r.doc||'';
+  document.getElementById('fNumDoc').value = r.numDoc||'';
+  document.getElementById('fMedioPago').value = r.medioPago||'';
+  document.getElementById('fCuenta').value    = r.cuenta||'';
   document.getElementById('modalAdd').classList.add('open');
 }
 
-function saveRecord(){
-  const fecha=document.getElementById('fFecha').value;
-  const tipo=document.getElementById('fTipo').value;
-  const cat=document.getElementById('fCat').value;
-  const desc=document.getElementById('fDesc').value.trim();
-  const monto=parseFloat(document.getElementById('fMonto').value)||0;
-  const doc=document.getElementById('fDoc').value;
-  const numDoc=document.getElementById('fNumDoc').value;
-  const medioPago=document.getElementById('fMedioPago').value;
-  const cuenta=document.getElementById('fCuenta').value;
-  const editId=document.getElementById('editId').value;
-  if(!fecha||!desc||monto<=0){ alert('Completa Fecha, Descripción y Monto'); return; }
-  const obj={fecha,tipo,cat,desc,monto,doc,numDoc,medioPago,cuenta};
-  if(editId){
-    const idx=DATA.findIndex(x=>x.id==editId);
-    if(idx>=0) DATA[idx]={...DATA[idx],...obj};
+function guardarRegistro() {
+  var fecha  = document.getElementById('fFecha').value;
+  var tipo   = document.getElementById('fTipo').value;
+  var cat    = document.getElementById('fCat').value;
+  var desc   = document.getElementById('fDesc').value.trim();
+  var monto  = parseFloat(document.getElementById('fMonto').value)||0;
+  var doc    = document.getElementById('fDoc').value;
+  var numDoc = document.getElementById('fNumDoc').value;
+  var medioPago = document.getElementById('fMedioPago').value;
+  var cuenta    = document.getElementById('fCuenta').value;
+  var editId    = document.getElementById('editId').value;
+  if (!fecha||!desc||monto<=0) { alert('Completa Fecha, Descripción y Monto'); return; }
+  var obj = {fecha:fecha,tipo:tipo,cat:cat,desc:desc,monto:monto,doc:doc,numDoc:numDoc,medioPago:medioPago,cuenta:cuenta};
+  if (editId) {
+    var idx = DATA.findIndex(function(x){return x.id==editId;});
+    if (idx >= 0) DATA[idx] = Object.assign({}, DATA[idx], obj);
   } else {
-    DATA.push({id:nextId++,...obj});
+    DATA.push(Object.assign({id:nextId++}, obj));
   }
-  save(); closeModal('modalAdd'); renderAll();
+  guardar();
+  cerrarModal('modalAdd');
+  renderTodo();
 }
 
-function deleteRecord(id){
-  if(!confirm('¿Eliminar esta transacción?')) return;
-  DATA=DATA.filter(r=>r.id!==id);
-  save(); renderAll();
+function eliminarRegistro(id) {
+  if (!confirm('¿Eliminar esta transacción?')) return;
+  DATA = DATA.filter(function(r){return r.id!==id;});
+  guardar();
+  renderTodo();
 }
 
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+// ── 12. TABS ──
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('sec-'+id).classList.add('active');
+  btn.classList.add('active');
+  renderTodo();
+}
 
-// ── CSV ──
-function openImport(){
-  document.getElementById('csvPreview').style.display='none';
-  document.getElementById('csvFile').value='';
-  csvPending=[];
+// ── 13. CSV ──
+function openImport() {
+  document.getElementById('csvPreview').style.display = 'none';
+  document.getElementById('csvFile').value = '';
+  csvPending = [];
   document.getElementById('modalImport').classList.add('open');
 }
-function readCSV(input){
-  const file=input.files[0]; if(!file) return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const lines=e.target.result.split('\n').filter(l=>l.trim());
-    if(lines.length<2){ alert('Archivo vacío'); return; }
-    const headers=lines[0].split(',').map(h=>h.trim().toLowerCase().replace(/['"]/g,''));
-    const fechaIdx=headers.findIndex(h=>h.includes('fecha')||h.includes('date'));
-    const tipoIdx=headers.findIndex(h=>h.includes('tipo'));
-    const catIdx=headers.findIndex(h=>h.includes('cat'));
-    const descIdx=headers.findIndex(h=>h.includes('desc'));
-    const montoIdx=headers.findIndex(h=>h.includes('monto')||h.includes('ingres')||h.includes('gasto'));
-    csvPending=[];
-    const tbody=document.querySelector('#tblPreview tbody'); tbody.innerHTML='';
-    for(let i=1;i<lines.length;i++){
-      const cols=lines[i].split(',').map(c=>c.trim().replace(/['"]/g,''));
-      const row={id:nextId++,fecha:fechaIdx>=0?cols[fechaIdx]:new Date().toISOString().split('T')[0],tipo:tipoIdx>=0?cols[tipoIdx]:'Ingreso',cat:catIdx>=0?cols[catIdx]:'Otros Ingresos',desc:descIdx>=0?cols[descIdx]:'Importado',monto:parseFloat((cols[montoIdx]||'0').replace(/[^0-9.]/g,''))||0,doc:'',numDoc:'',medioPago:'',cuenta:''};
-      if(!row.monto) continue;
+function leerCSV(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var lines = e.target.result.split('\n').filter(function(l){return l.trim();});
+    if (lines.length < 2) { alert('Archivo vacío'); return; }
+    var headers = lines[0].split(',').map(function(h){return h.trim().toLowerCase().replace(/['"]/g,'');});
+    var fi = function(name) { return headers.findIndex(function(h){return h.indexOf(name)>=0;}); };
+    csvPending = [];
+    var tbody = document.querySelector('#tblPreview tbody');
+    tbody.innerHTML = '';
+    for (var i=1; i<lines.length; i++) {
+      var cols = lines[i].split(',').map(function(c){return c.trim().replace(/['"]/g,'');});
+      var row = {
+        id: nextId++,
+        fecha: cols[fi('fecha')]||new Date().toISOString().split('T')[0],
+        tipo:  cols[fi('tipo')]||'Ingreso',
+        cat:   cols[fi('cat')]||'Otros Ingresos',
+        desc:  cols[fi('desc')]||'Importado',
+        monto: parseFloat((cols[fi('monto')]||'0').replace(/[^0-9.]/g,''))||0,
+        doc:'', numDoc:'', medioPago:'', cuenta:''
+      };
+      if (!row.monto) continue;
       csvPending.push(row);
-      if(i<=8) tbody.innerHTML+=`<tr><td>${row.fecha}</td><td>${row.tipo}</td><td>${row.desc}</td><td style="color:var(--ok)">${clp(row.monto)}</td></tr>`;
+      if (i<=5) tbody.innerHTML += '<tr><td>'+row.fecha+'</td><td>'+row.tipo+'</td><td>'+row.desc+'</td><td style="color:var(--ok)">'+clp(row.monto)+'</td></tr>';
     }
-    document.getElementById('csvCount').textContent='✓ '+csvPending.length+' filas';
-    document.getElementById('csvPreview').style.display='block';
+    document.getElementById('csvCount').textContent = '✓ '+csvPending.length+' filas';
+    document.getElementById('csvPreview').style.display = 'block';
   };
   reader.readAsText(file);
 }
-function importData(mode){
-  if(!csvPending.length) return;
-  if(mode==='replace') DATA=csvPending;
-  else DATA=[...DATA,...csvPending];
-  save(); closeModal('modalImport'); renderAll();
+function importarCSV(modo) {
+  if (!csvPending.length) return;
+  if (modo === 'replace') DATA = csvPending.slice();
+  else DATA = DATA.concat(csvPending);
+  guardar();
+  cerrarModal('modalImport');
+  renderTodo();
 }
-function exportCSV(){
-  let csv='fecha,tipo,categoria,descripcion,monto,documento,numDoc,medioPago,cuenta\n';
-  DATA.forEach(r=>{ csv+=`"${r.fecha}","${r.tipo}","${r.cat}","${r.desc}",${r.monto},"${r.doc||''}","${r.numDoc||''}","${r.medioPago||''}","${r.cuenta||''}"\n`; });
-  const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download='finanzas_myp_'+new Date().toISOString().split('T')[0]+'.csv'; a.click();
+function exportCSV() {
+  var csv = 'fecha,tipo,categoria,descripcion,monto,documento,numDoc,medioPago,cuenta\n';
+  DATA.forEach(function(r){
+    csv += '"'+r.fecha+'","'+r.tipo+'","'+r.cat+'","'+r.desc+'",'+r.monto+',"'+(r.doc||'')+'","'+(r.numDoc||'')+'","'+(r.medioPago||'')+'","'+(r.cuenta||'')+'"\n';
+  });
+  var a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'finanzas_'+EMP.nombre.replace(/\s/g,'_')+'_'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();
 }
 
-document.querySelectorAll('.modal-overlay').forEach(m=>{ m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); }); });
+// ── 14. MODAL ──
+function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(function(m){
+  m.addEventListener('click', function(e){ if(e.target===m) m.classList.remove('open'); });
+});
 
-// ══════════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════════
-load();
-renderAll();
-try{var _n=document.getElementById('logoNombre');if(_n&&window._EMP)_n.textContent=window._EMP.nombre||'Empresa';}catch(e){}
+// ── 15. INIT ──
+cargar();
+sincronizarDesdeArriendos();
+renderTodo();
 </script>
 </body>
 </html>
