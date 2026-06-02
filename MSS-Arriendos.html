@@ -614,6 +614,7 @@ const clp=n=>new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maxi
 const df=d=>{try{return new Date(d+'T12:00:00').toLocaleDateString('es-CL');}catch(e){return d||'—';}};
 const badge=(txt,color)=>`<span style="background:${color}22;color:${color};border:1px solid ${color}44;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;font-family:monospace">${txt}</span>`;
 const EC={'Completado':'#22C55E','Finalizado':'#22C55E','Activo':'#F59E0B','En Ruta':'#38BDF8','Programado':'#A78BFA','Cancelado':'#EF4444','Pendiente':'#F59E0B','Disponible':'#22C55E','Arrendado':'#F59E0B','Mantencion':'#EF4444'};
+const ICONOS={'Camioneta':'🚛','Vehículo':'🚗','Moto':'🏍','Maquinaria':'⚙️','Equipo':'🔧','Herramienta':'🔨','Generador':'⚡','Compresor':'💨','default':'📦'};
 
 function load(){
   try{
