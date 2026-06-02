@@ -437,33 +437,36 @@ function sincronizarDesdeArriendos() {
       if (a.estadoPago !== 'Pagado' && a.estado !== 'Finalizado') return;
       var monto = a.total || a.tarifa || 0;
       if (!monto) return;
-      // Solo agregar el arriendo (monto real cobrado), sin garantía
-      var existe = DATA.some(function(r){return r.srcId===a.id && r.srcTipo==='arriendo';});
-      if (!existe) {
-        DATA.push({id:nextId++, srcId:a.id, srcTipo:'arriendo',
-          fecha:a.inicio||new Date().toISOString().split('T')[0],
-          tipo:'Ingreso', cat:'Servicio de Arriendos',
-          desc:'Arriendo '+(a.num||'')+' — '+(a.activoNombre||'')+' ('+(a.clienteNombre||')'),
-          monto:monto, doc:a.tipoDoc||'', numDoc:a.numDoc||'',
-          medioPago:a.formaPago||'', cuenta:'Mercado Pago'});
-        cambiado = true;
-      }
+      var idx = DATA.findIndex(function(r){return r.srcId===a.id && r.srcTipo==='arriendo';});
+      var reg = {
+        srcId:a.id, srcTipo:'arriendo',
+        fecha:a.inicio||new Date().toISOString().split('T')[0],
+        tipo:'Ingreso', cat:'Servicio de Arriendos',
+        desc:'Arriendo '+(a.num||'')+' — '+(a.activoNombre||'')+' ('+(a.clienteNombre||'')+')',
+        monto:monto, doc:a.tipoDoc||'', numDoc:a.numDoc||'',
+        medioPago:a.formaPago||'', cuenta:'Mercado Pago'
+      };
+      if (idx >= 0) { DATA[idx] = Object.assign({}, DATA[idx], reg); }
+      else { DATA.push(Object.assign({id:nextId++}, reg)); }
+      cambiado = true;
     });
 
     flData.forEach(function(f) {
       if (f.estadoPago !== 'Pagado' && f.estado !== 'Completado') return;
       var monto = f.tarifa || 0;
       if (!monto) return;
-      var existe = DATA.some(function(r){return r.srcId===f.id && r.srcTipo==='flete';});
-      if (!existe) {
-        DATA.push({id:nextId++, srcId:f.id, srcTipo:'flete',
-          fecha:f.fecha||new Date().toISOString().split('T')[0],
-          tipo:'Ingreso', cat:'Servicio de Fletes',
-          desc:'Flete '+(f.num||'')+' — '+(f.origen||'')+' → '+(f.destino||'')+' ('+(f.clienteNombre||'')+')',
-          monto:monto, doc:f.tipoDoc||'', numDoc:f.numDoc||'',
-          medioPago:f.formaPago||'', cuenta:'Mercado Pago'});
-        cambiado = true;
-      }
+      var idx = DATA.findIndex(function(r){return r.srcId===f.id && r.srcTipo==='flete';});
+      var reg = {
+        srcId:f.id, srcTipo:'flete',
+        fecha:f.fecha||new Date().toISOString().split('T')[0],
+        tipo:'Ingreso', cat:'Servicio de Fletes',
+        desc:'Flete '+(f.num||'')+' — '+(f.origen||'')+' → '+(f.destino||'')+' ('+(f.clienteNombre||'')+')',
+        monto:monto, doc:f.tipoDoc||'', numDoc:f.numDoc||'',
+        medioPago:f.formaPago||'', cuenta:'Mercado Pago'
+      };
+      if (idx >= 0) { DATA[idx] = Object.assign({}, DATA[idx], reg); }
+      else { DATA.push(Object.assign({id:nextId++}, reg)); }
+      cambiado = true;
     });
 
     if (cambiado) guardar();
