@@ -855,7 +855,7 @@ function saveActivo(){
 }
 
 function editActivo(id){
-  const a=ACTIVOS.find(x=>x.id===id);if(!a)return;
+  const a=ACTIVOS.find(x=>parseInt(x.id)===parseInt(id));if(!a)return;
   document.getElementById('tActivo').textContent='Editar Activo';
   document.getElementById('aId').value=id;
   document.getElementById('aNombre').value=a.nombre;
@@ -957,7 +957,7 @@ function saveArriendo(){
 }
 
 function editArriendo(id){
-  const a=ARRIENDOS.find(x=>x.id===id);if(!a)return;
+  const a=ARRIENDOS.find(x=>parseInt(x.id)===parseInt(id));if(!a)return;
   poblarSelects();
   document.getElementById('tArriendo').textContent='Editar Arriendo';
   document.getElementById('arId').value=id;
@@ -999,7 +999,7 @@ function delArriendo(id){
 // EMISIÓN AUTOMÁTICA DESDE ARRIENDO
 // ═══════════════════════════════════════════
 function emitirContrato(id){
-  const a=ARRIENDOS.find(x=>x.id===id);if(!a)return;
+  const a=ARRIENDOS.find(x=>parseInt(x.id)===parseInt(id));if(!a)return;
   const activo=ACTIVOS.find(x=>x.id===a.activoId)||{};
   const cliente=CLIENTES.find(x=>x.id===a.clienteId)||{};
   const emp=getEmpresa();
@@ -1088,7 +1088,7 @@ function emitirContrato(id){
 }
 
 function emitirGuia(id){
-  const a=ARRIENDOS.find(x=>x.id===id);if(!a)return;
+  const a=ARRIENDOS.find(x=>parseInt(x.id)===parseInt(id));if(!a)return;
   const activo=ACTIVOS.find(x=>x.id===a.activoId)||{};
   const cliente=CLIENTES.find(x=>x.id===a.clienteId)||{};
   const emp=getEmpresa();
@@ -1148,7 +1148,7 @@ function emitirGuia(id){
 }
 
 function emitirDevolucion(id){
-  const a=ARRIENDOS.find(x=>x.id===id);if(!a)return;
+  const a=ARRIENDOS.find(x=>parseInt(x.id)===parseInt(id));if(!a)return;
   const activo=ACTIVOS.find(x=>x.id===a.activoId)||{};
   const cliente=CLIENTES.find(x=>x.id===a.clienteId)||{};
   const emp=getEmpresa();
@@ -1266,7 +1266,7 @@ function saveFlete(){
 }
 
 function editFlete(id){
-  const f=FLETES.find(x=>x.id===id);if(!f)return;
+  const f=FLETES.find(x=>parseInt(x.id)===parseInt(id));if(!f)return;
   poblarSelects();
   document.getElementById('tFlete').textContent='Editar Flete';
   document.getElementById('flId').value=id;
@@ -1318,7 +1318,7 @@ function saveCliente(){
 }
 
 function editCliente(id){
-  const c=CLIENTES.find(x=>x.id===id);if(!c)return;
+  const c=CLIENTES.find(x=>parseInt(x.id)===parseInt(id));if(!c)return;
   document.getElementById('cliId').value=id;
   document.getElementById('cliNombre').value=c.nombre;
   document.getElementById('cliRut').value=c.rut||'';
