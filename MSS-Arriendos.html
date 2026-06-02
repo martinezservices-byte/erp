@@ -852,8 +852,8 @@ function saveActivo(){
 
 function editActivo(id){
   const a=ACTIVOS.find(x=>parseInt(x.id)===parseInt(id));if(!a)return;
-  document.getElementById('tActivo').textContent='Editar Activo';
   document.getElementById('aId').value=id;
+  document.getElementById('tActivo').textContent='Editar Activo';
   document.getElementById('aNombre').value=a.nombre;
   document.getElementById('aTipo').value=a.tipo;
   document.getElementById('aCat').value=a.cat;
@@ -1323,7 +1323,8 @@ function editCliente(id){
   document.getElementById('cliTel').value=c.tel||'';
   document.getElementById('cliEmail').value=c.email||'';
   document.getElementById('cliDir').value=c.dir||'';
-  O('moCliente');
+  document.getElementById('tCliente').textContent='Editar Cliente';
+  document.getElementById('moCliente').classList.add('open');
 }
 function delCliente(id){if(!confirm('¿Eliminar este cliente?'))return;CLIENTES=CLIENTES.filter(x=>x.id!==id&&x.id!==parseInt(id));save();rClientes();}
 
@@ -1484,7 +1485,7 @@ function O(id){
     document.getElementById('flNumDoc').value='';
   }
   if(id==='moActivo'&&!document.getElementById('aId').value) document.getElementById('tActivo').textContent='Nuevo Activo';
-  if(id==='moCliente'&&!document.getElementById('cliId').value) document.getElementById('cliId').value='';
+  // moCliente: solo limpiar título si es nuevo (cliId vacío)
   if(id==='moMant') document.getElementById('mFecha').value=HOY;
   document.getElementById(id)?.classList.add('open');
 }
