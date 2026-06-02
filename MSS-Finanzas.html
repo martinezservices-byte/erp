@@ -160,7 +160,7 @@ try{
     </div>
     <div class="card">
       <div class="card-title">Balance Mensual Detallado</div>
-      <div class="tbl-wrap"><table id="tblFlujo"><thead><tr><th>Período</th><th>Ingresos</th><th>Gastos</th><th>Utilidad</th><th>Rentabilidad</th><th>Var. Ingresos</th><th>Estado</th></tr></thead><tbody></tbody><tfoot></tfoot></table></div>
+      <div class="tbl-wrap"><table id="tblFlujo"><thead><tr><th>Período</th><th>Ventas Reales</th><th style="font-size:10px">Fletes / Arriendos</th><th>Gastos</th><th>Resultado</th><th>Margen</th><th>Var. Ventas</th><th>Estado</th></tr></thead><tbody></tbody><tfoot></tfoot></table></div>
     </div>
   </div>
 
@@ -444,20 +444,25 @@ const dlt = (a,b) => b===0?null:(((a-b)/b)*100).toFixed(1);
 const df  = d => { try{ return new Date(d+'T12:00:00').toLocaleDateString('es-CL'); }catch(e){ return d||'—'; } };
 const MES_NAMES = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
-function ingresos(){ return DATA.filter(r=>r.tipo==='Ingreso'&&r.cat!=='Garantías Recibidas'&&r.cat!=='Garantías Devueltas').reduce((s,r)=>s+r.monto,0); }
+function ingresos(){ return DATA.filter(r=>r.tipo==='Ingreso'&&r.cat!=='Garantías Recibidas'&&r.cat!=='Garantías Devueltas'&&r.cat!=='Aporte de Capital').reduce((s,r)=>s+r.monto,0); }
 function egresos(){  return DATA.filter(r=>r.tipo==='Egreso'&&r.cat!=='Garantías Devueltas').reduce((s,r)=>s+r.monto,0); }
 function utilidad(){ return ingresos()-egresos(); }
 function capital(){  return DATA.filter(r=>r.cat==='Aporte de Capital').reduce((s,r)=>s+r.monto,0); }
+function ventasFletes(){ return DATA.filter(r=>r.cat==='Servicio de Fletes').reduce((s,r)=>s+r.monto,0); }
+function ventasArriendos(){ return DATA.filter(r=>r.cat==='Servicio de Arriendos').reduce((s,r)=>s+r.monto,0); }
 
 function porMes(){
   const map={};
   DATA.forEach(r=>{
-    if(r.cat==='Garantías Recibidas'||r.cat==='Garantías Devueltas') return;
+    if(r.cat==='Garantías Recibidas'||r.cat==='Garantías Devueltas'||r.cat==='Aporte de Capital') return;
     const m=r.fecha?r.fecha.substring(0,7):'';
     if(!m) return;
-    if(!map[m]) map[m]={mes:m,ing:0,egr:0};
-    if(r.tipo==='Ingreso') map[m].ing+=r.monto;
-    else map[m].egr+=r.monto;
+    if(!map[m]) map[m]={mes:m,ing:0,egr:0,fletes:0,arriendos:0};
+    if(r.tipo==='Ingreso'){
+      map[m].ing+=r.monto;
+      if(r.cat==='Servicio de Fletes') map[m].fletes+=r.monto;
+      if(r.cat==='Servicio de Arriendos') map[m].arriendos+=r.monto;
+    } else map[m].egr+=r.monto;
   });
   return Object.values(map).sort((a,b)=>a.mes.localeCompare(b.mes));
 }
@@ -503,17 +508,19 @@ function updateHeader(){
 // ── KPI FLUJO ──
 function renderKPIFlujo(){
   const tI=ingresos(), tG=egresos(), tU=utilidad(), tC=capital();
+  const tF=ventasFletes(), tA=ventasArriendos();
   const r = tI>0?((tU/tI)*100).toFixed(1):0;
+  const empNombre = getEmpNombre();
   document.getElementById('kpi-flujo').innerHTML = `
     <div class="kpi" style="--kc:rgba(201,168,76,0.12)">
       <div class="kpi-label">Capital Invertido</div>
       <div class="kpi-value" style="color:var(--gold)">${M(tC)}</div>
-      <div class="kpi-sub">Aportes socia Feb-Mar 2026</div>
+      <div class="kpi-sub">Aportes propios — NO es venta</div>
     </div>
     <div class="kpi" style="--kc:rgba(39,174,96,0.1)">
-      <div class="kpi-label">Ingresos Operacionales</div>
+      <div class="kpi-label">Ventas Reales del Negocio</div>
       <div class="kpi-value" style="color:var(--ok)">${M(tI)}</div>
-      <div class="kpi-sub">Fletes + Arriendos</div>
+      <div class="kpi-sub">🚛 Fletes: ${M(tF)} · 📋 Arriendos: ${M(tA)}</div>
     </div>
     <div class="kpi" style="--kc:rgba(192,57,43,0.1)">
       <div class="kpi-label">Egresos Totales</div>
@@ -521,10 +528,15 @@ function renderKPIFlujo(){
       <div class="kpi-sub">Operativos + Inversiones</div>
     </div>
     <div class="kpi" style="--kc:rgba(${tU>=0?'39,174,96':'192,57,43'},0.1)">
-      <div class="kpi-label">Resultado Neto</div>
+      <div class="kpi-label">Resultado Operacional</div>
       <div class="kpi-value" style="color:var(--${tU>=0?'ok':'danger'})">${M(tU)}</div>
-      <div class="kpi-sub">Margen: ${r}%</div>
+      <div class="kpi-sub">Margen: ${r}% sobre ventas reales</div>
       <div class="kpi-trend" style="color:var(--${tU>=0?'ok':'danger'})">${tU>=0?'▲ Positivo':'▼ Negativo'}</div>
+    </div>
+    <div class="kpi" style="--kc:rgba(56,189,248,0.1)">
+      <div class="kpi-label">Saldo Disponible Estimado</div>
+      <div class="kpi-value" style="color:var(--info)">${M(tC+tI-tG)}</div>
+      <div class="kpi-sub">Capital + Ventas − Egresos</div>
     </div>
   `;
 }
@@ -543,6 +555,21 @@ function renderTableFlujo(){
     const ok=parseFloat(re)>=0;
     const [y,mo]=m.mes.split('-');
     const mesNombre=MES_NAMES[parseInt(mo)]+' '+y;
+    html+=`<tr>
+      <td style="color:var(--white);font-weight:600">${mesNombre}</td>
+      <td style="color:var(--ok)">${clp(m.ing)}</td>
+      <td style="color:var(--info);font-size:10px">${clp(m.fletes||0)} / ${clp(m.arriendos||0)}</td>
+      <td style="color:var(--danger)">${clp(m.egr)}</td>
+      <td style="color:${u>=0?'var(--ok)':'var(--danger)'};font-weight:700">${clp(u)}</td>
+      <td>${re}%</td>
+      <td style="color:${d==null?'var(--muted)':parseFloat(d)>=0?'var(--ok)':'var(--danger)'}">${d==null?'—':(parseFloat(d)>=0?'+':'')+d+'%'}</td>
+      <td><span class="badge" style="background:${ok?'rgba(39,174,96,0.15)':'rgba(192,57,43,0.15)'};color:${ok?'var(--ok)':'var(--danger)'};border:1px solid ${ok?'rgba(39,174,96,0.3)':'rgba(192,57,43,0.3)'}">${ok?'Positivo':'Negativo'}</span></td>
+    </tr>`;
+  });
+  tbody.innerHTML=html||'<tr><td colspan="8" style="text-align:center;color:var(--muted)">Sin datos</td></tr>';
+  const tI=ingresos(),tG=egresos(),tU=utilidad();
+  tfoot.innerHTML=`<tr><td style="color:var(--gold)">TOTAL</td><td style="color:var(--ok)">${clp(tI)}</td><td style="color:var(--info);font-size:10px">${clp(ventasFletes())} / ${clp(ventasArriendos())}</td><td style="color:var(--danger)">${clp(tG)}</td><td style="color:${tU>=0?'var(--ok)':'var(--danger)'}">${clp(tU)}</td><td>${tI>0?((tU/tI)*100).toFixed(1):0}%</td><td></td><td></td></tr>`;
+}
     html+=`<tr>
       <td style="color:var(--white);font-weight:600">${mesNombre}</td>
       <td style="color:var(--ok)">${clp(m.ing)}</td>
@@ -651,10 +678,65 @@ function buildCharts(){
   const labels=meses.map(m=>{ const [y,mo]=m.mes.split('-'); return MES_NAMES[parseInt(mo)].substring(0,3)+' '+y; });
   const ing=meses.map(m=>m.ing);
   const egr=meses.map(m=>m.egr);
+  const fletes=meses.map(m=>m.fletes||0);
+  const arriendos=meses.map(m=>m.arriendos||0);
   const util=meses.map(m=>m.ing-m.egr);
   const acum=util.reduce((a,v,i)=>{ a.push((a[i-1]||0)+v); return a; },[]);
-  const rents=meses.map(m=>m.ing>0?+((m.ing-m.egr)/m.ing*100).toFixed(1):0);
+  // Capital por mes (separado)
+  const capMap={};
+  DATA.filter(r=>r.cat==='Aporte de Capital').forEach(r=>{
+    const m=r.fecha?r.fecha.substring(0,7):'';
+    if(!m) return;
+    capMap[m]=(capMap[m]||0)+r.monto;
+  });
+  const capData=labels.map((_,i)=>capMap[meses[i]?.mes]||0);
+
   const build=(id,cfg)=>{ if(charts[id]) charts[id].destroy(); const c=document.getElementById(id); if(c) charts[id]=new Chart(c,cfg); };
+
+  // Gráfico principal: Fletes + Arriendos + Capital + Egresos separados
+  build('areaChart',{type:'bar',data:{labels,datasets:[
+    {label:'Ventas Fletes',data:fletes,backgroundColor:'rgba(39,174,96,0.8)',borderRadius:3,borderSkipped:false},
+    {label:'Ventas Arriendos',data:arriendos,backgroundColor:'rgba(56,189,248,0.8)',borderRadius:3,borderSkipped:false},
+    {label:'Capital Propio',data:capData,backgroundColor:'rgba(201,168,76,0.6)',borderRadius:3,borderSkipped:false},
+    {label:'Egresos',data:egr,backgroundColor:'rgba(192,57,43,0.7)',borderRadius:3,borderSkipped:false},
+    {label:'Resultado Operacional',data:util,type:'line',borderColor:'#A78BFA',backgroundColor:'rgba(167,139,250,0.1)',fill:false,tension:.4,borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#A78BFA'},
+  ]},options:{plugins:{legend:{labels:{font:CF.font,boxWidth:10}}},scales:{x:{grid:{color:CF.color},ticks:{font:CF.font}},y:{grid:{color:CF.color},ticks:{font:CF.font,callback:v=>'$'+(v/1000).toFixed(0)+'K'}}}}});
+
+  // Flujo acumulado (solo ventas reales - egresos)
+  build('rentChart',{type:'line',data:{labels,datasets:[
+    {label:'Acumulado Operacional',data:acum,borderColor:acum[acum.length-1]>=0?'#27AE60':'#C0392B',backgroundColor:acum[acum.length-1]>=0?'rgba(39,174,96,0.1)':'rgba(192,57,43,0.08)',fill:true,tension:.4,borderWidth:2.5,pointRadius:4},
+  ]},options:{plugins:{legend:{labels:{font:CF.font,boxWidth:10}}},scales:{x:{grid:{color:CF.color},ticks:{font:CF.font}},y:{grid:{color:CF.color},ticks:{font:CF.font,callback:v=>'$'+(v/1000).toFixed(0)+'K'}}}}});
+
+  // Distribución de egresos por categoría
+  const catData=porCategoria();
+  const catLabels=catData.map(c=>c[0]);
+  const catVals=catData.map(c=>c[1]);
+  const catColors=['#C9A84C','#38BDF8','#EF4444','#10B981','#F59E0B','#A78BFA','#FB7185','#34D399'];
+  build('pieChart',{type:'doughnut',data:{labels:catLabels,datasets:[{data:catVals,backgroundColor:catColors.slice(0,catLabels.length),borderWidth:0}]},options:{cutout:'55%',plugins:{legend:{display:false}}}});
+  const totEgr=catVals.reduce((s,v)=>s+v,0);
+  document.getElementById('pieLegend').innerHTML=catLabels.map((c,i)=>`
+    <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="width:8px;height:8px;border-radius:2px;background:${catColors[i]}"></div>
+        <span style="font-size:10px;color:var(--muted)">${c}</span>
+      </div>
+      <span style="font-size:10px;font-weight:700">${clp(catVals[i])} <span style="color:var(--muted)">(${totEgr>0?(catVals[i]/totEgr*100).toFixed(0):0}%)</span></span>
+    </div>`).join('');
+
+  // Proyección basada en ventas reales
+  const lastI=ing.length>0?ing[ing.length-1]:0;
+  const growth=ing.length>1?(ing[ing.length-1]-ing[0])/(ing.length-1):50000;
+  const pl=[],pb=[],pc=[],po=[];
+  for(let i=1;i<=6;i++){
+    const v=Math.round(lastI+growth*i);
+    pl.push('M+'+i); pb.push(Math.max(0,v)); pc.push(Math.max(0,Math.round(v*.8))); po.push(Math.max(0,Math.round(v*1.2)));
+  }
+  build('proyChart',{type:'line',data:{labels:pl,datasets:[
+    {label:'Optimista +20%',data:po,borderColor:'#27AE60',borderWidth:1.5,borderDash:[5,3],pointRadius:0,fill:false},
+    {label:'Base',data:pb,borderColor:'#C9A84C',borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#C9A84C',fill:false},
+    {label:'Conservador -20%',data:pc,borderColor:'#D4890A',borderWidth:1.5,borderDash:[5,3],pointRadius:0,fill:false},
+  ]},options:{plugins:{legend:{labels:{font:CF.font,boxWidth:10}}},scales:{x:{grid:{color:CF.color},ticks:{font:CF.font}},y:{grid:{color:CF.color},ticks:{font:CF.font,callback:v=>'$'+(v/1000).toFixed(0)+'K'}}}}});
+}
 
   // Ingresos vs Egresos (barras agrupadas)
   build('areaChart',{type:'bar',data:{labels,datasets:[
