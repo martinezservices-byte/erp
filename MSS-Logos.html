@@ -214,7 +214,11 @@ try{
 const SK_LOGOS = 'mss_logos_v1';
 let LOGOS = {}, selectedEmpId = null, newLogoData = null, previewType = 'liquidacion';
 
-const DEF_EMPRESAS = []
+const DEF_EMPRESAS = [
+  {id:'1', nombre:'Martinez Services Spa',                          rut:'76.782.954-K'},
+  {id:'2', nombre:'Condominio Pioneros 2',                          rut:'65.184.252-2'},
+  {id:'3', nombre:'Martinez y Pajuelo Arriendos y Servicios SpA',   rut:'78.361.479-0'},
+]
 
 function loadLogos(){try{LOGOS=JSON.parse(localStorage.getItem(SK_LOGOS)||'{}');}catch(e){LOGOS={};}}
 function saveLogos(){try{localStorage.setItem(SK_LOGOS,JSON.stringify(LOGOS));}catch(e){alert('Error guardando — imagen muy grande, intenta con una más pequeña');}}

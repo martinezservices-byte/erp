@@ -357,8 +357,10 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
     <div class="fl"><label>Tarifa Mensual ($)</label><input id="aTarifaMes" type="number" value="0"/></div>
     <div class="fl"><label>Km/Horas Actuales</label><input id="aKm" type="number" value="0"/></div>
     <div class="fl"><label>Próx. Mantención (km/horas)</label><input id="aProxMant" type="number" value="0"/></div>
-    <div class="fl"><label>Vencimiento Seguro</label><input id="aSeguro" type="date"/></div>
+    <div class="fl"><label>Vencimiento SOAP / Seguro</label><input id="aSeguro" type="date"/></div>
     <div class="fl"><label>Vencimiento Revisión Técnica</label><input id="aRevision" type="date"/></div>
+    <div class="fl"><label>Vencimiento Permiso Circulación</label><input id="aPermiso" type="date"/></div>
+    <div class="fl"><label>Valor Comercial ($)</label><input id="aValor" type="number" value="0" placeholder="Valor de reposición"/></div>
     <div class="fl"><label>Estado</label><select id="aEstado" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
       <option>Disponible</option><option>Arrendado</option><option>Mantención</option><option>Fuera de Servicio</option>
     </select></div>
@@ -758,10 +760,30 @@ function rDash(){
     if(dias<0) alertas.push({tipo:'danger',msg:`Arriendo ${a.num} VENCIDO hace ${Math.abs(dias)} días — ${a.activoNombre} · ${a.clienteNombre}`});
   });
   ACTIVOS.forEach(a=>{
-    if(a.seguro&&new Date(a.seguro)<=new Date(new Date().setDate(hoyDate.getDate()+30)))
-      alertas.push({tipo:'warning',msg:`Seguro de ${a.nombre} vence el ${df(a.seguro)}`});
-    if(a.revision&&new Date(a.revision)<=new Date(new Date().setDate(hoyDate.getDate()+30)))
-      alertas.push({tipo:'warning',msg:`Revisión técnica de ${a.nombre} vence el ${df(a.revision)}`});
+    const lim7  = new Date(new Date().setDate(hoyDate.getDate()+7));
+    const lim30 = new Date(new Date().setDate(hoyDate.getDate()+30));
+    const hoy   = new Date();
+    // SOAP / Seguro
+    if(a.seguro){
+      const fs=new Date(a.seguro);
+      if(fs<hoy)        alertas.push({tipo:'danger', msg:`🚨 SOAP VENCIDO — ${a.nombre} (${a.patente||'S/S'}) · Venció el ${df(a.seguro)}`});
+      else if(fs<=lim30) alertas.push({tipo:'warning',msg:`⚠ SOAP por vencer — ${a.nombre} (${a.patente||'S/S'}) · Vence el ${df(a.seguro)}`});
+    }
+    // Revisión Técnica
+    if(a.revision){
+      const fr=new Date(a.revision);
+      if(fr<hoy)        alertas.push({tipo:'danger', msg:`🚨 REVISIÓN TÉCNICA VENCIDA — ${a.nombre} (${a.patente||'S/S'}) · Venció el ${df(a.revision)}`});
+      else if(fr<=lim30) alertas.push({tipo:'warning',msg:`⚠ Revisión Técnica por vencer — ${a.nombre} · Vence el ${df(a.revision)}`});
+    }
+    // Permiso de Circulación
+    if(a.permiso){
+      const fp=new Date(a.permiso);
+      if(fp<hoy)        alertas.push({tipo:'danger', msg:`🚨 PERMISO CIRCULACIÓN VENCIDO — ${a.nombre} (${a.patente||'S/S'}) · Venció el ${df(a.permiso)}`});
+      else if(fp<=lim30) alertas.push({tipo:'warning',msg:`⚠ Permiso Circulación por vencer — ${a.nombre} · Vence el ${df(a.permiso)}`});
+    }
+    // Mantención por km
+    if(a.proxMant&&a.km&&a.km>=a.proxMant)
+      alertas.push({tipo:'warning',msg:`🔧 Mantención pendiente — ${a.nombre} · Km actuales: ${a.km.toLocaleString('es-CL')} / Próxima: ${a.proxMant.toLocaleString('es-CL')}`});
   });
   document.getElementById('dashAlertas').innerHTML=alertas.length===0
     ?'<div style="color:var(--ok);font-size:12px;padding:8px">✓ Sin alertas pendientes</div>'
@@ -801,7 +823,7 @@ function rActivos(){
 
 function saveActivo(){
   const id=document.getElementById('aId').value;
-  const obj={nombre:document.getElementById('aNombre').value.trim(),tipo:document.getElementById('aTipo').value,cat:document.getElementById('aCat').value,marca:document.getElementById('aMarca').value,modelo:document.getElementById('aModelo').value,anio:document.getElementById('aAnio').value,patente:document.getElementById('aPatente').value,tarifaDia:parseFloat(document.getElementById('aTarifaDia').value)||0,tarifaSem:parseFloat(document.getElementById('aTarifaSem').value)||0,tarifaMes:parseFloat(document.getElementById('aTarifaMes').value)||0,km:parseFloat(document.getElementById('aKm').value)||0,proxMant:parseFloat(document.getElementById('aProxMant').value)||0,seguro:document.getElementById('aSeguro').value,revision:document.getElementById('aRevision').value,estado:document.getElementById('aEstado').value,obs:document.getElementById('aObs').value};
+  const obj={nombre:document.getElementById('aNombre').value.trim(),tipo:document.getElementById('aTipo').value,cat:document.getElementById('aCat').value,marca:document.getElementById('aMarca').value,modelo:document.getElementById('aModelo').value,anio:document.getElementById('aAnio').value,patente:document.getElementById('aPatente').value,tarifaDia:parseFloat(document.getElementById('aTarifaDia').value)||0,tarifaSem:parseFloat(document.getElementById('aTarifaSem').value)||0,tarifaMes:parseFloat(document.getElementById('aTarifaMes').value)||0,km:parseFloat(document.getElementById('aKm').value)||0,proxMant:parseFloat(document.getElementById('aProxMant').value)||0,seguro:document.getElementById('aSeguro').value,revision:document.getElementById('aRevision').value,permiso:document.getElementById('aPermiso').value,valor:parseFloat(document.getElementById('aValor').value)||0,estado:document.getElementById('aEstado').value,obs:document.getElementById('aObs').value};
   if(!obj.nombre)return alert('Nombre requerido');
   if(id){const i=ACTIVOS.findIndex(a=>a.id==id);if(i>=0)ACTIVOS[i]={...ACTIVOS[i],...obj};}
   else ACTIVOS.push({id:uid(),...obj});
@@ -826,11 +848,13 @@ function editActivo(id){
   document.getElementById('aProxMant').value=a.proxMant||0;
   document.getElementById('aSeguro').value=a.seguro||'';
   document.getElementById('aRevision').value=a.revision||'';
+  document.getElementById('aPermiso').value=a.permiso||'';
+  document.getElementById('aValor').value=a.valor||0;
   document.getElementById('aEstado').value=a.estado;
   document.getElementById('aObs').value=a.obs||'';
   O('moActivo');
 }
-function delActivo(id){if(!confirm('¿Eliminar?'))return;ACTIVOS=ACTIVOS.filter(a=>a.id!==id);save();rActivos();}
+function delActivo(id){if(!confirm('¿Eliminar este activo?'))return;ACTIVOS=ACTIVOS.filter(x=>x.id!==id&&x.id!==parseInt(id));save();rActivos();}
 
 function nuevoArriendoActivo(id){
   poblarSelects();
@@ -939,7 +963,13 @@ function editArriendo(id){
   if(document.getElementById('arHoraRetiro')) document.getElementById('arHoraRetiro').value=a.horaRetiro||'';
   O('moArriendo');
 }
-function delArriendo(id){if(!confirm('¿Eliminar?'))return;const a=ARRIENDOS.find(x=>x.id===id);if(a)syncFinanzas('arriendo',a,'delete');ARRIENDOS=ARRIENDOS.filter(a=>a.id!==id);save();rArriendos();}
+function delArriendo(id){
+  if(!confirm('¿Eliminar este arriendo?'))return;
+  const arr=ARRIENDOS.find(x=>x.id===id||x.id===parseInt(id));
+  if(arr) syncFinanzas('arriendo',arr,'delete');
+  ARRIENDOS=ARRIENDOS.filter(x=>x.id!==id&&x.id!==parseInt(id));
+  save();rArriendos();
+}
 
 // ═══════════════════════════════════════════
 // EMISIÓN AUTOMÁTICA DESDE ARRIENDO
@@ -1223,7 +1253,7 @@ function editFlete(id){
   document.getElementById('flNumDoc').value=f.numDoc||'';
   O('moFlete');
 }
-function delFlete(id){if(!confirm('¿Eliminar?'))return;const f=FLETES.find(x=>x.id===id);if(f)syncFinanzas('flete',f,'delete');FLETES=FLETES.filter(f=>f.id!==id);save();rFletes();}
+function delFlete(id){if(!confirm('¿Eliminar este flete?'))return;const fl=FLETES.find(x=>x.id===id||x.id===parseInt(id));if(fl)syncFinanzas('flete',fl,'delete');FLETES=FLETES.filter(x=>x.id!==id&&x.id!==parseInt(id));save();rFletes();}
 
 // CLIENTES
 function rClientes(){
@@ -1262,7 +1292,7 @@ function editCliente(id){
   document.getElementById('cliDir').value=c.dir||'';
   O('moCliente');
 }
-function delCliente(id){if(!confirm('¿Eliminar?'))return;CLIENTES=CLIENTES.filter(c=>c.id!==id);save();rClientes();}
+function delCliente(id){if(!confirm('¿Eliminar este cliente?'))return;CLIENTES=CLIENTES.filter(x=>x.id!==id&&x.id!==parseInt(id));save();rClientes();}
 
 // DISPONIBILIDAD
 function rDispInit(){
@@ -1369,7 +1399,7 @@ function saveMant(){
   MANTENCION.push({id:uid(),activoId:aId,activoNombre:activo?.nombre||'—',tipo:document.getElementById('mTipo').value,desc:document.getElementById('mDesc').value,fecha:document.getElementById('mFecha').value,proxima:document.getElementById('mProxima').value,costo:parseFloat(document.getElementById('mCosto').value)||0,taller:document.getElementById('mTaller').value,estado:document.getElementById('mEstado').value});
   save();C('moMant');rMantencion();
 }
-function delMant(id){if(!confirm('¿Eliminar?'))return;MANTENCION=MANTENCION.filter(m=>m.id!==id);save();rMantencion();}
+function delMant(id){if(!confirm('¿Eliminar esta mantención?'))return;MANTENCION=MANTENCION.filter(x=>x.id!==id&&x.id!==parseInt(id));save();rMantencion();}
 
 // CONFIG
 function rConfig(){
