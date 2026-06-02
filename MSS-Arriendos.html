@@ -620,7 +620,21 @@ function load(){
     const c = localStorage.getItem(SK.cfg);
     if(c) CFG = JSON.parse(c);
   }catch(e){}
-  save();
+  // Solo guardar si hay datos para no sobreescribir con vacío
+  if(ACTIVOS.length||ARRIENDOS.length||FLETES.length){
+    save();
+    // Sincronizar datos históricos con Finanzas si es M&P y Finanzas está vacío
+    if(EMP.id===3){
+      const finKey='mss_finanzas2_v1_3';
+      const finRaw=localStorage.getItem(finKey);
+      const finData=finRaw?JSON.parse(finRaw):null;
+      if(!finData||!finData.data||finData.data.length===0){
+        // Finanzas vacío — sincronizar todos los registros pagados
+        ARRIENDOS.forEach(a=>syncFinanzas('arriendo',a,'save'));
+        FLETES.forEach(f=>syncFinanzas('flete',f,'save'));
+      }
+    }
+  }
 }
 function save(){
   try{
@@ -631,6 +645,55 @@ function save(){
     localStorage.setItem(SK.mant, JSON.stringify(MANTENCION));
     localStorage.setItem(SK.cfg,  JSON.stringify(CFG));
   }catch(e){}
+}
+
+// ── SINCRONIZACIÓN CON FINANZAS ──
+// Cuando se guarda un arriendo o flete pagado, registra en Finanzas automáticamente
+function syncFinanzas(tipo, obj, accion){
+  try{
+    const finKey = 'mss_finanzas2_v1_'+EMP.id;
+    const raw = localStorage.getItem(finKey);
+    let fin = raw ? JSON.parse(raw) : {data:[], nextId:500};
+    if(!fin.data) fin.data = [];
+
+    if(accion === 'delete'){
+      // Eliminar registro financiero asociado
+      fin.data = fin.data.filter(r => r.srcId !== obj.id || r.srcTipo !== tipo);
+      localStorage.setItem(finKey, JSON.stringify(fin));
+      return;
+    }
+
+    // Solo sincronizar si está pagado
+    const pagado = obj.estadoPago === 'Pagado' || obj.estado === 'Completado' || obj.estado === 'Finalizado';
+    if(!pagado) return;
+
+    // Evitar duplicados — eliminar registro anterior del mismo origen
+    fin.data = fin.data.filter(r => !(r.srcId === obj.id && r.srcTipo === tipo));
+
+    // Crear registro financiero
+    const monto = tipo === 'flete' ? (obj.tarifa||0) : (obj.total||obj.tarifa||0);
+    if(!monto) return;
+
+    const registro = {
+      id: fin.nextId++,
+      srcId: obj.id,
+      srcTipo: tipo,
+      fecha: obj.fecha || obj.inicio || new Date().toISOString().split('T')[0],
+      tipo: 'Ingreso',
+      cat: tipo === 'flete' ? 'Servicio de Fletes' : 'Servicio de Arriendos',
+      desc: tipo === 'flete'
+        ? `Flete ${obj.num||''} — ${obj.origen||''} → ${obj.destino||''} (${obj.clienteNombre||''})`
+        : `Arriendo ${obj.num||''} — ${obj.activoNombre||''} (${obj.clienteNombre||''})`,
+      monto: monto,
+      doc: obj.tipoDoc||'',
+      numDoc: obj.numDoc||'',
+      medioPago: obj.formaPago||'',
+      cuenta: 'Mercado Pago'
+    };
+
+    fin.data.push(registro);
+    localStorage.setItem(finKey, JSON.stringify(fin));
+  }catch(e){ console.warn('syncFinanzas error:', e); }
 }
 function getEmpresa(){ return EMP; }
 function getLogo(){
@@ -833,9 +896,11 @@ function saveArriendo(){
   const cliente=CLIENTES.find(x=>x.id===cId);
   const obj={num:document.getElementById('arNum').value||'ARR-'+(ARRIENDOS.length+1).toString().padStart(3,'0'),activoId:aId,activoNombre:activo?.nombre||'—',clienteId:cId,clienteNombre:cliente?.nombre||'—',inicio:document.getElementById('arInicio').value,termino:document.getElementById('arTermino').value,tipoTarifa:document.getElementById('arTipoTarifa').value,tarifa:parseFloat(document.getElementById('arTarifa').value)||0,total:parseFloat(document.getElementById('arTotal').value)||0,pagado:parseFloat(document.getElementById('arPagado').value)||0,lugar:document.getElementById('arLugar').value,resp:document.getElementById('arResp').value,estado:document.getElementById('arEstado').value,obs:document.getElementById('arObs').value,garantia:parseFloat(document.getElementById('arGarantia').value)||0,formaPagoGarantia:document.getElementById('arFormaPagoGarantia').value,estadoGarantia:document.getElementById('arEstadoGarantia').value,formaPago:document.getElementById('arFormaPago').value,estadoPago:document.getElementById('arEstadoPago').value,tipoDoc:document.getElementById('arTipoDoc').value,numDoc:document.getElementById('arNumDoc').value};
   if(!obj.activoNombre||obj.activoNombre==='—')return alert('Selecciona un activo');
-  if(id){const i=ARRIENDOS.findIndex(a=>a.id==id);if(i>=0)ARRIENDOS[i]={...ARRIENDOS[i],...obj};}
-  else ARRIENDOS.push({id:uid(),...obj});
+  let savedObj;
+  if(id){const i=ARRIENDOS.findIndex(a=>a.id==id);if(i>=0){ARRIENDOS[i]={...ARRIENDOS[i],...obj};savedObj=ARRIENDOS[i];}}
+  else{const newObj={id:uid(),...obj};ARRIENDOS.push(newObj);savedObj=newObj;}
   if(activo&&obj.estado==='Activo'){activo.estado='Arrendado';save();}
+  if(savedObj) syncFinanzas('arriendo', savedObj, 'save');
   save();C('moArriendo');rArriendos();
 }
 
@@ -866,7 +931,7 @@ function editArriendo(id){
   document.getElementById('arNumDoc').value=a.numDoc||'';
   O('moArriendo');
 }
-function delArriendo(id){if(!confirm('¿Eliminar?'))return;ARRIENDOS=ARRIENDOS.filter(a=>a.id!==id);save();rArriendos();}
+function delArriendo(id){if(!confirm('¿Eliminar?'))return;const a=ARRIENDOS.find(x=>x.id===id);if(a)syncFinanzas('arriendo',a,'delete');ARRIENDOS=ARRIENDOS.filter(a=>a.id!==id);save();rArriendos();}
 
 // ═══════════════════════════════════════════
 // EMISIÓN AUTOMÁTICA DESDE ARRIENDO
@@ -1120,8 +1185,8 @@ function saveFlete(){
   const vehiculo=ACTIVOS.find(x=>x.id===vId);
   const cliente=CLIENTES.find(x=>x.id===cId);
   const obj={num:document.getElementById('flNum').value||'FL-'+(FLETES.length+1).toString().padStart(3,'0'),fecha:document.getElementById('flFecha').value,vehiculoId:vId,vehiculoNombre:vehiculo?.nombre||'—',conductor:document.getElementById('flConductor').value,origen:document.getElementById('flOrigen').value,destino:document.getElementById('flDestino').value,carga:document.getElementById('flCarga').value,peso:document.getElementById('flPeso').value,km:parseFloat(document.getElementById('flKm').value)||0,tarifa:parseFloat(document.getElementById('flTarifa').value)||parseFloat(document.getElementById('flTotal').value)||0,clienteId:cId,clienteNombre:cliente?.nombre||'Particular',estado:document.getElementById('flEstado').value,obs:document.getElementById('flObs').value,formaPago:document.getElementById('flFormaPago').value,estadoPago:document.getElementById('flEstadoPago').value,tipoDoc:document.getElementById('flTipoDoc').value,numDoc:document.getElementById('flNumDoc').value};
-  if(id){const i=FLETES.findIndex(f=>f.id==id);if(i>=0)FLETES[i]={...FLETES[i],...obj};}
-  else FLETES.push({id:uid(),...obj});
+  if(id){const i=FLETES.findIndex(f=>f.id==id);if(i>=0){FLETES[i]={...FLETES[i],...obj};syncFinanzas('flete',FLETES[i],'save');}}
+  else{const newObj={id:uid(),...obj};FLETES.push(newObj);syncFinanzas('flete',newObj,'save');}
   save();C('moFlete');rFletes();
 }
 
@@ -1150,7 +1215,7 @@ function editFlete(id){
   document.getElementById('flNumDoc').value=f.numDoc||'';
   O('moFlete');
 }
-function delFlete(id){if(!confirm('¿Eliminar?'))return;FLETES=FLETES.filter(f=>f.id!==id);save();rFletes();}
+function delFlete(id){if(!confirm('¿Eliminar?'))return;const f=FLETES.find(x=>x.id===id);if(f)syncFinanzas('flete',f,'delete');FLETES=FLETES.filter(f=>f.id!==id);save();rFletes();}
 
 // CLIENTES
 function rClientes(){
