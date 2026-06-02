@@ -1421,17 +1421,45 @@ function poblarSelects(){
 
 function O(id){
   if(['moArriendo','moFlete','moMant'].includes(id)) poblarSelects();
-  if(id==='moArriendo'){document.getElementById('arId').value='';document.getElementById('tArriendo').textContent='Nuevo Arriendo';document.getElementById('arInicio').value=HOY;document.getElementById('arNum').value='ARR-'+(ARRIENDOS.length+1).toString().padStart(3,'0');document.getElementById('arGarantia').value=0;document.getElementById('arFormaPagoGarantia').value='';document.getElementById('arEstadoGarantia').value='';document.getElementById('arFormaPago').value='';document.getElementById('arEstadoPago').value='';document.getElementById('arTipoDoc').value='';document.getElementById('arNumDoc').value='';}
-  if(id==='moFlete'){document.getElementById('flId').value='';document.getElementById('tFlete').textContent='Nuevo Flete';document.getElementById('flFecha').value=HOY;document.getElementById('flNum').value='FL-'+(FLETES.length+1).toString().padStart(3,'0');document.getElementById('flTarifa').value=CFG.tarifaBase||50000;document.getElementById('flFormaPago').value='';document.getElementById('flEstadoPago').value='';document.getElementById('flTipoDoc').value='';document.getElementById('flNumDoc').value='';}
-  if(id==='moActivo'){document.getElementById('aId').value='';document.getElementById('tActivo').textContent='Nuevo Activo';}
-  if(id==='moCliente'){document.getElementById('cliId').value='';}
+  // Solo resetear si es NUEVO (no si viene de editar)
+  if(id==='moArriendo'&&!document.getElementById('arId').value){
+    document.getElementById('tArriendo').textContent='Nuevo Arriendo';
+    document.getElementById('arInicio').value=HOY;
+    document.getElementById('arNum').value='ARR-'+(ARRIENDOS.length+1).toString().padStart(3,'0');
+    document.getElementById('arGarantia').value=0;
+    document.getElementById('arFormaPagoGarantia').value='';
+    document.getElementById('arEstadoGarantia').value='';
+    document.getElementById('arFormaPago').value='';
+    document.getElementById('arEstadoPago').value='';
+    document.getElementById('arTipoDoc').value='';
+    document.getElementById('arNumDoc').value='';
+  }
+  if(id==='moFlete'&&!document.getElementById('flId').value){
+    document.getElementById('tFlete').textContent='Nuevo Flete';
+    document.getElementById('flFecha').value=HOY;
+    document.getElementById('flNum').value='FL-'+(FLETES.length+1).toString().padStart(3,'0');
+    document.getElementById('flTarifa').value=CFG.tarifaBase||50000;
+    document.getElementById('flFormaPago').value='';
+    document.getElementById('flEstadoPago').value='';
+    document.getElementById('flTipoDoc').value='';
+    document.getElementById('flNumDoc').value='';
+  }
+  if(id==='moActivo'&&!document.getElementById('aId').value){
+    document.getElementById('tActivo').textContent='Nuevo Activo';
+  }
+  if(id==='moCliente'&&!document.getElementById('cliId').value){}
   if(id==='moMant'){document.getElementById('mFecha').value=HOY;}
   document.getElementById(id)?.classList.add('open');
 }
-function C(id){document.getElementById(id)?.classList.remove('open');}
-document.querySelectorAll('.mo').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
-
-// NAV EMP
+function C(id){
+  // Al cerrar, limpiar IDs para que próxima apertura sea "Nuevo"
+  if(id==='moArriendo') document.getElementById('arId').value='';
+  if(id==='moFlete')    document.getElementById('flId').value='';
+  if(id==='moActivo')   document.getElementById('aId').value='';
+  if(id==='moCliente')  document.getElementById('cliId').value='';
+  document.getElementById(id)?.classList.remove('open');
+}
+document.querySelectorAll('.mo').forEach(function(m){m.addEventListener('click',function(e){if(e.target===m)C(m.id);});});
 // Actualizar header con empresa actual
 document.getElementById('empNombre').textContent=EMP.nombre||'Empresa';
 const _navEmp=document.getElementById('nav-emp');
