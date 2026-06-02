@@ -150,7 +150,7 @@ try{
 <div id="header">
   <div class="logo">
     <div class="logo-icon">M</div>
-    <div><div class="logo-name">Martinez Services Spa</div><div class="logo-mod">MÓDULO VENTAS & CRM</div></div>
+    <div><div class="logo-name"><span id="_empNombreLogo">Mi Empresa</span></div><div class="logo-mod">MÓDULO VENTAS & CRM</div></div>
   </div>
   <div class="hright">
     <span class="hinfo" id="hInfo">Cargando...</span>
@@ -300,33 +300,9 @@ const ETAPA_COLOR = {
   'Negociación':'#FB923C','Cerrado Won':'#22C55E','Cerrado Lost':'#EF4444'
 };
 
-const DEF_CLI = [
-  {id:uid(),empresa:"Minera Atacama S.A.",contacto:"Jorge Díaz",cargo:"Gerente Finanzas",email:"jdiaz@atacama.cl",telefono:"+56912345678",etapa:"Negociación",valor:8500000,prob:75,origen:"LinkedIn",responsable:"A. Martínez",fechaContacto:"2025-01-15",proximaAccion:"Enviar propuesta final",notas:"Interesado en diagnóstico + control financiero"},
-  {id:uid(),empresa:"Constructora Bío-Bío Ltda.",contacto:"Ana Reyes",cargo:"Directora Operaciones",email:"areyes@biobio.cl",telefono:"+56923456789",etapa:"Propuesta",valor:5200000,prob:60,origen:"Referido",responsable:"A. Martínez",fechaContacto:"2025-02-03",proximaAccion:"Seguimiento propuesta",notas:"Requiere auditoría de procesos"},
-  {id:uid(),empresa:"Retail Central SpA",contacto:"Luis Morales",cargo:"CFO",email:"lmorales@rcentral.cl",telefono:"+56934567890",etapa:"Calificado",valor:3800000,prob:40,origen:"Facebook",responsable:"C. López",fechaContacto:"2025-02-20",proximaAccion:"Presentación solución",notas:"PyME en expansión, necesita KPI"},
-  {id:uid(),empresa:"Agrícola Sur Verde S.A.",contacto:"Patricia Muñoz",cargo:"Gerente General",email:"pmunoz@surverde.cl",telefono:"+56945678901",etapa:"Cerrado Won",valor:12000000,prob:100,origen:"WhatsApp",responsable:"A. Martínez",fechaContacto:"2025-01-08",proximaAccion:"Inicio implementación",notas:"Contrato firmado"},
-  {id:uid(),empresa:"Transportes Andes Ltda.",contacto:"Carlos Soto",cargo:"Jefe Administración",email:"csoto@andes.cl",telefono:"+56956789012",etapa:"Prospecto",valor:2100000,prob:20,origen:"Referido",responsable:"C. López",fechaContacto:"2025-03-01",proximaAccion:"Primera reunión",notas:"Contacto inicial"},
-  {id:uid(),empresa:"Inmobiliaria Pacífico S.A.",contacto:"Roberto Fuentes",cargo:"Director Finanzas",email:"rfuentes@pacifico.cl",telefono:"+56967890123",etapa:"Propuesta",valor:6800000,prob:55,origen:"LinkedIn",responsable:"A. Martínez",fechaContacto:"2025-02-14",proximaAccion:"Negociar alcance",notas:"Interesado en plan estratégico"},
-  {id:uid(),empresa:"Clínica Salud Total Ltda.",contacto:"Marcela Torres",cargo:"Gerente Administrativa",email:"mtorres@saludtotal.cl",telefono:"+56978901234",etapa:"Negociación",valor:9200000,prob:70,origen:"Email",responsable:"A. Martínez",fechaContacto:"2025-01-28",proximaAccion:"Cierre contrato",notas:"Muy avanzados"},
-  {id:uid(),empresa:"Tecnología e Innovación SpA",contacto:"Felipe Vargas",cargo:"CEO",email:"fvargas@tecinn.cl",telefono:"+56989012345",etapa:"Cerrado Lost",valor:4500000,prob:0,origen:"Instagram",responsable:"C. López",fechaContacto:"2025-02-01",proximaAccion:"—",notas:"Eligió competidor"},
-  {id:uid(),empresa:"Pesquera Costa Azul S.A.",contacto:"Sandra Pérez",cargo:"Contadora General",email:"sperez@costaazul.cl",telefono:"+56990123456",etapa:"Calificado",valor:4100000,prob:45,origen:"WhatsApp",responsable:"M. García",fechaContacto:"2025-03-10",proximaAccion:"Diagnóstico gratuito",notas:"Interesada en flujo de caja"},
-  {id:uid(),empresa:"Distribuidora Norte Ltda.",contacto:"Hernán Lagos",cargo:"Gerente Comercial",email:"hlagos@dnorte.cl",telefono:"+56901234567",etapa:"Propuesta",valor:3300000,prob:50,origen:"Facebook",responsable:"M. García",fechaContacto:"2025-03-05",proximaAccion:"Reunión propuesta",notas:"Indicadores de venta"},
-];
+const DEF_CLI = []
 
-const DEF_VTA = [
-  {mes:"Enero",proyectado:5500000,real:4200000},
-  {mes:"Febrero",proyectado:5800000,real:3800000},
-  {mes:"Marzo",proyectado:6000000,real:5100000},
-  {mes:"Abril",proyectado:6200000,real:4700000},
-  {mes:"Mayo",proyectado:6500000,real:5600000},
-  {mes:"Junio",proyectado:7000000,real:6200000},
-  {mes:"Julio",proyectado:7200000,real:5900000},
-  {mes:"Agosto",proyectado:7500000,real:6800000},
-  {mes:"Septiembre",proyectado:8000000,real:7200000},
-  {mes:"Octubre",proyectado:8200000,real:6500000},
-  {mes:"Noviembre",proyectado:8500000,real:7800000},
-  {mes:"Diciembre",proyectado:9000000,real:9100000},
-];
+const DEF_VTA = []
 
 // ════════════════════════════
 //  STATE
@@ -714,6 +690,8 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
 // ════════════════════════════
 loadState();
 renderAll();
+
+try{var _l=document.getElementById('_empNombreLogo');if(_l&&window._MSS_EMP)_l.textContent=window._MSS_EMP.nombre||_empObj.nombre||'Mi Empresa';}catch(e){}
 </script>
 </body>
 </html>

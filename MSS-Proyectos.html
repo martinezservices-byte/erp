@@ -155,7 +155,7 @@ try{
 <div id="header">
   <div class="logo">
     <div class="logo-icon">M</div>
-    <div><div class="logo-name">Martinez Services Spa</div><div class="logo-mod">MÓDULO PROYECTOS</div></div>
+    <div><div class="logo-name"><span id="_empNombreLogo">Mi Empresa</span></div><div class="logo-mod">MÓDULO PROYECTOS</div></div>
   </div>
   <div class="hright">
     <span class="hinfo" id="hInfo">Cargando...</span>
@@ -306,27 +306,8 @@ const KANBAN_COLS = ['Planificado','En Proceso','En Revisión','Completado'];
 // ════════════════════════════════
 //  DEFAULT DATA
 // ════════════════════════════════
-const DEF_PROJ = [
-  {id:1,nombre:"Auditoría Financiera Q2",responsable:"A. Martínez",area:"Finanzas",inicio:"2025-01-05",fin:"2025-03-28",estado:"Completado",prioridad:"Alta",presupuesto:4500000,costo:4200000,avance:100},
-  {id:2,nombre:"Implementación CRM",responsable:"C. López",area:"Ventas",inicio:"2025-02-10",fin:"2025-06-30",estado:"En Proceso",prioridad:"Alta",presupuesto:8000000,costo:5100000,avance:62},
-  {id:3,nombre:"Plan Estratégico 2025",responsable:"A. Martínez",area:"Dirección",inicio:"2025-01-15",fin:"2025-04-15",estado:"Completado",prioridad:"Alta",presupuesto:2000000,costo:1950000,avance:100},
-  {id:4,nombre:"Control de Calidad",responsable:"R. Torres",area:"Operaciones",inicio:"2025-03-01",fin:"2025-07-31",estado:"En Proceso",prioridad:"Media",presupuesto:6000000,costo:2800000,avance:47},
-  {id:5,nombre:"Diagnóstico Empresarial",responsable:"A. Martínez",area:"Consultoría",inicio:"2025-04-01",fin:"2025-05-31",estado:"En Proceso",prioridad:"Alta",presupuesto:3200000,costo:960000,avance:30},
-  {id:6,nombre:"Optimización RRHH",responsable:"M. García",area:"RRHH",inicio:"2025-05-01",fin:"2025-08-30",estado:"Planificado",prioridad:"Media",presupuesto:2800000,costo:0,avance:0},
-  {id:7,nombre:"Análisis Rentabilidad",responsable:"A. Martínez",area:"Finanzas",inicio:"2025-05-15",fin:"2025-06-30",estado:"En Proceso",prioridad:"Alta",presupuesto:1500000,costo:400000,avance:25},
-];
-const DEF_TASK = [
-  {id:101,proyId:2,titulo:"Configurar módulos CRM",responsable:"C. López",estado:"Completado",prioridad:"Alta",fechaInicio:"2025-02-10",fechaFin:"2025-02-28",horasEst:40,horasReal:38,desc:"Setup inicial"},
-  {id:102,proyId:2,titulo:"Migración datos históricos",responsable:"R. Torres",estado:"Completado",prioridad:"Alta",fechaInicio:"2025-03-01",fechaFin:"2025-03-20",horasEst:60,horasReal:72,desc:"Migración desde Excel"},
-  {id:103,proyId:2,titulo:"Capacitación equipo ventas",responsable:"M. García",estado:"En Proceso",prioridad:"Media",fechaInicio:"2025-04-01",fechaFin:"2025-05-15",horasEst:30,horasReal:12,desc:"Talleres de uso"},
-  {id:104,proyId:2,titulo:"Integración sistema financiero",responsable:"C. López",estado:"En Proceso",prioridad:"Alta",fechaInicio:"2025-04-15",fechaFin:"2025-06-01",horasEst:80,horasReal:20,desc:"API financiero"},
-  {id:105,proyId:2,titulo:"Pruebas UAT",responsable:"A. Martínez",estado:"Planificado",prioridad:"Alta",fechaInicio:"2025-06-01",fechaFin:"2025-06-20",horasEst:40,horasReal:0,desc:"Testing usuario final"},
-  {id:106,proyId:5,titulo:"Levantamiento de procesos",responsable:"A. Martínez",estado:"Completado",prioridad:"Alta",fechaInicio:"2025-04-01",fechaFin:"2025-04-15",horasEst:24,horasReal:26,desc:"Mapeo AS-IS"},
-  {id:107,proyId:5,titulo:"Análisis FODA",responsable:"A. Martínez",estado:"En Proceso",prioridad:"Alta",fechaInicio:"2025-04-16",fechaFin:"2025-05-10",horasEst:20,horasReal:8,desc:"Análisis estratégico"},
-  {id:108,proyId:5,titulo:"Informe diagnóstico",responsable:"A. Martínez",estado:"Planificado",prioridad:"Alta",fechaInicio:"2025-05-11",fechaFin:"2025-05-31",horasEst:32,horasReal:0,desc:"Documento final"},
-  {id:109,proyId:4,titulo:"Definir estándares calidad",responsable:"R. Torres",estado:"Completado",prioridad:"Alta",fechaInicio:"2025-03-01",fechaFin:"2025-03-20",horasEst:30,horasReal:28,desc:"Manual de calidad"},
-  {id:110,proyId:4,titulo:"Implementar controles",responsable:"R. Torres",estado:"En Proceso",prioridad:"Alta",fechaInicio:"2025-03-21",fechaFin:"2025-06-30",horasEst:120,horasReal:55,desc:"Controles operativos"},
-];
+const DEF_PROJ = []
+const DEF_TASK = []
 
 // ════════════════════════════════
 //  STATE
@@ -707,6 +688,8 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
 // ════════════════════════════════
 loadState();
 renderAll();
+
+try{var _l=document.getElementById('_empNombreLogo');if(_l&&window._MSS_EMP)_l.textContent=window._MSS_EMP.nombre||_empObj.nombre||'Mi Empresa';}catch(e){}
 </script>
 </body>
 </html>

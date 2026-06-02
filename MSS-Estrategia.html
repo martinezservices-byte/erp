@@ -143,7 +143,7 @@ try{
 <div id="header">
   <div class="logo">
     <div class="logo-icon">M</div>
-    <div><div class="logo-name">Martinez Services Spa</div><div class="logo-mod">MÓDULO ESTRATEGIA</div></div>
+    <div><div class="logo-name"><span id="_empNombreLogo">Mi Empresa</span></div><div class="logo-mod">MÓDULO ESTRATEGIA</div></div>
   </div>
   <div class="hright">
     <span class="hinfo" id="hInfo">Cargando...</span>
@@ -325,21 +325,9 @@ const MESES = ['Ene','Feb','Mar','Abr','May','Jun'];
 let _id = 500;
 const uid = () => ++_id;
 
-const DEF_KPI = [
-  {id:uid(),nombre:"Ingresos Mensuales",unidad:"$CLP",meta:7000000,valores:[4200000,3800000,5100000,4700000,5600000,6200000],frecuencia:"Mensual",area:"Finanzas",tendencia:"Subida"},
-  {id:uid(),nombre:"Satisfacción Clientes",unidad:"%",meta:90,valores:[82,78,85,88,91,94],frecuencia:"Mensual",area:"Comercial",tendencia:"Subida"},
-  {id:uid(),nombre:"Cumplimiento Proyectos",unidad:"%",meta:95,valores:[88,82,90,91,94,97],frecuencia:"Mensual",area:"Proyectos",tendencia:"Subida"},
-  {id:uid(),nombre:"Rotación de Personal",unidad:"%",meta:5,valores:[6.2,5.8,5.1,4.9,4.2,3.9],frecuencia:"Trimest.",area:"RRHH",tendencia:"Bajada"},
-  {id:uid(),nombre:"Margen Bruto",unidad:"%",meta:40,valores:[33,31,39,38,39,43],frecuencia:"Mensual",area:"Finanzas",tendencia:"Subida"},
-  {id:uid(),nombre:"Nuevos Clientes",unidad:"Ud.",meta:15,valores:[8,6,11,13,14,17],frecuencia:"Mensual",area:"Comercial",tendencia:"Subida"},
-];
+const DEF_KPI = []
 
-const DEF_SMART = [
-  {id:uid(),objetivo:"Aumentar ingresos en un 25% respecto al año anterior",especifico:"Incrementar facturación mensual promedio de $5M a $6.25M",medible:"Ingresos mensuales medidos en CLP",alcanzable:"Basado en pipeline actual y 3 contratos nuevos",relevante:"Alinea con plan de crecimiento 2025",tiempo:"2025-12-31",estado:"En Proceso",avance:62,area:"Finanzas"},
-  {id:uid(),objetivo:"Certificar al 100% del equipo en metodologías ágiles",especifico:"Capacitar 12 profesionales en Scrum y Kanban",medible:"Número de certificaciones obtenidas / 12",alcanzable:"Presupuesto de capacitación aprobado",relevante:"Mejora entrega de proyectos a clientes",tiempo:"2025-09-30",estado:"En Proceso",avance:41,area:"RRHH"},
-  {id:uid(),objetivo:"Implementar sistema CRM integral",especifico:"Despliegue completo del módulo CRM con datos migrados",medible:"% de módulos activos y usuarios capacitados",alcanzable:"Recurso técnico asignado y proveedor seleccionado",relevante:"Centraliza gestión de clientes y pipeline",tiempo:"2025-06-30",estado:"En Proceso",avance:62,area:"Comercial"},
-  {id:uid(),objetivo:"Reducir rotación de personal a menos del 4%",especifico:"Implementar plan de retención y clima organizacional",medible:"IRP mensual < 4%",alcanzable:"Acciones de clima y compensaciones definidas",relevante:"Impacto directo en costos y calidad",tiempo:"2025-12-31",estado:"En Proceso",avance:55,area:"RRHH"},
-];
+const DEF_SMART = []
 
 const DEF_FODA = {
   fortalezas:[
@@ -365,22 +353,9 @@ const DEF_FODA = {
   ],
 };
 
-const DEF_PESTEL = [
-  {id:uid(),factor:"Político",item:"Reformas tributarias en estudio (SII)",impacto:"Alto",prob:75,tendencia:"Negativa",accion:"Adaptar servicio de asesoría contable"},
-  {id:uid(),factor:"Económico",item:"Inflación sostenida sobre 4% anual",impacto:"Alto",prob:80,tendencia:"Negativa",accion:"Ajuste de tarifas semestral"},
-  {id:uid(),factor:"Económico",item:"Crecimiento del PIB proyectado 2.5%",impacto:"Medio",prob:65,tendencia:"Positiva",accion:"Posicionarse en sectores en expansión"},
-  {id:uid(),factor:"Social",item:"Mayor exigencia de transparencia corporativa",impacto:"Alto",prob:85,tendencia:"Positiva",accion:"Fortalecer servicio de auditoría"},
-  {id:uid(),factor:"Tecnológico",item:"Automatización contable con IA",impacto:"Alto",prob:75,tendencia:"Positiva",accion:"Integrar IA en herramientas propias"},
-  {id:uid(),factor:"Ecológico",item:"Reportes ESG obligatorios",impacto:"Medio",prob:60,tendencia:"Positiva",accion:"Desarrollar servicio de reporte ESG"},
-  {id:uid(),factor:"Legal",item:"Nueva Ley de Protección de Datos Personales",impacto:"Alto",prob:90,tendencia:"Negativa",accion:"Adecuación protocolos internos"},
-];
+const DEF_PESTEL = []
 
-const DEF_PLAN = [
-  {id:uid(),nombre:"Expansión Cartera Clientes Corporativos",objetivo:"Ingresos +25%",area:"Comercial",prioridad:"Alta",estado:"En Proceso",avance:45,fechaInicio:"2025-01-01",fechaFin:"2025-12-31",responsable:"A. Martínez",presupuesto:2000000},
-  {id:uid(),nombre:"Certificación Metodología Propia",objetivo:"Diferenciación",area:"Operaciones",prioridad:"Alta",estado:"En Proceso",avance:30,fechaInicio:"2025-03-01",fechaFin:"2025-09-30",responsable:"R. Torres",presupuesto:1500000},
-  {id:uid(),nombre:"Plataforma Digital Suite ERP",objetivo:"Eficiencia 40%",area:"Tecnología",prioridad:"Alta",estado:"En Proceso",avance:70,fechaInicio:"2025-01-15",fechaFin:"2025-06-30",responsable:"A. Martínez",presupuesto:800000},
-  {id:uid(),nombre:"Plan de Marketing Digital",objetivo:"Visibilidad x3",area:"Comercial",prioridad:"Media",estado:"Planificado",avance:10,fechaInicio:"2025-05-01",fechaFin:"2025-12-31",responsable:"M. García",presupuesto:600000},
-];
+const DEF_PLAN = []
 
 // ════════════════════════════
 //  STATE
@@ -869,6 +844,8 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
 // ════════════════════════════
 load();
 renderAll();
+
+try{var _l=document.getElementById('_empNombreLogo');if(_l&&window._MSS_EMP)_l.textContent=window._MSS_EMP.nombre||_empObj.nombre||'Mi Empresa';}catch(e){}
 </script>
 </body>
 </html>

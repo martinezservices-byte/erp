@@ -106,7 +106,7 @@ try{
 <div id="header">
   <div style="display:flex;align-items:center;gap:14px">
     <div class="logo-icon">M</div>
-    <div><div class="logo-name">Martinez Services Spa</div><div class="logo-mod">MÓDULO TESORERÍA</div></div>
+    <div><div class="logo-name"><span id="_empNombreLogo">Mi Empresa</span></div><div class="logo-mod">MÓDULO TESORERÍA</div></div>
   </div>
   <div style="display:flex;gap:10px;align-items:center">
     <span style="font-size:11px;color:var(--muted);font-family:monospace" id="hInfo">Cargando...</span>
@@ -235,25 +235,9 @@ try{
 const SK_CTAS='mss_tes_cuentas_v1_'+_EMP_ID,SK_MOVS='mss_tes_movs_v1_'+_EMP_ID,SK_PRES='mss_tes_presup_v1_'+_EMP_ID;
 let _id=5000;const uid=()=>++_id;
 
-const DEF_CUENTAS=[
-  {id:5001,nombre:'BCI Cuenta Corriente Principal',banco:'BCI',tipo:'Cuenta Corriente',num:'1234567890',saldoInicial:15000000,color:'#38BDF8'},
-  {id:5002,nombre:'BancoEstado Cuenta Vista',banco:'BancoEstado',tipo:'Cuenta Vista',num:'9876543210',saldoInicial:3500000,color:'#22C55E'},
-  {id:5003,nombre:'Santander Cuenta Ahorro',banco:'Santander',tipo:'Cuenta de Ahorro',num:'5555444433',saldoInicial:8000000,color:'#FBBF24'},
-];
-const DEF_MOVS=[
-  {id:5101,fecha:'2025-06-01',tipo:'Ingreso',cuentaId:5001,cat:'Ventas / Cobros',desc:'Cobro Minera Atacama',monto:4165000,ref:'FAC-001',estado:'Conciliado'},
-  {id:5102,fecha:'2025-06-02',tipo:'Egreso',cuentaId:5001,cat:'Arriendo',desc:'Arriendo oficina Junio',monto:800000,ref:'REC-056',estado:'Conciliado'},
-  {id:5103,fecha:'2025-06-05',tipo:'Egreso',cuentaId:5001,cat:'Remuneraciones',desc:'Pago remuneraciones',monto:3200000,ref:'LR-06',estado:'Efectivo'},
-  {id:5104,fecha:'2025-06-10',tipo:'Ingreso',cuentaId:5001,cat:'Ventas / Cobros',desc:'Cobro Agrícola Sur Verde',monto:3332000,ref:'FAC-002',estado:'Conciliado'},
-  {id:5105,fecha:'2025-06-15',tipo:'Egreso',cuentaId:5001,cat:'Servicios Básicos',desc:'Luz, agua, internet',monto:185000,ref:'SB-06',estado:'Efectivo'},
-  {id:5106,fecha:'2025-06-22',tipo:'Egreso',cuentaId:5001,cat:'AFP/Salud',desc:'Pago cotizaciones',monto:950000,ref:'PREV-06',estado:'Efectivo'},
-];
-const DEF_PRESUP=[
-  {id:5201,concepto:'Ingresos por Servicios',tipo:'Ingreso',montos:[5500000,5800000,6000000,6200000,6500000,7000000,7200000,7500000,8000000,8200000,8500000,9000000]},
-  {id:5202,concepto:'Remuneraciones',tipo:'Egreso',montos:[3200000,3200000,3200000,3200000,3200000,3200000,3200000,3200000,3200000,3200000,3200000,3200000]},
-  {id:5203,concepto:'Arriendo Oficina',tipo:'Egreso',montos:[800000,800000,800000,800000,800000,800000,800000,800000,800000,800000,800000,800000]},
-  {id:5204,concepto:'Gastos Operacionales',tipo:'Egreso',montos:[400000,400000,450000,420000,430000,500000,480000,460000,520000,500000,550000,600000]},
-];
+const DEF_CUENTAS=[]
+const DEF_MOVS=[]
+const DEF_PRESUP=[]
 
 let CUENTAS_TES=[],MOVIMIENTOS=[],PRESUPUESTO=[];
 
@@ -444,6 +428,8 @@ populateCuentasSelects();
 renderCuentas();
 document.getElementById('hInfo').textContent=CUENTAS_TES.length+' cuentas · '+MOVIMIENTOS.length+' movimientos';
 document.getElementById('concMes').value=new Date().toISOString().substring(0,7);
+
+try{var _l=document.getElementById('_empNombreLogo');if(_l&&window._MSS_EMP)_l.textContent=window._MSS_EMP.nombre||_empObj.nombre||'Mi Empresa';}catch(e){}
 </script>
 </body>
 </html>

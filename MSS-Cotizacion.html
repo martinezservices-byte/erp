@@ -131,6 +131,7 @@ tfoot td{border-top:2px solid rgba(56,189,248,0.2);font-weight:800;}
 <script>
 const _empRaw = localStorage.getItem('mss_empresa_actual');
 const _empObj = _empRaw ? JSON.parse(_empRaw) : {id:1, nombre:'Mi Empresa'};
+window._MSS_EMP = _empObj;
 const _EMP_ID = _empObj.id || 1;
 const _EMP_NOMBRE = _empObj.nombre || 'Mi Empresa';
 (function(){
@@ -363,14 +364,9 @@ const SK_CLI='mss_cot_clientes_v1'+getEmpId();
 let _id=7000; const uid=()=>++_id;
 let DOCS=[], CLIENTES_COT=[], ITEMS=[{desc:'',qty:1,precio:0,total:0}];
 
-const DEF_CLIENTES=[
-  {id:7001,nombre:'Fundación Educacional Macaya',rut:'65.151.098-8',giro:'Educación',direccion:'Av. Los Condores 3881',contacto:'Macarena',email:'',tel:'',ciudad:'Alto Hospicio'},
-  {id:7002,nombre:'Minera Atacama S.A.',rut:'76.123.456-7',giro:'Minería',direccion:'Av. Los Carrera 500',contacto:'Jorge Díaz',email:'jdiaz@atacama.cl',tel:'+56923456789',ciudad:'Antofagasta'},
-];
+const DEF_CLIENTES=[]
 
-const DEF_DOCS=[
-  {id:7101,tipo:'Cotización',num:231,fecha:'2025-05-20',vence:'2025-05-25',clienteId:7001,clienteNombre:'Fundación Educacional Macaya',clienteRut:'65.151.098-8',clienteGiro:'Educación',clienteDir:'Av. Los Condores 3881',contacto:'Macarena',condPago:'A la recepción del servicio',comentarios:'Pedido por entregar día 20/10/2025',repLegal:'Gaudy Martínez',items:[{desc:'Chapitas personalizadas (logo) 56mm',qty:50,precio:1000,total:50000},{desc:'Entrega (Colegio Macaya)',qty:1,precio:2500,total:2500}],neto:52500,iva:9975,total:62475,estado:'Enviada'},
-];
+const DEF_DOCS=[]
 
 function save(){try{localStorage.setItem(SK_COT,JSON.stringify(DOCS));localStorage.setItem(SK_CLI,JSON.stringify(CLIENTES_COT));}catch(e){}}
 function load(){

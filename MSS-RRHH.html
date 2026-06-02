@@ -149,7 +149,7 @@ try{
 <div id="header">
   <div class="logo">
     <div class="logo-icon">M</div>
-    <div><div class="logo-name">Martinez Services Spa</div><div class="logo-mod">MÓDULO RRHH</div></div>
+    <div><div class="logo-name"><span id="_empNombreLogo">Mi Empresa</span></div><div class="logo-mod">MÓDULO RRHH</div></div>
   </div>
   <div class="hright">
     <span class="hinfo" id="hInfo">Cargando...</span>
@@ -343,40 +343,11 @@ const ESTADO_COLOR = {Activo:'#22C55E',Licencia:'#F59E0B',Vacaciones:'#38BDF8',D
 const FORM_ESTADO_COLOR = {Completado:'#22C55E','En Proceso':'#A78BFA',Pendiente:'#F59E0B'};
 const PALET = ['#A78BFA','#38BDF8','#22C55E','#EF4444','#F59E0B','#F472B6','#34D399'];
 
-const DEF_PERSONAS = [
-  {id:uid(),nombre:"Alejandro Martínez",cargo:"Gerente General",area:"Dirección",contrato:"Indefinido",ingreso:"2020-03-01",salario:4200000,estado:"Activo",eval:95,disc:{D:85,I:60,S:40,C:70}},
-  {id:uid(),nombre:"Carolina López",cargo:"Jefa Comercial",area:"Comercial",contrato:"Indefinido",ingreso:"2021-06-15",salario:2800000,estado:"Activo",eval:88,disc:{D:55,I:90,S:50,C:35}},
-  {id:uid(),nombre:"Roberto Torres",cargo:"Jefe de Operaciones",area:"Operaciones",contrato:"Indefinido",ingreso:"2020-08-01",salario:3100000,estado:"Activo",eval:91,disc:{D:45,I:40,S:85,C:80}},
-  {id:uid(),nombre:"Marcela García",cargo:"Profesional RRHH",area:"RRHH",contrato:"Indefinido",ingreso:"2022-01-10",salario:2200000,estado:"Activo",eval:86,disc:{D:30,I:70,S:90,C:55}},
-  {id:uid(),nombre:"Felipe Rojas",cargo:"Analista Financiero",area:"Finanzas",contrato:"Plazo Fijo",ingreso:"2023-03-01",salario:1850000,estado:"Activo",eval:82,disc:{D:40,I:35,S:60,C:95}},
-  {id:uid(),nombre:"Valentina Soto",cargo:"Profesional Comercial",area:"Comercial",contrato:"Plazo Fijo",ingreso:"2023-07-01",salario:1700000,estado:"Activo",eval:79,disc:{D:50,I:85,S:45,C:40}},
-  {id:uid(),nombre:"Diego Fuentes",cargo:"Analista TI",area:"Tecnología",contrato:"Indefinido",ingreso:"2022-09-01",salario:2500000,estado:"Activo",eval:84,disc:{D:35,I:50,S:55,C:90}},
-  {id:uid(),nombre:"Patricia Muñoz",cargo:"Directora Consultoría",area:"Consultoría",contrato:"Honorarios",ingreso:"2021-11-01",salario:3800000,estado:"Activo",eval:93,disc:{D:75,I:65,S:50,C:80}},
-  {id:uid(),nombre:"Hernán Vargas",cargo:"Coordinador Operaciones",area:"Operaciones",contrato:"Indefinido",ingreso:"2023-01-15",salario:1600000,estado:"Activo",eval:77,disc:{D:40,I:55,S:80,C:60}},
-  {id:uid(),nombre:"Sandra Pérez",cargo:"Analista Contable",area:"Finanzas",contrato:"Plazo Fijo",ingreso:"2024-02-01",salario:1550000,estado:"Activo",eval:80,disc:{D:25,I:30,S:70,C:95}},
-  {id:uid(),nombre:"Luis Morales",cargo:"Profesional Comercial",area:"Comercial",contrato:"Honorarios",ingreso:"2024-04-01",salario:1400000,estado:"Activo",eval:75,disc:{D:60,I:80,S:40,C:30}},
-  {id:uid(),nombre:"Andrea Castro",cargo:"Jefa de Finanzas",area:"Finanzas",contrato:"Indefinido",ingreso:"2021-03-01",salario:3200000,estado:"Licencia",eval:90,disc:{D:50,I:45,S:75,C:85}},
-];
+const DEF_PERSONAS = []
 
-const DEF_CLIMA = [
-  {cat:"Liderazgo",prom:82,meta:85},
-  {cat:"Comunicación Interna",prom:74,meta:80},
-  {cat:"Ambiente de Trabajo",prom:88,meta:85},
-  {cat:"Reconocimiento",prom:68,meta:80},
-  {cat:"Desarrollo Profesional",prom:71,meta:80},
-  {cat:"Carga Laboral",prom:65,meta:75},
-  {cat:"Trabajo en Equipo",prom:90,meta:85},
-  {cat:"Satisfacción General",prom:79,meta:85},
-];
+const DEF_CLIMA = []
 
-const DEF_FORM = [
-  {id:uid(),nombre:"Metodologías Ágiles — Scrum Master",area:"Tecnología",tipo:"Externo",inicio:"2025-02-10",fin:"2025-02-28",horas:40,costo:850000,estado:"Completado"},
-  {id:uid(),nombre:"Excel Avanzado y Power BI",area:"Finanzas",tipo:"Interno",inicio:"2025-03-05",fin:"2025-03-20",horas:24,costo:320000,estado:"Completado"},
-  {id:uid(),nombre:"Gestión de Personas y Liderazgo",area:"RRHH",tipo:"Externo",inicio:"2025-04-01",fin:"2025-04-30",horas:32,costo:1200000,estado:"En Proceso"},
-  {id:uid(),nombre:"Normas IFRS y Control Financiero",area:"Finanzas",tipo:"Externo",inicio:"2025-05-01",fin:"2025-06-15",horas:48,costo:1500000,estado:"En Proceso"},
-  {id:uid(),nombre:"Seguridad y Salud en el Trabajo",area:"Operaciones",tipo:"Interno",inicio:"2025-05-20",fin:"2025-05-22",horas:8,costo:120000,estado:"Pendiente"},
-  {id:uid(),nombre:"Estrategia Comercial Avanzada",area:"Comercial",tipo:"Externo",inicio:"2025-06-10",fin:"2025-07-10",horas:36,costo:980000,estado:"Pendiente"},
-];
+const DEF_FORM = []
 
 const IRP_DATA = [
   {mes:"Ene",irp:4.2},{mes:"Feb",irp:3.8},{mes:"Mar",irp:3.5},
@@ -833,6 +804,8 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
 // ════════════════════════════
 loadState();
 renderAll();
+
+try{var _l=document.getElementById('_empNombreLogo');if(_l&&window._MSS_EMP)_l.textContent=window._MSS_EMP.nombre||_empObj.nombre||'Mi Empresa';}catch(e){}
 </script>
 </body>
 </html>

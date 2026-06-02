@@ -169,7 +169,7 @@ try{
   <div class="logo">
     <div class="logo-icon">M</div>
     <div>
-      <div class="logo-name">Martinez Services Spa</div>
+      <div class="logo-name"><span id="_empNombreLogo">Mi Empresa</span></div>
       <div class="logo-mod">MÓDULO REMUNERACIONES</div>
     </div>
   </div>
@@ -1499,6 +1499,8 @@ function imprimirDoc(){
   window.print();
   document.body.removeChild(clone);
 }
+
+try{var _l=document.getElementById('_empNombreLogo');if(_l&&window._MSS_EMP)_l.textContent=window._MSS_EMP.nombre||_empObj.nombre||'Mi Empresa';}catch(e){}
 </script>
 </body>
 </html>

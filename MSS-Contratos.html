@@ -91,6 +91,7 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.012);}
 // ═══════════════════════════════════════════════════
 const _empRaw = localStorage.getItem('mss_empresa_actual');
 const _empObj = _empRaw ? JSON.parse(_empRaw) : {id:1, nombre:'Mi Empresa'};
+window._MSS_EMP = _empObj;
 const _EMP_ID = _empObj.id || 1;
 const _EMP_NOMBRE = _empObj.nombre || 'Mi Empresa';
 (function(){
@@ -218,16 +219,8 @@ try{
 <script>
 const SK_CTR='mss_contratos_v1_'+_EMP_ID,SK_ANX='mss_anexos_v1_'+_EMP_ID;
 let _id=6000;const uid=()=>++_id;
-const DEF_CONTRATOS=[
-  {id:6001,tipo:'Contrato de Trabajo Indefinido',contraparte:'Carolina López',rut:'15.234.567-8',cargo:'Jefa Comercial',inicio:'2021-06-15',termino:'',monto:2800000,estado:'Vigente',obs:''},
-  {id:6002,tipo:'Contrato de Trabajo Plazo Fijo',contraparte:'Felipe Rojas',rut:'18.456.789-0',cargo:'Analista Financiero',inicio:'2025-03-01',termino:'2025-08-31',monto:1850000,estado:'Vigente',obs:'Renovación pendiente'},
-  {id:6003,tipo:'Contrato de Honorarios',contraparte:'Patricia Muñoz',rut:'12.987.654-3',cargo:'Directora Consultoría',inicio:'2021-11-01',termino:'2025-12-31',monto:3800000,estado:'Vigente',obs:''},
-  {id:6004,tipo:'Contrato de Servicios',contraparte:'Minera Atacama S.A.',rut:'76.123.456-7',cargo:'Auditoría y Control',inicio:'2025-01-01',termino:'2025-06-30',monto:5000000,estado:'Por Vencer',obs:'Renovación en negociación'},
-];
-const DEF_ANEXOS=[
-  {id:6101,contratoId:6001,tipo:'Cambio de Remuneración',fecha:'2023-01-01',desc:'Aumento a $2.800.000 brutos mensuales',estado:'Firmado'},
-  {id:6102,contratoId:6002,tipo:'Prórroga de Contrato',fecha:'2025-02-28',desc:'Prórroga por 6 meses hasta 31/08/2025',estado:'Firmado'},
-];
+const DEF_CONTRATOS=[]
+const DEF_ANEXOS=[]
 let CONTRATOS=[],ANEXOS=[];
 function saveAll(){try{localStorage.setItem(SK_CTR,JSON.stringify(CONTRATOS));localStorage.setItem(SK_ANX,JSON.stringify(ANEXOS));}catch(e){}}
 function loadAll(){try{CONTRATOS=JSON.parse(localStorage.getItem(SK_CTR))||DEF_CONTRATOS.map(x=>({...x}));ANEXOS=JSON.parse(localStorage.getItem(SK_ANX))||DEF_ANEXOS.map(x=>({...x}));}catch(e){CONTRATOS=DEF_CONTRATOS.map(x=>({...x}));ANEXOS=DEF_ANEXOS.map(x=>({...x}));}}

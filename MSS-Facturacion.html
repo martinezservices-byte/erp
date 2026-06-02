@@ -139,7 +139,7 @@ try{
 <div id="header">
   <div class="logo">
     <div class="logo-icon">M</div>
-    <div><div class="logo-name" id="facHeaderEmp">Martinez Services Spa</div><div class="logo-mod">MÓDULO FACTURACIÓN</div></div>
+    <div><div class="logo-name" id="facHeaderEmp"><span id="_empNombreLogo">Mi Empresa</span></div><div class="logo-mod">MÓDULO FACTURACIÓN</div></div>
   </div>
   <div style="display:flex;gap:10px;align-items:center;">
     <span style="font-size:11px;color:var(--muted);font-family:var(--mono)" id="hInfo">Cargando...</span>
@@ -345,25 +345,11 @@ const SK_PRODS= 'mss_fact_prods_v1_'+_EMP_ID;
 let _id=4000; const uid=()=>++_id;
 let currentFiltTipo='';
 
-const DEF_CLIENTES=[
-  {id:uid(),nombre:'Minera Atacama S.A.',rut:'76.123.456-7',tipo:'Cliente',giro:'Minería',email:'contacto@atacama.cl',telefono:'+56912345678',direccion:'Av. Principal 100',ciudad:'Antofagasta',condPago:'30 días',limite:50000000},
-  {id:uid(),nombre:'Agrícola Sur Verde S.A.',rut:'77.234.567-8',tipo:'Cliente',giro:'Agricultura',email:'admin@surverde.cl',telefono:'+56923456789',direccion:'Camino Rural km 5',ciudad:'Los Ángeles',condPago:'Contado',limite:20000000},
-  {id:uid(),nombre:'Constructora Bío-Bío Ltda.',rut:'78.345.678-9',tipo:'Cliente',giro:'Construcción',email:'facturacion@biobio.cl',telefono:'+56934567890',direccion:'Calle Comercio 200',ciudad:'Concepción',condPago:'60 días',limite:30000000},
-];
+const DEF_CLIENTES=[]
 
-const DEF_PRODS=[
-  {id:uid(),codigo:'SRV-001',tipo:'Servicio',descripcion:'Servicio de Auditoría Empresarial',precio:3500000,unidad:'Proyecto',iva:'si'},
-  {id:uid(),codigo:'SRV-002',tipo:'Servicio',descripcion:'Consultoría Plan Estratégico',precio:2800000,unidad:'Proyecto',iva:'si'},
-  {id:uid(),codigo:'SRV-003',tipo:'Servicio',descripcion:'Control de Gestión Mensual',precio:1200000,unidad:'Mes',iva:'si'},
-  {id:uid(),codigo:'SRV-004',tipo:'Servicio',descripcion:'Diagnóstico Empresarial',precio:1800000,unidad:'Proyecto',iva:'si'},
-  {id:uid(),codigo:'SRV-005',tipo:'Servicio',descripcion:'Capacitación KPI y Gestión',precio:950000,unidad:'Sesión',iva:'si'},
-];
+const DEF_PRODS=[]
 
-const DEF_DOCS=[
-  {id:uid(),tipo:'Factura',folio:1,fecha:'2025-06-01',vcto:'2025-07-01',clienteId:null,clienteNombre:'Minera Atacama S.A.',clienteRut:'76.123.456-7',glosa:'Servicio auditoría Q2',items:[{desc:'Servicio de Auditoría Empresarial',qty:1,precio:3500000,total:3500000}],neto:3500000,iva:665000,total:4165000,condPago:'30 días',estado:'Pagada'},
-  {id:uid(),tipo:'Factura',folio:2,fecha:'2025-06-10',vcto:'2025-07-10',clienteId:null,clienteNombre:'Agrícola Sur Verde S.A.',clienteRut:'77.234.567-8',glosa:'Plan Estratégico 2025',items:[{desc:'Consultoría Plan Estratégico',qty:1,precio:2800000,total:2800000}],neto:2800000,iva:532000,total:3332000,condPago:'Contado',estado:'Pagada'},
-  {id:uid(),tipo:'Factura',folio:3,fecha:'2025-06-20',vcto:'2025-07-20',clienteId:null,clienteNombre:'Constructora Bío-Bío Ltda.',clienteRut:'78.345.678-9',glosa:'Auditoría procesos operativos',items:[{desc:'Servicio de Auditoría Empresarial',qty:1,precio:3500000,total:3500000},{desc:'Informe y recomendaciones',qty:1,precio:700000,total:700000}],neto:4200000,iva:798000,total:4998000,condPago:'60 días',estado:'Emitida'},
-];
+const DEF_DOCS=[]
 
 let DOCUMENTOS=[], CLIENTES_FAC=[], PRODUCTOS=[];
 let ITEMS_FORM=[{desc:'',qty:1,precio:0,total:0}];
@@ -787,6 +773,8 @@ function imprimirDoc(){
   window.print();
   document.body.removeChild(clone);
 }
+
+try{var _l=document.getElementById('_empNombreLogo');if(_l&&window._MSS_EMP)_l.textContent=window._MSS_EMP.nombre||_empObj.nombre||'Mi Empresa';}catch(e){}
 </script>
 </body>
 </html>

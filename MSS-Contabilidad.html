@@ -134,7 +134,7 @@ try{
 <div id="header">
   <div class="logo">
     <div class="logo-icon">M</div>
-    <div><div class="logo-name">Martinez Services Spa</div><div class="logo-mod">MÓDULO CONTABILIDAD</div></div>
+    <div><div class="logo-name"><span id="_empNombreLogo">Mi Empresa</span></div><div class="logo-mod">MÓDULO CONTABILIDAD</div></div>
   </div>
   <div class="hright">
     <span style="font-size:11px;color:var(--muted);font-family:var(--mono)" id="hInfo">Cargando...</span>
@@ -373,16 +373,7 @@ const PLAN_BASE = [
   {id:72,codigo:'5-03-002',nombre:'Comisiones Bancarias',tipo:'egreso',naturaleza:'deudora',grupo:'Gastos Financieros',estado:'activa'},
 ];
 
-const DEF_ASIENTOS = [
-  {id:uid(),fecha:'2025-06-01',tipo:'Ingreso',glosa:'Servicio auditoría Minera Atacama - Factura 001',cuentaDebito:2,cuentaCredito:50,debito:5000000,credito:5000000,doc:'Factura',docNum:'001',obs:''},
-  {id:uid(),fecha:'2025-06-02',tipo:'Egreso',glosa:'Pago arriendo oficina Junio 2025',cuentaDebito:62,cuentaCredito:2,debito:800000,credito:800000,doc:'Recibo',docNum:'R-056',obs:''},
-  {id:uid(),fecha:'2025-06-05',tipo:'Egreso',glosa:'Remuneraciones personal Junio 2025',cuentaDebito:60,cuentaCredito:24,debito:3200000,credito:3200000,doc:'Planilla',docNum:'LR-06',obs:''},
-  {id:uid(),fecha:'2025-06-10',tipo:'Ingreso',glosa:'Consultoría Plan Estratégico Agrícola Sur Verde',cuentaDebito:2,cuentaCredito:51,debito:3800000,credito:3800000,doc:'Factura',docNum:'002',obs:''},
-  {id:uid(),fecha:'2025-06-15',tipo:'Egreso',glosa:'Servicios básicos oficina',cuentaDebito:63,cuentaCredito:1,debito:120000,credito:120000,doc:'Boleta',docNum:'B-123',obs:''},
-  {id:uid(),fecha:'2025-06-20',tipo:'Ingreso',glosa:'Auditoría procesos Constructora Bío-Bío',cuentaDebito:2,cuentaCredito:52,debito:4200000,credito:4200000,doc:'Factura',docNum:'003',obs:''},
-  {id:uid(),fecha:'2025-06-22',tipo:'Egreso',glosa:'Honorarios contador externo',cuentaDebito:61,cuentaCredito:2,debito:450000,credito:450000,doc:'Boleta Hon.',docNum:'BH-089',obs:''},
-  {id:uid(),fecha:'2025-06-25',tipo:'Egreso',glosa:'Comunicaciones y telefonía',cuentaDebito:65,cuentaCredito:1,debito:85000,credito:85000,doc:'Boleta',docNum:'B-456',obs:''},
-];
+const DEF_ASIENTOS = []
 
 let ASIENTOS=[], CUENTAS=[];
 
@@ -827,6 +818,8 @@ renderKPIs();
 renderDiario();
 populateCuentasSelects();
 document.getElementById('hInfo').textContent=`${ASIENTOS.length} asientos · ${CUENTAS.length} cuentas`;
+
+try{var _l=document.getElementById('_empNombreLogo');if(_l&&window._MSS_EMP)_l.textContent=window._MSS_EMP.nombre||_empObj.nombre||'Mi Empresa';}catch(e){}
 </script>
 </body>
 </html>
