@@ -592,6 +592,9 @@ const badge=(txt,color)=>`<span style="background:${color}22;color:${color};bord
 const EC={'Completado':'#22C55E','Finalizado':'#22C55E','Activo':'#F59E0B','En Ruta':'#38BDF8','Programado':'#A78BFA','Cancelado':'#EF4444','Pendiente':'#F59E0B','Disponible':'#22C55E','Arrendado':'#F59E0B','Mantencion':'#EF4444'};
 const ICONOS={'Camioneta':'🚛','Vehículo':'🚗','Moto':'🏍','Maquinaria':'⚙️','Equipo':'🔧','Herramienta':'🔨','Generador':'⚡','Compresor':'💨','default':'📦'};
 
+// Normaliza IDs a número para evitar bugs de comparación string vs number
+function normIds(arr){ return arr.map(function(o){var copy=Object.assign({},o);copy.id=parseInt(o.id)||o.id;return copy;}); }
+
 function load(){
   try{
     if(_ES_MYP){
@@ -605,11 +608,11 @@ function load(){
       const mant = JSON.parse(localStorage.getItem(SK.mant)||'[]');
       // Solo usar localStorage si tiene datos VÁLIDOS (más de 0 registros)
       // Y si el primer registro tiene las propiedades correctas
-      if(a.length  && a[0].nombre)    ACTIVOS    = a;
-      if(ar.length && ar[0].num)      ARRIENDOS  = ar;
-      if(fl.length && fl[0].num)      FLETES     = fl;
-      if(cli.length&& cli[0].nombre)  CLIENTES   = cli;
-      if(mant.length&&mant[0].tipo)   MANTENCION = mant;
+      if(a.length  && a[0].nombre)    ACTIVOS    = normIds(a);
+      if(ar.length && ar[0].num)      ARRIENDOS  = normIds(ar);
+      if(fl.length && fl[0].num)      FLETES     = normIds(fl);
+      if(cli.length&& cli[0].nombre)  CLIENTES   = normIds(cli);
+      if(mant.length&&mant[0].tipo)   MANTENCION = normIds(mant);
     } else {
       // Otras empresas: leer solo de localStorage
       const a    = JSON.parse(localStorage.getItem(SK.a)   ||'[]');
@@ -617,11 +620,11 @@ function load(){
       const fl   = JSON.parse(localStorage.getItem(SK.fl)  ||'[]');
       const cli  = JSON.parse(localStorage.getItem(SK.cli) ||'[]');
       const mant = JSON.parse(localStorage.getItem(SK.mant)||'[]');
-      ACTIVOS    = a;
-      ARRIENDOS  = ar;
-      FLETES     = fl;
-      CLIENTES   = cli;
-      MANTENCION = mant;
+      ACTIVOS    = normIds(a);
+      ARRIENDOS  = normIds(ar);
+      FLETES     = normIds(fl);
+      CLIENTES   = normIds(cli);
+      MANTENCION = normIds(mant);
     }
     const c = localStorage.getItem(SK.cfg);
     if(c) CFG = JSON.parse(c);
@@ -941,8 +944,8 @@ function saveArriendo(){
   const id=document.getElementById('arId').value;
   const aId=parseInt(document.getElementById('arActivo').value)||0;
   const cId=parseInt(document.getElementById('arCliente').value)||0;
-  const activo=ACTIVOS.find(x=>x.id===aId);
-  const cliente=CLIENTES.find(x=>x.id===cId);
+  const activo=ACTIVOS.find(x=>parseInt(x.id)===aId);
+  const cliente=CLIENTES.find(x=>parseInt(x.id)===cId);
   const obj={num:document.getElementById('arNum').value||'ARR-'+(ARRIENDOS.length+1).toString().padStart(3,'0'),activoId:aId,activoNombre:activo?.nombre||'—',clienteId:cId,clienteNombre:cliente?.nombre||'—',inicio:document.getElementById('arInicio').value,termino:document.getElementById('arTermino').value,tipoTarifa:document.getElementById('arTipoTarifa').value,tarifa:parseFloat(document.getElementById('arTarifa').value)||0,total:parseFloat(document.getElementById('arTotal').value)||0,pagado:parseFloat(document.getElementById('arPagado').value)||0,lugar:document.getElementById('arLugar').value,resp:document.getElementById('arResp').value,estado:document.getElementById('arEstado').value,obs:document.getElementById('arObs').value,garantia:parseFloat(document.getElementById('arGarantia').value)||0,formaPagoGarantia:document.getElementById('arFormaPagoGarantia').value,estadoGarantia:document.getElementById('arEstadoGarantia').value,formaPago:document.getElementById('arFormaPago').value,estadoPago:document.getElementById('arEstadoPago').value,tipoDoc:document.getElementById('arTipoDoc').value,numDoc:document.getElementById('arNumDoc').value,tipoDespacho:document.getElementById('arTipoDespacho')?.value||'retira',costoFlete:parseFloat(document.getElementById('arCostoFlete')?.value)||0,horaEntrega:document.getElementById('arHoraEntrega')?.value||'',horaRetiro:document.getElementById('arHoraRetiro')?.value||''};
   if(!obj.activoNombre||obj.activoNombre==='—')return alert('Selecciona un activo');
   let savedObj;
@@ -1254,8 +1257,8 @@ function saveFlete(){
   const id=document.getElementById('flId').value;
   const vId=parseInt(document.getElementById('flVehiculo').value)||0;
   const cId=parseInt(document.getElementById('flCliente').value)||0;
-  const vehiculo=ACTIVOS.find(x=>x.id===vId);
-  const cliente=CLIENTES.find(x=>x.id===cId);
+  const vehiculo=ACTIVOS.find(x=>parseInt(x.id)===vId);
+  const cliente=CLIENTES.find(x=>parseInt(x.id)===cId);
   const obj={num:document.getElementById('flNum').value||'FL-'+(FLETES.length+1).toString().padStart(3,'0'),fecha:document.getElementById('flFecha').value,vehiculoId:vId,vehiculoNombre:vehiculo?.nombre||'—',conductor:document.getElementById('flConductor').value,origen:document.getElementById('flOrigen').value,destino:document.getElementById('flDestino').value,carga:document.getElementById('flCarga').value,peso:document.getElementById('flPeso').value,km:parseFloat(document.getElementById('flKm').value)||0,tarifa:parseFloat(document.getElementById('flTarifa').value)||parseFloat(document.getElementById('flTotal').value)||0,clienteId:cId,clienteNombre:cliente?.nombre||'Particular',estado:document.getElementById('flEstado').value,obs:document.getElementById('flObs').value,formaPago:document.getElementById('flFormaPago').value,estadoPago:document.getElementById('flEstadoPago').value,tipoDoc:document.getElementById('flTipoDoc').value,numDoc:document.getElementById('flNumDoc').value};
   if(id){const i=FLETES.findIndex(f=>f.id==id);if(i>=0){FLETES[i]={...FLETES[i],...obj};syncFinanzas('flete',FLETES[i],'save');}}
   else{const newObj={id:uid(),...obj};FLETES.push(newObj);syncFinanzas('flete',newObj,'save');}
@@ -1429,7 +1432,7 @@ function rMantencion(){
 
 function saveMant(){
   const aId=parseInt(document.getElementById('mActivo').value)||0;
-  const activo=ACTIVOS.find(x=>x.id===aId);
+  const activo=ACTIVOS.find(x=>parseInt(x.id)===aId);
   MANTENCION.push({id:uid(),activoId:aId,activoNombre:activo?.nombre||'—',tipo:document.getElementById('mTipo').value,desc:document.getElementById('mDesc').value,fecha:document.getElementById('mFecha').value,proxima:document.getElementById('mProxima').value,costo:parseFloat(document.getElementById('mCosto').value)||0,taller:document.getElementById('mTaller').value,estado:document.getElementById('mEstado').value});
   save();C('moMant');rMantencion();
 }
