@@ -116,6 +116,20 @@ canvas{max-height:230px;}
 <div id="nav-emp" style="margin-left:auto;padding:3px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;font-size:9px;color:#C9A84C;font-family:monospace;white-space:nowrap;flex-shrink:0;display:none"></div>
 </div>
 <script>
+
+// ═══ EMPRESA DINÁMICA ═══
+var _er = localStorage.getItem('mss_empresa_actual');
+var _EMP = _er ? JSON.parse(_er) : {id:1, nombre:'Mi Empresa', rut:''};
+window._MSS_EMP = _EMP;
+var _nd = document.getElementById('nav-emp');
+if(_nd){_nd.textContent='🏢 '+_EMP.nombre; _nd.style.display='block';}
+var _cur = window.location.pathname.split('/').pop();
+document.querySelectorAll('#nav-bar a').forEach(function(a){
+  if(a.getAttribute('href')===_cur){
+    a.style.background='rgba(201,168,76,0.25)';
+    a.style.color='#E8C97A';
+  }
+});
 const _empRaw = localStorage.getItem('mss_empresa_actual');
 const _empObj = _empRaw ? JSON.parse(_empRaw) : {id:1, nombre:'Mi Empresa'};
 const _EMP_ID = _empObj.id || 1;
@@ -143,7 +157,7 @@ try{
 <div id="header">
   <div class="logo">
     <div class="logo-icon">M</div>
-    <div><div class="logo-name"><span id="_empNombreLogo">Mi Empresa</span></div><div class="logo-mod">MÓDULO ESTRATEGIA</div></div>
+    <div><div class="logo-name">Martinez Services Spa</div><div class="logo-mod">MÓDULO ESTRATEGIA</div></div>
   </div>
   <div class="hright">
     <span class="hinfo" id="hInfo">Cargando...</span>
@@ -844,8 +858,6 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
 // ════════════════════════════
 load();
 renderAll();
-
-try{var _l=document.getElementById('_empNombreLogo');if(_l&&window._MSS_EMP)_l.textContent=window._MSS_EMP.nombre||_empObj.nombre||'Mi Empresa';}catch(e){}
 </script>
 </body>
 </html>

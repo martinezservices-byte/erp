@@ -329,61 +329,7 @@ var pct = function(a,b) { return b===0?'—':((a/b)*100).toFixed(1)+'%'; };
 var MESES = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
 // ── 4. DATOS REALES M&P Feb-May 2026 ──
-var _DATOS_MYP = [
-  {id:1,  fecha:'2026-02-21',tipo:'Ingreso',cat:'Aporte de Capital',       desc:'Capital Inicial Empresa',                  monto:300000, doc:'',        numDoc:'',             medioPago:'Transferencia',  cuenta:'Mercado Pago'},
-  {id:2,  fecha:'2026-02-24',tipo:'Egreso', cat:'Inversión Activos',        desc:'Compra Demoledor 3000W TASBEL',            monto:85990,  doc:'Boleta',  numDoc:'2000011716707', medioPago:'Online',         cuenta:'Mercado Pago'},
-  {id:3,  fecha:'2026-02-24',tipo:'Egreso', cat:'Gastos de Oficina',        desc:'Artículos de Oficina',                    monto:14990,  doc:'Factura', numDoc:'69',            medioPago:'Crédito',        cuenta:''},
-  {id:4,  fecha:'2026-02-24',tipo:'Egreso', cat:'Gastos de Oficina',        desc:'Artículos de Oficina',                    monto:7500,   doc:'Factura', numDoc:'70',            medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
-  {id:5,  fecha:'2026-02-25',tipo:'Egreso', cat:'Gastos Legales',           desc:'Legalización Cesión Vehicular Notaría',   monto:3000,   doc:'Boleta',  numDoc:'146996904865',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
-  {id:6,  fecha:'2026-02-25',tipo:'Egreso', cat:'Gastos Legales',           desc:'Traspaso Vehículo Registro Civil',        monto:8820,   doc:'Boleta',  numDoc:'147015739333',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
-  {id:7,  fecha:'2026-02-25',tipo:'Egreso', cat:'Gastos Legales',           desc:'Legalización Cesión Máquinas Notaría',    monto:3000,   doc:'Boleta',  numDoc:'147736698184',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
-  {id:8,  fecha:'2026-02-25',tipo:'Egreso', cat:'Combustible y Transporte', desc:'Compra Diesel Copec',                     monto:20000,  doc:'Factura', numDoc:'147782058682',  medioPago:'App',            cuenta:'Mercado Pago'},
-  {id:9,  fecha:'2026-02-26',tipo:'Egreso', cat:'Gastos de Oficina',        desc:'Servicios Profesionales',                 monto:59500,  doc:'Factura', numDoc:'71',            medioPago:'Crédito',        cuenta:''},
-  {id:10, fecha:'2026-03-05',tipo:'Ingreso',cat:'Aporte de Capital',        desc:'Aumento Capital Empresa Inyección 2',     monto:150000, doc:'',        numDoc:'',              medioPago:'Transferencia',  cuenta:'Mercado Pago'},
-  {id:11, fecha:'2026-03-05',tipo:'Ingreso',cat:'Aporte de Capital',        desc:'Aumento Capital Empresa Inyección 3',     monto:150000, doc:'',        numDoc:'',              medioPago:'Transferencia',  cuenta:'Mercado Pago'},
-  {id:12, fecha:'2026-03-05',tipo:'Egreso', cat:'Combustible y Transporte', desc:'Compra Diesel Copec',                     monto:39170,  doc:'',        numDoc:'148234568137',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
-  {id:13, fecha:'2026-03-05',tipo:'Egreso', cat:'Costos Operativos',        desc:'Harmony Imp. Exp. Ltda — Eslingas',       monto:7776,   doc:'Boleta',  numDoc:'148250401827',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
-  {id:14, fecha:'2026-03-05',tipo:'Egreso', cat:'Inversión Activos',        desc:'Compra Betonera 200L + Pala + Carretilla', monto:271915, doc:'Factura', numDoc:'',             medioPago:'Transferencia',  cuenta:'Mercado Pago'},
-  {id:15, fecha:'2026-03-05',tipo:'Egreso', cat:'Combustible y Transporte', desc:'SOAP 2026 Porter II',                     monto:12300,  doc:'Boleta',  numDoc:'148308903735',  medioPago:'Online',         cuenta:'Mercado Pago'},
-  {id:16, fecha:'2026-03-06',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-001',                            monto:25000,  doc:'Boleta',  numDoc:'2',             medioPago:'Efectivo',       cuenta:'Caja Efectivo'},
-  {id:17, fecha:'2026-03-06',tipo:'Egreso', cat:'Combustible y Transporte', desc:'Permiso de Circulación 2026 Porter II',   monto:34876,  doc:'Boleta',  numDoc:'148402469395',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
-  {id:18, fecha:'2026-03-06',tipo:'Egreso', cat:'Combustible y Transporte', desc:'Estacionamiento Trámites Empresa',        monto:2390,   doc:'Boleta',  numDoc:'149139399170',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
-  {id:19, fecha:'2026-03-08',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-006 Lázaro',                     monto:25000,  doc:'Boleta',  numDoc:'9003',          medioPago:'Transferencia',  cuenta:'Mercado Pago'},
-  {id:20, fecha:'2026-03-09',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-007 Lázaro',                     monto:25000,  doc:'Boleta',  numDoc:'7004',          medioPago:'Transferencia',  cuenta:'Mercado Pago'},
-  {id:21, fecha:'2026-03-12',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-008 Lázaro',                     monto:25000,  doc:'Boleta',  numDoc:'7005',          medioPago:'Transferencia',  cuenta:'Mercado Pago'},
-  {id:22, fecha:'2026-03-12',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-009 Lázaro',                     monto:25000,  doc:'Boleta',  numDoc:'9004',          medioPago:'Transferencia',  cuenta:'Mercado Pago'},
-  {id:23, fecha:'2026-03-12',tipo:'Egreso', cat:'Gastos de Oficina',        desc:'EPP',                                     monto:63950,  doc:'Factura', numDoc:'72',            medioPago:'Crédito',        cuenta:''},
-  {id:24, fecha:'2026-03-13',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-010 Lázaro',                     monto:25000,  doc:'Boleta',  numDoc:'9005',          medioPago:'Transferencia',  cuenta:'Mercado Pago'},
-  {id:25, fecha:'2026-03-14',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-011 Lázaro',                     monto:25000,  doc:'Boleta',  numDoc:'89142086',      medioPago:'Transferencia',  cuenta:'Mercado Pago'},
-  {id:26, fecha:'2026-03-20',tipo:'Egreso', cat:'Costos Operativos',        desc:'Insumos Operativos Encerma',              monto:4000,   doc:'Boleta',  numDoc:'151221337612',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
-  {id:27, fecha:'2026-03-20',tipo:'Egreso', cat:'Mantención Vehículos',     desc:'Lubricentro Ohiggins — Cambio Aceite',    monto:55000,  doc:'',        numDoc:'151222162054',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
-  {id:28, fecha:'2026-03-20',tipo:'Egreso', cat:'Mantención Vehículos',     desc:'La Casa Del Encendido — Comp. Eléctricos', monto:48490, doc:'',        numDoc:'150500398515',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
-  {id:29, fecha:'2026-03-20',tipo:'Egreso', cat:'Mantención Vehículos',     desc:'Servicios Mecánicos Ronald Mamani',       monto:20000,  doc:'',        numDoc:'',              medioPago:'Transferencia',  cuenta:'Mercado Pago'},
-  {id:30, fecha:'2026-03-22',tipo:'Egreso', cat:'Combustible y Transporte', desc:'Compra Diesel Copec',                     monto:54639,  doc:'Factura', numDoc:'',              medioPago:'App',            cuenta:'Mercado Pago'},
-  {id:31, fecha:'2026-03-23',tipo:'Egreso', cat:'Costos Operativos',        desc:'Harmony Imp. Exp. Ltda — Insumos',        monto:19400,  doc:'Boleta',  numDoc:'151589188204',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
-  {id:32, fecha:'2026-03-24',tipo:'Egreso', cat:'Costos Operativos',        desc:'Soc. Inversiones Cordillera',             monto:14000,  doc:'Boleta',  numDoc:'150971121573',  medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
-  {id:33, fecha:'2026-03-24',tipo:'Egreso', cat:'Mantención Vehículos',     desc:'Rs Diesel Ltda — Filtros y Repuestos',    monto:52360,  doc:'Factura', numDoc:'000a9p3u23',    medioPago:'Transferencia',  cuenta:'Mercado Pago'},
-  {id:34, fecha:'2026-03-25',tipo:'Egreso', cat:'Combustible y Transporte', desc:'Compra Diesel Copec',                     monto:15986,  doc:'Factura', numDoc:'',              medioPago:'App',            cuenta:'Mercado Pago'},
-  {id:35, fecha:'2026-03-25',tipo:'Ingreso',cat:'Aporte de Capital',        desc:'Aumento Capital Empresa Inyección 4',     monto:100000, doc:'',        numDoc:'',              medioPago:'Transferencia',  cuenta:'Mercado Pago'},
-  {id:36, fecha:'2026-03-29',tipo:'Egreso', cat:'Gastos de Oficina',        desc:'EPP y Máquina MP',                        monto:101388, doc:'Factura', numDoc:'73',            medioPago:'Crédito',        cuenta:''},
-  {id:37, fecha:'2026-04-08',tipo:'Ingreso',cat:'Servicio de Arriendos',    desc:'Arriendo Betonera ARR-1001 — Rubén Núñez', monto:15000, doc:'Boleta',  numDoc:'7007',          medioPago:'Transferencia',  cuenta:'Mercado Pago'},
-  {id:38, fecha:'2026-04-10',tipo:'Ingreso',cat:'Servicio de Arriendos',    desc:'Arriendo Betonera ARR-1003 — Rubén Núñez', monto:15000, doc:'Boleta',  numDoc:'7008',          medioPago:'Transferencia',  cuenta:'Mercado Pago'},
-  {id:39, fecha:'2026-04-10',tipo:'Ingreso',cat:'Garantías Recibidas',      desc:'Garantía Ctto 1003 — Rubén Núñez',        monto:50000,  doc:'',        numDoc:'',              medioPago:'Transferencia',  cuenta:'Mercado Pago'},
-  {id:40, fecha:'2026-04-15',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-002',                            monto:25000,  doc:'Boleta',  numDoc:'154885222544',  medioPago:'Tarjeta Débito', cuenta:'Mercado Pago'},
-  {id:41, fecha:'2026-04-16',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-003',                            monto:15000,  doc:'Boleta',  numDoc:'155066556404',  medioPago:'Tarjeta Débito', cuenta:'Mercado Pago'},
-  {id:42, fecha:'2026-04-19',tipo:'Egreso', cat:'Costos Operativos',        desc:'Cámara Solar Bodega',                     monto:35700,  doc:'Factura', numDoc:'75',            medioPago:'Transferencia',  cuenta:'Mercado Pago'},
-  {id:43, fecha:'2026-04-30',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-004',                            monto:25000,  doc:'Boleta',  numDoc:'156350052399',  medioPago:'Tarjeta Débito', cuenta:'Mercado Pago'},
-  {id:44, fecha:'2026-05-02',tipo:'Egreso', cat:'Gastos Administrativos',   desc:'Plan Telefónico Corporativo Entel',        monto:6742,   doc:'Factura', numDoc:'',             medioPago:'Online',         cuenta:'Mercado Pago'},
-  {id:45, fecha:'2026-05-14',tipo:'Ingreso',cat:'Servicio de Arriendos',    desc:'Arriendo Moto ARR-1004 — Nelson Lien',    monto:25000,  doc:'Boleta',  numDoc:'7011',          medioPago:'Efectivo',       cuenta:'Caja Efectivo'},
-  {id:46, fecha:'2026-05-14',tipo:'Ingreso',cat:'Garantías Recibidas',      desc:'Garantía Ctto 1004 — Nelson Lien',        monto:100000, doc:'',        numDoc:'',              medioPago:'Efectivo',       cuenta:'Caja Efectivo'},
-  {id:47, fecha:'2026-05-14',tipo:'Egreso', cat:'Mantención Vehículos',     desc:'Arreglo Camión Porter II',                monto:65000,  doc:'',        numDoc:'',              medioPago:'Tarjeta',        cuenta:'Mercado Pago'},
-  {id:48, fecha:'2026-05-15',tipo:'Ingreso',cat:'Servicio de Fletes',       desc:'Flete FL-005',                            monto:5000,   doc:'Boleta',  numDoc:'158633275697',  medioPago:'Tarjeta Débito', cuenta:'Mercado Pago'},
-  {id:49, fecha:'2026-05-15',tipo:'Egreso', cat:'Garantías Devueltas',      desc:'Devolución Garantía Ctto 1004 — Nelson',  monto:100000, doc:'',        numDoc:'',              medioPago:'Efectivo',       cuenta:'Caja Efectivo'},
-  {id:50, fecha:'2026-05-20',tipo:'Ingreso',cat:'Servicio de Arriendos',    desc:'Arriendo Betonera ARR-1005 — Miguel M.',  monto:15000,  doc:'Boleta',  numDoc:'9006',          medioPago:'Efectivo',       cuenta:'Caja Efectivo'},
-  {id:51, fecha:'2026-05-20',tipo:'Ingreso',cat:'Garantías Recibidas',      desc:'Garantía Ctto 1005 — Miguel Morales',     monto:50000,  doc:'',        numDoc:'',              medioPago:'Efectivo',       cuenta:'Caja Efectivo'},
-  {id:52, fecha:'2026-05-28',tipo:'Ingreso',cat:'Servicio de Arriendos',    desc:'Arriendo Demoledor ARR-1006 — José Avilés', monto:15000, doc:'Boleta', numDoc:'',              medioPago:'Transferencia',  cuenta:'Mercado Pago'},
-  {id:53, fecha:'2026-05-28',tipo:'Ingreso',cat:'Garantías Recibidas',      desc:'Garantía Ctto 1006 — José Avilés',        monto:50000,  doc:'',        numDoc:'',              medioPago:'Transferencia',  cuenta:'Mercado Pago'}
-];
+var _DATOS_MYP = []
 
 // ── 5. ESTADO ──
 var DATA = [];
@@ -406,17 +352,9 @@ function cargar() {
         return;
       }
     }
-    // Sin datos guardados: cargar datos base si es M&P
-    var esMYP = EMP.rut === '78.361.479-0' || 
-                (EMP.nombre||'').toLowerCase().indexOf('pajuelo') >= 0 ||
-                EMP.id === 3;
-    if (esMYP) {
-      DATA = _DATOS_MYP.map(function(r) { return Object.assign({}, r); });
-      nextId = 300;
-    } else {
-      DATA = [];
-      nextId = 100;
-    }
+    // Sin datos: empezar vacío
+    DATA = [];
+    nextId = 100;
     guardar();
   } catch(e) {
     DATA = [];
@@ -427,83 +365,67 @@ function cargar() {
 // Cuando se registra un arriendo/flete en MSS-Arriendos, aparece acá automáticamente
 function sincronizarDesdeArriendos() {
   try {
+    var esMYP = EMP.rut === '78.361.479-0' || EMP.id === 3;
     var arrKey = 'mss_arr' + EMP.id + '_arriendos';
     var flKey  = 'mss_arr' + EMP.id + '_fletes';
-    var arrData = JSON.parse(localStorage.getItem(arrKey) || '[]');
-    var flData  = JSON.parse(localStorage.getItem(flKey)  || '[]');
-    var cambiado = false;
-
-    arrData.forEach(function(a) {
+    var arriendos = JSON.parse(localStorage.getItem(arrKey) || '[]');
+    var fletes    = JSON.parse(localStorage.getItem(flKey)  || '[]');
+    var cambiado  = false;
+    
+    // Sincronizar arriendos pagados
+    arriendos.forEach(function(a) {
       if (a.estadoPago !== 'Pagado' && a.estado !== 'Finalizado') return;
-      var monto = a.total || a.tarifa || 0;
-      if (!monto) return;
-      var idx = DATA.findIndex(function(r){return r.srcId===a.id && r.srcTipo==='arriendo';});
-      var reg = {
-        srcId:a.id, srcTipo:'arriendo',
-        fecha:a.inicio||new Date().toISOString().split('T')[0],
-        tipo:'Ingreso', cat:'Servicio de Arriendos',
-        desc:'Arriendo '+(a.num||'')+' — '+(a.activoNombre||'')+' ('+(a.clienteNombre||'')+')',
-        monto:monto, doc:a.tipoDoc||'', numDoc:a.numDoc||'',
-        medioPago:a.formaPago||'', cuenta:'Mercado Pago'
-      };
-      if (idx >= 0) { DATA[idx] = Object.assign({}, DATA[idx], reg); }
-      else { DATA.push(Object.assign({id:nextId++}, reg)); }
-      cambiado = true;
+      var existe = DATA.some(function(r) { return r.srcId === a.id && r.srcTipo === 'arriendo'; });
+      if (!existe) {
+        DATA.push({
+          id: nextId++,
+          srcId: a.id, srcTipo: 'arriendo',
+          fecha: a.inicio || new Date().toISOString().split('T')[0],
+          tipo: 'Ingreso', cat: 'Servicio de Arriendos',
+          desc: 'Arriendo ' + (a.num||'') + ' — ' + (a.activoNombre||'') + ' (' + (a.clienteNombre||'') + ')',
+          monto: a.total || a.tarifa || 0,
+          doc: a.tipoDoc || '', numDoc: a.numDoc || '',
+          medioPago: a.formaPago || '', cuenta: 'Mercado Pago'
+        });
+        cambiado = true;
+      }
     });
-
-    flData.forEach(function(f) {
+    
+    // Sincronizar fletes completados
+    fletes.forEach(function(f) {
       if (f.estadoPago !== 'Pagado' && f.estado !== 'Completado') return;
-      var monto = f.tarifa || 0;
-      if (!monto) return;
-      var idx = DATA.findIndex(function(r){return r.srcId===f.id && r.srcTipo==='flete';});
-      var reg = {
-        srcId:f.id, srcTipo:'flete',
-        fecha:f.fecha||new Date().toISOString().split('T')[0],
-        tipo:'Ingreso', cat:'Servicio de Fletes',
-        desc:'Flete '+(f.num||'')+' — '+(f.origen||'')+' → '+(f.destino||'')+' ('+(f.clienteNombre||'')+')',
-        monto:monto, doc:f.tipoDoc||'', numDoc:f.numDoc||'',
-        medioPago:f.formaPago||'', cuenta:'Mercado Pago'
-      };
-      if (idx >= 0) { DATA[idx] = Object.assign({}, DATA[idx], reg); }
-      else { DATA.push(Object.assign({id:nextId++}, reg)); }
-      cambiado = true;
+      var existe = DATA.some(function(r) { return r.srcId === f.id && r.srcTipo === 'flete'; });
+      if (!existe) {
+        DATA.push({
+          id: nextId++,
+          srcId: f.id, srcTipo: 'flete',
+          fecha: f.fecha || new Date().toISOString().split('T')[0],
+          tipo: 'Ingreso', cat: 'Servicio de Fletes',
+          desc: 'Flete ' + (f.num||'') + ' — ' + (f.origen||'') + ' → ' + (f.destino||'') + ' (' + (f.clienteNombre||'') + ')',
+          monto: f.tarifa || 0,
+          doc: f.tipoDoc || '', numDoc: f.numDoc || '',
+          medioPago: f.formaPago || '', cuenta: 'Mercado Pago'
+        });
+        cambiado = true;
+      }
     });
-
+    
     if (cambiado) guardar();
   } catch(e) {}
 }
 
 // ── 8. CÁLCULOS ──
-function ventas()   { return DATA.filter(function(r){
-  return r.tipo==='Ingreso' && 
-         r.cat!=='Garantías Recibidas' && 
-         r.cat!=='Garantías Devueltas' && 
-         r.cat!=='Aporte de Capital';
-}).reduce(function(s,r){return s+r.monto;},0); }
-
-function egresos()  { return DATA.filter(function(r){
-  return r.tipo==='Egreso' && r.cat!=='Garantías Devueltas';
-}).reduce(function(s,r){return s+r.monto;},0); }
-
-function capital()  { return DATA.filter(function(r){
-  return r.cat==='Aporte de Capital';
-}).reduce(function(s,r){return s+r.monto;},0); }
-
-function fletes()   { return DATA.filter(function(r){
-  return r.cat==='Servicio de Fletes';
-}).reduce(function(s,r){return s+r.monto;},0); }
-
-function arriendos(){ return DATA.filter(function(r){
-  return r.cat==='Servicio de Arriendos';
-}).reduce(function(s,r){return s+r.monto;},0); }
-
+function ventas()   { return DATA.filter(function(r){return r.tipo==='Ingreso'&&r.cat!=='Garantías Recibidas'&&r.cat!=='Garantías Devueltas'&&r.cat!=='Aporte de Capital';}).reduce(function(s,r){return s+r.monto;},0); }
+function egresos()  { return DATA.filter(function(r){return r.tipo==='Egreso'&&r.cat!=='Garantías Devueltas';}).reduce(function(s,r){return s+r.monto;},0); }
+function capital()  { return DATA.filter(function(r){return r.cat==='Aporte de Capital';}).reduce(function(s,r){return s+r.monto;},0); }
+function fletes()   { return DATA.filter(function(r){return r.cat==='Servicio de Fletes';}).reduce(function(s,r){return s+r.monto;},0); }
+function arriendos(){ return DATA.filter(function(r){return r.cat==='Servicio de Arriendos';}).reduce(function(s,r){return s+r.monto;},0); }
 function resultado(){ return ventas()-egresos(); }
 
 function porMes() {
   var map = {};
   DATA.forEach(function(r) {
-    // Excluir garantías y capital del flujo operacional
-    if (r.cat==='Garantías Recibidas' || r.cat==='Garantías Devueltas' || r.cat==='Aporte de Capital') return;
+    if (r.cat==='Garantías Recibidas'||r.cat==='Garantías Devueltas'||r.cat==='Aporte de Capital') return;
     var m = r.fecha ? r.fecha.substring(0,7) : '';
     if (!m) return;
     if (!map[m]) map[m] = {mes:m, ventas:0, fletes:0, arriendos:0, egr:0};
@@ -893,18 +815,6 @@ document.querySelectorAll('.modal-overlay').forEach(function(m){
 
 // ── 15. INIT ──
 cargar();
-// Limpiar duplicados que pudo haber dejado la sincronización anterior
-(function limpiarDuplicados(){
-  var vistos = {};
-  DATA = DATA.filter(function(r) {
-    var key = r.srcId && r.srcTipo ? (r.srcTipo + '_' + r.srcId) : null;
-    if (!key) return true; // registros manuales siempre se mantienen
-    if (vistos[key]) return false;
-    vistos[key] = true;
-    return true;
-  });
-  guardar();
-})();
 sincronizarDesdeArriendos();
 renderTodo();
 </script>

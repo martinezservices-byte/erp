@@ -63,6 +63,20 @@ body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;m
 <div id="nav-emp" style="margin-left:auto;padding:3px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;font-size:9px;color:#C9A84C;font-family:monospace;white-space:nowrap;flex-shrink:0;display:none"></div>
 </div>
 <script>
+
+// ═══ EMPRESA DINÁMICA ═══
+var _er = localStorage.getItem('mss_empresa_actual');
+var _EMP = _er ? JSON.parse(_er) : {id:1, nombre:'Mi Empresa', rut:''};
+window._MSS_EMP = _EMP;
+var _nd = document.getElementById('nav-emp');
+if(_nd){_nd.textContent='🏢 '+_EMP.nombre; _nd.style.display='block';}
+var _cur = window.location.pathname.split('/').pop();
+document.querySelectorAll('#nav-bar a').forEach(function(a){
+  if(a.getAttribute('href')===_cur){
+    a.style.background='rgba(201,168,76,0.25)';
+    a.style.color='#E8C97A';
+  }
+});
 const _empRaw = localStorage.getItem('mss_empresa_actual');
 const _empObj = _empRaw ? JSON.parse(_empRaw) : {id:1, nombre:'Mi Empresa'};
 const _EMP_ID = _empObj.id || 1;
@@ -200,11 +214,7 @@ try{
 const SK_LOGOS = 'mss_logos_v1';
 let LOGOS = {}, selectedEmpId = null, newLogoData = null, previewType = 'liquidacion';
 
-const DEF_EMPRESAS = [
-  {id:'1', nombre:'Martinez Services Spa',                          rut:'76.782.954-K', ciudad:'Alto Hospicio'},
-  {id:'2', nombre:'Condominio Pioneros 2',                          rut:'65.184.252-2', ciudad:'Alto Hospicio'},
-  {id:'3', nombre:'Martinez y Pajuelo Arriendos y Servicios SpA',   rut:'78.361.479-0', ciudad:'Alto Hospicio'},
-];
+const DEF_EMPRESAS = []
 
 function loadLogos(){try{LOGOS=JSON.parse(localStorage.getItem(SK_LOGOS)||'{}');}catch(e){LOGOS={};}}
 function saveLogos(){try{localStorage.setItem(SK_LOGOS,JSON.stringify(LOGOS));}catch(e){alert('Error guardando — imagen muy grande, intenta con una más pequeña');}}

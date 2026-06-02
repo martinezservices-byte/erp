@@ -75,6 +75,20 @@ textarea.restore-input:focus{border-color:var(--gold);}
 <div id="nav-emp" style="margin-left:auto;padding:3px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;font-size:9px;color:#C9A84C;font-family:monospace;white-space:nowrap;flex-shrink:0;display:none"></div>
 </div>
 <script>
+
+// ═══ EMPRESA DINÁMICA ═══
+var _er = localStorage.getItem('mss_empresa_actual');
+var _EMP = _er ? JSON.parse(_er) : {id:1, nombre:'Mi Empresa', rut:''};
+window._MSS_EMP = _EMP;
+var _nd = document.getElementById('nav-emp');
+if(_nd){_nd.textContent='🏢 '+_EMP.nombre; _nd.style.display='block';}
+var _cur = window.location.pathname.split('/').pop();
+document.querySelectorAll('#nav-bar a').forEach(function(a){
+  if(a.getAttribute('href')===_cur){
+    a.style.background='rgba(201,168,76,0.25)';
+    a.style.color='#E8C97A';
+  }
+});
 const _empRaw = localStorage.getItem('mss_empresa_actual');
 const _empObj = _empRaw ? JSON.parse(_empRaw) : {id:1, nombre:'Mi Empresa'};
 const _EMP_ID = _empObj.id || 1;
@@ -211,33 +225,33 @@ try{
 const MODULOS = [
   {nombre:'Empresas Hub',     key:'mss_hub_v3',               icon:'🏢', color:'#C9A84C'},
   {nombre:'Finanzas',         key:'mss_finanzas_v1',           icon:'₲',  color:'#C9A84C'},
-  {nombre:'Trabajadores',     key:'mss_rem_trabajadores_v1',   icon:'👥', color:'#22C55E'},
-  {nombre:'Liquidaciones',    key:'mss_rem_liquidaciones_v1',  icon:'📄', color:'#22C55E'},
-  {nombre:'Vacaciones',       key:'mss_rem_vacaciones_v1',     icon:'🏖', color:'#22C55E'},
-  {nombre:'Finiquitos',       key:'mss_rem_finiquitos_v1',     icon:'📋', color:'#22C55E'},
-  {nombre:'Parámetros Rem.',  key:'mss_rem_params_v1',         icon:'⚙',  color:'#22C55E'},
-  {nombre:'Asientos Cont.',   key:'mss_cont_asientos_v1',      icon:'📗', color:'#10B981'},
-  {nombre:'Plan Cuentas',     key:'mss_cont_cuentas_v1',       icon:'📗', color:'#10B981'},
-  {nombre:'Facturación Docs', key:'mss_fact_docs_v1',          icon:'🧾', color:'#38BDF8'},
-  {nombre:'Clientes Fact.',   key:'mss_fact_clis_v1',          icon:'🏢', color:'#38BDF8'},
-  {nombre:'Productos',        key:'mss_fact_prods_v1',         icon:'📦', color:'#38BDF8'},
-  {nombre:'Cuentas Banco',    key:'mss_tes_cuentas_v1',        icon:'🏦', color:'#FBBF24'},
-  {nombre:'Movimientos',      key:'mss_tes_movs_v1',           icon:'💳', color:'#FBBF24'},
-  {nombre:'Presupuesto Tes.', key:'mss_tes_presup_v1',         icon:'📋', color:'#FBBF24'},
-  {nombre:'Contratos',        key:'mss_contratos_v1',          icon:'📄', color:'#A78BFA'},
-  {nombre:'Anexos',           key:'mss_anexos_v1',             icon:'📎', color:'#A78BFA'},
-  {nombre:'Proyectos',        key:'mss_proyectos_v1',          icon:'◈',  color:'#38BDF8'},
-  {nombre:'Tareas',           key:'mss_tareas_v1',             icon:'✅', color:'#38BDF8'},
-  {nombre:'Clientes CRM',     key:'mss_clientes_v1',           icon:'◎',  color:'#FB923C'},
-  {nombre:'Ventas Plan',      key:'mss_ventas_v1',             icon:'📈', color:'#FB923C'},
-  {nombre:'Personas RRHH',    key:'mss_personas_v1',           icon:'◉',  color:'#A78BFA'},
-  {nombre:'Clima Org.',       key:'mss_clima_v1',              icon:'🌡', color:'#A78BFA'},
-  {nombre:'Formaciones',      key:'mss_formacion_v1',          icon:'📚', color:'#A78BFA'},
-  {nombre:'KPIs',             key:'mss_kpis_v1',               icon:'◆',  color:'#10B981'},
-  {nombre:'SMART',            key:'mss_smart_v1',              icon:'🎯', color:'#10B981'},
-  {nombre:'FODA',             key:'mss_foda_v1',               icon:'⬡',  color:'#10B981'},
-  {nombre:'PESTEL',           key:'mss_pestel_v1',             icon:'🌐', color:'#10B981'},
-  {nombre:'Plan Estrat.',     key:'mss_plan_v1',               icon:'🗺', color:'#10B981'},
+  {nombre:'Trabajadores',     key:'mss_rem_trabajadores_v1_'+(_EMP.id||1),   icon:'👥', color:'#22C55E'},
+  {nombre:'Liquidaciones',    key:'mss_rem_liquidaciones_v1_'+(_EMP.id||1),  icon:'📄', color:'#22C55E'},
+  {nombre:'Vacaciones',       key:'mss_rem_vacaciones_v1_'+(_EMP.id||1),     icon:'🏖', color:'#22C55E'},
+  {nombre:'Finiquitos',       key:'mss_rem_finiquitos_v1_'+(_EMP.id||1),     icon:'📋', color:'#22C55E'},
+  {nombre:'Parámetros Rem.',  key:'mss_rem_params_v1_'+(_EMP.id||1),         icon:'⚙',  color:'#22C55E'},
+  {nombre:'Asientos Cont.',   key:'mss_cont_asientos_v1_'+(_EMP.id||1),      icon:'📗', color:'#10B981'},
+  {nombre:'Plan Cuentas',     key:'mss_cont_cuentas_v1_'+(_EMP.id||1),       icon:'📗', color:'#10B981'},
+  {nombre:'Facturación Docs', key:'mss_fact_docs_v1_'+(_EMP.id||1),          icon:'🧾', color:'#38BDF8'},
+  {nombre:'Clientes Fact.',   key:'mss_fact_clis_v1_'+(_EMP.id||1),          icon:'🏢', color:'#38BDF8'},
+  {nombre:'Productos',        key:'mss_fact_prods_v1_'+(_EMP.id||1),         icon:'📦', color:'#38BDF8'},
+  {nombre:'Cuentas Banco',    key:'mss_tes_cuentas_v1_'+(_EMP.id||1),        icon:'🏦', color:'#FBBF24'},
+  {nombre:'Movimientos',      key:'mss_tes_movs_v1_'+(_EMP.id||1),           icon:'💳', color:'#FBBF24'},
+  {nombre:'Presupuesto Tes.', key:'mss_tes_presup_v1_'+(_EMP.id||1),         icon:'📋', color:'#FBBF24'},
+  {nombre:'Contratos',        key:'mss_contratos_v1_'+(_EMP.id||1),          icon:'📄', color:'#A78BFA'},
+  {nombre:'Anexos',           key:'mss_anexos_v1_'+(_EMP.id||1),             icon:'📎', color:'#A78BFA'},
+  {nombre:'Proyectos',        key:'mss_proyectos_v1_'+(_EMP.id||1),          icon:'◈',  color:'#38BDF8'},
+  {nombre:'Tareas',           key:'mss_tareas_v1_'+(_EMP.id||1),             icon:'✅', color:'#38BDF8'},
+  {nombre:'Clientes CRM',     key:'mss_clientes_v1_'+(_EMP.id||1),           icon:'◎',  color:'#FB923C'},
+  {nombre:'Ventas Plan',      key:'mss_ventas_v1_'+(_EMP.id||1),             icon:'📈', color:'#FB923C'},
+  {nombre:'Personas RRHH',    key:'mss_personas_v1_'+(_EMP.id||1),           icon:'◉',  color:'#A78BFA'},
+  {nombre:'Clima Org.',       key:'mss_clima_v1_'+(_EMP.id||1),              icon:'🌡', color:'#A78BFA'},
+  {nombre:'Formaciones',      key:'mss_formacion_v1_'+(_EMP.id||1),          icon:'📚', color:'#A78BFA'},
+  {nombre:'KPIs',             key:'mss_kpis_v1_'+(_EMP.id||1),               icon:'◆',  color:'#10B981'},
+  {nombre:'SMART',            key:'mss_smart_v1_'+(_EMP.id||1),              icon:'🎯', color:'#10B981'},
+  {nombre:'FODA',             key:'mss_foda_v1_'+(_EMP.id||1),               icon:'⬡',  color:'#10B981'},
+  {nombre:'PESTEL',           key:'mss_pestel_v1_'+(_EMP.id||1),             icon:'🌐', color:'#10B981'},
+  {nombre:'Plan Estrat.',     key:'mss_plan_v1_'+(_EMP.id||1),               icon:'🗺', color:'#10B981'},
   {nombre:'ERP Multi-Emp.',   key:'mss_erp3_empresas',         icon:'🏗', color:'#C9A84C'},
   {nombre:'ERP Data',         key:'mss_erp3_data',             icon:'💾', color:'#C9A84C'},
 ];
@@ -357,7 +371,7 @@ function exportarCSVTodo(){
     }catch(e){log('exportLog','Error Finanzas','err');}
   }
   // Trabajadores
-  const trabs=localStorage.getItem('mss_rem_trabajadores_v1');
+  const trabs=localStorage.getItem('mss_rem_trabajadores_v1_'+(_EMP.id||1));
   if(trabs){
     try{
       const data=JSON.parse(trabs);
@@ -370,7 +384,7 @@ function exportarCSVTodo(){
     }catch(e){log('exportLog','Error Trabajadores','err');}
   }
   // Liquidaciones
-  const liqs=localStorage.getItem('mss_rem_liquidaciones_v1');
+  const liqs=localStorage.getItem('mss_rem_liquidaciones_v1_'+(_EMP.id||1));
   if(liqs){
     try{
       const data=JSON.parse(liqs);
@@ -383,7 +397,7 @@ function exportarCSVTodo(){
     }catch(e){log('exportLog','Error Liquidaciones','err');}
   }
   // Contratos
-  const ctrs=localStorage.getItem('mss_contratos_v1');
+  const ctrs=localStorage.getItem('mss_contratos_v1_'+(_EMP.id||1));
   if(ctrs){
     try{
       const data=JSON.parse(ctrs);
@@ -396,7 +410,7 @@ function exportarCSVTodo(){
     }catch(e){log('exportLog','Error Contratos','err');}
   }
   // Facturación
-  const docs=localStorage.getItem('mss_fact_docs_v1');
+  const docs=localStorage.getItem('mss_fact_docs_v1_'+(_EMP.id||1));
   if(docs){
     try{
       const data=JSON.parse(docs);
@@ -409,7 +423,7 @@ function exportarCSVTodo(){
     }catch(e){log('exportLog','Error Facturación','err');}
   }
   // Movimientos tesorería
-  const movs=localStorage.getItem('mss_tes_movs_v1');
+  const movs=localStorage.getItem('mss_tes_movs_v1_'+(_EMP.id||1));
   if(movs){
     try{
       const data=JSON.parse(movs);

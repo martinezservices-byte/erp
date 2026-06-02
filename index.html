@@ -217,6 +217,20 @@ body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;m
 </div>
 
 <script>
+
+// ═══ EMPRESA DINÁMICA ═══
+var _er = localStorage.getItem('mss_empresa_actual');
+var _EMP = _er ? JSON.parse(_er) : {id:1, nombre:'Mi Empresa', rut:''};
+window._MSS_EMP = _EMP;
+var _nd = document.getElementById('nav-emp');
+if(_nd){_nd.textContent='🏢 '+_EMP.nombre; _nd.style.display='block';}
+var _cur = window.location.pathname.split('/').pop();
+document.querySelectorAll('#nav-bar a').forEach(function(a){
+  if(a.getAttribute('href')===_cur){
+    a.style.background='rgba(201,168,76,0.25)';
+    a.style.color='#E8C97A';
+  }
+});
 // ════════════════════════════════════════════════════════════
 //  MSS HUB — Motor Unificado v4.0
 //  Lee datos reales de cada módulo · 3 empresas fijas + CRUD
@@ -573,11 +587,7 @@ let EMPRESAS = [], selColor = COLORS[0];
 // ════════════════════════════════════════
 //  DATOS DEFAULT
 // ════════════════════════════════════════
-const DEF_EMPS = [
-  {id:1, nombre:'Martinez Services Spa',  rut:'76.999.888-1', rubro:'Consultoría / Auditoría', contacto:'Gaudy Martínez', email:'contacto@mss.cl',   tel:'+56912345678', direccion:'Av. Providencia 123, Santiago', color:'#C9A84C', notas:'Empresa propia — Consultora y auditora', ingresos:73800000, proyectos:7,  trabajadores:12, clientes:10},
-  {id:2, nombre:'Minera Atacama S.A.',     rut:'76.123.456-7', rubro:'Minería',                 contacto:'Jorge Díaz',         email:'jdiaz@atacama.cl',  tel:'+56923456789', direccion:'Av. Los Carrera 500, Antofagasta', color:'#38BDF8', notas:'Cliente auditoría Q1-Q2 2025',          ingresos:128000000,proyectos:4,  trabajadores:45, clientes:8},
-  {id:3, nombre:'Agrícola Sur Verde S.A.', rut:'77.234.567-8', rubro:'Agricultura',             contacto:'Patricia Muñoz',     email:'pmunoz@surverde.cl',tel:'+56934567890', direccion:'Camino Rural km 5, Los Ángeles',   color:'#10B981', notas:'Plan estratégico en ejecución 2025',    ingresos:45200000, proyectos:3,  trabajadores:28, clientes:5},
-];
+const DEF_EMPS = []
 
 // ════════════════════════════════════════
 //  PERSISTENCIA

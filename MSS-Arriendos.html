@@ -570,52 +570,11 @@ const SK = {
 };
 
 // ── PASO 3: Datos reales M&P precargados ──
-const _MYP_ACTIVOS = [
-  {"id":1,"nombre":"Camioneta Porter II","tipo":"Vehículo","cat":"Camioneta","marca":"Hyundai","modelo":"Porter II DCAB 2.5","anio":2011,"patente":"RKJW59","km":0,"estado":"Disponible","tarifaDia":0,"valor":3500000,"seguro":"2027-03-05","revision":"2027-03-05","permiso":"2027-03-06","obs":"Cedida por Gaudy Martínez Yovera, notarial 25/02/2026. SOAP y Permiso pagados 05-06/03/2026"},
-  {"id":2,"nombre":"Betonera 200L 900W BONICA","tipo":"Equipo","cat":"Maquinaria","marca":"BONICA","modelo":"200L 900W","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":15000,"valor":271915,"obs":"Comprada 05/03/2026. Contratos 1001,1003,1005"},
-  {"id":3,"nombre":"Demoledor 3000W TASBEL","tipo":"Equipo","cat":"Maquinaria","marca":"TASBEL","modelo":"3000W","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":15000,"valor":85990,"obs":"Comprado 24/02/2026. Contrato 1006"},
-  {"id":4,"nombre":"Generador c/s Extensión","tipo":"Equipo","cat":"Equipo","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido notarial 25/02/2026"},
-  {"id":5,"nombre":"Compresor","tipo":"Equipo","cat":"Equipo","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido notarial 25/02/2026"},
-  {"id":6,"nombre":"Rotomartillo","tipo":"Equipo","cat":"Herramienta","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido notarial 25/02/2026"},
-  {"id":7,"nombre":"Sierra de Banco","tipo":"Equipo","cat":"Herramienta","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido notarial 25/02/2026"},
-  {"id":8,"nombre":"Ingletadora","tipo":"Equipo","cat":"Herramienta","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido notarial 25/02/2026"},
-  {"id":9,"nombre":"Sierra Circular","tipo":"Equipo","cat":"Herramienta","marca":"—","modelo":"—","anio":2026,"patente":"S/S","km":0,"estado":"Disponible","tarifaDia":0,"obs":"Cedido notarial 25/02/2026"},
-  {"id":10,"nombre":"Moto Suzuki Lets 4 50cc","tipo":"Vehículo","cat":"Vehículo","marca":"Suzuki","modelo":"Lets 4 50cc","anio":2008,"patente":"MGP-76","motor":"A404589303","km":0,"estado":"Disponible","tarifaDia":25000,"valor":350000,"obs":"Ctto 1004 — Nelson Lien 14/05/2026"}
-];
-const _MYP_ARRIENDOS = [
-  {"id":1001,"num":"ARR-1001","activoId":2,"activoNombre":"Betonera 200L 900W BONICA","clienteId":1,"clienteNombre":"Rubén Darío Núñez Rocha","inicio":"2026-04-08","termino":"2026-04-08","tipoTarifa":"Diaria","tarifa":15000,"total":15000,"pagado":15000,"lugar":"Feria Navideña Frente al Jumbo, Iquique","resp":"Rubén Núñez","estado":"Finalizado","garantia":0,"formaPagoGarantia":"","estadoGarantia":"","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"7007","obs":"Sin garantía. Guía 111."},
-  {"id":1003,"num":"ARR-1003","activoId":2,"activoNombre":"Betonera 200L 900W BONICA","clienteId":1,"clienteNombre":"Rubén Darío Núñez Rocha","inicio":"2026-04-10","termino":"2026-04-10","tipoTarifa":"Diaria","tarifa":15000,"total":15000,"pagado":15000,"lugar":"China con Proyectada, Alto Hospicio","resp":"Rubén Núñez","estado":"Finalizado","garantia":50000,"formaPagoGarantia":"Transferencia","estadoGarantia":"Devuelta","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"7008","obs":"Guía 113."},
-  {"id":1004,"num":"ARR-1004","activoId":10,"activoNombre":"Moto Suzuki Lets 4 50cc","clienteId":2,"clienteNombre":"Nelson Enrique Lien Catrilaf","inicio":"2026-05-14","termino":"2026-05-15","tipoTarifa":"Diaria","tarifa":25000,"total":25000,"pagado":25000,"lugar":"Pozo Almonte","resp":"Nelson Lien","estado":"Finalizado","garantia":100000,"formaPagoGarantia":"Efectivo","estadoGarantia":"Devuelta","formaPago":"Efectivo","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"7011","obs":"Garantía devuelta 15/05."},
-  {"id":1005,"num":"ARR-1005","activoId":2,"activoNombre":"Betonera 200L 900W BONICA","clienteId":3,"clienteNombre":"Miguel Ángel Morales Villalobos","inicio":"2026-05-20","termino":"2026-05-20","tipoTarifa":"Diaria","tarifa":15000,"total":15000,"pagado":15000,"lugar":"La Cantera N°2447, Iquique","resp":"Miguel Morales","estado":"Finalizado","garantia":50000,"formaPagoGarantia":"Efectivo","estadoGarantia":"Devuelta","formaPago":"Efectivo","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"9006","obs":"Guía 115."},
-  {"id":1006,"num":"ARR-1006","activoId":3,"activoNombre":"Demoledor 3000W TASBEL","clienteId":4,"clienteNombre":"José Alfredo Avilés Varela","inicio":"2026-05-28","termino":"2026-05-29","tipoTarifa":"Diaria","tarifa":15000,"total":15000,"pagado":15000,"lugar":"Santa Marta 4237, Alto Hospicio","resp":"José Avilés","estado":"Finalizado","garantia":50000,"formaPagoGarantia":"Transferencia","estadoGarantia":"Recibida","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"","obs":"Guía 116. Retira cliente."}
-];
-const _MYP_FLETES = [
-  {"id":2001,"num":"FL-001","fecha":"2026-03-06","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Mudanza","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Particular","estado":"Completado","formaPago":"Efectivo","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"2","obs":""},
-  {"id":2002,"num":"FL-002","fecha":"2026-04-15","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Hospicio","carga":"Mudanza","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Particular","estado":"Completado","formaPago":"Tarjeta Débito","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"154885222544","obs":""},
-  {"id":2003,"num":"FL-003","fecha":"2026-04-16","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Hospicio","carga":"Mudanza","peso":"","km":0,"tarifa":15000,"clienteId":5,"clienteNombre":"Particular","estado":"Completado","formaPago":"Tarjeta Débito","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"155066556404","obs":""},
-  {"id":2004,"num":"FL-004","fecha":"2026-04-30","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Iquique","destino":"Iquique","carga":"Flete","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Particular","estado":"Completado","formaPago":"Tarjeta Débito","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"156350052399","obs":""},
-  {"id":2005,"num":"FL-005","fecha":"2026-05-15","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete","peso":"","km":0,"tarifa":5000,"clienteId":5,"clienteNombre":"Particular","estado":"Completado","formaPago":"Tarjeta Débito","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"158633275697","obs":""},
-  {"id":2006,"num":"FL-006","fecha":"2026-03-08","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete/Arriendo","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Lázaro","estado":"Completado","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"9003","obs":""},
-  {"id":2007,"num":"FL-007","fecha":"2026-03-09","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete/Arriendo","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Lázaro","estado":"Completado","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"7004","obs":""},
-  {"id":2008,"num":"FL-008","fecha":"2026-03-12","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete/Arriendo","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Lázaro","estado":"Completado","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"7005","obs":""},
-  {"id":2009,"num":"FL-009","fecha":"2026-03-12","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete/Arriendo","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Lázaro","estado":"Completado","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"9004","obs":""},
-  {"id":2010,"num":"FL-010","fecha":"2026-03-13","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete/Arriendo","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Lázaro","estado":"Completado","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"9005","obs":""},
-  {"id":2011,"num":"FL-011","fecha":"2026-03-14","vehiculoId":1,"vehiculoNombre":"Camioneta Porter II","conductor":"Joseph Pajuelo Valderrama","origen":"Alto Hospicio","destino":"Iquique","carga":"Flete/Arriendo","peso":"","km":0,"tarifa":25000,"clienteId":5,"clienteNombre":"Lázaro","estado":"Completado","formaPago":"Transferencia","estadoPago":"Pagado","tipoDoc":"Boleta","numDoc":"89142086","obs":""}
-];
-const _MYP_CLIENTES = [
-  {"id":1,"nombre":"Rubén Darío Núñez Rocha","rut":"27.967.415-4","tel":"+56983961043","dir":"Juan Martínez N°1757, Iquique","contacto":"Rubén Núñez","email":"","giro":""},
-  {"id":2,"nombre":"Nelson Enrique Lien Catrilaf","rut":"13.632.114-5","tel":"+56994929624","dir":"Cala Cala N°619, Pozo Almonte","contacto":"Nelson Lien","email":"","giro":""},
-  {"id":3,"nombre":"Miguel Ángel Morales Villalobos","rut":"19.975.831-4","tel":"+56986576978","dir":"La Cantera N°2447, Iquique","contacto":"Miguel Morales","email":"","giro":""},
-  {"id":4,"nombre":"José Alfredo Avilés Varela","rut":"18.493.333-0","tel":"+56954834612","dir":"Santa Marta 4237, Alto Hospicio","contacto":"José Avilés","email":"","giro":""},
-  {"id":5,"nombre":"Lázaro (Particular)","rut":"","tel":"","dir":"","contacto":"Lázaro","email":"","giro":"Particular"}
-];
-const _MYP_MANT = [
-  {"id":3001,"activoId":1,"activoNombre":"Camioneta Porter II","tipo":"Cambio Aceite","desc":"Lubricentro Ohiggins","fecha":"2026-03-20","proxima":"","costo":55000,"taller":"Lubricentro Ohiggins","estado":"Completada"},
-  {"id":3002,"activoId":1,"activoNombre":"Camioneta Porter II","tipo":"Correctiva","desc":"La Casa Del Encendido","fecha":"2026-03-20","proxima":"","costo":48490,"taller":"La Casa Del Encendido","estado":"Completada"},
-  {"id":3003,"activoId":1,"activoNombre":"Camioneta Porter II","tipo":"Correctiva","desc":"Servicios Mecánicos Ronald Mamani","fecha":"2026-03-20","proxima":"","costo":20000,"taller":"Ronald Mamani","estado":"Completada"},
-  {"id":3004,"activoId":1,"activoNombre":"Camioneta Porter II","tipo":"Correctiva","desc":"Rs Diesel Ltda — Filtros y Repuestos","fecha":"2026-03-24","proxima":"","costo":52360,"taller":"Rs Diesel Ltda","estado":"Completada"},
-  {"id":3005,"activoId":1,"activoNombre":"Camioneta Porter II","tipo":"Correctiva","desc":"Arreglo Camión Porter II","fecha":"2026-05-14","proxima":"","costo":65000,"taller":"Taller externo","estado":"Completada"}
-];
+const _MYP_ACTIVOS = [];
+const _MYP_ARRIENDOS = [];
+const _MYP_FLETES = [];
+const _MYP_CLIENTES = [];
+const _MYP_MANT = [];
 
 // ── PASO 4: Variables de estado con datos base de M&P siempre cargados ──
 // Para M&P (id:3): siempre inician con datos reales
@@ -648,25 +607,12 @@ function load(){
       const fl   = JSON.parse(localStorage.getItem(SK.fl)  ||'[]');
       const cli  = JSON.parse(localStorage.getItem(SK.cli) ||'[]');
       const mant = JSON.parse(localStorage.getItem(SK.mant)||'[]');
-      // Solo usar localStorage si tiene datos VÁLIDOS (más de 0 registros)
-      // Y si el primer registro tiene las propiedades correctas
-      if(a.length  && a[0].nombre)    ACTIVOS    = a;
-      if(ar.length && ar[0].num)      ARRIENDOS  = ar;
-      if(fl.length && fl[0].num)      FLETES     = fl;
-      if(cli.length&& cli[0].nombre)  CLIENTES   = cli;
-      if(mant.length&&mant[0].tipo)   MANTENCION = mant;
-    } else {
-      // Otras empresas: leer solo de localStorage
-      const a    = JSON.parse(localStorage.getItem(SK.a)   ||'[]');
-      const ar   = JSON.parse(localStorage.getItem(SK.ar)  ||'[]');
-      const fl   = JSON.parse(localStorage.getItem(SK.fl)  ||'[]');
-      const cli  = JSON.parse(localStorage.getItem(SK.cli) ||'[]');
-      const mant = JSON.parse(localStorage.getItem(SK.mant)||'[]');
-      ACTIVOS    = a;
-      ARRIENDOS  = ar;
-      FLETES     = fl;
-      CLIENTES   = cli;
-      MANTENCION = mant;
+      // Usar datos del localStorage si existen
+      if(a.length)    ACTIVOS    = a;
+      if(ar.length)   ARRIENDOS  = ar;
+      if(fl.length)   FLETES     = fl;
+      if(cli.length)  CLIENTES   = cli;
+      if(mant.length) MANTENCION = mant;
     }
     const c = localStorage.getItem(SK.cfg);
     if(c) CFG = JSON.parse(c);
@@ -774,28 +720,27 @@ function T(id,btn){
 function rDash(){
   const actActivos=ARRIENDOS.filter(a=>a.estado==='Activo').length;
   const ingArr=ARRIENDOS.reduce((s,a)=>s+a.pagado,0);
-  const ingFlTot=FLETES.reduce((s,f)=>s+f.tarifa,0);
+  const ingFl=FLETES.filter(f=>f.fecha&&f.fecha.startsWith(MES)).reduce((s,f)=>s+f.tarifa,0);
   const dispCount=ACTIVOS.filter(a=>a.estado==='Disponible').length;
-  const fletesRecientes=FLETES.slice().sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,5);
   document.getElementById('kpiDash').innerHTML=`
     <div class="kc"><div class="kl">Total Activos</div><div class="kv" style="color:var(--acc)">${ACTIVOS.length}</div><div style="font-size:9px;color:var(--ok)">${dispCount} disponibles</div></div>
     <div class="kc"><div class="kl">Arriendos Activos</div><div class="kv" style="color:${actActivos>0?'var(--ok)':'var(--muted)'}">${actActivos}</div></div>
     <div class="kc"><div class="kl">Ingresos Arriendos</div><div class="kv" style="color:var(--ok)">${clp(ingArr)}</div></div>
-    <div class="kc"><div class="kl">Total Fletes</div><div class="kv" style="color:var(--info)">${FLETES.length}</div><div style="font-size:9px;color:var(--ok)">${clp(ingFlTot)}</div></div>
+    <div class="kc"><div class="kl">Fletes del Mes</div><div class="kv" style="color:var(--info)">${FLETES.filter(f=>f.fecha&&f.fecha.startsWith(MES)).length}</div><div style="font-size:9px;color:var(--ok)">${clp(ingFl)}</div></div>
     <div class="kc"><div class="kl">Clientes</div><div class="kv" style="color:var(--acc)">${CLIENTES.length}</div></div>
   `;
   document.getElementById('dashArriendos').innerHTML=ARRIENDOS.filter(a=>a.estado==='Activo').length===0
-    ?'<div style="color:var(--muted);font-size:11px;padding:8px">Sin arriendos activos — todos finalizados</div>'
+    ?'<div style="color:var(--muted);font-size:11px;padding:8px">Sin arriendos activos</div>'
     :ARRIENDOS.filter(a=>a.estado==='Activo').map(a=>`
       <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b2);font-size:11px">
         <div><div style="font-weight:700">${a.activoNombre}</div><div style="color:var(--muted)">${a.clienteNombre} · hasta ${df(a.termino)}</div></div>
         <span style="color:var(--ok);font-weight:700">${clp(a.total)}</span>
       </div>`).join('');
-  document.getElementById('dashFletes').innerHTML=fletesRecientes.length===0
-    ?'<div style="color:var(--muted);font-size:11px;padding:8px">Sin fletes registrados</div>'
-    :fletesRecientes.map(f=>`
+  document.getElementById('dashFletes').innerHTML=FLETES.filter(f=>f.fecha&&f.fecha.startsWith(MES)).length===0
+    ?'<div style="color:var(--muted);font-size:11px;padding:8px">Sin fletes este mes</div>'
+    :FLETES.filter(f=>f.fecha&&f.fecha.startsWith(MES)).slice(0,5).map(f=>`
       <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--b2);font-size:11px">
-        <div><div style="font-weight:700">${f.num} — ${f.origen||'—'} → ${f.destino||'—'}</div><div style="color:var(--muted)">${f.conductor||'—'} · ${df(f.fecha)}</div></div>
+        <div><div style="font-weight:700">${f.num} — ${f.origen} → ${f.destino}</div><div style="color:var(--muted)">${f.conductor} · ${df(f.fecha)}</div></div>
         <span style="color:var(--info);font-weight:700">${clp(f.tarifa)}</span>
       </div>`).join('');
   // Alertas
@@ -1148,8 +1093,6 @@ function abrirVentanaDoc(html, titulo, tipo){
   </body></html>`);
   ventana.document.close();
 }
-
-function emitirGuia(id){
   const a=ARRIENDOS.find(x=>x.id===id);if(!a)return;
   const activo=ACTIVOS.find(x=>x.id===a.activoId)||{};
   const cliente=CLIENTES.find(x=>x.id===a.clienteId)||{};

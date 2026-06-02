@@ -110,6 +110,20 @@ tfoot td{border-top:2px solid rgba(56,189,248,0.25);font-weight:800;}
 <div id="nav-emp" style="margin-left:auto;padding:3px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;font-size:9px;color:#C9A84C;font-family:monospace;white-space:nowrap;flex-shrink:0;display:none"></div>
 </div>
 <script>
+
+// ═══ EMPRESA DINÁMICA ═══
+var _er = localStorage.getItem('mss_empresa_actual');
+var _EMP = _er ? JSON.parse(_er) : {id:1, nombre:'Mi Empresa', rut:''};
+window._MSS_EMP = _EMP;
+var _nd = document.getElementById('nav-emp');
+if(_nd){_nd.textContent='🏢 '+_EMP.nombre; _nd.style.display='block';}
+var _cur = window.location.pathname.split('/').pop();
+document.querySelectorAll('#nav-bar a').forEach(function(a){
+  if(a.getAttribute('href')===_cur){
+    a.style.background='rgba(201,168,76,0.25)';
+    a.style.color='#E8C97A';
+  }
+});
 // ═══════════════════════════════════════════════════
 // EMPRESA DINÁMICA — Lee empresa seleccionada en Hub
 // ═══════════════════════════════════════════════════
@@ -139,7 +153,7 @@ try{
 <div id="header">
   <div class="logo">
     <div class="logo-icon">M</div>
-    <div><div class="logo-name" id="facHeaderEmp"><span id="_empNombreLogo">Mi Empresa</span></div><div class="logo-mod">MÓDULO FACTURACIÓN</div></div>
+    <div><div class="logo-name" id="facHeaderEmp">Martinez Services Spa</div><div class="logo-mod">MÓDULO FACTURACIÓN</div></div>
   </div>
   <div style="display:flex;gap:10px;align-items:center;">
     <span style="font-size:11px;color:var(--muted);font-family:var(--mono)" id="hInfo">Cargando...</span>
@@ -773,8 +787,6 @@ function imprimirDoc(){
   window.print();
   document.body.removeChild(clone);
 }
-
-try{var _l=document.getElementById('_empNombreLogo');if(_l&&window._MSS_EMP)_l.textContent=window._MSS_EMP.nombre||_empObj.nombre||'Mi Empresa';}catch(e){}
 </script>
 </body>
 </html>
