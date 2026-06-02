@@ -664,8 +664,8 @@ function syncFinanzas(tipo, obj, accion){
     if(!fin.data) fin.data = [];
 
     if(accion === 'delete'){
-      // Eliminar registro financiero asociado
-      fin.data = fin.data.filter(r => r.srcId !== obj.id || r.srcTipo !== tipo);
+      // Eliminar TODOS los registros asociados (arriendo + traslado si había)
+      fin.data = fin.data.filter(r => !(r.srcId === obj.id && (r.srcTipo === tipo || r.srcTipo === tipo+'_traslado')));
       localStorage.setItem(finKey, JSON.stringify(fin));
       return;
     }
@@ -674,31 +674,50 @@ function syncFinanzas(tipo, obj, accion){
     const pagado = obj.estadoPago === 'Pagado' || obj.estado === 'Completado' || obj.estado === 'Finalizado';
     if(!pagado) return;
 
-    // Evitar duplicados — eliminar registro anterior del mismo origen
-    fin.data = fin.data.filter(r => !(r.srcId === obj.id && r.srcTipo === tipo));
-
-    // Crear registro financiero
+    // ── REGISTRO PRINCIPAL (arriendo o flete) ──
     const monto = tipo === 'flete' ? (obj.tarifa||0) : (obj.total||obj.tarifa||0);
-    if(!monto) return;
 
-    const registro = {
-      id: fin.nextId++,
-      srcId: obj.id,
-      srcTipo: tipo,
-      fecha: obj.fecha || obj.inicio || new Date().toISOString().split('T')[0],
-      tipo: 'Ingreso',
-      cat: tipo === 'flete' ? 'Servicio de Fletes' : 'Servicio de Arriendos',
-      desc: tipo === 'flete'
-        ? `Flete ${obj.num||''} — ${obj.origen||''} → ${obj.destino||''} (${obj.clienteNombre||''})`
-        : `Arriendo ${obj.num||''} — ${obj.activoNombre||''} (${obj.clienteNombre||''})`,
-      monto: monto,
-      doc: obj.tipoDoc||'',
-      numDoc: obj.numDoc||'',
-      medioPago: obj.formaPago||'',
-      cuenta: 'Mercado Pago'
-    };
+    if(monto > 0){
+      // Actualizar o crear registro principal
+      const idxMain = fin.data.findIndex(r => r.srcId === obj.id && r.srcTipo === tipo);
+      const regMain = {
+        id: idxMain >= 0 ? fin.data[idxMain].id : fin.nextId++,
+        srcId: obj.id, srcTipo: tipo,
+        fecha: obj.fecha || obj.inicio || new Date().toISOString().split('T')[0],
+        tipo: 'Ingreso',
+        cat: tipo === 'flete' ? 'Servicio de Fletes' : 'Servicio de Arriendos',
+        desc: tipo === 'flete'
+          ? `Flete ${obj.num||''} — ${obj.origen||''} → ${obj.destino||''} (${obj.clienteNombre||''})`
+          : `Arriendo ${obj.num||''} — ${obj.activoNombre||''} (${obj.clienteNombre||''})`,
+        monto: monto,
+        doc: obj.tipoDoc||'', numDoc: obj.numDoc||'',
+        medioPago: obj.formaPago||'', cuenta: 'Mercado Pago'
+      };
+      if(idxMain >= 0) fin.data[idxMain] = regMain;
+      else fin.data.push(regMain);
+    }
 
-    fin.data.push(registro);
+    // ── TRASLADO DE EQUIPOS (solo si es arriendo con costo adicional) ──
+    if(tipo === 'arriendo' && obj.tipoDespacho === 'flete' && obj.costoFlete > 0){
+      const idxTras = fin.data.findIndex(r => r.srcId === obj.id && r.srcTipo === 'arriendo_traslado');
+      const regTras = {
+        id: idxTras >= 0 ? fin.data[idxTras].id : fin.nextId++,
+        srcId: obj.id, srcTipo: 'arriendo_traslado',
+        fecha: obj.fecha || obj.inicio || new Date().toISOString().split('T')[0],
+        tipo: 'Ingreso',
+        cat: 'Servicio de Traslado Equipos',
+        desc: `Traslado ${obj.num||''} — ${obj.activoNombre||''} (${obj.clienteNombre||''})`,
+        monto: obj.costoFlete,
+        doc: obj.tipoDoc||'', numDoc: obj.numDoc||'',
+        medioPago: obj.formaPago||'', cuenta: 'Mercado Pago'
+      };
+      if(idxTras >= 0) fin.data[idxTras] = regTras;
+      else fin.data.push(regTras);
+    } else {
+      // Si cambió de "con flete" a "sin flete", eliminar el traslado anterior
+      fin.data = fin.data.filter(r => !(r.srcId === obj.id && r.srcTipo === 'arriendo_traslado'));
+    }
+
     localStorage.setItem(finKey, JSON.stringify(fin));
   }catch(e){ console.warn('syncFinanzas error:', e); }
 }
@@ -1014,7 +1033,7 @@ function emitirContrato(id){
   <table style="width:100%;border:none;margin-bottom:12px;font-size:10pt;line-height:1.8">
     <tr>
       <td style="width:28px;text-align:center;vertical-align:top">[${a.tipoDespacho==='flete'?'X':'&nbsp;'}]</td>
-      <td style="padding-left:8px;text-align:justify"><strong>CON COSTO ADICIONAL.</strong> El cliente cancelará la suma única de ${clp(a.costoFlete||10000)} por concepto de flete (ida y vuelta).</td>
+      <td style="padding-left:8px;text-align:justify"><strong>CON COSTO ADICIONAL.</strong> El cliente cancelará la suma única de ${clp(a.costoFlete||0)} por concepto de traslado de equipos (ida y vuelta).</td>
     </tr>
     <tr>
       <td style="width:28px;text-align:center;vertical-align:top">[${(a.tipoDespacho==='retira'||!a.tipoDespacho)?'X':'&nbsp;'}]</td>
@@ -1585,7 +1604,7 @@ function generarContrato(){
       <p class="doc-arr-clausula">La renta se pagará por mensualidad vencida dentro de los primeros 5 días (o al término del periodo descrito si es menor a un mes), el retardo generará el interés máximo convencional. La garantía será devuelta al término del contrato si el equipo es devuelto en buen estado.</p>
       <p class="doc-arr-clausula"><strong>Se deja constancia que, se recibe GARANTIA mediante EFECTIVO [${garForma==='Efectivo'?' X ':' '}] TRANSFERENCIA [${garForma==='Transferencia'?' X ':' '}] a la cuenta de nuestra empresa, la cual será devuelta de la misma forma.</strong></p>
       <p class="doc-arr-clausula"><strong>CUARTO:</strong> El servicio de despacho y retiro de la maquinaria operará bajo las siguientes condiciones seleccionadas:<br/>
-      [${(a.tipoDespacho==='flete')?'X':' '}] <strong>CON COSTO ADICIONAL.</strong> El cliente cancelará la suma única de ${clp(a.costoFlete||flete||10000)} por concepto de flete (ida y vuelta).<br/>
+      [${(a.tipoDespacho==='flete')?'X':' '}] <strong>CON COSTO ADICIONAL.</strong> El cliente cancelará la suma única de ${clp(a.costoFlete||0)} por concepto de traslado de equipos (ida y vuelta).<br/>
       [${(a.tipoDespacho==='retira')?'X':' '}] <strong>RETIRA CLIENTE.</strong> El arrendatario retira y devuelve el equipo por sus propios medios, asumiendo total responsabilidad por daños durante el transporte.<br/>
       [${(a.tipoDespacho==='despacho')?'X':' '}] <strong>DESPACHO SIN COSTO ADICIONAL.</strong> El arrendador entrega y retira el equipo en la obra indicada sin costo extra para el arrendatario.</p>
       <p class="doc-arr-clausula"><strong>QUINTO:</strong> El contrato rige por <strong>${dias} día(s)</strong> desde el <strong>${df(inicio)}</strong> hasta el <strong>${df(termino)}</strong>. Se entenderá renovado tácita y sucesivamente por periodos iguales, salvo que una parte avise el término por escrito con 3 días de anticipación. El Arrendador podrá poner término inmediato en caso de urgencia según Art. 1967 del Código Civil.<br/><em>Se deja constancia que la maquinaria será entregada en la obra el día de inicio a las ${horaEnt} AM y será retirada por el arrendador el mismo día en horario nocturno, dándose por terminado el periodo de arriendo de mutuo acuerdo.</em></p>

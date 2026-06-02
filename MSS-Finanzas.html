@@ -136,6 +136,7 @@ canvas{max-height:240px;}
           <th>Ventas Reales</th>
           <th>🚛 Fletes</th>
           <th>📋 Arriendos</th>
+          <th>🔧 Traslados</th>
           <th>Egresos</th>
           <th>Resultado</th>
           <th>Margen</th>
@@ -187,6 +188,7 @@ canvas{max-height:240px;}
       <option value="">Todas las categorías</option>
       <option>Servicio de Arriendos</option>
       <option>Servicio de Fletes</option>
+      <option>Servicio de Traslado Equipos</option>
       <option>Aporte de Capital</option>
       <option>Garantías Recibidas</option>
       <option>Inversión Activos</option>
@@ -420,6 +422,7 @@ function egresos()  { return DATA.filter(function(r){return r.tipo==='Egreso'&&r
 function capital()  { return DATA.filter(function(r){return r.cat==='Aporte de Capital';}).reduce(function(s,r){return s+r.monto;},0); }
 function fletes()   { return DATA.filter(function(r){return r.cat==='Servicio de Fletes';}).reduce(function(s,r){return s+r.monto;},0); }
 function arriendos(){ return DATA.filter(function(r){return r.cat==='Servicio de Arriendos';}).reduce(function(s,r){return s+r.monto;},0); }
+function traslados(){ return DATA.filter(function(r){return r.cat==='Servicio de Traslado Equipos';}).reduce(function(s,r){return s+r.monto;},0); }
 function resultado(){ return ventas()-egresos(); }
 
 function porMes() {
@@ -428,11 +431,12 @@ function porMes() {
     if (r.cat==='Garantías Recibidas'||r.cat==='Garantías Devueltas'||r.cat==='Aporte de Capital') return;
     var m = r.fecha ? r.fecha.substring(0,7) : '';
     if (!m) return;
-    if (!map[m]) map[m] = {mes:m, ventas:0, fletes:0, arriendos:0, egr:0};
+    if (!map[m]) map[m] = {mes:m, ventas:0, fletes:0, arriendos:0, traslados:0, egr:0};
     if (r.tipo==='Ingreso') {
       map[m].ventas += r.monto;
-      if (r.cat==='Servicio de Fletes')    map[m].fletes    += r.monto;
-      if (r.cat==='Servicio de Arriendos') map[m].arriendos += r.monto;
+      if (r.cat==='Servicio de Fletes')           map[m].fletes    += r.monto;
+      if (r.cat==='Servicio de Arriendos')         map[m].arriendos += r.monto;
+      if (r.cat==='Servicio de Traslado Equipos')  map[m].traslados += r.monto;
     } else {
       map[m].egr += r.monto;
     }
@@ -478,7 +482,7 @@ function renderKPIs() {
     '<div class="kpi" style="--kc:rgba(39,174,96,0.1)">' +
       '<div class="kpi-label">Ventas Reales del Negocio</div>' +
       '<div class="kpi-value" style="color:var(--ok)">' + M(tV) + '</div>' +
-      '<div class="kpi-sub">🚛 Fletes: ' + M(tF) + ' · 📋 Arriendos: ' + M(tA) + '</div>' +
+      '<div class="kpi-sub">🚛 Fletes: ' + M(fletes()) + ' · 📋 Arriendos: ' + M(arriendos()) + ' · 🔧 Traslados: ' + M(traslados()) + '</div>' +
     '</div>' +
     '<div class="kpi" style="--kc:rgba(192,57,43,0.1)">' +
       '<div class="kpi-label">Egresos Totales</div>' +
@@ -514,6 +518,7 @@ function renderTabla() {
       '<td style="color:var(--ok)">' + clp(m.ventas) + '</td>' +
       '<td style="color:#38BDF8;font-size:11px">' + clp(m.fletes) + '</td>' +
       '<td style="color:#10B981;font-size:11px">' + clp(m.arriendos) + '</td>' +
+      '<td style="color:#A78BFA;font-size:11px">' + clp(m.traslados||0) + '</td>' +
       '<td style="color:var(--danger)">' + clp(m.egr) + '</td>' +
       '<td style="color:' + (ok?'var(--ok)':'var(--danger)') + ';font-weight:700">' + clp(res) + '</td>' +
       '<td>' + margen + '%</td>' +
@@ -522,7 +527,7 @@ function renderTabla() {
   });
   tbody.innerHTML = html || '<tr><td colspan="8" style="text-align:center;color:var(--muted)">Sin datos</td></tr>';
   var tV=ventas(), tE=egresos(), tR=resultado();
-  tfoot.innerHTML = '<tr><td style="color:var(--gold)">TOTAL</td><td style="color:var(--ok)">' + clp(tV) + '</td><td style="color:#38BDF8;font-size:11px">' + clp(fletes()) + '</td><td style="color:#10B981;font-size:11px">' + clp(arriendos()) + '</td><td style="color:var(--danger)">' + clp(tE) + '</td><td style="color:' + (tR>=0?'var(--ok)':'var(--danger)') + '">' + clp(tR) + '</td><td>' + (tV>0?((tR/tV)*100).toFixed(1):0) + '%</td><td></td></tr>';
+  tfoot.innerHTML = '<tr><td style="color:var(--gold)">TOTAL</td><td style="color:var(--ok)">' + clp(tV) + '</td><td style="color:#38BDF8;font-size:11px">' + clp(fletes()) + '</td><td style="color:#10B981;font-size:11px">' + clp(arriendos()) + '</td><td style="color:#A78BFA;font-size:11px">' + clp(traslados()) + '</td><td style="color:var(--danger)">' + clp(tE) + '</td><td style="color:' + (tR>=0?'var(--ok)':'var(--danger)') + '">' + clp(tR) + '</td><td>' + (tV>0?((tR/tV)*100).toFixed(1):0) + '%</td><td></td></tr>';
 }
 
 function renderControl() {
@@ -600,6 +605,7 @@ function buildCharts() {
   var egr    = meses.map(function(m){return m.egr;});
   var flt    = meses.map(function(m){return m.fletes;});
   var arr    = meses.map(function(m){return m.arriendos;});
+  var tras   = meses.map(function(m){return m.traslados||0;});
   var res    = meses.map(function(m){return m.ventas-m.egr;});
   var acum   = res.reduce(function(a,v,i){a.push((a[i-1]||0)+v);return a;},[]);
 
@@ -620,10 +626,11 @@ function buildCharts() {
 
   // Barras: Fletes + Arriendos + Capital + Egresos
   build('chartBarras', {type:'bar', data:{labels:labels, datasets:[
-    {label:'Ventas Fletes',    data:flt, backgroundColor:'rgba(39,174,96,0.75)',  borderRadius:3},
-    {label:'Ventas Arriendos', data:arr, backgroundColor:'rgba(56,189,248,0.75)', borderRadius:3},
-    {label:'Capital Propio',   data:cap, backgroundColor:'rgba(201,168,76,0.55)', borderRadius:3},
-    {label:'Egresos',          data:egr, backgroundColor:'rgba(192,57,43,0.7)',   borderRadius:3},
+    {label:'Ventas Fletes',    data:flt,  backgroundColor:'rgba(39,174,96,0.75)',  borderRadius:3},
+    {label:'Ventas Arriendos', data:arr,  backgroundColor:'rgba(56,189,248,0.75)', borderRadius:3},
+    {label:'Traslado Equipos', data:tras, backgroundColor:'rgba(167,139,250,0.75)',borderRadius:3},
+    {label:'Capital Propio',   data:cap,  backgroundColor:'rgba(201,168,76,0.55)', borderRadius:3},
+    {label:'Egresos',          data:egr,  backgroundColor:'rgba(192,57,43,0.7)',   borderRadius:3},
     {label:'Resultado Oper.',  data:res, type:'line', borderColor:'#A78BFA', backgroundColor:'rgba(167,139,250,0.08)', fill:false, tension:.4, borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#A78BFA'}
   ]}, options:{plugins:{legend:{labels:{font:CF.font,boxWidth:10}}}, scales:{x:{grid:{color:CF.color},ticks:{font:CF.font}}, y:{grid:{color:CF.color},ticks:{font:CF.font,callback:function(v){return '$'+(v/1000).toFixed(0)+'K';}}}}}});
 
@@ -666,7 +673,7 @@ function buildCharts() {
 }
 
 // ── 11. CRUD ──
-var CATS_ING = ['Servicio de Arriendos','Servicio de Fletes','Aporte de Capital','Garantías Recibidas','Otros Ingresos'];
+var CATS_ING = ['Servicio de Arriendos','Servicio de Fletes','Servicio de Traslado Equipos','Aporte de Capital','Garantías Recibidas','Otros Ingresos'];
 var CATS_EGR = ['Inversión Activos','Combustible y Transporte','Mantención Vehículos','Costos Operativos','Gastos de Oficina','Gastos Legales','Gastos Administrativos','Garantías Devueltas','Otros Egresos'];
 
 function actualizarCats() {
