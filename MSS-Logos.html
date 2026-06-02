@@ -63,9 +63,13 @@ body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;m
 <div id="nav-emp" style="margin-left:auto;padding:3px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;font-size:9px;color:#C9A84C;font-family:monospace;white-space:nowrap;flex-shrink:0;display:none"></div>
 </div>
 <script>
+const _empRaw = localStorage.getItem('mss_empresa_actual');
+const _empObj = _empRaw ? JSON.parse(_empRaw) : {id:1, nombre:'Mi Empresa'};
+const _EMP_ID = _empObj.id || 1;
+const _EMP_NOMBRE = _empObj.nombre || 'Mi Empresa';
 (function(){
 try{
-  var emp=JSON.parse(localStorage.getItem("mss_empresa_actual")||"{}");
+  var emp=_empObj;
   if(emp&&emp.nombre){
     var nd=document.getElementById("nav-emp");
     if(nd){nd.textContent="Empresa: "+emp.nombre;nd.style.display="block";}

@@ -86,9 +86,16 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.012);}
 <div id="nav-emp" style="margin-left:auto;padding:3px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;font-size:9px;color:#C9A84C;font-family:monospace;white-space:nowrap;flex-shrink:0;display:none"></div>
 </div>
 <script>
+// ═══════════════════════════════════════════════════
+// EMPRESA DINÁMICA — Lee empresa seleccionada en Hub
+// ═══════════════════════════════════════════════════
+const _empRaw = localStorage.getItem('mss_empresa_actual');
+const _empObj = _empRaw ? JSON.parse(_empRaw) : {id:1, nombre:'Mi Empresa'};
+const _EMP_ID = _empObj.id || 1;
+const _EMP_NOMBRE = _empObj.nombre || 'Mi Empresa';
 (function(){
 try{
-  var emp=JSON.parse(localStorage.getItem("mss_empresa_actual")||"{}");
+  var emp=_empObj;
   if(emp&&emp.nombre){
     var nd=document.getElementById("nav-emp");
     if(nd){nd.textContent="Empresa: "+emp.nombre;nd.style.display="block";}
@@ -209,7 +216,7 @@ try{
   </div>
 </div>
 <script>
-const SK_CTR='mss_contratos_v1',SK_ANX='mss_anexos_v1';
+const SK_CTR='mss_contratos_v1_'+_EMP_ID,SK_ANX='mss_anexos_v1_'+_EMP_ID;
 let _id=6000;const uid=()=>++_id;
 const DEF_CONTRATOS=[
   {id:6001,tipo:'Contrato de Trabajo Indefinido',contraparte:'Carolina López',rut:'15.234.567-8',cargo:'Jefa Comercial',inicio:'2021-06-15',termino:'',monto:2800000,estado:'Vigente',obs:''},

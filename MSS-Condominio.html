@@ -78,6 +78,10 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
 <div id="nav-emp" style="margin-left:auto;padding:3px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;font-size:9px;color:#C9A84C;font-family:monospace;white-space:nowrap;flex-shrink:0;display:none"></div>
 </div>
 <script>
+const _empRaw = localStorage.getItem('mss_empresa_actual');
+const _empObj = _empRaw ? JSON.parse(_empRaw) : {id:1, nombre:'Mi Empresa'};
+const _EMP_ID = _empObj.id || 1;
+const _EMP_NOMBRE = _empObj.nombre || 'Mi Empresa';
 try{var _e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}');if(_e&&_e.nombre){var _nd=document.getElementById('nav-emp');if(_nd){_nd.textContent='🏢 '+_e.nombre;_nd.style.display='block';}}}catch(ex){}
 </script>
 
