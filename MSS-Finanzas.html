@@ -109,7 +109,10 @@ canvas{max-height:240px;}
 <script>
 (function(){
 try{
-  var emp=JSON.parse(localStorage.getItem("mss_empresa_actual")||"{}");
+  var empRaw=localStorage.getItem("mss_empresa_actual");
+  var emp=empRaw?JSON.parse(empRaw):{id:3,nombre:"Martinez y Pajuelo Arriendos y Servicios SpA",rut:"78.361.479-0"};
+  if(!empRaw) localStorage.setItem("mss_empresa_actual",JSON.stringify(emp));
+  window._EMP=emp;
   if(emp&&emp.nombre){
     var nd=document.getElementById("nav-emp");
     if(nd){nd.textContent="Empresa: "+emp.nombre;nd.style.display="block";}
@@ -131,7 +134,7 @@ try{
   <div class="logo">
     <div class="logo-icon">M</div>
     <div>
-      <div class="logo-name">Martinez Services Spa</div>
+      <div class="logo-name" id="logoEmpNombre">Empresa</div>
       <div class="logo-mod">MÓDULO FINANZAS</div>
     </div>
   </div>
@@ -247,8 +250,8 @@ try{
 </div><!-- /content -->
 
 <div id="footer">
-  <span id="hInfo">Cargando...</span>
-  <span><a href="index.html" style="color:var(--gold);text-decoration:none;font-family:monospace;font-size:11px">← Volver al Hub</a> &nbsp;·&nbsp; Datos guardados automáticamente por empresa</span>
+  <span id="hInfo">Martinez y Pajuelo Arriendos y Servicios SpA · Módulo Finanzas v2.0</span>
+  <span>Datos guardados automáticamente · Por empresa · Feb–May 2026</span>
 </div>
 
 <!-- MODAL AGREGAR/EDITAR -->
@@ -341,21 +344,13 @@ try{
 //  Registro diario por transacción · Por empresa · Feb-May 2026
 // ══════════════════════════════════════════════════════════════
 
-// ══════════════════════════════════════════════════════════════
-//  MÓDULO FINANZAS — Sistema dinámico por empresa v3.0
-//  Lee empresa desde Hub · Datos M&P solo para empresa id:3
-// ══════════════════════════════════════════════════════════════
-
-// 1. Leer empresa actual (NO sobreescribir — el Hub ya la fijó)
-const _empRaw = localStorage.getItem('mss_empresa_actual');
-const _empActual = _empRaw ? JSON.parse(_empRaw) : null;
-const _EMP_DEFAULT = {"id":3,"nombre":"Martinez y Pajuelo Arriendos y Servicios SpA","rut":"78.361.479-0"};
-const EMP = _empActual || _EMP_DEFAULT;
-if(!_empRaw) localStorage.setItem('mss_empresa_actual', JSON.stringify(EMP));
-
-// 2. Key de storage única por empresa
-const STORAGE_KEY = 'mss_finanzas2_v1_'+EMP.id;
-function getEmpNombre(){ return EMP.nombre||'Mi Empresa'; }
+// ── EMPRESA ──
+function getEmpId(){
+  try{ const e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}'); return e.id?'_'+e.id:'_def'; }catch(e){ return '_def'; }
+}
+function getEmpNombre(){ return _empObj.nombre||'Mi Empresa'; }
+const STORAGE_KEY = 'mss_finanzas2_v1_'+(_empObj.id||3);
+const DATA_VERSION = 'FIN_MYP_v20260601';
 
 // ── DATOS REALES M&P FEB–MAY 2026 ──
 const DATOS_REALES = [
@@ -424,31 +419,20 @@ let nextId = 200;
 let charts = {};
 
 function save(){
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({data:DATA, nextId})); }catch(e){}
+  try{ localStorage.setItem(STORAGE_KEY(),JSON.stringify({data:DATA,nextId,version:DATA_VERSION})); }catch(e){}
 }
 function load(){
   try{
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw=localStorage.getItem(STORAGE_KEY());
     if(raw){
-      const p = JSON.parse(raw);
-      DATA = p.data||[];
-      nextId = p.nextId||200;
-      // Si hay datos guardados, usarlos
-      if(DATA.length > 0) return;
+      const p=JSON.parse(raw);
+      if(p.version===DATA_VERSION){ DATA=p.data||[]; nextId=p.nextId||200; return; }
     }
-    // Sin datos guardados: cargar datos reales solo si es M&P (id:3)
-    if(EMP.id === 3){
-      DATA = DATOS_REALES.map(r=>({...r}));
-      nextId = 300;
-    } else {
-      DATA = []; // Otras empresas empiezan vacías
-      nextId = 200;
-    }
+    // Primera vez o versión nueva: cargar datos reales
+    DATA=DATOS_REALES.map(r=>({...r}));
+    nextId=300;
     save();
-  }catch(e){
-    DATA = EMP.id===3 ? DATOS_REALES.map(r=>({...r})) : [];
-    nextId = EMP.id===3 ? 300 : 200;
-  }
+  }catch(e){ DATA=DATOS_REALES.map(r=>({...r})); nextId=300; }
 }
 
 // ══════════════════════════════════════════
@@ -514,7 +498,7 @@ function renderAll(){
 }
 
 function updateHeader(){
-  document.getElementById('hInfo').textContent = getEmpNombre()+' · Finanzas · '+DATA.length+' transacciones · '+new Date().toLocaleDateString('es-CL');
+  document.getElementById('hInfo').textContent = getEmpNombre()+' · '+DATA.length+' transacciones · '+new Date().toLocaleDateString('es-CL');
 }
 
 // ── KPI FLUJO ──
