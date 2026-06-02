@@ -374,45 +374,66 @@ function sincronizarDesdeArriendos() {
     var fletes    = JSON.parse(localStorage.getItem(flKey)  || '[]');
     var cambiado  = false;
     
-    // Sincronizar arriendos pagados
+    // Sincronizar arriendos pagados/finalizados o con monto pagado > 0
     arriendos.forEach(function(a) {
-      if (a.estadoPago !== 'Pagado' && a.estado !== 'Finalizado') return;
-      var existe = DATA.some(function(r) { return r.srcId === a.id && r.srcTipo === 'arriendo'; });
-      if (!existe) {
-        DATA.push({
-          id: nextId++,
-          srcId: a.id, srcTipo: 'arriendo',
+      var esPagado = a.estadoPago === 'Pagado' || a.estado === 'Finalizado' || a.estado === 'Activo' || (a.pagado && a.pagado > 0);
+      if (!esPagado) return;
+      var monto = a.total || a.tarifa || 0;
+      if (monto <= 0) return;
+      var idx = -1;
+      DATA.forEach(function(r, i) { if (parseInt(r.srcId) === parseInt(a.id) && r.srcTipo === 'arriendo') idx = i; });
+      var reg = {
+        id: idx >= 0 ? DATA[idx].id : nextId++,
+        srcId: parseInt(a.id), srcTipo: 'arriendo',
+        fecha: a.inicio || new Date().toISOString().split('T')[0],
+        tipo: 'Ingreso', cat: 'Servicio de Arriendos',
+        desc: 'Arriendo ' + (a.num||'') + ' — ' + (a.activoNombre||'') + ' (' + (a.clienteNombre||'') + ')',
+        monto: monto,
+        doc: a.tipoDoc || '', numDoc: a.numDoc || '',
+        medioPago: a.formaPago || '', cuenta: 'Mercado Pago'
+      };
+      if (idx >= 0) { DATA[idx] = reg; } else { DATA.push(reg); }
+      // Traslado de equipos si aplica
+      if (a.tipoDespacho === 'flete' && a.costoFlete > 0) {
+        var idxT = -1;
+        DATA.forEach(function(r, i) { if (parseInt(r.srcId) === parseInt(a.id) && r.srcTipo === 'arriendo_traslado') idxT = i; });
+        var regT = {
+          id: idxT >= 0 ? DATA[idxT].id : nextId++,
+          srcId: parseInt(a.id), srcTipo: 'arriendo_traslado',
           fecha: a.inicio || new Date().toISOString().split('T')[0],
-          tipo: 'Ingreso', cat: 'Servicio de Arriendos',
-          desc: 'Arriendo ' + (a.num||'') + ' — ' + (a.activoNombre||'') + ' (' + (a.clienteNombre||'') + ')',
-          monto: a.total || a.tarifa || 0,
+          tipo: 'Ingreso', cat: 'Servicio de Traslado Equipos',
+          desc: 'Traslado ' + (a.num||'') + ' — ' + (a.activoNombre||'') + ' (' + (a.clienteNombre||'') + ')',
+          monto: a.costoFlete,
           doc: a.tipoDoc || '', numDoc: a.numDoc || '',
           medioPago: a.formaPago || '', cuenta: 'Mercado Pago'
-        });
-        cambiado = true;
+        };
+        if (idxT >= 0) { DATA[idxT] = regT; } else { DATA.push(regT); }
       }
+      cambiado = true;
     });
     
-    // Sincronizar fletes completados
+    // Sincronizar fletes completados o con monto > 0
     fletes.forEach(function(f) {
-      if (f.estadoPago !== 'Pagado' && f.estado !== 'Completado') return;
-      var existe = DATA.some(function(r) { return r.srcId === f.id && r.srcTipo === 'flete'; });
-      if (!existe) {
-        DATA.push({
-          id: nextId++,
-          srcId: f.id, srcTipo: 'flete',
-          fecha: f.fecha || new Date().toISOString().split('T')[0],
-          tipo: 'Ingreso', cat: 'Servicio de Fletes',
-          desc: 'Flete ' + (f.num||'') + ' — ' + (f.origen||'') + ' → ' + (f.destino||'') + ' (' + (f.clienteNombre||'') + ')',
-          monto: f.tarifa || 0,
-          doc: f.tipoDoc || '', numDoc: f.numDoc || '',
-          medioPago: f.formaPago || '', cuenta: 'Mercado Pago'
-        });
-        cambiado = true;
-      }
+      var esPagado = f.estadoPago === 'Pagado' || f.estado === 'Completado' || (f.tarifa && f.tarifa > 0);
+      if (!esPagado) return;
+      if ((f.tarifa || 0) <= 0) return;
+      var idx = -1;
+      DATA.forEach(function(r, i) { if (parseInt(r.srcId) === parseInt(f.id) && r.srcTipo === 'flete') idx = i; });
+      var reg = {
+        id: idx >= 0 ? DATA[idx].id : nextId++,
+        srcId: parseInt(f.id), srcTipo: 'flete',
+        fecha: f.fecha || new Date().toISOString().split('T')[0],
+        tipo: 'Ingreso', cat: 'Servicio de Fletes',
+        desc: 'Flete ' + (f.num||'') + ' — ' + (f.origen||'') + ' → ' + (f.destino||'') + ' (' + (f.clienteNombre||'') + ')',
+        monto: f.tarifa || 0,
+        doc: f.tipoDoc || '', numDoc: f.numDoc || '',
+        medioPago: f.formaPago || '', cuenta: 'Mercado Pago'
+      };
+      if (idx >= 0) { DATA[idx] = reg; } else { DATA.push(reg); }
+      cambiado = true;
     });
     
-    if (cambiado) guardar();
+    guardar(); // Siempre persistir después de sincronizar
   } catch(e) {}
 }
 
@@ -699,7 +720,7 @@ function openAdd() {
 }
 
 function abrirEditar(id) {
-  var r = DATA.find(function(x){return x.id===id;});
+  var r = DATA.find(function(x){return parseInt(x.id)===parseInt(id);});
   if (!r) return;
   document.getElementById('modalTitulo').textContent = 'Editar Transacción';
   document.getElementById('editId').value  = id;

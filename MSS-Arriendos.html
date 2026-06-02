@@ -985,7 +985,7 @@ function editArriendo(id){
 }
 function delArriendo(id){
   if(!confirm('¿Eliminar este arriendo?'))return;
-  const arr=ARRIENDOS.find(x=>x.id===id||x.id===parseInt(id));
+  const arr=ARRIENDOS.find(x=>parseInt(x.id)===parseInt(id));
   if(arr) syncFinanzas('arriendo',arr,'delete');
   ARRIENDOS=ARRIENDOS.filter(x=>x.id!==id&&x.id!==parseInt(id));
   save();rArriendos();
@@ -996,8 +996,8 @@ function delArriendo(id){
 // ═══════════════════════════════════════════
 function emitirContrato(id){
   const a=ARRIENDOS.find(x=>parseInt(x.id)===parseInt(id));if(!a)return;
-  const activo=ACTIVOS.find(x=>x.id===a.activoId)||{};
-  const cliente=CLIENTES.find(x=>x.id===a.clienteId)||{};
+  const activo=ACTIVOS.find(x=>parseInt(x.id)===parseInt(a.activoId))||{};
+  const cliente=CLIENTES.find(x=>parseInt(x.id)===parseInt(a.clienteId))||{};
   const emp=getEmpresa();
   const logo=getLogo();
   const logoHTML=logo?`<img src="${logo}" style="height:60px;object-fit:contain"/>`:`<div style="font-size:22px;font-weight:900;color:#F59E0B">${emp.nombre.charAt(0)}</div>`;
@@ -1085,8 +1085,8 @@ function emitirContrato(id){
 
 function emitirGuia(id){
   const a=ARRIENDOS.find(x=>parseInt(x.id)===parseInt(id));if(!a)return;
-  const activo=ACTIVOS.find(x=>x.id===a.activoId)||{};
-  const cliente=CLIENTES.find(x=>x.id===a.clienteId)||{};
+  const activo=ACTIVOS.find(x=>parseInt(x.id)===parseInt(a.activoId))||{};
+  const cliente=CLIENTES.find(x=>parseInt(x.id)===parseInt(a.clienteId))||{};
   const emp=getEmpresa();
   const logo=getLogo();
   const logoHTML=logo?`<img src="${logo}" style="height:55px;object-fit:contain"/>`:`<div style="font-size:22px;font-weight:900;color:#F59E0B">${emp.nombre.charAt(0)}</div>`;
@@ -1145,8 +1145,8 @@ function emitirGuia(id){
 
 function emitirDevolucion(id){
   const a=ARRIENDOS.find(x=>parseInt(x.id)===parseInt(id));if(!a)return;
-  const activo=ACTIVOS.find(x=>x.id===a.activoId)||{};
-  const cliente=CLIENTES.find(x=>x.id===a.clienteId)||{};
+  const activo=ACTIVOS.find(x=>parseInt(x.id)===parseInt(a.activoId))||{};
+  const cliente=CLIENTES.find(x=>parseInt(x.id)===parseInt(a.clienteId))||{};
   const emp=getEmpresa();
   const logo=getLogo();
   const logoHTML=logo?`<img src="${logo}" style="height:55px;object-fit:contain"/>`:`<div style="font-size:22px;font-weight:900;color:#F59E0B">${emp.nombre.charAt(0)}</div>`;
@@ -1286,7 +1286,7 @@ function editFlete(id){
   document.getElementById('flNumDoc').value=f.numDoc||'';
   O('moFlete');
 }
-function delFlete(id){if(!confirm('¿Eliminar este flete?'))return;const fl=FLETES.find(x=>x.id===id||x.id===parseInt(id));if(fl)syncFinanzas('flete',fl,'delete');FLETES=FLETES.filter(x=>x.id!==id&&x.id!==parseInt(id));save();rFletes();}
+function delFlete(id){if(!confirm('¿Eliminar este flete?'))return;const fl=FLETES.find(x=>parseInt(x.id)===parseInt(id));if(fl)syncFinanzas('flete',fl,'delete');FLETES=FLETES.filter(x=>x.id!==id&&x.id!==parseInt(id));save();rFletes();}
 
 // CLIENTES
 function rClientes(){
