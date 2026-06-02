@@ -1148,6 +1148,8 @@ function abrirVentanaDoc(html, titulo, tipo){
   </body></html>`);
   ventana.document.close();
 }
+
+function emitirGuia(id){
   const a=ARRIENDOS.find(x=>x.id===id);if(!a)return;
   const activo=ACTIVOS.find(x=>x.id===a.activoId)||{};
   const cliente=CLIENTES.find(x=>x.id===a.clienteId)||{};
