@@ -201,10 +201,9 @@ const SK_LOGOS = 'mss_logos_v1';
 let LOGOS = {}, selectedEmpId = null, newLogoData = null, previewType = 'liquidacion';
 
 const DEF_EMPRESAS = [
-  {id:'mss',  nombre:'Martinez Services Spa',  rut:'76.999.888-1'},
-  {id:'min',  nombre:'Minera Atacama S.A.',      rut:'76.123.456-7'},
-  {id:'agr',  nombre:'Agrícola Sur Verde S.A.',  rut:'77.234.567-8'},
-  {id:'con',  nombre:'Constructora Bío-Bío',     rut:'78.345.678-9'},
+  {id:'1', nombre:'Martinez Services Spa',                          rut:'76.782.954-K', ciudad:'Alto Hospicio'},
+  {id:'2', nombre:'Condominio Pioneros 2',                          rut:'65.184.252-2', ciudad:'Alto Hospicio'},
+  {id:'3', nombre:'Martinez y Pajuelo Arriendos y Servicios SpA',   rut:'78.361.479-0', ciudad:'Alto Hospicio'},
 ];
 
 function loadLogos(){try{LOGOS=JSON.parse(localStorage.getItem(SK_LOGOS)||'{}');}catch(e){LOGOS={};}}

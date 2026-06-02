@@ -427,67 +427,80 @@ function cargar() {
 // Cuando se registra un arriendo/flete en MSS-Arriendos, aparece acá automáticamente
 function sincronizarDesdeArriendos() {
   try {
-    var esMYP = EMP.rut === '78.361.479-0' || EMP.id === 3;
     var arrKey = 'mss_arr' + EMP.id + '_arriendos';
     var flKey  = 'mss_arr' + EMP.id + '_fletes';
-    var arriendos = JSON.parse(localStorage.getItem(arrKey) || '[]');
-    var fletes    = JSON.parse(localStorage.getItem(flKey)  || '[]');
-    var cambiado  = false;
-    
-    // Sincronizar arriendos pagados
-    arriendos.forEach(function(a) {
+    var arrData = JSON.parse(localStorage.getItem(arrKey) || '[]');
+    var flData  = JSON.parse(localStorage.getItem(flKey)  || '[]');
+    var cambiado = false;
+
+    arrData.forEach(function(a) {
       if (a.estadoPago !== 'Pagado' && a.estado !== 'Finalizado') return;
-      var existe = DATA.some(function(r) { return r.srcId === a.id && r.srcTipo === 'arriendo'; });
+      var monto = a.total || a.tarifa || 0;
+      if (!monto) return;
+      // Solo agregar el arriendo (monto real cobrado), sin garantía
+      var existe = DATA.some(function(r){return r.srcId===a.id && r.srcTipo==='arriendo';});
       if (!existe) {
-        DATA.push({
-          id: nextId++,
-          srcId: a.id, srcTipo: 'arriendo',
-          fecha: a.inicio || new Date().toISOString().split('T')[0],
-          tipo: 'Ingreso', cat: 'Servicio de Arriendos',
-          desc: 'Arriendo ' + (a.num||'') + ' — ' + (a.activoNombre||'') + ' (' + (a.clienteNombre||'') + ')',
-          monto: a.total || a.tarifa || 0,
-          doc: a.tipoDoc || '', numDoc: a.numDoc || '',
-          medioPago: a.formaPago || '', cuenta: 'Mercado Pago'
-        });
+        DATA.push({id:nextId++, srcId:a.id, srcTipo:'arriendo',
+          fecha:a.inicio||new Date().toISOString().split('T')[0],
+          tipo:'Ingreso', cat:'Servicio de Arriendos',
+          desc:'Arriendo '+(a.num||'')+' — '+(a.activoNombre||'')+' ('+(a.clienteNombre||')'),
+          monto:monto, doc:a.tipoDoc||'', numDoc:a.numDoc||'',
+          medioPago:a.formaPago||'', cuenta:'Mercado Pago'});
         cambiado = true;
       }
     });
-    
-    // Sincronizar fletes completados
-    fletes.forEach(function(f) {
+
+    flData.forEach(function(f) {
       if (f.estadoPago !== 'Pagado' && f.estado !== 'Completado') return;
-      var existe = DATA.some(function(r) { return r.srcId === f.id && r.srcTipo === 'flete'; });
+      var monto = f.tarifa || 0;
+      if (!monto) return;
+      var existe = DATA.some(function(r){return r.srcId===f.id && r.srcTipo==='flete';});
       if (!existe) {
-        DATA.push({
-          id: nextId++,
-          srcId: f.id, srcTipo: 'flete',
-          fecha: f.fecha || new Date().toISOString().split('T')[0],
-          tipo: 'Ingreso', cat: 'Servicio de Fletes',
-          desc: 'Flete ' + (f.num||'') + ' — ' + (f.origen||'') + ' → ' + (f.destino||'') + ' (' + (f.clienteNombre||'') + ')',
-          monto: f.tarifa || 0,
-          doc: f.tipoDoc || '', numDoc: f.numDoc || '',
-          medioPago: f.formaPago || '', cuenta: 'Mercado Pago'
-        });
+        DATA.push({id:nextId++, srcId:f.id, srcTipo:'flete',
+          fecha:f.fecha||new Date().toISOString().split('T')[0],
+          tipo:'Ingreso', cat:'Servicio de Fletes',
+          desc:'Flete '+(f.num||'')+' — '+(f.origen||'')+' → '+(f.destino||'')+' ('+(f.clienteNombre||'')+')',
+          monto:monto, doc:f.tipoDoc||'', numDoc:f.numDoc||'',
+          medioPago:f.formaPago||'', cuenta:'Mercado Pago'});
         cambiado = true;
       }
     });
-    
+
     if (cambiado) guardar();
   } catch(e) {}
 }
 
 // ── 8. CÁLCULOS ──
-function ventas()   { return DATA.filter(function(r){return r.tipo==='Ingreso'&&r.cat!=='Garantías Recibidas'&&r.cat!=='Garantías Devueltas'&&r.cat!=='Aporte de Capital';}).reduce(function(s,r){return s+r.monto;},0); }
-function egresos()  { return DATA.filter(function(r){return r.tipo==='Egreso'&&r.cat!=='Garantías Devueltas';}).reduce(function(s,r){return s+r.monto;},0); }
-function capital()  { return DATA.filter(function(r){return r.cat==='Aporte de Capital';}).reduce(function(s,r){return s+r.monto;},0); }
-function fletes()   { return DATA.filter(function(r){return r.cat==='Servicio de Fletes';}).reduce(function(s,r){return s+r.monto;},0); }
-function arriendos(){ return DATA.filter(function(r){return r.cat==='Servicio de Arriendos';}).reduce(function(s,r){return s+r.monto;},0); }
+function ventas()   { return DATA.filter(function(r){
+  return r.tipo==='Ingreso' && 
+         r.cat!=='Garantías Recibidas' && 
+         r.cat!=='Garantías Devueltas' && 
+         r.cat!=='Aporte de Capital';
+}).reduce(function(s,r){return s+r.monto;},0); }
+
+function egresos()  { return DATA.filter(function(r){
+  return r.tipo==='Egreso' && r.cat!=='Garantías Devueltas';
+}).reduce(function(s,r){return s+r.monto;},0); }
+
+function capital()  { return DATA.filter(function(r){
+  return r.cat==='Aporte de Capital';
+}).reduce(function(s,r){return s+r.monto;},0); }
+
+function fletes()   { return DATA.filter(function(r){
+  return r.cat==='Servicio de Fletes';
+}).reduce(function(s,r){return s+r.monto;},0); }
+
+function arriendos(){ return DATA.filter(function(r){
+  return r.cat==='Servicio de Arriendos';
+}).reduce(function(s,r){return s+r.monto;},0); }
+
 function resultado(){ return ventas()-egresos(); }
 
 function porMes() {
   var map = {};
   DATA.forEach(function(r) {
-    if (r.cat==='Garantías Recibidas'||r.cat==='Garantías Devueltas'||r.cat==='Aporte de Capital') return;
+    // Excluir garantías y capital del flujo operacional
+    if (r.cat==='Garantías Recibidas' || r.cat==='Garantías Devueltas' || r.cat==='Aporte de Capital') return;
     var m = r.fecha ? r.fecha.substring(0,7) : '';
     if (!m) return;
     if (!map[m]) map[m] = {mes:m, ventas:0, fletes:0, arriendos:0, egr:0};
@@ -877,6 +890,18 @@ document.querySelectorAll('.modal-overlay').forEach(function(m){
 
 // ── 15. INIT ──
 cargar();
+// Limpiar duplicados que pudo haber dejado la sincronización anterior
+(function limpiarDuplicados(){
+  var vistos = {};
+  DATA = DATA.filter(function(r) {
+    var key = r.srcId && r.srcTipo ? (r.srcTipo + '_' + r.srcId) : null;
+    if (!key) return true; // registros manuales siempre se mantienen
+    if (vistos[key]) return false;
+    vistos[key] = true;
+    return true;
+  });
+  guardar();
+})();
 sincronizarDesdeArriendos();
 renderTodo();
 </script>
