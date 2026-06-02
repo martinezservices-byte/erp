@@ -592,8 +592,8 @@ const badge=(txt,color)=>`<span style="background:${color}22;color:${color};bord
 const EC={'Completado':'#22C55E','Finalizado':'#22C55E','Activo':'#F59E0B','En Ruta':'#38BDF8','Programado':'#A78BFA','Cancelado':'#EF4444','Pendiente':'#F59E0B','Disponible':'#22C55E','Arrendado':'#F59E0B','Mantencion':'#EF4444'};
 const ICONOS={'Camioneta':'🚛','Vehículo':'🚗','Moto':'🏍','Maquinaria':'⚙️','Equipo':'🔧','Herramienta':'🔨','Generador':'⚡','Compresor':'💨','default':'📦'};
 
-// Normaliza IDs a número para evitar bugs de comparación string vs number
-function normIds(arr){ return arr.map(function(o){var copy=Object.assign({},o);copy.id=parseInt(o.id)||o.id;return copy;}); }
+// Normaliza IDs a número — fix bug string vs number en localStorage
+function normIds(arr){ return arr.map(function(o){var c=Object.assign({},o);c.id=parseInt(o.id)||o.id;return c;}); }
 
 function load(){
   try{
@@ -636,13 +636,9 @@ function load(){
   // Sincronizar con Finanzas si es M&P
   if(_ES_MYP){
     try{
-      const finKey='mss_finanzas2_v1_'+EMP.id;
-      const finRaw=localStorage.getItem(finKey);
-      const finData=finRaw?JSON.parse(finRaw):null;
-      if(!finData||!finData.data||finData.data.length===0){
-        ARRIENDOS.forEach(a=>syncFinanzas('arriendo',a,'save'));
-        FLETES.forEach(f=>syncFinanzas('flete',f,'save'));
-      }
+      // Siempre resincronizar Finanzas al cargar para mantener consistencia
+      ARRIENDOS.forEach(a=>syncFinanzas('arriendo',a,'save'));
+      FLETES.forEach(f=>syncFinanzas('flete',f,'save'));
     }catch(e){}
   }
 }
@@ -668,13 +664,13 @@ function syncFinanzas(tipo, obj, accion){
 
     if(accion === 'delete'){
       // Eliminar TODOS los registros asociados (arriendo + traslado si había)
-      fin.data = fin.data.filter(r => !(r.srcId === obj.id && (r.srcTipo === tipo || r.srcTipo === tipo+'_traslado')));
+      fin.data = fin.data.filter(r => !(parseInt(r.srcId) === parseInt(obj.id) && (r.srcTipo === tipo || r.srcTipo === tipo+'_traslado')));
       localStorage.setItem(finKey, JSON.stringify(fin));
       return;
     }
 
-    // Solo sincronizar si está pagado
-    const pagado = obj.estadoPago === 'Pagado' || obj.estado === 'Completado' || obj.estado === 'Finalizado';
+    // Sincronizar si está pagado, finalizado, o tiene monto pagado > 0
+    const pagado = obj.estadoPago === 'Pagado' || obj.estado === 'Completado' || obj.estado === 'Finalizado' || (obj.pagado && obj.pagado > 0);
     if(!pagado) return;
 
     // ── REGISTRO PRINCIPAL (arriendo o flete) ──
@@ -682,7 +678,7 @@ function syncFinanzas(tipo, obj, accion){
 
     if(monto > 0){
       // Actualizar o crear registro principal
-      const idxMain = fin.data.findIndex(r => r.srcId === obj.id && r.srcTipo === tipo);
+      const idxMain = fin.data.findIndex(r => parseInt(r.srcId) === parseInt(obj.id) && r.srcTipo === tipo);
       const regMain = {
         id: idxMain >= 0 ? fin.data[idxMain].id : fin.nextId++,
         srcId: obj.id, srcTipo: tipo,
@@ -702,7 +698,7 @@ function syncFinanzas(tipo, obj, accion){
 
     // ── TRASLADO DE EQUIPOS (solo si es arriendo con costo adicional) ──
     if(tipo === 'arriendo' && obj.tipoDespacho === 'flete' && obj.costoFlete > 0){
-      const idxTras = fin.data.findIndex(r => r.srcId === obj.id && r.srcTipo === 'arriendo_traslado');
+      const idxTras = fin.data.findIndex(r => parseInt(r.srcId) === parseInt(obj.id) && r.srcTipo === 'arriendo_traslado');
       const regTras = {
         id: idxTras >= 0 ? fin.data[idxTras].id : fin.nextId++,
         srcId: obj.id, srcTipo: 'arriendo_traslado',
@@ -718,7 +714,7 @@ function syncFinanzas(tipo, obj, accion){
       else fin.data.push(regTras);
     } else {
       // Si cambió de "con flete" a "sin flete", eliminar el traslado anterior
-      fin.data = fin.data.filter(r => !(r.srcId === obj.id && r.srcTipo === 'arriendo_traslado'));
+      fin.data = fin.data.filter(r => !(parseInt(r.srcId) === parseInt(obj.id) && r.srcTipo === 'arriendo_traslado'));
     }
 
     localStorage.setItem(finKey, JSON.stringify(fin));
