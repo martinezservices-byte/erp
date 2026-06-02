@@ -109,10 +109,7 @@ canvas{max-height:240px;}
 <script>
 (function(){
 try{
-  var empRaw=localStorage.getItem("mss_empresa_actual");
-  var emp=empRaw?JSON.parse(empRaw):{id:3,nombre:"Martinez y Pajuelo Arriendos y Servicios SpA",rut:"78.361.479-0"};
-  if(!empRaw) localStorage.setItem("mss_empresa_actual",JSON.stringify(emp));
-  window._EMP=emp;
+  var emp=JSON.parse(localStorage.getItem("mss_empresa_actual")||"{}");
   if(emp&&emp.nombre){
     var nd=document.getElementById("nav-emp");
     if(nd){nd.textContent="Empresa: "+emp.nombre;nd.style.display="block";}
@@ -134,7 +131,7 @@ try{
   <div class="logo">
     <div class="logo-icon">M</div>
     <div>
-      <div class="logo-name" id="logoEmpNombre">Empresa</div>
+      <div class="logo-name" id="logoNombre">Empresa</div>
       <div class="logo-mod">MÓDULO FINANZAS</div>
     </div>
   </div>
@@ -348,8 +345,10 @@ try{
 function getEmpId(){
   try{ const e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}'); return e.id?'_'+e.id:'_def'; }catch(e){ return '_def'; }
 }
-function getEmpNombre(){ return _empObj.nombre||'Mi Empresa'; }
-const STORAGE_KEY = 'mss_finanzas2_v1_'+(_empObj.id||3);
+function getEmpNombre(){
+  try{ const e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}'); return e.nombre||'Mi Empresa'; }catch(e){ return 'Mi Empresa'; }
+}
+const STORAGE_KEY = 'mss_finanzas2_v1_'+(window._EMP?window._EMP.id:3);
 const DATA_VERSION = 'FIN_MYP_v20260601';
 
 // ── DATOS REALES M&P FEB–MAY 2026 ──
@@ -419,11 +418,11 @@ let nextId = 200;
 let charts = {};
 
 function save(){
-  try{ localStorage.setItem(STORAGE_KEY(),JSON.stringify({data:DATA,nextId,version:DATA_VERSION})); }catch(e){}
+  try{ localStorage.setItem(STORAGE_KEY,JSON.stringify({data:DATA,nextId,version:DATA_VERSION})); }catch(e){}
 }
 function load(){
   try{
-    const raw=localStorage.getItem(STORAGE_KEY());
+    const raw=localStorage.getItem(STORAGE_KEY);
     if(raw){
       const p=JSON.parse(raw);
       if(p.version===DATA_VERSION){ DATA=p.data||[]; nextId=p.nextId||200; return; }
@@ -827,358 +826,7 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{ m.addEventListener('cli
 // ══════════════════════════════════════════
 load();
 renderAll();
-const DEFAULT_DATA = [
-  {id:1,mes:"Enero",    ingresos:4200000,gastos:2800000,categoria:"Operaciones"},
-  {id:2,mes:"Febrero",  ingresos:3800000,gastos:2600000,categoria:"Operaciones"},
-  {id:3,mes:"Marzo",    ingresos:5100000,gastos:3100000,categoria:"Operaciones"},
-  {id:4,mes:"Abril",    ingresos:4700000,gastos:2900000,categoria:"Operaciones"},
-  {id:5,mes:"Mayo",     ingresos:5600000,gastos:3400000,categoria:"Operaciones"},
-  {id:6,mes:"Junio",    ingresos:6200000,gastos:3800000,categoria:"Operaciones"},
-  {id:7,mes:"Julio",    ingresos:5900000,gastos:3600000,categoria:"Operaciones"},
-  {id:8,mes:"Agosto",   ingresos:6800000,gastos:4100000,categoria:"Operaciones"},
-  {id:9,mes:"Septiembre",ingresos:7200000,gastos:4300000,categoria:"Operaciones"},
-  {id:10,mes:"Octubre", ingresos:6500000,gastos:3900000,categoria:"Operaciones"},
-  {id:11,mes:"Noviembre",ingresos:7800000,gastos:4500000,categoria:"Operaciones"},
-  {id:12,mes:"Diciembre",ingresos:9100000,gastos:5200000,categoria:"Operaciones"},
-];
-
-let DATA = [];
-let csvPending = [];
-let nextId = 100;
-let charts = {};
-
-function save(){ try{ localStorage.setItem(STORAGE_KEY,JSON.stringify({data:DATA,nextId})); }catch(e){} }
-function load(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw){ const p=JSON.parse(raw); DATA=p.data||[]; nextId=p.nextId||100; }
-    else{ DATA=DEFAULT_DATA.map(r=>({...r})); nextId=200; save(); }
-  }catch(e){ DATA=DEFAULT_DATA.map(r=>({...r})); nextId=200; }
-}
-
-// ══════════════════════════════════════════
-//  FORMATTERS
-// ══════════════════════════════════════════
-const clp = n => new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(n);
-const M   = n => '$'+(n/1e6).toFixed(2)+'M';
-const pct = (a,b) => b===0?'—':((a/b)*100).toFixed(1)+'%';
-const dlt = (a,b) => b===0?null:(((a-b)/b)*100).toFixed(1);
-
-function totI(){ return DATA.reduce((s,r)=>s+r.ingresos,0); }
-function totG(){ return DATA.reduce((s,r)=>s+r.gastos,0); }
-function totU(){ return totI()-totG(); }
-
-// ══════════════════════════════════════════
-//  TABS
-// ══════════════════════════════════════════
-function showTab(id, btn){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-  document.getElementById('sec-'+id).classList.add('active');
-  btn.classList.add('active');
-  renderAll();
-}
-
-// ══════════════════════════════════════════
-//  RENDER ALL
-// ══════════════════════════════════════════
-function renderAll(){
-  updateHeader();
-  renderKPIFlujo();
-  renderTableFlujo();
-  renderKPIControl();
-  renderControlIndicators();
-  renderDatos();
-  renderViability();
-  buildCharts();
-}
-
-function updateHeader(){
-  document.getElementById('hInfo').textContent = DATA.length+' períodos · '+new Date().toLocaleDateString('es-CL');
-}
-
-// ── KPI FLUJO ──
-function renderKPIFlujo(){
-  const tI=totI(), tG=totG(), tU=totU();
-  const r = tI>0?((tU/tI)*100).toFixed(1):0;
-  document.getElementById('kpi-flujo').innerHTML = `
-    <div class="kpi" style="--kc:rgba(201,168,76,0.12)"><div class="kpi-label">Total Ingresos</div><div class="kpi-value" style="color:var(--gold)">${M(tI)}</div><div class="kpi-sub">Período completo</div><div class="kpi-trend" style="color:var(--ok)">▲ 8.2% vs anterior</div></div>
-    <div class="kpi" style="--kc:rgba(192,57,43,0.1)"><div class="kpi-label">Total Gastos</div><div class="kpi-value" style="color:var(--danger)">${M(tG)}</div><div class="kpi-sub">Período completo</div></div>
-    <div class="kpi" style="--kc:rgba(39,174,96,0.1)"><div class="kpi-label">Utilidad Neta</div><div class="kpi-value" style="color:var(--ok)">${M(tU)}</div><div class="kpi-sub">Resultado final</div><div class="kpi-trend" style="color:var(--ok)">▲ 12.4%</div></div>
-    <div class="kpi"><div class="kpi-label">Rentabilidad</div><div class="kpi-value" style="color:var(--gold)">${r}%</div><div class="kpi-sub">Margen neto</div></div>
-  `;
-}
-
-// ── TABLE FLUJO ──
-function renderTableFlujo(){
-  const tbody = document.querySelector('#tblFlujo tbody');
-  const tfoot = document.querySelector('#tblFlujo tfoot');
-  let html='';
-  DATA.forEach((r,i)=>{
-    const u = r.ingresos-r.gastos;
-    const re = r.ingresos>0?((u/r.ingresos)*100).toFixed(1):0;
-    const prev = DATA[i-1];
-    const d = prev?dlt(r.ingresos,prev.ingresos):null;
-    const ok = parseFloat(re)>=35;
-    const dStyle = d==null?'color:var(--muted)':parseFloat(d)>=0?'color:var(--ok)':'color:var(--danger)';
-    html+=`<tr>
-      <td style="color:var(--white);font-weight:600">${r.mes}</td>
-      <td style="color:var(--gold)">${clp(r.ingresos)}</td>
-      <td style="color:var(--danger)">${clp(r.gastos)}</td>
-      <td style="color:${u>=0?'var(--ok)':'var(--danger)'};font-weight:700">${clp(u)}</td>
-      <td>${re}%</td>
-      <td style="${dStyle}">${d==null?'—':(parseFloat(d)>=0?'+':'')+d+'%'}</td>
-      <td><span class="badge" style="background:${ok?'rgba(39,174,96,0.15)':'rgba(212,137,10,0.15)'};color:${ok?'var(--ok)':'var(--warn)'};border:1px solid ${ok?'rgba(39,174,96,0.3)':'rgba(212,137,10,0.3)'}">${ok?'Óptimo':'Normal'}</span></td>
-    </tr>`;
-  });
-  tbody.innerHTML = html;
-  const tI=totI(),tG=totG(),tU=totU();
-  tfoot.innerHTML=`<tr><td style="color:var(--gold)">TOTAL</td><td style="color:var(--gold)">${clp(tI)}</td><td style="color:var(--danger)">${clp(tG)}</td><td style="color:var(--ok)">${clp(tU)}</td><td>${pct(tU,tI)}</td><td></td><td></td></tr>`;
-}
-
-// ── KPI CONTROL ──
-function renderKPIControl(){
-  const sorted = [...DATA].sort((a,b)=>(b.ingresos-b.gastos)-(a.ingresos-a.gastos));
-  const best = sorted[0], worst = sorted[sorted.length-1];
-  const tI=totI(),tG=totG();
-  const avgI = tI/Math.max(DATA.length,1), avgG = tG/Math.max(DATA.length,1);
-  document.getElementById('kpi-control').innerHTML=`
-    <div class="kpi" style="--kc:rgba(39,174,96,0.1)"><div class="kpi-label">Mejor Período</div><div class="kpi-value" style="color:var(--ok);font-size:18px">${best?.mes||'—'}</div><div class="kpi-sub">Util: ${best?M(best.ingresos-best.gastos):'—'}</div></div>
-    <div class="kpi" style="--kc:rgba(192,57,43,0.1)"><div class="kpi-label">Peor Período</div><div class="kpi-value" style="color:var(--danger);font-size:18px">${worst?.mes||'—'}</div><div class="kpi-sub">Util: ${worst?M(worst.ingresos-worst.gastos):'—'}</div></div>
-    <div class="kpi"><div class="kpi-label">Promedio Ingr.</div><div class="kpi-value" style="color:var(--gold)">${M(avgI)}</div><div class="kpi-sub">Por período</div></div>
-    <div class="kpi" style="--kc:rgba(212,137,10,0.1)"><div class="kpi-label">Promedio Gastos</div><div class="kpi-value" style="color:var(--warn)">${M(avgG)}</div><div class="kpi-sub">Por período</div></div>
-  `;
-}
-
-// ── CONTROL INDICATORS ──
-function renderControlIndicators(){
-  const tI=totI(),tG=totG(),tU=totU();
-  const items=[
-    {l:'Ratio Gastos/Ingresos',v:(tG/tI*100).toFixed(1)+'%',ok:tG/tI<0.65,ref:'< 65%'},
-    {l:'Margen Bruto',v:(tU/tI*100).toFixed(1)+'%',ok:tU/tI>0.35,ref:'> 35%'},
-    {l:'Cobertura de Gastos',v:(tI/tG).toFixed(2)+'x',ok:tI/tG>1.5,ref:'> 1.5x'},
-    {l:'Períodos Analizados',v:DATA.length,ok:true,ref:'Total'},
-    {l:'Períodos Óptimos',v:DATA.filter(r=>(r.ingresos-r.gastos)/r.ingresos>=0.35).length,ok:DATA.filter(r=>(r.ingresos-r.gastos)/r.ingresos>=0.35).length>=DATA.length*0.7,ref:'≥ 70%'},
-  ];
-  document.getElementById('controlIndicators').innerHTML = items.map(i=>`
-    <div class="ind-row">
-      <div><div style="font-size:12px;color:var(--white);font-family:monospace">${i.l}</div><div style="font-size:10px;color:var(--muted)">Ref: ${i.ref}</div></div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:16px;font-weight:800;color:${i.ok?'var(--ok)':'var(--warn)'};font-family:monospace">${i.v}</span>
-        <span class="badge" style="background:${i.ok?'rgba(39,174,96,0.15)':'rgba(212,137,10,0.15)'};color:${i.ok?'var(--ok)':'var(--warn)'};border:1px solid ${i.ok?'rgba(39,174,96,0.3)':'rgba(212,137,10,0.3)'}">${i.ok?'✓':'⚠'}</span>
-      </div>
-    </div>`).join('');
-}
-
-// ── DATOS TABLE ──
-function renderDatos(){
-  document.getElementById('datosCount').textContent = DATA.length+' registros';
-  const tbody = document.querySelector('#tblDatos tbody');
-  let html='';
-  DATA.forEach((r,i)=>{
-    const u=r.ingresos-r.gastos;
-    const re=r.ingresos>0?((u/r.ingresos)*100).toFixed(1):0;
-    html+=`<tr>
-      <td style="color:var(--muted)">${i+1}</td>
-      <td style="color:var(--white);font-weight:600">${r.mes}</td>
-      <td style="color:var(--gold)">${clp(r.ingresos)}</td>
-      <td style="color:var(--danger)">${clp(r.gastos)}</td>
-      <td style="color:${u>=0?'var(--ok)':'var(--danger)'};font-weight:700">${clp(u)}</td>
-      <td>${re}%</td>
-      <td><span class="badge" style="background:rgba(36,113,163,0.15);color:var(--info);border:1px solid rgba(36,113,163,0.3)">${r.categoria}</span></td>
-      <td style="display:flex;gap:5px">
-        <button class="btn btn-sm btn-edit" onclick="openEdit(${r.id})">✎</button>
-        <button class="btn btn-sm btn-del" onclick="deleteRecord(${r.id})">✕</button>
-      </td>
-    </tr>`;
-  });
-  tbody.innerHTML = html;
-}
-
-// ── VIABILITY ──
-function renderViability(){
-  const tI=totI(),tG=totG(),tU=totU();
-  const roi = tG>0?(tU/tG*100).toFixed(1):0;
-  const score = Math.min(100,Math.round(
-    (26.2>20?30:15)+(114.8>0?25:0)+(parseFloat(roi)>30?25:15)+(tU/tI>0.35?20:10)
-  ));
-  document.getElementById('viabilityScore').textContent = score;
-  document.getElementById('viabilityLabel').textContent = score>=70?'Proyecto Viable':'Requiere Revisión';
-  document.getElementById('roiVal').textContent = roi+'%';
-  // gauge
-  const ctx = document.getElementById('viabilityGauge').getContext('2d');
-  if(charts.viabilityGauge) charts.viabilityGauge.destroy();
-  const c = score>=70?'#27AE60':score>=50?'#D4890A':'#C0392B';
-  charts.viabilityGauge = new Chart(ctx,{type:'doughnut',data:{datasets:[{data:[score,100-score],backgroundColor:[c,'rgba(255,255,255,0.05)'],borderWidth:0,circumference:360}]},options:{cutout:'78%',plugins:{legend:{display:false},tooltip:{enabled:false}}}});
-}
-
-// ══════════════════════════════════════════
-//  CHARTS
-// ══════════════════════════════════════════
-const CF = {color:'rgba(255,255,255,0.04)',font:{family:'monospace',size:10}};
-
-function buildCharts(){
-  const labels = DATA.map(r=>r.mes.substring(0,3));
-  const ingresos = DATA.map(r=>r.ingresos);
-  const gastos   = DATA.map(r=>r.gastos);
-  const utilidad = DATA.map(r=>r.ingresos-r.gastos);
-  const rents    = DATA.map(r=>r.ingresos>0?+((r.ingresos-r.gastos)/r.ingresos*100).toFixed(1):0);
-
-  const build = (id,cfg)=>{ if(charts[id]) charts[id].destroy(); const c=document.getElementById(id); if(c) charts[id]=new Chart(c,cfg); };
-
-  // Area chart
-  build('areaChart',{type:'line',data:{labels,datasets:[
-    {label:'Ingresos',data:ingresos,borderColor:'#C9A84C',backgroundColor:'rgba(201,168,76,0.15)',fill:true,tension:.4,borderWidth:2,pointRadius:2},
-    {label:'Gastos',data:gastos,borderColor:'#C0392B',backgroundColor:'rgba(192,57,43,0.08)',fill:true,tension:.4,borderWidth:2,pointRadius:0,borderDash:[6,3]},
-    {label:'Utilidad',data:utilidad,borderColor:'#27AE60',backgroundColor:'rgba(39,174,96,0.08)',fill:true,tension:.4,borderWidth:2.5,pointRadius:0},
-  ]},options:{plugins:{legend:{labels:{font:CF.font,boxWidth:10}}},scales:{x:{grid:{color:CF.color},ticks:{font:CF.font}},y:{grid:{color:CF.color},ticks:{font:CF.font,callback:v=>'$'+(v/1e6).toFixed(0)+'M'}}}}});
-
-  // Rent horizontal bar
-  build('rentChart',{type:'bar',data:{labels,datasets:[{label:'Rentabilidad %',data:rents,backgroundColor:rents.map(v=>v>=35?'rgba(39,174,96,0.7)':'rgba(212,137,10,0.7)'),borderRadius:4}]},options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{max:60,grid:{color:CF.color},ticks:{font:CF.font,callback:v=>v+'%'}},y:{grid:{color:CF.color},ticks:{font:CF.font}}}}});
-
-  // Bar chart
-  build('barChart',{type:'bar',data:{labels,datasets:[
-    {label:'Ingresos',data:ingresos,backgroundColor:'rgba(201,168,76,0.7)',borderRadius:4},
-    {label:'Gastos',data:gastos,backgroundColor:'rgba(192,57,43,0.7)',borderRadius:4},
-    {label:'Utilidad',data:utilidad,backgroundColor:'rgba(39,174,96,0.7)',borderRadius:4},
-  ]},options:{plugins:{legend:{labels:{font:CF.font,boxWidth:10}}},scales:{x:{grid:{color:CF.color},ticks:{font:CF.font}},y:{grid:{color:CF.color},ticks:{font:CF.font,callback:v=>'$'+(v/1e6).toFixed(0)+'M'}}}}});
-
-  // Pie gastos
-  const cats=['Personal','Operaciones','Marketing','Tecnología','Otros'];
-  const catVals=[38,24,14,12,12];
-  const catColors=['#C9A84C','#38BDF8','#10B981','#EF4444','#F59E0B'];
-  build('pieChart',{type:'doughnut',data:{labels:cats,datasets:[{data:catVals,backgroundColor:catColors,borderWidth:0}]},options:{cutout:'55%',plugins:{legend:{display:false}}}});
-  document.getElementById('pieLegend').innerHTML = cats.map((c,i)=>`<div style="display:flex;justify-content:space-between"><div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:2px;background:${catColors[i]}"></div><span style="font-size:11px;color:var(--muted)">${c}</span></div><span style="font-size:11px;font-weight:700">${catVals[i]}%</span></div>`).join('');
-
-  // Proyección
-  const lastVal = DATA.length>0?DATA[DATA.length-1].ingresos:5000000;
-  const inc = DATA.length>1?(DATA[DATA.length-1].ingresos-DATA[0].ingresos)/(DATA.length-1):200000;
-  const projLabels=[], base=[], cons=[], opt=[];
-  for(let i=1;i<=12;i++){
-    projLabels.push('M+'+i);
-    const v=Math.round(lastVal+inc*i);
-    base.push(v); cons.push(Math.round(v*.85)); opt.push(Math.round(v*1.15));
-  }
-  build('proyChart',{type:'line',data:{labels:projLabels,datasets:[
-    {label:'Optimista',data:opt,borderColor:'#27AE60',borderWidth:1.5,borderDash:[5,3],pointRadius:0,fill:false},
-    {label:'Base',data:base,borderColor:'#C9A84C',borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#C9A84C',fill:false},
-    {label:'Conservador',data:cons,borderColor:'#D4890A',borderWidth:1.5,borderDash:[5,3],pointRadius:0,fill:false},
-  ]},options:{plugins:{legend:{labels:{font:CF.font,boxWidth:10}}},scales:{x:{grid:{color:CF.color},ticks:{font:CF.font}},y:{grid:{color:CF.color},ticks:{font:CF.font,callback:v=>'$'+(v/1e6).toFixed(1)+'M'}}}}});
-}
-
-// ══════════════════════════════════════════
-//  CRUD
-// ══════════════════════════════════════════
-function openAdd(){
-  document.getElementById('modalTitle').textContent='Nuevo Registro';
-  document.getElementById('editId').value='';
-  ['fMes','fIngresos','fGastos'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('fCategoria').value='Operaciones';
-  document.getElementById('modalAdd').classList.add('open');
-}
-
-function openEdit(id){
-  const r=DATA.find(x=>x.id===id); if(!r) return;
-  document.getElementById('modalTitle').textContent='Editar Registro';
-  document.getElementById('editId').value=id;
-  document.getElementById('fMes').value=r.mes;
-  document.getElementById('fIngresos').value=r.ingresos;
-  document.getElementById('fGastos').value=r.gastos;
-  document.getElementById('fCategoria').value=r.categoria;
-  document.getElementById('modalAdd').classList.add('open');
-}
-
-function saveRecord(){
-  const mes=document.getElementById('fMes').value.trim();
-  const ingresos=parseFloat(document.getElementById('fIngresos').value)||0;
-  const gastos=parseFloat(document.getElementById('fGastos').value)||0;
-  const categoria=document.getElementById('fCategoria').value;
-  const editId=document.getElementById('editId').value;
-  if(!mes||ingresos<=0){alert('Completa al menos Período e Ingresos'); return;}
-  if(editId){
-    const idx=DATA.findIndex(x=>x.id==editId);
-    if(idx>=0) DATA[idx]={...DATA[idx],mes,ingresos,gastos,categoria};
-  } else {
-    DATA.push({id:nextId++,mes,ingresos,gastos,categoria});
-  }
-  save(); closeModal('modalAdd'); renderAll();
-}
-
-function deleteRecord(id){
-  if(!confirm('¿Eliminar este registro?')) return;
-  DATA=DATA.filter(r=>r.id!==id);
-  save(); renderAll();
-}
-
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-
-// ══════════════════════════════════════════
-//  CSV IMPORT / EXPORT
-// ══════════════════════════════════════════
-function openImport(){
-  document.getElementById('csvPreview').style.display='none';
-  document.getElementById('csvFile').value='';
-  csvPending=[];
-  document.getElementById('modalImport').classList.add('open');
-}
-
-function readCSV(input){
-  const file=input.files[0]; if(!file) return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const lines=e.target.result.split('\n').filter(l=>l.trim());
-    if(lines.length<2){alert('Archivo vacío o sin datos'); return;}
-    const headers=lines[0].split(',').map(h=>h.trim().toLowerCase().replace(/['"]/g,''));
-    const mesIdx=headers.findIndex(h=>h.includes('mes')||h.includes('period'));
-    const ingIdx=headers.findIndex(h=>h.includes('ingres'));
-    const gasIdx=headers.findIndex(h=>h.includes('gasto'));
-    const catIdx=headers.findIndex(h=>h.includes('categ'));
-    if(mesIdx<0||ingIdx<0||gasIdx<0){alert('El archivo debe tener columnas: mes, ingresos, gastos'); return;}
-    csvPending=[];
-    const tbody=document.querySelector('#tblPreview tbody'); tbody.innerHTML='';
-    for(let i=1;i<lines.length;i++){
-      const cols=lines[i].split(',').map(c=>c.trim().replace(/['"]/g,''));
-      if(!cols[mesIdx]) continue;
-      const row={id:nextId++,mes:cols[mesIdx],ingresos:parseFloat(cols[ingIdx].replace(/[^0-9.]/g,''))||0,gastos:parseFloat(cols[gasIdx].replace(/[^0-9.]/g,''))||0,categoria:catIdx>=0&&cols[catIdx]?cols[catIdx]:'Importado'};
-      csvPending.push(row);
-      if(i<=8) tbody.innerHTML+=`<tr><td>${row.mes}</td><td style="color:var(--ok)">${clp(row.ingresos)}</td><td style="color:var(--danger)">${clp(row.gastos)}</td><td>${row.categoria}</td></tr>`;
-    }
-    document.getElementById('csvCount').textContent='✓ '+csvPending.length+' filas detectadas'+(csvPending.length>8?' (mostrando las primeras 8)':'');
-    document.getElementById('csvPreview').style.display='block';
-  };
-  reader.readAsText(file);
-}
-
-function importData(mode){
-  if(!csvPending.length) return;
-  if(mode==='replace') DATA=csvPending;
-  else DATA=[...DATA,...csvPending];
-  save(); closeModal('modalImport'); renderAll();
-}
-
-function exportCSV(){
-  let csv='mes,ingresos,gastos,utilidad,rentabilidad,categoria\n';
-  DATA.forEach(r=>{
-    const u=r.ingresos-r.gastos;
-    const re=r.ingresos>0?((u/r.ingresos)*100).toFixed(1):0;
-    csv+=`"${r.mes}",${r.ingresos},${r.gastos},${u},${re}%,"${r.categoria}"\n`;
-  });
-  const a=document.createElement('a');
-  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
-  a.download='mss_finanzas_'+new Date().toISOString().split('T')[0]+'.csv';
-  a.click();
-}
-
-// Close modal clicking outside
-document.querySelectorAll('.modal-overlay').forEach(m=>{
-  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); });
-});
-
-// ══════════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════════
-load();
-renderAll();
+try{var _n=document.getElementById('logoNombre');if(_n&&window._EMP)_n.textContent=window._EMP.nombre||'Empresa';}catch(e){}
 </script>
 </body>
 </html>
