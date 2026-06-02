@@ -1323,7 +1323,8 @@ function editCliente(id){
   document.getElementById('cliTel').value=c.tel||'';
   document.getElementById('cliEmail').value=c.email||'';
   document.getElementById('cliDir').value=c.dir||'';
-  O('moCliente');
+  document.getElementById('tCliente').textContent='Editar Cliente';
+  document.getElementById('moCliente').classList.add('open');
 }
 function delCliente(id){if(!confirm('¿Eliminar este cliente?'))return;CLIENTES=CLIENTES.filter(x=>x.id!==id&&x.id!==parseInt(id));save();rClientes();}
 
@@ -1484,18 +1485,9 @@ function O(id){
     document.getElementById('flNumDoc').value='';
   }
   if(id==='moActivo'&&!document.getElementById('aId').value) document.getElementById('tActivo').textContent='Nuevo Activo';
-  if(id==='moCliente') document.getElementById('cliId').value='';
-  if(id==='moMant') document.getElementById('mFecha').value=HOY;
-  document.getElementById(id)?.classList.add('open');
-}
-function C(id){
-  // Al cerrar, limpiar IDs y títulos para que próxima apertura sea "Nuevo"
-  if(id==='moArriendo') document.getElementById('arId').value='';
-  if(id==='moFlete')    document.getElementById('flId').value='';
-  if(id==='moActivo'){  document.getElementById('aId').value=''; document.getElementById('tActivo').textContent='Nuevo Activo';}
   if(id==='moCliente'){
-    document.getElementById('cliId').value='';
     document.getElementById('tCliente').textContent='Nuevo Cliente';
+    document.getElementById('cliId').value='';
     document.getElementById('cliNombre').value='';
     document.getElementById('cliRut').value='';
     document.getElementById('cliGiro').value='';
@@ -1504,6 +1496,15 @@ function C(id){
     document.getElementById('cliEmail').value='';
     document.getElementById('cliDir').value='';
   }
+  if(id==='moMant') document.getElementById('mFecha').value=HOY;
+  document.getElementById(id)?.classList.add('open');
+}
+function C(id){
+  // Al cerrar, limpiar IDs para que próxima apertura sea "Nuevo"
+  if(id==='moArriendo') document.getElementById('arId').value='';
+  if(id==='moFlete')    document.getElementById('flId').value='';
+  if(id==='moActivo')   document.getElementById('aId').value='';
+  if(id==='moCliente')  document.getElementById('cliId').value='';
   document.getElementById(id)?.classList.remove('open');
 }
 document.querySelectorAll('.mo').forEach(function(m){m.addEventListener('click',function(e){if(e.target===m)C(m.id);});});
