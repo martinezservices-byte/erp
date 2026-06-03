@@ -107,7 +107,29 @@ try{var _e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}');if(_e&&_
       <div style="font-size:9px;color:var(--acc);font-family:monospace;letter-spacing:1px">ADMINISTRACIÓN · LEY 21.442</div>
     </div>
   </div>
-  <div style="display:flex;gap:8px">
+  <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+    <div style="position:relative">
+      <button class="bgh" style="padding:6px 12px;font-size:11px" onclick="toggleExpCond()" id="btnExpCond">⬇ Exportar ▾</button>
+      <div id="expCondMenu" style="display:none;position:absolute;right:0;top:36px;background:#08101C;border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:6px;z-index:200;min-width:210px;box-shadow:0 4px 20px rgba(0,0,0,0.6)">
+        <div style="font-size:9px;color:#78716C;padding:4px 10px;font-family:monospace;letter-spacing:1px">📄 PDF PROFESIONAL</div>
+        <button onclick="reporteCond('resumen');toggleExpCond()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:#FFFBEB;font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(16,185,129,0.1)'" onmouseout="this.style.background='none'">📊 Resumen Financiero</button>
+        <button onclick="reporteCond('gastos');toggleExpCond()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:#FFFBEB;font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(16,185,129,0.1)'" onmouseout="this.style.background='none'">💰 Gastos Comunes</button>
+        <button onclick="reporteCond('egresos');toggleExpCond()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:#FFFBEB;font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(16,185,129,0.1)'" onmouseout="this.style.background='none'">📤 Egresos</button>
+        <button onclick="reporteCond('morosidad');toggleExpCond()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:#FFFBEB;font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(16,185,129,0.1)'" onmouseout="this.style.background='none'">⚠ Morosidad</button>
+        <div style="height:1px;background:rgba(16,185,129,0.15);margin:4px 0"></div>
+        <div style="font-size:9px;color:#78716C;padding:4px 10px;font-family:monospace;letter-spacing:1px">📊 CSV / EXCEL</div>
+        <button onclick="expCondCSV('gastos');toggleExpCond()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:#FFFBEB;font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">💰 Gastos Comunes (CSV)</button>
+        <button onclick="expCondCSV('egresos');toggleExpCond()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:#FFFBEB;font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">📤 Egresos (CSV)</button>
+        <button onclick="expCondCSV('unidades');toggleExpCond()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:#FFFBEB;font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">🏠 Unidades (CSV)</button>
+        <button onclick="expCondCSV('fondo');toggleExpCond()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:#FFFBEB;font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">🏦 Fondo Reserva (CSV)</button>
+        <div style="height:1px;background:rgba(16,185,129,0.15);margin:4px 0"></div>
+        <div style="font-size:9px;color:#78716C;padding:4px 10px;font-family:monospace;letter-spacing:1px">📥 IMPORTAR</div>
+        <button onclick="abrirImportCond('egresos');toggleExpCond()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:#FFFBEB;font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">⬆ Importar Egresos (CSV)</button>
+        <button onclick="abrirImportCond('cobros');toggleExpCond()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:#FFFBEB;font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">⬆ Importar Gastos Comunes (CSV)</button>
+        <button onclick="descargarPlantilla('egresos');toggleExpCond()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:#10B981;font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">📋 Plantilla Egresos (CSV)</button>
+        <button onclick="descargarPlantilla('cobros');toggleExpCond()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:#10B981;font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">📋 Plantilla Gastos Comunes (CSV)</button>
+      </div>
+    </div>
     <button class="bg" style="padding:6px 12px;font-size:11px" onclick="O('moCobro')">+ Cobro GC</button>
     <button class="bgh" style="padding:6px 12px;font-size:11px" onclick="O('moEgreso')">+ Egreso</button>
   </div>
@@ -977,7 +999,12 @@ function O(id){
   if(id==='moUnidad'){document.getElementById('tU2').textContent='Nueva Unidad';document.getElementById('uId').value='';poblarTorres();poblarPisos();}
   document.getElementById(id)?.classList.add('open');
 }
-function C(id){document.getElementById(id)?.classList.remove('open');}
+function C(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  if(id==='moImportCond'){el.style.display='none';}
+  else el.classList.remove('open');
+}
 document.querySelectorAll('.mo').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 
 function poblarUnidades(){
@@ -1007,6 +1034,352 @@ function nuevoBlock(){
   document.getElementById('uTorre').value=n.trim();
 }
 
+// ═══════════════════════════════════════════════════
+// EXPORTAR CSV
+// ═══════════════════════════════════════════════════
+function expCondCSV(tipo){
+  const hoy=new Date().toISOString().split('T')[0];
+  const empNombre=(CFG.nombre||'Condominio').replace(/\s/g,'_');
+  let csv='',nombre='';
+  if(tipo==='gastos'){
+    csv='N°,Unidad,Propietario,Mes,GC Ordinario,Mora,Total,Pagado,Saldo,Estado\n';
+    COBROS.forEach(c=>{
+      csv+=`"${c.num||''}","${c.unidadNum||''}","${c.prop||''}","${c.mes||''}",${c.gcOrd||0},${c.mora||0},${c.total||0},${c.pagado||0},${c.saldo||0},"${c.estado||''}"\n`;
+    });
+    nombre='GastosComunes';
+  } else if(tipo==='egresos'){
+    csv='Fecha,Descripción,Categoría,Monto,Proveedor,N°Doc\n';
+    EGRESOS.forEach(e=>{
+      csv+=`"${e.fecha||''}","${e.desc||''}","${e.cat||''}",${e.monto||0},"${e.prov||''}","${e.ndoc||''}"\n`;
+    });
+    nombre='Egresos';
+  } else if(tipo==='unidades'){
+    csv='N° Unidad,Torre/Block,Propietario,RUT,Email,Teléfono,Estado,GC Mensual\n';
+    UNIDADES.forEach(u=>{
+      csv+=`"${u.num||''}","${u.torre||''}","${u.prop||''}","${u.rut||''}","${u.email||''}","${u.tel||''}","${u.estado||''}",${gc(u)}\n`;
+    });
+    nombre='Unidades';
+  } else if(tipo==='fondo'){
+    csv='Fecha,Descripción,Tipo,Monto\n';
+    FONDO.forEach(f=>{
+      csv+=`"${f.fecha||''}","${f.desc||''}","${f.tipo||''}",${f.monto||0}\n`;
+    });
+    nombre='FondoReserva';
+  }
+  if(!csv)return;
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download=nombre+'_'+empNombre+'_'+hoy+'.csv';
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════
+// IMPORTAR CSV EGRESOS
+// ═══════════════════════════════════════════════════
+let _importPending=[];
+
+let _importCondTipo='egresos';
+function abrirImportCond(tipo){
+  _importCondTipo=tipo||'egresos';
+  _importPending=[];
+  const titulo=_importCondTipo==='cobros'?'📥 Importar Gastos Comunes (CSV)':'📥 Importar Egresos (CSV)';
+  const hint=_importCondTipo==='cobros'
+    ?'Columnas: <strong style="color:#FFFBEB">unidad, propietario, mes, monto, estado</strong>'
+    :'Columnas: <strong style="color:#FFFBEB">fecha, descripcion, categoria, monto, proveedor, ndoc</strong>';
+  document.getElementById('importCondTitulo').textContent=titulo;
+  document.getElementById('importCondHint').innerHTML=hint;
+  document.getElementById('moImportCond').style.display='flex';
+  document.getElementById('importCondFile').value='';
+  document.getElementById('importCondPreview').style.display='none';
+  document.getElementById('importCondCount').textContent='';
+}
+
+function leerImportCond(input){
+  const file=input.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const texto=e.target.result;
+    const sep=texto.split('\n')[0].includes(';')?';':',';
+    const lines=texto.split('\n').filter(l=>l.trim());
+    if(lines.length<2){alert('Archivo vacío');return;}
+    const headers=lines[0].split(sep).map(h=>h.trim().toLowerCase().replace(/["'\r]/g,''));
+    const fi=name=>headers.findIndex(h=>h.includes(name));
+    _importPending=[];
+    const tbody=document.querySelector('#importCondTbody');
+    tbody.innerHTML='';
+
+    if(_importCondTipo==='cobros'){
+      // Importar Gastos Comunes
+      for(let i=1;i<lines.length;i++){
+        const cols=lines[i].split(sep).map(c=>c.trim().replace(/["'\r]/g,''));
+        const monto=parseFloat((cols[fi('monto')]||'0').replace(/[^0-9]/g,''))||CFG.gc||40000;
+        const unidadNum=cols[fi('unidad')]||cols[fi('num')]||'';
+        if(!unidadNum)continue;
+        const mes=cols[fi('mes')]||MES;
+        const prop=cols[fi('prop')]||cols[fi('propietario')]||'Sin nombre';
+        const estado=cols[fi('estado')]||'Pendiente';
+        const pagado=estado==='Pagado'?monto:0;
+        const row={
+          id:Date.now()+i,
+          num:'GC-IMP-'+String(i).padStart(3,'0'),
+          unidadNum:unidadNum,
+          prop:prop,
+          mes:mes,
+          gcOrd:monto,
+          mora:0,
+          total:monto,
+          pagado:pagado,
+          saldo:monto-pagado,
+          estado:estado,
+          fechaPago:estado==='Pagado'?mes+'-01':''
+        };
+        _importPending.push(row);
+        if(_importPending.length<=5) tbody.innerHTML+=`<tr><td>Unidad ${row.unidadNum}</td><td>${row.prop}</td><td style="color:var(--ok)">${clp(row.total)}</td></tr>`;
+      }
+      document.getElementById('importCondCount').textContent='✓ '+_importPending.length+' cobros GC listos para importar';
+    } else {
+      // Importar Egresos
+      for(let i=1;i<lines.length;i++){
+        const cols=lines[i].split(sep).map(c=>c.trim().replace(/["'\r]/g,''));
+        const monto=parseFloat((cols[fi('monto')]||'0').replace(/[^0-9]/g,''))||0;
+        if(!monto)continue;
+        const row={
+          id:Date.now()+i,
+          fecha:cols[fi('fecha')]||MES+'-01',
+          desc:cols[fi('desc')]||cols[fi('descripcion')]||'Importado',
+          cat:cols[fi('cat')]||cols[fi('categ')]||'Gastos Generales',
+          monto:monto,
+          prov:cols[fi('prov')]||cols[fi('proveedor')]||'',
+          ndoc:cols[fi('doc')]||cols[fi('ndoc')]||''
+        };
+        _importPending.push(row);
+        if(_importPending.length<=5) tbody.innerHTML+=`<tr><td>${row.fecha}</td><td>${row.desc}</td><td style="color:var(--danger)">${clp(row.monto)}</td></tr>`;
+      }
+      document.getElementById('importCondCount').textContent='✓ '+_importPending.length+' egresos listos para importar';
+    }
+    document.getElementById('importCondPreview').style.display='block';
+  };
+  reader.readAsText(file,'ISO-8859-1');
+}
+
+function confirmarImportCond(){
+  if(!_importPending.length)return;
+  if(_importCondTipo==='cobros'){
+    COBROS=COBROS.concat(_importPending);
+    save();
+    C('moImportCond');
+    rGastos();
+    alert('✓ '+_importPending.length+' cobros de Gastos Comunes importados correctamente');
+  } else {
+    EGRESOS=EGRESOS.concat(_importPending);
+    save();
+    C('moImportCond');
+    rEgresos();
+    alert('✓ '+_importPending.length+' egresos importados correctamente');
+  }
+  _importPending=[];
+}
+
+// ═══════════════════════════════════════════════════
+// TOGGLE MENÚ EXPORTAR
+// ═══════════════════════════════════════════════════
+function descargarPlantilla(tipo){
+  let csv='',nombre='';
+  if(tipo==='egresos'){
+    csv='fecha,descripcion,categoria,monto,proveedor,ndoc\n';
+    csv+=MES+'-01,Gastos de limpieza,Mantención,50000,Empresa Limpieza Ltda,F-001\n';
+    csv+=MES+'-05,Consumo agua,Servicios Básicos,35000,AGUAS DEL NORTE,001234\n';
+    csv+=MES+'-10,Electricidad areas comunes,Servicios Básicos,28000,CGE,B-567\n';
+    nombre='Plantilla_Egresos';
+  } else {
+    csv='unidad,propietario,mes,monto,estado\n';
+    csv+='101,Juan Pérez González,'+MES+',40000,Pendiente\n';
+    csv+='102,María López Soto,'+MES+',40000,Pagado\n';
+    csv+='103,Carlos Rodríguez,'+MES+',40000,Pendiente\n';
+    nombre='Plantilla_GastosComunes';
+  }
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download=nombre+'_'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();
+  setTimeout(()=>alert('✓ Plantilla descargada.\n\nÁbrela en Excel, llena los datos y súbela con "Importar".'),300);
+}
+
+function toggleExpCond(){
+  const m=document.getElementById('expCondMenu');
+  m.style.display=m.style.display==='none'?'block':'none';
+}
+document.addEventListener('click',function(e){
+  const btn=document.getElementById('btnExpCond');
+  const menu=document.getElementById('expCondMenu');
+  if(menu&&btn&&!btn.contains(e.target)&&!menu.contains(e.target)) menu.style.display='none';
+});
+
+// ═══════════════════════════════════════════════════
+// REPORTES PDF PROFESIONALES — CONDOMINIO
+// ═══════════════════════════════════════════════════
+function getLogo(){
+  try{const logos=JSON.parse(localStorage.getItem('mss_logos_v1')||'{}');return logos[String(_EMP_ID)]||null;}catch(e){return null;}
+}
+
+function _headerCondPDF(titulo,subtitulo){
+  const logo=getLogo();
+  const empNombre=CFG.nombre||'Condominio Pioneros 2';
+  const logoHTML=logo
+    ?`<div style="width:65px;height:50px;background:white;border-radius:6px;padding:3px;display:flex;align-items:center;justify-content:center;overflow:hidden"><img src="${logo}" style="max-width:100%;max-height:100%;object-fit:contain"/></div>`
+    :`<div style="width:50px;height:50px;background:#10B981;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:white">🏢</div>`;
+  const hoy=new Date().toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'}).toUpperCase();
+  return `<div style="background:#1a1a1a;color:white;padding:18px 24px;display:flex;justify-content:space-between;align-items:center">
+    <div style="display:flex;align-items:center;gap:14px">${logoHTML}
+      <div><div style="font-size:14px;font-weight:900;margin-bottom:2px">${empNombre}</div>
+      <div style="font-size:10px;color:#aaa">Administración de Condominios · Ley 21.442</div>
+      <div style="font-size:10px;color:#aaa">RUT: ${_EMP_NOMBRE!==empNombre?'65.184.252-2':''}</div></div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:20px;font-weight:900;color:#10B981">${titulo}</div>
+      <div style="font-size:11px;color:#aaa;margin-top:3px">${subtitulo||hoy}</div>
+    </div>
+  </div>`;
+}
+
+function _footerCondPDF(){
+  return `<div style="background:#f5f5f5;padding:10px 24px;display:flex;justify-content:space-between;border-top:1px solid #eee;font-size:10px;color:#999">
+    <span>${CFG.nombre||'Condominio'}</span><span>Generado: ${new Date().toLocaleDateString('es-CL')}</span>
+  </div>`;
+}
+
+function _abrirCondPDF(html,titulo){
+  const v=window.open('','_blank','width=900,height=700');
+  v.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/>
+    <title>${titulo}</title>
+    <style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,sans-serif;background:#f0f0f0;padding:20px;}
+    .page{background:white;max-width:800px;margin:0 auto;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.15);overflow:hidden;margin-bottom:20px;}
+    table{width:100%;border-collapse:collapse;font-size:11px;}
+    th{background:#1a1a1a;color:white;padding:7px 10px;text-align:left;font-size:10px;}
+    td{padding:7px 10px;border-bottom:1px solid #f0f0f0;}tr:nth-child(even){background:#fafafa;}
+    .krow{display:flex;gap:10px;margin:16px 0;flex-wrap:wrap;}
+    .kc{flex:1;min-width:110px;background:#f9f9f9;border-radius:8px;padding:12px;border:1px solid #eee;text-align:center;}
+    .kl{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1px;}
+    .kv{font-size:18px;font-weight:900;margin-top:4px;}
+    .sec{font-size:11px;font-weight:700;color:#10B981;letter-spacing:2px;text-transform:uppercase;margin:18px 0 8px;border-bottom:1px solid #eee;padding-bottom:5px;}
+    .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;}
+    .btn-p{display:block;margin:16px auto;padding:12px 36px;background:#10B981;color:white;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
+    @media print{.btn-p{display:none!important;}body{background:white;padding:0;}@page{margin:12mm;size:A4;}}
+    </style></head><body>
+    <button class="btn-p" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
+    ${html}
+    <button class="btn-p" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
+    </body></html>`);
+  v.document.close();
+}
+
+function reporteCond(tipo){
+  const MES_N=['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const mesActual=document.getElementById('filtMes')?.value||MES;
+  const partes=mesActual.split('-');
+  const mesLabel=(MES_N[parseInt(partes[1])]||partes[1])+' '+partes[0];
+  const clpP=n=>new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Math.round(n||0));
+  const dfP=d=>{try{return new Date(d+'T12:00:00').toLocaleDateString('es-CL');}catch(e){return d||'—';}};
+
+  let html='';
+
+  if(tipo==='resumen'){
+    const cobMes=COBROS.filter(c=>c.mes===mesActual);
+    const egMes=EGRESOS.filter(e=>e.fecha&&e.fecha.startsWith(mesActual));
+    const totCob=cobMes.reduce((s,c)=>s+(c.pagado||0),0);
+    const totEgr=egMes.reduce((s,e)=>s+(e.monto||0),0);
+    const totFondo=FONDO.reduce((s,f)=>s+(f.tipo==='ingreso'?f.monto:-(f.monto||0)),0);
+    const morosos=COBROS.filter(c=>c.mes===mesActual&&(c.saldo||0)>0);
+    const totMora=morosos.reduce((s,c)=>s+(c.saldo||0),0);
+    html=`<div class="page">
+      ${_headerCondPDF('RESUMEN FINANCIERO',mesLabel.toUpperCase())}
+      <div style="padding:20px 24px">
+        <div class="krow">
+          <div class="kc"><div class="kl">GC Recaudado</div><div class="kv" style="color:#059669;font-size:15px">${clpP(totCob)}</div></div>
+          <div class="kc"><div class="kl">Egresos Mes</div><div class="kv" style="color:#dc2626;font-size:15px">${clpP(totEgr)}</div></div>
+          <div class="kc"><div class="kl">Balance</div><div class="kv" style="color:${totCob-totEgr>=0?'#059669':'#dc2626'};font-size:15px">${clpP(totCob-totEgr)}</div></div>
+          <div class="kc"><div class="kl">Fondo Reserva</div><div class="kv" style="color:#d97706;font-size:15px">${clpP(totFondo)}</div></div>
+          <div class="kc"><div class="kl">Por Cobrar</div><div class="kv" style="color:#dc2626;font-size:15px">${clpP(totMora)}</div></div>
+        </div>
+        <div class="sec">Egresos del Mes</div>
+        <table><thead><tr><th>Fecha</th><th>Descripción</th><th>Categoría</th><th>Proveedor</th><th style="text-align:right">Monto</th></tr></thead>
+        <tbody>${egMes.length?egMes.map(e=>`<tr><td>${dfP(e.fecha)}</td><td>${e.desc||'—'}</td><td>${e.cat||'—'}</td><td>${e.prov||'—'}</td><td style="text-align:right;color:#dc2626;font-weight:700">${clpP(e.monto)}</td></tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:#999;padding:14px">Sin egresos este mes</td></tr>'}</tbody>
+        <tfoot><tr><td colspan="4" style="font-weight:700">TOTAL EGRESOS</td><td style="text-align:right;font-weight:900;color:#dc2626">${clpP(totEgr)}</td></tr></tfoot>
+        </table>
+        ${morosos.length?`<div class="sec">Unidades con Deuda</div>
+        <table><thead><tr><th>Unidad</th><th>Propietario</th><th>Mes</th><th style="text-align:right">Deuda</th></tr></thead>
+        <tbody>${morosos.map(c=>`<tr><td style="font-weight:700">Unidad ${c.unidadNum}</td><td>${c.prop||'—'}</td><td>${c.mes||'—'}</td><td style="text-align:right;color:#dc2626;font-weight:700">${clpP(c.saldo)}</td></tr>`).join('')}</tbody></table>`:''}
+      </div>
+      ${_footerCondPDF()}
+    </div>`;
+
+  } else if(tipo==='gastos'){
+    const mes=document.getElementById('filtMes')?.value||MES;
+    const lista=COBROS.filter(c=>c.mes===mes);
+    const totE=lista.reduce((s,c)=>s+(c.total||0),0);
+    const totP=lista.reduce((s,c)=>s+(c.pagado||0),0);
+    html=`<div class="page">
+      ${_headerCondPDF('GASTOS COMUNES',mesLabel.toUpperCase())}
+      <div style="padding:20px 24px">
+        <div class="krow">
+          <div class="kc"><div class="kl">Unidades</div><div class="kv">${lista.length}</div></div>
+          <div class="kc"><div class="kl">Total Emitido</div><div class="kv" style="color:#1a1a1a;font-size:14px">${clpP(totE)}</div></div>
+          <div class="kc"><div class="kl">Recaudado</div><div class="kv" style="color:#059669;font-size:14px">${clpP(totP)}</div></div>
+          <div class="kc"><div class="kl">Pendiente</div><div class="kv" style="color:#dc2626;font-size:14px">${clpP(totE-totP)}</div></div>
+          <div class="kc"><div class="kl">% Cobrado</div><div class="kv" style="color:${totE>0&&totP/totE>=0.9?'#059669':'#d97706'}">${totE>0?Math.round(totP/totE*100):0}%</div></div>
+        </div>
+        <table><thead><tr><th>N°</th><th>Unidad</th><th>Propietario</th><th style="text-align:right">GC Ord.</th><th style="text-align:right">Mora</th><th style="text-align:right">Total</th><th style="text-align:right">Pagado</th><th style="text-align:right">Saldo</th><th>Estado</th></tr></thead>
+        <tbody>${lista.map(c=>{
+          const badge=c.estado==='Pagado'?'background:#d1fae5;color:#065f46':c.estado==='Moroso'?'background:#fee2e2;color:#991b1b':'background:#fef3c7;color:#92400e';
+          return `<tr><td style="color:#10B981;font-weight:700">${c.num||''}</td><td>${c.unidadNum||''}</td><td>${c.prop||'—'}</td><td style="text-align:right">${clpP(c.gcOrd)}</td><td style="text-align:right;color:#dc2626">${clpP(c.mora)}</td><td style="text-align:right;font-weight:700">${clpP(c.total)}</td><td style="text-align:right;color:#059669">${clpP(c.pagado)}</td><td style="text-align:right;color:${c.saldo>0?'#dc2626':'#059669'};font-weight:700">${clpP(c.saldo)}</td><td><span class="badge" style="${badge}">${c.estado||'—'}</span></td></tr>`;
+        }).join('')}</tbody>
+        <tfoot><tr style="background:#1a1a1a;color:white"><td colspan="5" style="padding:8px 10px;font-weight:700">TOTALES</td><td style="text-align:right;padding:8px 10px;font-weight:900">${clpP(totE)}</td><td style="text-align:right;padding:8px 10px;color:#4ade80">${clpP(totP)}</td><td style="text-align:right;padding:8px 10px;color:#f87171">${clpP(totE-totP)}</td><td></td></tr></tfoot>
+        </table>
+      </div>
+      ${_footerCondPDF()}
+    </div>`;
+
+  } else if(tipo==='egresos'){
+    const tot=EGRESOS.reduce((s,e)=>s+(e.monto||0),0);
+    html=`<div class="page">
+      ${_headerCondPDF('REGISTRO DE EGRESOS','TODOS LOS PERÍODOS')}
+      <div style="padding:20px 24px">
+        <div class="krow">
+          <div class="kc"><div class="kl">Total Registros</div><div class="kv">${EGRESOS.length}</div></div>
+          <div class="kc"><div class="kl">Total Egresos</div><div class="kv" style="color:#dc2626;font-size:14px">${clpP(tot)}</div></div>
+        </div>
+        <table><thead><tr><th>Fecha</th><th>Descripción</th><th>Categoría</th><th>Proveedor</th><th>N°Doc</th><th style="text-align:right">Monto</th></tr></thead>
+        <tbody>${EGRESOS.slice().sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||'')).map(e=>`<tr><td>${dfP(e.fecha)}</td><td>${e.desc||'—'}</td><td>${e.cat||'—'}</td><td>${e.prov||'—'}</td><td style="font-family:monospace">${e.ndoc||'—'}</td><td style="text-align:right;font-weight:700;color:#dc2626">${clpP(e.monto)}</td></tr>`).join('')}</tbody>
+        <tfoot><tr style="background:#1a1a1a;color:white"><td colspan="5" style="padding:8px 10px;font-weight:700">TOTAL</td><td style="text-align:right;padding:8px 10px;font-weight:900;color:#f87171">${clpP(tot)}</td></tr></tfoot>
+        </table>
+      </div>
+      ${_footerCondPDF()}
+    </div>`;
+
+  } else if(tipo==='morosidad'){
+    const mesM=document.getElementById('filtMes')?.value||MES;
+    const morosos=COBROS.filter(c=>c.mes===mesM&&(c.saldo||0)>0);
+    const totMora=morosos.reduce((s,c)=>s+(c.saldo||0),0);
+    html=`<div class="page">
+      ${_headerCondPDF('REPORTE DE MOROSIDAD',mesLabel.toUpperCase())}
+      <div style="padding:20px 24px">
+        <div class="krow">
+          <div class="kc"><div class="kl">Unidades con Deuda</div><div class="kv" style="color:#dc2626">${morosos.length}</div></div>
+          <div class="kc"><div class="kl">Total Adeudado</div><div class="kv" style="color:#dc2626;font-size:14px">${clpP(totMora)}</div></div>
+          <div class="kc"><div class="kl">% Morosidad</div><div class="kv" style="color:#dc2626">${COBROS.filter(c=>c.mes===mesM).length>0?Math.round(morosos.length/COBROS.filter(c=>c.mes===mesM).length*100):0}%</div></div>
+        </div>
+        ${morosos.length?`<table><thead><tr><th>Unidad</th><th>Propietario</th><th>Mes</th><th style="text-align:right">GC Ord.</th><th style="text-align:right">Mora</th><th style="text-align:right">Total</th><th style="text-align:right">Pagado</th><th style="text-align:right">Deuda</th></tr></thead>
+        <tbody>${morosos.map(c=>`<tr><td style="font-weight:700;color:#dc2626">Unidad ${c.unidadNum}</td><td>${c.prop||'—'}</td><td>${c.mes||'—'}</td><td style="text-align:right">${clpP(c.gcOrd)}</td><td style="text-align:right;color:#dc2626">${clpP(c.mora)}</td><td style="text-align:right;font-weight:700">${clpP(c.total)}</td><td style="text-align:right;color:#059669">${clpP(c.pagado)}</td><td style="text-align:right;font-weight:900;color:#dc2626">${clpP(c.saldo)}</td></tr>`).join('')}</tbody>
+        <tfoot><tr style="background:#1a1a1a;color:white"><td colspan="7" style="padding:8px 10px;font-weight:700">TOTAL ADEUDADO</td><td style="text-align:right;padding:8px 10px;font-weight:900;color:#f87171">${clpP(totMora)}</td></tr></tfoot>
+        </table>`:'<div style="text-align:center;padding:24px;color:#059669;font-weight:700">✓ Sin morosos este mes</div>'}
+      </div>
+      ${_footerCondPDF()}
+    </div>`;
+  }
+
+  if(html) _abrirCondPDF(html, tipo.charAt(0).toUpperCase()+tipo.slice(1)+' — '+CFG.nombre);
+}
+
 // ═══════════════════════════════════
 // INIT
 // ═══════════════════════════════════
@@ -1015,5 +1388,36 @@ document.getElementById('condNombre').textContent=CFG.nombre||'Condominio Pioner
 document.getElementById('filtMes').value=MES;
 rDash();
 </script>
+
+<!-- MODAL IMPORTAR EGRESOS -->
+<div class="mo" id="moImportCond" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;padding:16px;overflow-y:auto">
+  <div style="background:#08101C;border-radius:13px;padding:24px;border:1px solid rgba(16,185,129,0.3);width:500px;max-height:90vh;overflow-y:auto">
+    <h3 id="importCondTitulo" style="font-size:15px;font-weight:900;margin-bottom:14px;color:#FFFBEB">📥 Importar (CSV)</h3>
+    <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:12px;margin-bottom:14px;font-size:11px;color:#A8A29E">
+      <div style="color:#10B981;font-weight:700;margin-bottom:6px">Formato CSV requerido:</div>
+      <div id="importCondHint">Columnas: <strong style="color:#FFFBEB">fecha, descripcion, categoria, monto, proveedor, ndoc</strong></div>
+      <div style="margin-top:4px">Separador: coma (,) o punto y coma (;) · <span style="color:#10B981">Descarga la plantilla para empezar</span></div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:10px;color:#78716C;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;font-family:monospace">Archivo CSV</label>
+      <input type="file" id="importCondFile" accept=".csv,.txt" onchange="leerImportCond(this)" style="width:100%;padding:7px;background:#04080F;border:1px solid rgba(16,185,129,0.15);border-radius:6px;color:#FFFBEB;font-family:monospace;font-size:11px"/>
+    </div>
+    <div id="importCondPreview" style="display:none;margin-bottom:12px">
+      <div style="font-size:11px;color:#10B981;font-weight:700;margin-bottom:8px" id="importCondCount"></div>
+      <div style="overflow-y:auto;max-height:160px;border:1px solid rgba(16,185,129,0.15);border-radius:6px">
+        <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:monospace">
+          <thead><tr style="background:#0D1826"><th style="padding:6px 8px;text-align:left;color:#10B981">Fecha</th><th style="padding:6px 8px;text-align:left;color:#10B981">Descripción</th><th style="padding:6px 8px;text-align:right;color:#10B981">Monto</th></tr></thead>
+          <tbody id="importCondTbody"></tbody>
+        </table>
+      </div>
+      <div style="font-size:10px;color:#78716C;margin-top:5px">* Mostrando primeros 5 registros</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button onclick="confirmarImportCond()" style="flex:1;padding:9px;border-radius:7px;border:none;cursor:pointer;font-weight:700;font-size:12px;font-family:monospace;background:#10B981;color:white">✓ Importar Egresos</button>
+      <button onclick="C('moImportCond')" style="padding:9px 18px;border-radius:7px;cursor:pointer;font-weight:700;font-size:12px;font-family:monospace;background:transparent;border:1px solid rgba(16,185,129,0.2);color:#10B981">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
