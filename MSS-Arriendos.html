@@ -1017,94 +1017,214 @@ function delArriendo(id){
 // ═══════════════════════════════════════════
 // EMISIÓN AUTOMÁTICA DESDE ARRIENDO
 // ═══════════════════════════════════════════
+function esVehiculo(activo){
+  const tipo=(activo.tipo||activo.cat||activo.nombre||'').toLowerCase();
+  return tipo.includes('veh')||tipo.includes('auto')||tipo.includes('moto')||
+         tipo.includes('camion')||tipo.includes('camión')||tipo.includes('furgon')||
+         tipo.includes('furgón')||tipo.includes('pickup')||tipo.includes('van')||
+         tipo.includes('porter')||tipo.includes('truck')||tipo.includes('minibus')||
+         tipo.includes('microbus');
+}
+
+function estilosDoc(){
+  return `*{margin:0;padding:0;box-sizing:border-box;}body{background:#f5f5f5;font-family:Arial,sans-serif;padding:20px;}
+  .doc{background:white;max-width:760px;margin:0 auto;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.15);overflow:hidden;}
+  .doc-head{border-bottom:3px solid #1a1a1a;padding:16px 22px;display:flex;justify-content:space-between;align-items:flex-start;}
+  .doc-head-left{display:flex;flex-direction:column;gap:4px;}
+  .doc-body{padding:20px 24px;}
+  .doc-title{font-size:14px;font-weight:900;text-align:center;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #1a1a1a;padding-bottom:8px;}
+  .doc-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:10px;}
+  .doc-table th{background:#1a1a1a;color:white;padding:7px 9px;text-align:left;}
+  .doc-table td{padding:7px 9px;border:1px solid #ccc;}
+  .clausula{margin-bottom:10px;font-size:10.5px;line-height:1.75;text-align:justify;}
+  .firmas{display:flex;justify-content:space-around;margin-top:32px;padding-top:16px;border-top:2px solid #1a1a1a;}
+  .firma{text-align:center;min-width:180px;}
+  .firma-line{border-top:1px solid #1a1a1a;padding-top:6px;margin-top:36px;font-size:10px;line-height:1.6;}
+  .doc-footer{background:#f5f5f5;padding:8px 22px;font-size:9px;color:#666;border-top:1px solid #ddd;text-align:center;}
+  .btn-print{display:block;margin:16px auto;padding:12px 32px;background:#F59E0B;color:#1a1a1a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
+  @media print{.btn-print{display:none!important;}body{background:white;padding:0;}@page{margin:12mm;size:letter;}}`;
+}
+
 function emitirContrato(id){
   const a=ARRIENDOS.find(x=>parseInt(x.id)===parseInt(id));if(!a)return;
   const activo=ACTIVOS.find(x=>parseInt(x.id)===parseInt(a.activoId))||{};
   const cliente=CLIENTES.find(x=>parseInt(x.id)===parseInt(a.clienteId))||{};
   const emp=getEmpresa();
   const logo=getLogo();
-  const logoHTML=logo?`<img src="${logo}" style="height:60px;object-fit:contain"/>`:`<div style="font-size:22px;font-weight:900;color:#F59E0B">${emp.nombre.charAt(0)}</div>`;
+  const logoHTML=logo?`<img src="${logo}" style="height:65px;object-fit:contain"/>`:`<div style="font-size:24px;font-weight:900;color:#F59E0B">${emp.nombre.charAt(0)}</div>`;
   const dias=a.inicio&&a.termino?Math.ceil((new Date(a.termino)-new Date(a.inicio))/(1000*60*60*24))+1:1;
-  const fechaF=a.inicio?new Date(a.inicio+'T12:00:00').toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'}).toUpperCase():'—';
+  const fechaLarga=a.inicio?new Date(a.inicio+'T12:00:00').toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'}).toUpperCase():'—';
+  const fechaInicio=df(a.inicio);
+  const fechaTermino=df(a.termino);
   const garantia=a.garantia||0;
+  const vehiculo=esVehiculo(activo);
+  const numCtto=a.num?a.num.replace('ARR-',''):'';
+  const ciudad=(emp.ciudad||emp.comuna||'ALTO HOSPICIO').toUpperCase();
 
-  const html=`<div class="doc-arr">
-    <div class="doc-arr-head">
-      <div>${logoHTML}
-        <div style="font-size:13px;font-weight:900;margin-top:6px">${emp.nombre}</div>
-        <div style="font-size:10px;color:#444">${emp.direccion||''}</div>
-        <div style="font-size:10px;color:#444">Rut: ${emp.rut||''}</div>
-        <div style="font-size:10px;color:#444">Giro: ${emp.giro||'Servicios de Arriendos, Flete y Venta de productos para Construcción y Ferretería'}</div>
-        <div style="font-size:10px;color:#444">Tel: ${emp.tel||''} | Email: ${emp.email||''}</div>
+  // Despacho checks
+  const chkFlete   = a.tipoDespacho==='flete'    ?'X':'&nbsp;';
+  const chkRetira  = (a.tipoDespacho==='retira'||!a.tipoDespacho)?'X':'&nbsp;';
+  const chkSinCost = a.tipoDespacho==='despacho' ?'X':'&nbsp;';
+  const chkEfectivo   = (a.formaPagoGarantia||'').toLowerCase().includes('efectivo')  ?'X':' ';
+  const chkTransfer   = (a.formaPagoGarantia||'').toLowerCase().includes('transfer')  ?'X':' ';
+
+  let html = '';
+
+  if(vehiculo){
+    // ══════════════════════════════════════════
+    // CONTRATO ARRIENDO VEHÍCULOS
+    // ══════════════════════════════════════════
+    const patente = activo.patente||'—';
+    const motor   = activo.motor||activo.serie||'—';
+    const anio    = activo.anio||'—';
+    const tipoVeh = activo.tipo||activo.nombre||'Vehículo';
+    const marca   = activo.marca||'—';
+
+    html = `<div class="doc">
+      <div class="doc-head">
+        <div class="doc-head-left">${logoHTML}</div>
+        <div style="text-align:right">
+          <div style="font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:1px">CONTRATO ARRIENDO DE VEHÍCULOS N°${numCtto}</div>
+        </div>
       </div>
-      <div style="text-align:right"><div style="font-size:9px;color:#666">N°</div><div style="font-size:22px;font-weight:900">${a.num}</div></div>
-    </div>
-    <div class="doc-arr-body">
-      <div class="doc-arr-title">CONTRATO DE ARRIENDO MAQUINARIA N° ${a.num}</div>
-      <p class="doc-arr-clausula">En <strong>${(emp.ciudad||emp.comuna||'ALTO HOSPICIO').toUpperCase()}</strong>, a ${fechaF}, entre <strong>${emp.nombre}</strong>, RUT ${emp.rut||''}, representada por <strong>DOÑA ${((emp.contacto)||'GAUDY MARTINEZ YOVERA').toUpperCase()}</strong>, RUT ${emp.rut_rep||'23.918.699-8'}, domiciliada en ${emp.direccion||''}, en adelante <strong>"EL ARRENDADOR"</strong>; y Don(ña) <strong>${(cliente.nombre||'—').toUpperCase()}</strong>, RUT: ${cliente.rut||'—'}, domiciliado en ${cliente.dir||a.lugar||'—'}, Fono: ${cliente.tel||'—'}, en adelante <strong>"EL ARRENDATARIO"</strong>, se ha convenido el siguiente contrato:</p>
-      <p class="doc-arr-clausula"><strong>PRIMERO:</strong> EL ARRENDADOR es dueño de las especies individualizadas o aquellas descritas en la cláusula tercera.</p>
-      <p class="doc-arr-clausula"><strong>SEGUNDO:</strong> EL ARRENDADOR da en arriendo al ARRENDATARIO las especies señaladas, quien declara recibirlas en buen estado, con sus mantenciones al día y a su entera satisfacción. El equipo deberá mantenerse exclusivamente en la obra ubicada en <strong>${a.lugar||'—'}</strong>, y usarse según su naturaleza técnica.</p>
-      <p class="doc-arr-clausula"><strong>TERCERO:</strong> La renta de arrendamiento será la siguiente:</p>
-      <table class="doc-arr-table">
-        <thead><tr><th>Cant.</th><th>Descripción</th><th>Marca</th><th>Nro. Serie</th><th>Valor Diario</th><th>Garantía</th></tr></thead>
-        <tbody><tr><td style="text-align:center">1</td><td>${activo.nombre||a.activoNombre}</td><td>${activo.marca||'—'}</td><td>${activo.patente||'S/S'}</td><td style="text-align:right">${clp(a.tarifa)}</td><td style="text-align:right">${clp(garantia)}</td></tr></tbody>
-      </table>
-      <p class="doc-arr-clausula">La renta se pagará por mensualidad vencida dentro de los primeros 5 días (o al término del periodo descrito si es menor a un mes), el retardo generará el interés máximo convencional. La garantía será devuelta al término del contrato si el equipo es devuelto en buen estado.</p>
-      ${garantia>0?`<p class="doc-arr-clausula"><strong>Se deja constancia que, se recibe GARANTÍA mediante EFECTIVO [${(a.formaPagoGarantia||'').toLowerCase().includes('efectivo')?'X':' '}] TRANSFERENCIA [${(a.formaPagoGarantia||'').toLowerCase().includes('transfer')?'X':' '}] a la cuenta de nuestra empresa, la cual será devuelta de la misma forma.</strong></p>`:''}
-      <p class="doc-arr-clausula"><strong>CUARTO:</strong> El servicio de despacho y retiro de la maquinaria operará bajo las siguientes condiciones seleccionadas:</p>
-  <table style="width:100%;border:none;margin-bottom:12px;font-size:10pt;line-height:1.8">
-    <tr>
-      <td style="width:28px;text-align:center;vertical-align:top">[${a.tipoDespacho==='flete'?'X':'&nbsp;'}]</td>
-      <td style="padding-left:8px;text-align:justify"><strong>CON COSTO ADICIONAL.</strong> El cliente cancelará la suma única de ${clp(a.costoFlete||0)} por concepto de traslado de equipos (ida y vuelta).</td>
-    </tr>
-    <tr>
-      <td style="width:28px;text-align:center;vertical-align:top">[${(a.tipoDespacho==='retira'||!a.tipoDespacho)?'X':'&nbsp;'}]</td>
-      <td style="padding-left:8px;text-align:justify"><strong>RETIRA CLIENTE.</strong> El arrendatario retira y devuelve el equipo por sus propios medios, asumiendo total responsabilidad por daños durante el transporte.</td>
-    </tr>
-    <tr>
-      <td style="width:28px;text-align:center;vertical-align:top">[${a.tipoDespacho==='despacho'?'X':'&nbsp;'}]</td>
-      <td style="padding-left:8px;text-align:justify"><strong>DESPACHO SIN COSTO ADICIONAL.</strong> El arrendador entrega y retira el equipo en la obra indicada sin costo extra para el arrendatario.</td>
-    </tr>
-  </table>
-  <p style="display:none">
-      <p class="doc-arr-clausula"><strong>QUINTO:</strong> El contrato rige por <strong>${dias} día(s)</strong> desde el <strong>${df(a.inicio)}</strong> hasta el <strong>${df(a.termino)}</strong>. Se entenderá renovado tácita y sucesivamente por periodos iguales, salvo que una parte avise el término por escrito con 3 días de anticipación.</p>
-      <p class="doc-arr-clausula"><strong>SEXTO:</strong> Se prohíbe el subarriendo, la cesión a terceros o el traslado de la maquinaria fuera de la obra indicada sin autorización escrita.</p>
-      <p class="doc-arr-clausula"><strong>SÉPTIMO:</strong> Ante incumplimiento, el Arrendatario faculta al Arrendador para retirar las especies desde donde se encuentren. Se aplicará el Art. 1945 del C. Civil respecto a indemnizaciones.</p>
-      <p class="doc-arr-clausula"><strong>OCTAVO:</strong> El contrato no se extingue por pérdida o destrucción del bien. El Arrendatario deberá indemnizar al Arrendador pagando el <strong>valor comercial de reposición</strong> del equipo.</p>
-      <p class="doc-arr-clausula"><strong>NOVENO:</strong> El Arrendatario asume la responsabilidad civil y penal por accidentes, daños a terceros o mal uso del equipo.</p>
-      <p class="doc-arr-clausula"><strong>DÉCIMO:</strong> Para todos los efectos legales, las partes fijan domicilio en la ciudad de <strong>IQUIQUE/ALTO HOSPICIO</strong> y se someten a sus tribunales ordinarios.</p>
-      <div class="doc-arr-firmas">
-        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">${emp.nombre}</div><div>RUT: ${emp.rut||''}</div><div>Arrendador</div></div></div>
-        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">${cliente.nombre||'—'}</div><div>RUT: ${cliente.rut||'—'}</div><div>Arrendatario</div></div></div>
+      <div class="doc-body">
+        <p class="clausula">En <strong>${ciudad}</strong>, a ${fechaLarga}, entre <strong>${emp.nombre.toUpperCase()}</strong>, RUT <strong>${emp.rut||''}</strong>, representada por <strong>DOÑA ${(emp.contacto||'GAUDY MARTINEZ YOVERA').toUpperCase()}</strong>, RUT <strong>${emp.rut_rep||'23.918.699-8'}</strong>, domiciliada ${emp.direccion||''}, en adelante <strong>"EL ARRENDADOR"</strong>&nbsp;; y Don(ña) <strong>${(cliente.nombre||'—').toUpperCase()}</strong>, RUT: <strong>${cliente.rut||'—'}</strong>, domiciliado en <strong>${cliente.dir||'—'}</strong>, Teléfono: <strong>${cliente.tel||'—'}</strong>, Email: <u>${cliente.email||'_______________________________'}</u>&nbsp;&nbsp;en adelante <strong>"EL ARRENDATARIO"</strong>, se ha convenido lo siguiente:</p>
+
+        <p class="clausula"><strong>PRIMERO:</strong> EL ARRENDADOR es dueño del vehículo que entrega en arriendo al ARRENDATARIO, quien declara recibirlo en buen estado, con sus mantenciones al día y a su entera satisfacción:</p>
+        <ul style="font-size:10.5px;line-height:2;padding-left:24px;margin-bottom:10px">
+          <li><strong>Tipo:</strong> ${tipoVeh} ${marca}.</li>
+          <li><strong>Patente:</strong> ${patente} | <strong>Motor:</strong> ${motor}.</li>
+          <li><strong>Año:</strong> ${anio}.</li>
+        </ul>
+
+        <p class="clausula"><strong>SEGUNDO:</strong> El vehículo se destinará exclusivamente a <strong>${a.obs||'uso según lo acordado'}</strong>. Cualquier daño ocurrido durante la carga, transporte o descarga es responsabilidad exclusiva del ARRENDATARIO. Se prohíbe estrictamente el subarriendo, la cesión a terceros o el traslado del vehículo fuera de la Región de Tarapacá sin autorización escrita.</p>
+        <ul style="font-size:10.5px;line-height:1.9;padding-left:24px;margin-bottom:10px">
+          <li><strong>Exención de Responsabilidad:</strong> EL ARRENDADOR solo provee el vehículo. EL ARRENDATARIO asume todo riesgo derivado del uso, lo cual no le da derecho a reembolso del arriendo pactado.</li>
+        </ul>
+
+        <p class="clausula"><strong>TERCERO:</strong> EL ARRENDATARIO asume la responsabilidad civil y penal total por accidentes, daños a terceros o mal uso del equipo.</p>
+        <ul style="font-size:10.5px;line-height:1.9;padding-left:24px;margin-bottom:10px">
+          <li><strong>Indemnización:</strong> En caso de pérdida total, robo o destrucción, el Arrendatario pagará el valor comercial de reposición.</li>
+          <li><strong>Seguro:</strong> En caso de siniestro con cobertura de seguro, el Arrendatario pagará de forma inmediata el valor del deducible. Si el seguro no cubre el evento por responsabilidad del conductor, el Arrendatario pagará el daño total.</li>
+          <li><strong>Ley de Tránsito:</strong> El Arrendatario es responsable de toda infracción de tránsito o TAG. Autoriza irrevocablemente al Arrendador a cobrar cualquier multa notificada con fecha posterior a la devolución.</li>
+        </ul>
+
+        <p class="clausula"><strong>CUARTO:</strong> El contrato rige por <strong>${dias} día(s) (${dias===1?'24 horas':dias*24+' horas'})</strong>, con un valor día de <strong>${clp(a.tarifa)}</strong>, desde el <strong>${fechaInicio}</strong> hasta el <strong>${fechaTermino}</strong>. La renta se pagará por el periodo pactado.</p>
+        ${garantia>0?`<p class="clausula"><strong>Garantía:</strong> Se entrega una <strong>garantía de ${clp(garantia)}</strong>. Es totalmente reembolsable siempre que el vehículo se devuelva en el domicilio del ARRENDADOR sin daños y con el mismo nivel de combustible entregado.</p>`:''}
+
+        <p class="clausula"><strong>QUINTO:</strong> Ante cualquier incumplimiento, el Arrendatario faculta al Arrendador para retirar el vehículo desde donde se encuentre, renunciando a cualquier acción de oposición.</p>
+
+        <p class="clausula"><strong>SEXTO:</strong> Se deja constancia de la entrega de los siguientes documentos (originales o copias autorizadas):</p>
+        <ul style="font-size:10.5px;line-height:2;padding-left:24px;margin-bottom:10px">
+          <li>Permiso de Circulación vigente.</li>
+          <li>SOAP (Seguro Obligatorio) vigente.</li>
+          <li>Revisión Técnica al día.</li>
+        </ul>
+
+        <div style="border:1px solid #ccc;border-radius:4px;padding:14px;margin-bottom:14px">
+          <p style="font-size:11px;font-weight:900;text-transform:uppercase;margin-bottom:10px;border-bottom:1px solid #ccc;padding-bottom:6px">ANEXO: GUÍA DE ENTREGA Y ESTADO (ACTA DE RECEPCIÓN)</p>
+          <ul style="font-size:10.5px;line-height:2.2;padding-left:24px">
+            <li><strong>Casco y Accesorios:</strong> _________________________________</li>
+            <li><strong>Nivel de Combustible:</strong> _________________________________</li>
+            <li><strong>Observaciones de Estado (Daños/Rayas):</strong> _____________________________</li>
+          </ul>
+          <p style="font-size:11px;font-weight:700;margin:10px 0 6px">Datos de Traslado del Equipo:</p>
+          <ul style="font-size:10.5px;line-height:2.2;padding-left:24px">
+            <li><strong>Modo de Traslado:</strong> _______________________________</li>
+            <li><strong>Patente Vehículo de Traslado:</strong> _____________</li>
+            <li><strong>Destino del Traslado:</strong> ${a.lugar||'___________'} / <strong>Fecha:</strong> ${fechaInicio} <strong>Hora de Traslado:</strong> ${a.horaEntrega||'______'}</li>
+          </ul>
+        </div>
+
+        <div class="firmas">
+          <div class="firma"><div class="firma-line"><div style="font-weight:700">Arrendador</div><div>${emp.nombre}</div><div>RUT: ${emp.rut||''}</div></div></div>
+          <div class="firma"><div class="firma-line"><div style="font-weight:700">Arrendatario</div><div>${cliente.nombre||'—'}</div><div>RUT: ${cliente.rut||'—'}</div></div></div>
+        </div>
       </div>
-    </div>
-    <div class="doc-arr-footer"><span>${emp.nombre} · RUT ${emp.rut||''} · ${emp.direccion||''}</span></div>
-  </div>`;
+      <div class="doc-footer">${emp.nombre} · RUT ${emp.rut||''} · ${emp.direccion||''}</div>
+    </div>`;
+
+  } else {
+    // ══════════════════════════════════════════
+    // CONTRATO ARRIENDO MAQUINARIA / EQUIPOS
+    // ══════════════════════════════════════════
+    html = `<div class="doc">
+      <div class="doc-head">
+        <div class="doc-head-left">
+          ${logoHTML}
+          <div style="font-size:12px;font-weight:900;margin-top:6px">${emp.nombre.toUpperCase()}</div>
+          <div style="font-size:9.5px;color:#444">${emp.direccion||''}</div>
+          <div style="font-size:9.5px;color:#444">Rut: ${emp.rut||''}</div>
+          <div style="font-size:9.5px;color:#444">Giro: ${emp.giro||'Servicios de Arriendos, Flete y Venta de productos para Construcción y Ferretería'}</div>
+          <div style="font-size:9.5px;color:#444">Tel: ${emp.tel||''} | Email: ${emp.email||''}</div>
+        </div>
+        <div style="text-align:right"><div style="font-size:9px;color:#666">N°</div><div style="font-size:24px;font-weight:900">${a.num}</div></div>
+      </div>
+      <div class="doc-body">
+        <div class="doc-title">CONTRATO DE ARRIENDO MAQUINARIA N° ${numCtto}</div>
+
+        <p class="clausula">En <strong>${ciudad}</strong>, a <strong>${fechaLarga}</strong>, entre <strong>${emp.nombre.toUpperCase()}</strong>, RUT <strong>${emp.rut||''}</strong>, representada por <strong>DOÑA ${(emp.contacto||'GAUDY MARTINEZ YOVERA').toUpperCase()}</strong>, RUT <strong>${emp.rut_rep||'23.918.699-8'}</strong>, domiciliada en <strong>${emp.direccion||''}</strong>, en adelante <strong>"EL ARRENDADOR"</strong>; y Don(ña) <strong>${(cliente.nombre||'—').toUpperCase()}</strong>, RUT: <strong>${cliente.rut||'—'}</strong>, domiciliado en <strong>${cliente.dir||'—'}</strong>, Fono: <strong>${cliente.tel||'—'}</strong>, en adelante <strong>"EL ARRENDATARIO"</strong>, se ha convenido el siguiente contrato:</p>
+
+        <p class="clausula"><strong>PRIMERO:</strong> EL ARRENDADOR es dueño de las especies individualizadas o aquellas descritas en la cláusula tercera.</p>
+
+        <p class="clausula"><strong>SEGUNDO:</strong> EL ARRENDADOR da en arriendo al ARRENDATARIO las especies señaladas, quien declara recibirlas en buen estado, con sus mantenciones al día y a su entera satisfacción. El equipo deberá mantenerse exclusivamente en la obra ubicada en <strong>${(a.lugar||'—').toUpperCase()}</strong>, y usarse según su naturaleza técnica.</p>
+
+        <p class="clausula"><strong>TERCERO:</strong> La renta de arrendamiento será la siguiente:</p>
+        <table class="doc-table">
+          <thead><tr><th>Cant.</th><th>Descripción</th><th>Marca</th><th>Nro. Serie</th><th style="text-align:right">Valor Diario</th><th style="text-align:right">Garantía</th></tr></thead>
+          <tbody><tr>
+            <td style="text-align:center">1</td>
+            <td style="font-weight:700">${activo.nombre||a.activoNombre}</td>
+            <td>${activo.marca||'—'}</td>
+            <td>${activo.patente||activo.serie||'S/S'}</td>
+            <td style="text-align:right">${clp(a.tarifa)}</td>
+            <td style="text-align:right">${clp(garantia)}</td>
+          </tr></tbody>
+        </table>
+
+        <p class="clausula">La renta se pagará por mensualidad vencida dentro de los primeros 5 días (o al término del periodo descrito si es menor a un mes), el retardo generará el interés máximo convencional. La garantía será devuelta al término del contrato si el equipo es devuelto en buen estado.</p>
+
+        ${garantia>0?`<p class="clausula"><strong>Se deja constancia que, se recibe GARANTÍA mediante</strong> EFECTIVO [${chkEfectivo}] TRANSFERENCIA [${chkTransfer}] a la cuenta de nuestra empresa, la cual será devuelta de la misma forma. Siempre y cuando el equipo sea devuelto en las mismas condiciones de entrega.</p>`:''}
+
+        <p class="clausula"><strong>CUARTO:</strong> El servicio de despacho y retiro de la maquinaria operará bajo las siguientes condiciones seleccionadas:</p>
+        <table style="width:100%;border:none;margin-bottom:12px;font-size:10.5px;line-height:1.9">
+          <tr><td style="width:26px;text-align:center;vertical-align:top">[${chkFlete}]</td><td style="padding-left:8px;text-align:justify"><strong>CON COSTO ADICIONAL.</strong> El cliente cancelará la suma única de <strong>${clp(a.costoFlete||0)}</strong> por concepto de traslado de equipos (ida y vuelta).</td></tr>
+          <tr><td style="width:26px;text-align:center;vertical-align:top">[${chkRetira}]</td><td style="padding-left:8px;text-align:justify"><strong>RETIRA CLIENTE.</strong> El arrendatario retira y devuelve el equipo por sus propios medios, asumiendo total responsabilidad por daños durante el transporte.</td></tr>
+          <tr><td style="width:26px;text-align:center;vertical-align:top">[${chkSinCost}]</td><td style="padding-left:8px;text-align:justify"><strong>DESPACHO SIN COSTO ADICIONAL.</strong> El arrendador entrega y retira el equipo en la obra indicada sin costo extra para el arrendatario.</td></tr>
+        </table>
+
+        <p class="clausula"><strong>QUINTO:</strong> El contrato rige por <strong>${dias} día(s)</strong> desde el <strong>${fechaInicio}</strong> hasta el <strong>${fechaTermino}</strong>. Se entenderá renovado tácita y sucesivamente por periodos iguales, salvo que una parte avise el término por escrito o telefónicamente con 3 días de anticipación. El Arrendador podrá poner término inmediato en caso de urgencia según Art. 1967 del Código Civil.</p>
+        <p class="clausula" style="font-style:italic">Se deja constancia que la maquinaria será entregada el día <strong>${fechaInicio}</strong> a las <strong>${a.horaEntrega||'__:__ hrs'}</strong> y será devuelta por el arrendatario al cumplir el plazo <strong>${fechaTermino}</strong>, dándose por terminado el periodo de arriendo de mutuo acuerdo.</p>
+
+        <p class="clausula"><strong>SEXTO:</strong> Se prohíbe el subarriendo, la cesión a terceros o el traslado de la maquinaria fuera de la obra indicada sin autorización escrita. El incumplimiento de esto o la insolvencia del arrendatario facultan la terminación inmediata del contrato.</p>
+
+        <p class="clausula"><strong>SÉPTIMO:</strong> Ante incumplimiento, el Arrendatario faculta al Arrendador para retirar las especies desde donde se encuentren, renunciando a cualquier acción de oposición. Se aplicará el Art. 1945 del C. Civil respecto a indemnizaciones.</p>
+
+        <p class="clausula"><strong>OCTAVO:</strong> El contrato no se extingue por pérdida o destrucción del bien. El Arrendatario deberá indemnizar al Arrendador pagando el <strong>valor comercial de reposición</strong> del equipo.</p>
+
+        <p class="clausula"><strong>NOVENO:</strong> El Arrendatario asume la responsabilidad civil y penal por accidentes, daños a terceros o mal uso del equipo por parte de su personal.</p>
+
+        <p class="clausula"><strong>DÉCIMO:</strong> Para todos los efectos legales, las partes fijan domicilio en la ciudad de <strong>IQUIQUE/ALTO HOSPICIO</strong> y se someten a sus tribunales ordinarios.</p>
+
+        <div class="firmas">
+          <div class="firma"><div class="firma-line"><div style="font-weight:700">${emp.nombre}</div><div>RUT: ${emp.rut||''}</div><div>Arrendador</div></div></div>
+          <div class="firma"><div class="firma-line"><div style="font-weight:700">${(cliente.nombre||'—').toUpperCase()}</div><div>RUT: ${cliente.rut||'—'}</div><div>Arrendatario</div></div></div>
+        </div>
+      </div>
+      <div class="doc-footer">${emp.nombre} · RUT ${emp.rut||''} · ${emp.direccion||''}</div>
+    </div>`;
+  }
 
   const ventana=window.open('','_blank','width=900,height=700');
   ventana.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Contrato ${a.num}</title>
-  <style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#f5f5f5;font-family:Arial,sans-serif;padding:20px;}
-  .doc-arr{background:white;max-width:760px;margin:0 auto;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.15);overflow:hidden;}
-  .doc-arr-head{border-bottom:3px solid #1a1a1a;padding:16px 22px;display:flex;justify-content:space-between;}
-  .doc-arr-body{padding:18px 22px;}
-  .doc-arr-title{font-size:15px;font-weight:900;text-align:center;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;}
-  .doc-arr-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:10px;}
-  .doc-arr-table th{background:#1a1a1a;color:white;padding:6px 8px;}
-  .doc-arr-table td{padding:6px 8px;border:1px solid #ccc;}
-  .doc-arr-clausula{margin-bottom:10px;font-size:10px;line-height:1.7;text-align:justify;}
-  .doc-arr-firmas{display:flex;justify-content:space-between;margin-top:28px;padding-top:16px;border-top:2px solid #1a1a1a;}
-  .doc-arr-firma{text-align:center;min-width:200px;}
-  .doc-arr-firma-line{border-top:1px solid #1a1a1a;padding-top:6px;margin-top:32px;font-size:10px;}
-  .doc-arr-footer{background:#f5f5f5;padding:8px 22px;font-size:9px;color:#666;border-top:1px solid #ddd;}
-  .btn-print{display:block;margin:16px auto;padding:12px 32px;background:#F59E0B;color:#1a1a1a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
-  @media print{.btn-print{display:none!important;}body{background:white;padding:0;}@page{margin:10mm;}}
-  </style></head><body>
+  <style>${estilosDoc()}</style></head><body>
   <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
   ${html}
   <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
   </body></html>`);
   ventana.document.close();
 }
+
 
 function emitirGuia(id){
   const a=ARRIENDOS.find(x=>parseInt(x.id)===parseInt(id));if(!a)return;
@@ -1112,59 +1232,119 @@ function emitirGuia(id){
   const cliente=CLIENTES.find(x=>parseInt(x.id)===parseInt(a.clienteId))||{};
   const emp=getEmpresa();
   const logo=getLogo();
-  const logoHTML=logo?`<img src="${logo}" style="height:55px;object-fit:contain"/>`:`<div style="font-size:22px;font-weight:900;color:#F59E0B">${emp.nombre.charAt(0)}</div>`;
-  const numGuia=String(id).slice(-3);
+  const logoHTML=logo?`<img src="${logo}" style="height:60px;object-fit:contain"/>`:`<div style="font-size:24px;font-weight:900;color:#F59E0B">${emp.nombre.charAt(0)}</div>`;
+  const numGuia=String(a.num||id).replace('ARR-','');
+  const vehiculo=esVehiculo(activo);
+  const fechaEntrega=df(a.inicio);
 
-  const html=`<div class="doc-arr">
-    <div class="doc-arr-head">
-      <div>${logoHTML}</div>
-      <div style="text-align:center;flex:1;padding:0 20px">
-        <div style="font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:1px">GUÍA DE ENTREGA EQUIPOS N° ${numGuia}</div>
+  let html='';
+
+  if(vehiculo){
+    // GUÍA ENTREGA VEHÍCULO
+    html=`<div class="doc">
+      <div class="doc-head">
+        <div>${logoHTML}</div>
+        <div style="text-align:center;flex:1;padding:0 16px">
+          <div style="font-size:16px;font-weight:900;text-transform:uppercase">GUÍA DE ENTREGA VEHÍCULO N° ${numGuia}</div>
+          <div style="font-size:10px;color:#666;margin-top:4px">${emp.nombre} · RUT ${emp.rut||''}</div>
+        </div>
       </div>
-    </div>
-    <div class="doc-arr-body">
-      <p style="margin-bottom:6px;font-size:11px"><strong>Obra:</strong> ${a.lugar||'—'}</p>
-      <p style="margin-bottom:14px;font-size:11px"><strong>Comuna:</strong> Iquique</p>
-      <table class="doc-arr-table" style="margin-bottom:16px">
-        <thead><tr><th>Cant.</th><th>Detalle de Equipo</th><th>Marca/Modelo</th><th>Observación Estado</th></tr></thead>
-        <tbody><tr><td style="text-align:center">1</td><td>${activo.nombre||a.activoNombre}</td><td>${activo.marca||'—'} ${activo.modelo||''}</td><td>Operativa</td></tr></tbody>
-      </table>
-      <p style="font-size:11px;font-weight:700;margin-bottom:8px">Datos Transporte:</p>
-      <ul style="font-size:11px;line-height:2.2;padding-left:18px">
-        <li>Nombre Conductor: <strong>_________________________________</strong></li>
-        <li>RUT: <strong>_________________________</strong></li>
-        <li>Patente Vehículo: <strong>_____________</strong></li>
-        <li>Hora de Entrega Estipulada: <strong>_____________</strong></li>
-        <li>Hora de Retiro Estimada: <strong>_____________</strong></li>
-      </ul>
-      <p style="margin-top:20px;font-size:11px">Recibe Conforme (Cliente): ___________________________</p>
-      <div class="doc-arr-firmas">
-        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">Arrendador</div><div>${emp.nombre}</div><div>RUT: ${emp.rut||''}</div></div></div>
-        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">Arrendatario</div><div>${cliente.nombre||'—'}</div><div>RUT: ${cliente.rut||'—'}</div></div></div>
+      <div class="doc-body">
+        <div style="border:1px solid #ccc;border-radius:4px;margin-bottom:14px;overflow:hidden">
+          <div style="background:#1a1a1a;color:white;padding:7px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px">1. DATOS DEL CLIENTE Y VEHÍCULO</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;font-size:10.5px">
+            <div style="padding:8px 12px;border-bottom:1px solid #eee"><strong>Cliente:</strong> ${cliente.nombre||'—'}</div>
+            <div style="padding:8px 12px;border-bottom:1px solid #eee;border-left:1px solid #eee"><strong>RUT:</strong> ${cliente.rut||'—'}</div>
+            <div style="padding:8px 12px;border-bottom:1px solid #eee"><strong>Vehículo:</strong> ${activo.nombre||a.activoNombre} | Patente: ${activo.patente||'—'}</div>
+            <div style="padding:8px 12px;border-bottom:1px solid #eee;border-left:1px solid #eee"><strong>Fecha Entrega:</strong> ${fechaEntrega} | Hora: ${a.horaEntrega||'____'}</div>
+          </div>
+        </div>
+
+        <div style="border:1px solid #ccc;border-radius:4px;margin-bottom:14px;overflow:hidden">
+          <div style="background:#1a1a1a;color:white;padding:7px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px">2. ESTADO DE RECEPCIÓN</div>
+          <div style="padding:10px 12px;font-size:10.5px">
+            <div style="display:grid;grid-template-columns:1fr 2fr;gap:8px;line-height:2.2">
+              <div><strong>Combustible:</strong></div><div>[&nbsp;] Lleno &nbsp; [&nbsp;] Nivel Medio (OK) &nbsp; [&nbsp;] Otro: _________</div>
+              <div><strong>Documentación:</strong></div><div>[&nbsp;] Permiso Circulación &nbsp; [&nbsp;] SOAP &nbsp; [&nbsp;] Rev. Técnica</div>
+              <div><strong>Accesorios:</strong></div><div>_______________________________________________</div>
+            </div>
+            <p style="margin-top:8px"><strong>Observaciones de Daños:</strong> _______________________________________________</p>
+          </div>
+        </div>
+
+        <div style="border:1px solid #ccc;border-radius:4px;margin-bottom:14px;overflow:hidden">
+          <div style="background:#1a1a1a;color:white;padding:7px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px">3. DATOS DE TRASLADO</div>
+          <div style="padding:10px 12px;font-size:10.5px;line-height:2.2">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div><strong>Modo Traslado:</strong> _____________________</div>
+              <div><strong>Patente Vehículo Traslado:</strong> _________</div>
+              <div><strong>Destino:</strong> ${a.lugar||'___________________'}</div>
+              <div><strong>Hora Traslado:</strong> ${a.horaEntrega||'_________'}</div>
+            </div>
+          </div>
+        </div>
+
+        <p style="font-size:10.5px;margin-bottom:20px">Recibe Conforme (Cliente): ___________________________</p>
+
+        <div class="firmas">
+          <div class="firma"><div class="firma-line"><div style="font-weight:700">Arrendador</div><div>${emp.nombre}</div><div>RUT: ${emp.rut||''}</div></div></div>
+          <div class="firma"><div class="firma-line"><div style="font-weight:700">Arrendatario</div><div>${cliente.nombre||'—'}</div><div>RUT: ${cliente.rut||'—'}</div></div></div>
+        </div>
       </div>
-    </div>
-  </div>`;
+    </div>`;
+
+  } else {
+    // GUÍA ENTREGA EQUIPOS
+    html=`<div class="doc">
+      <div class="doc-head">
+        <div>${logoHTML}</div>
+        <div style="text-align:center;flex:1;padding:0 16px">
+          <div style="font-size:16px;font-weight:900;text-transform:uppercase">GUÍA DE ENTREGA EQUIPOS N° ${numGuia}</div>
+        </div>
+      </div>
+      <div class="doc-body">
+        <p style="margin-bottom:6px;font-size:11px"><strong>Obra:</strong> ${a.lugar||'—'}</p>
+        <p style="margin-bottom:14px;font-size:11px"><strong>Comuna:</strong> ${emp.ciudad||emp.comuna||'Alto Hospicio'}</p>
+
+        <table class="doc-table" style="margin-bottom:16px">
+          <thead><tr><th>Cant.</th><th>Detalle de Equipo</th><th>Marca/Modelo</th><th>Observación Estado</th></tr></thead>
+          <tbody><tr>
+            <td style="text-align:center">1</td>
+            <td style="font-weight:700">${activo.nombre||a.activoNombre}</td>
+            <td>${activo.marca||'—'} ${activo.modelo||''} - ${activo.patente||'S/S'}</td>
+            <td>Eléctrica - Operativa</td>
+          </tr></tbody>
+        </table>
+
+        <p style="font-size:11px;font-weight:700;margin-bottom:8px">Datos Transporte:</p>
+        <ul style="font-size:11px;line-height:2.2;padding-left:18px">
+          <li>Nombre Conductor: <strong>${a.tipoDespacho==='retira'?'N/A':'_________________________________'}</strong></li>
+          <li>RUT: <strong>${a.tipoDespacho==='retira'?'N/A':'_________________________'}</strong></li>
+          <li>Patente Vehículo: <strong>${a.tipoDespacho==='retira'?'N/A':'_____________'}</strong></li>
+          <li>Hora de Entrega Estipulada: <strong>${a.horaEntrega||'_____________'}</strong></li>
+          <li>Hora de Retiro Estimada: <strong>_____________</strong></li>
+        </ul>
+
+        <p style="margin-top:20px;font-size:11px">Recibe Conforme (Cliente): ___________________________</p>
+
+        <div class="firmas">
+          <div class="firma"><div class="firma-line"><div style="font-weight:700">Arrendador</div><div>${emp.nombre}</div><div>RUT: ${emp.rut||''}</div></div></div>
+          <div class="firma"><div class="firma-line"><div style="font-weight:700">Arrendatario</div><div>${cliente.nombre||'—'}</div><div>RUT: ${cliente.rut||'—'}</div></div></div>
+        </div>
+      </div>
+    </div>`;
+  }
 
   const ventana=window.open('','_blank','width=800,height=600');
   ventana.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Guía ${numGuia}</title>
-  <style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#f5f5f5;font-family:Arial,sans-serif;padding:20px;}
-  .doc-arr{background:white;max-width:760px;margin:0 auto;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.15);overflow:hidden;}
-  .doc-arr-head{border-bottom:3px solid #1a1a1a;padding:16px 22px;display:flex;align-items:center;}
-  .doc-arr-body{padding:18px 22px;}
-  .doc-arr-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:10px;}
-  .doc-arr-table th{background:#1a1a1a;color:white;padding:6px 8px;}
-  .doc-arr-table td{padding:6px 8px;border:1px solid #ccc;}
-  .doc-arr-firmas{display:flex;justify-content:space-between;margin-top:28px;padding-top:16px;border-top:2px solid #1a1a1a;}
-  .doc-arr-firma{text-align:center;min-width:200px;}
-  .doc-arr-firma-line{border-top:1px solid #1a1a1a;padding-top:6px;margin-top:32px;font-size:10px;}
-  .btn-print{display:block;margin:16px auto;padding:12px 32px;background:#F59E0B;color:#1a1a1a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
-  @media print{.btn-print{display:none!important;}body{background:white;padding:0;}@page{margin:10mm;}}
-  </style></head><body>
+  <style>${estilosDoc()}</style></head><body>
   <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
   ${html}
+  <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
   </body></html>`);
   ventana.document.close();
 }
+
 
 function emitirDevolucion(id){
   const a=ARRIENDOS.find(x=>parseInt(x.id)===parseInt(id));if(!a)return;
@@ -1173,67 +1353,132 @@ function emitirDevolucion(id){
   const emp=getEmpresa();
   const logo=getLogo();
   const logoHTML=logo?`<img src="${logo}" style="height:55px;object-fit:contain"/>`:`<div style="font-size:22px;font-weight:900;color:#F59E0B">${emp.nombre.charAt(0)}</div>`;
+  const garantia=a.garantia||0;
+  const vehiculo=esVehiculo(activo);
+  const numCtto=a.num?a.num.replace('ARR-',''):'';
 
-  const html=`<div class="doc-arr">
-    <div class="doc-arr-head">
-      <div>${logoHTML}</div>
-      <div style="text-align:center;flex:1;padding:0 20px">
-        <div style="font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:1px">COMPROBANTE DE DEVOLUCIÓN</div>
-      </div>
-    </div>
-    <div class="doc-arr-body">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;font-size:11px">
-        <div><strong>Cliente:</strong> ${cliente.nombre||'—'}</div>
-        <div><strong>Contrato Ref:</strong> ${a.num}</div>
-        <div><strong>Fecha Devolución:</strong> _____ / _____ / 2026</div>
-        <div><strong>Hora:</strong> _____________</div>
-      </div>
-      <table class="doc-arr-table" style="margin-bottom:14px">
-        <thead><tr><th>Detalle de Equipos Devueltos</th><th>Nro. Serie</th><th>Estado al Recibir</th></tr></thead>
-        <tbody><tr>
-          <td>1. ${activo.nombre||a.activoNombre}</td>
-          <td>${activo.patente||'S/S'}</td>
-          <td>[  ] Óptimo &nbsp;&nbsp; [  ] Daño &nbsp;&nbsp; [  ] Sucio</td>
-        </tr></tbody>
-      </table>
-      <p style="font-size:11px;margin-bottom:4px"><strong>Observaciones de Recepción:</strong> _________________________________________________________________</p>
-      <p style="font-size:11px;margin-top:6px">__________________________________________________________________________________</p>
-      <p style="font-size:11px;margin-top:6px">__________________________________________________________________________________</p>
-      <div style="border-top:1px solid #ccc;margin:16px 0;padding-top:12px">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;font-size:11px">
-          <div><p style="font-weight:700;margin-bottom:8px">ENTREGA</p>
-            <p>Cliente: ${cliente.nombre||'—'}</p><p>RUT: ${cliente.rut||'—'}</p></div>
-          <div><p style="font-weight:700;margin-bottom:8px">RECIBE</p>
-            <p>Encargado: ${emp.contacto||'Gaudy Martínez'}</p><p>RUT: ${emp.rut_rep||'23.918.699-8'}</p></div>
+  let html='';
+
+  if(vehiculo){
+    // COMPROBANTE DEVOLUCIÓN VEHÍCULO — con liquidación de garantía
+    html=`<div class="doc">
+      <div class="doc-head" style="display:flex;align-items:center;gap:16px">
+        <div>${logoHTML}</div>
+        <div style="flex:1">
+          <div style="font-size:11px;font-weight:900">${emp.nombre.toUpperCase()}</div>
+          <div style="font-size:9px;color:#666">RUT: ${emp.rut||''} | ${emp.direccion||''}</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:15px;font-weight:900;text-transform:uppercase">COMPROBANTE DE DEVOLUCIÓN N° ${numCtto}</div>
         </div>
       </div>
-      <div class="doc-arr-firmas">
-        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">${cliente.nombre||'—'}</div><div>RUT: ${cliente.rut||'—'}</div><div>Entrega</div></div></div>
-        <div class="doc-arr-firma"><div class="doc-arr-firma-line"><div style="font-weight:700">${emp.contacto||'Gaudy Martínez'}</div><div>${emp.nombre}</div><div>RUT: ${emp.rut||''}</div></div></div>
+      <div class="doc-body">
+        <div style="border:1px solid #ccc;border-radius:4px;margin-bottom:12px;overflow:hidden">
+          <div style="background:#1a1a1a;color:white;padding:6px 12px;font-size:10px;font-weight:700;text-transform:uppercase">1. DATOS DEL CLIENTE Y VEHÍCULO</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;font-size:10.5px">
+            <div style="padding:7px 12px;border-bottom:1px solid #eee"><strong>Cliente:</strong> ${cliente.nombre||'—'}</div>
+            <div style="padding:7px 12px;border-bottom:1px solid #eee;border-left:1px solid #eee"><strong>RUT:</strong> ${cliente.rut||'—'}</div>
+            <div style="padding:7px 12px;border-bottom:1px solid #eee"><strong>Vehículo:</strong> ${activo.nombre||a.activoNombre} | Patente: ${activo.patente||'—'}</div>
+            <div style="padding:7px 12px;border-bottom:1px solid #eee;border-left:1px solid #eee"><strong>Fecha y Hora Devolución:</strong> _____ / _____ / 2026 | ___:___ hrs</div>
+          </div>
+        </div>
+
+        <div style="border:1px solid #ccc;border-radius:4px;margin-bottom:12px;overflow:hidden">
+          <div style="background:#1a1a1a;color:white;padding:6px 12px;font-size:10px;font-weight:700;text-transform:uppercase">2. ESTADO DE RECEPCIÓN</div>
+          <div style="padding:10px 12px;font-size:10.5px">
+            <div style="display:grid;grid-template-columns:1fr 2fr;gap:8px;line-height:2.2">
+              <div><strong>Combustible:</strong></div><div>[&nbsp;] Nivel Medio (OK) &nbsp; [&nbsp;] Otro: ___________</div>
+              <div><strong>Documentación:</strong></div><div>[&nbsp;] Permiso Circulación &nbsp; [&nbsp;] SOAP &nbsp; [&nbsp;] Rev. Técnica</div>
+              <div><strong>Accesorios:</strong></div><div>_______________________________________________</div>
+            </div>
+            <p style="margin-top:8px"><strong>Observaciones de Daños Nuevos:</strong></p>
+            <div style="border:1px solid #ddd;min-height:40px;border-radius:4px;margin-top:4px;padding:6px;font-size:10px">&nbsp;</div>
+          </div>
+        </div>
+
+        ${garantia>0?`<div style="border:1px solid #ccc;border-radius:4px;margin-bottom:12px;overflow:hidden">
+          <div style="background:#1a1a1a;color:white;padding:6px 12px;font-size:10px;font-weight:700;text-transform:uppercase">3. LIQUIDACIÓN DE GARANTÍA (${clp(garantia)})</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;font-size:10.5px">
+            <div style="padding:8px 12px;border-bottom:1px solid #eee"><strong>Monto Devuelto:</strong> $ _____________</div>
+            <div style="padding:8px 12px;border-bottom:1px solid #eee;border-left:1px solid #eee"><strong>Monto Retenido:</strong> $ _____________</div>
+          </div>
+          <div style="padding:8px 12px;font-size:9.5px;color:#555;line-height:1.6">
+            <strong>CLÁUSULA DE RESPONSABILIDAD POSTERIOR:</strong> El Arrendatario declara recibir su garantía a conformidad. No obstante, acepta que su responsabilidad económica por multas de tránsito, TAG o infracciones municipales cursadas durante el periodo de uso NO FINALIZA con esta devolución. ${emp.nombre} podrá exigir el pago de dichas multas en cuanto sean notificadas.
+          </div>
+        </div>`:''}
+
+        <div class="firmas">
+          <div class="firma"><div class="firma-line"><div style="font-weight:700">${emp.nombre}</div><div>ARRENDADOR</div></div></div>
+          <div class="firma"><div class="firma-line"><div style="font-weight:700">${(cliente.nombre||'—').toUpperCase()}</div><div>CLIENTE / RECIBO CONFORME</div></div></div>
+        </div>
       </div>
-    </div>
-  </div>`;
+    </div>`;
+
+  } else {
+    // COMPROBANTE DEVOLUCIÓN MAQUINARIA
+    html=`<div class="doc">
+      <div class="doc-head" style="display:flex;align-items:center;gap:16px">
+        <div>${logoHTML}</div>
+        <div style="text-align:center;flex:1">
+          <div style="font-size:15px;font-weight:900;text-transform:uppercase">COMPROBANTE DE DEVOLUCIÓN N° ${numCtto}</div>
+        </div>
+      </div>
+      <div class="doc-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;font-size:11px">
+          <div><strong>Cliente:</strong> ${cliente.nombre||'—'}</div>
+          <div><strong>Contrato Ref:</strong> ${a.num}</div>
+          <div><strong>Fecha Devolución:</strong> _____ / _____ / 2026</div>
+          <div><strong>Hora:</strong> _____________</div>
+        </div>
+
+        <table class="doc-table" style="margin-bottom:14px">
+          <thead><tr><th>Detalle de Equipos Devueltos</th><th>Nro. Serie</th><th>Estado al Recibir</th></tr></thead>
+          <tbody><tr>
+            <td>1. ${activo.nombre||a.activoNombre}</td>
+            <td>${activo.patente||activo.serie||'S/S'}</td>
+            <td>[&nbsp;&nbsp;] Óptimo &nbsp;&nbsp; [&nbsp;&nbsp;] Daño &nbsp;&nbsp; [&nbsp;&nbsp;] Sucio</td>
+          </tr></tbody>
+        </table>
+
+        <p style="font-size:11px;margin-bottom:4px"><strong>Observaciones de Recepción:</strong> _____________________________________________</p>
+        <p style="font-size:11px;margin-top:8px">__________________________________________________________________________________</p>
+        <p style="font-size:11px;margin-top:8px">__________________________________________________________________________________</p>
+
+        ${garantia>0?`<div style="border:1px solid #ccc;border-radius:4px;margin:14px 0;overflow:hidden">
+          <div style="background:#1a1a1a;color:white;padding:6px 12px;font-size:10px;font-weight:700">LIQUIDACIÓN DE GARANTÍA (${clp(garantia)})</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;font-size:11px">
+            <div style="padding:8px 12px"><strong>Monto Devuelto:</strong> $ _____________</div>
+            <div style="padding:8px 12px;border-left:1px solid #eee"><strong>Monto Retenido:</strong> $ _____________</div>
+          </div>
+        </div>`:''}
+
+        <div style="border-top:1px solid #ccc;margin:16px 0;padding-top:12px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;font-size:11px">
+            <div><p style="font-weight:700;margin-bottom:8px">ENTREGA</p>
+              <p>Cliente: ${cliente.nombre||'—'}</p><p>RUT: ${cliente.rut||'—'}</p></div>
+            <div><p style="font-weight:700;margin-bottom:8px">RECIBE</p>
+              <p>Encargado: ${emp.contacto||'Gaudy Martínez'}</p><p>RUT: ${emp.rut_rep||'23.918.699-8'}</p></div>
+          </div>
+        </div>
+
+        <div class="firmas">
+          <div class="firma"><div class="firma-line"><div style="font-weight:700">${cliente.nombre||'—'}</div><div>RUT: ${cliente.rut||'—'}</div><div>Entrega</div></div></div>
+          <div class="firma"><div class="firma-line"><div style="font-weight:700">${emp.contacto||'Gaudy Martínez'}</div><div>${emp.nombre}</div><div>RUT: ${emp.rut||''}</div></div></div>
+        </div>
+      </div>
+    </div>`;
+  }
 
   const ventana=window.open('','_blank','width=800,height=600');
   ventana.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Devolución ${a.num}</title>
-  <style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#f5f5f5;font-family:Arial,sans-serif;padding:20px;}
-  .doc-arr{background:white;max-width:760px;margin:0 auto;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.15);overflow:hidden;}
-  .doc-arr-head{border-bottom:3px solid #1a1a1a;padding:16px 22px;display:flex;align-items:center;}
-  .doc-arr-body{padding:18px 22px;}
-  .doc-arr-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:10px;}
-  .doc-arr-table th{background:#1a1a1a;color:white;padding:6px 8px;}
-  .doc-arr-table td{padding:6px 8px;border:1px solid #ccc;}
-  .doc-arr-firmas{display:flex;justify-content:space-between;margin-top:28px;padding-top:16px;border-top:2px solid #1a1a1a;}
-  .doc-arr-firma{text-align:center;min-width:200px;}
-  .doc-arr-firma-line{border-top:1px solid #1a1a1a;padding-top:6px;margin-top:32px;font-size:10px;}
-  .btn-print{display:block;margin:16px auto;padding:12px 32px;background:#F59E0B;color:#1a1a1a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
-  @media print{.btn-print{display:none!important;}body{background:white;padding:0;}@page{margin:10mm;}}
-  </style></head><body>
+  <style>${estilosDoc()}</style></head><body>
   <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
   ${html}
+  <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
   </body></html>`);
   ventana.document.close();
 }
+
 
 // FLETES
 function calcFlete(){
