@@ -104,7 +104,16 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
       <div style="font-size:9px;color:var(--acc);font-family:monospace;letter-spacing:1px">ARRIENDOS · FLETES · EQUIPOS</div>
     </div>
   </div>
-  <div style="display:flex;gap:8px">
+  <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+    <div style="position:relative">
+      <button class="bgh" style="padding:6px 12px;font-size:11px" onclick="toggleExpMenu()" id="btnExp">⬇ Exportar ▾</button>
+      <div id="expMenu" style="display:none;position:absolute;right:0;top:36px;background:var(--surf);border:1px solid var(--b1);border-radius:8px;padding:6px;z-index:200;min-width:180px;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+        <button onclick="expCSV('arriendos');toggleExpMenu()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:var(--white);font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">📋 Arriendos (CSV)</button>
+        <button onclick="expCSV('fletes');toggleExpMenu()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:var(--white);font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">🚚 Fletes (CSV)</button>
+        <button onclick="expCSV('clientes');toggleExpMenu()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:var(--white);font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">👥 Clientes (CSV)</button>
+        <button onclick="expCSV('activos');toggleExpMenu()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:var(--white);font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">🔧 Activos (CSV)</button>
+      </div>
+    </div>
     <button class="bg" style="padding:6px 12px;font-size:11px" onclick="O('moArriendo')">+ Arriendo</button>
     <button class="bgh" style="padding:6px 12px;font-size:11px" onclick="O('moFlete')">+ Flete</button>
   </div>
@@ -1756,6 +1765,52 @@ function generarDevolucion(){
 // Agregar documentos al tab handler
 // Agregar documentos al tab handler — ya integrado en T principal
 
+
+// ── EXPORTAR CSV ──
+function expCSV(tipo){
+  var datos, csv='', nombre='';
+  var hoy=new Date().toISOString().split('T')[0];
+  if(tipo==='arriendos'){
+    csv='N°,Activo,Cliente,Inicio,Término,Días,Tarifa/día,Total,Pagado,Saldo,Estado\n';
+    ARRIENDOS.forEach(function(a){
+      var dias=Math.ceil((new Date(a.termino)-new Date(a.inicio))/(1000*60*60*24))+1;
+      csv+='"'+a.num+'","'+a.activoNombre+'","'+a.clienteNombre+'","'+a.inicio+'","'+a.termino+'",'+dias+','+a.tarifa+','+a.total+','+a.pagado+','+(a.total-a.pagado)+',"'+a.estado+'"\n';
+    });
+    nombre='Arriendos';
+  } else if(tipo==='fletes'){
+    csv='N°,Fecha,Vehículo,Conductor,Origen,Destino,Carga,Km,Tarifa,Cliente,Estado\n';
+    FLETES.forEach(function(f){
+      csv+='"'+f.num+'","'+f.fecha+'","'+(f.vehiculoNombre||'')+'","'+(f.conductor||'')+'","'+(f.origen||'')+'","'+(f.destino||'')+'","'+(f.carga||'')+'",'+( f.km||0)+','+f.tarifa+',"'+(f.clienteNombre||'')+'","'+f.estado+'"\n';
+    });
+    nombre='Fletes';
+  } else if(tipo==='clientes'){
+    csv='Nombre,RUT,Giro,Contacto,Teléfono,Email,Dirección\n';
+    CLIENTES.forEach(function(c){
+      csv+='"'+c.nombre+'","'+(c.rut||'')+'","'+(c.giro||'')+'","'+(c.contacto||'')+'","'+(c.tel||'')+'","'+(c.email||'')+'","'+(c.dir||'')+'"\n';
+    });
+    nombre='Clientes';
+  } else if(tipo==='activos'){
+    csv='Nombre,Tipo,Categoría,Marca,Modelo,Año,Patente,Tarifa/día,Estado\n';
+    ACTIVOS.forEach(function(a){
+      csv+='"'+a.nombre+'","'+(a.tipo||'')+'","'+(a.cat||'')+'","'+(a.marca||'')+'","'+(a.modelo||'')+'","'+(a.anio||'')+'","'+(a.patente||'')+'",'+( a.tarifaDia||0)+',"'+a.estado+'"\n';
+    });
+    nombre='Activos';
+  }
+  if(!csv) return;
+  var a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download=nombre+'_'+EMP.nombre.replace(/\s/g,'_')+'_'+hoy+'.csv';
+  a.click();
+}
+function toggleExpMenu(){
+  var m=document.getElementById('expMenu');
+  m.style.display=m.style.display==='none'?'block':'none';
+}
+document.addEventListener('click',function(e){
+  var btn=document.getElementById('btnExp');
+  var menu=document.getElementById('expMenu');
+  if(menu&&btn&&!btn.contains(e.target)&&!menu.contains(e.target)) menu.style.display='none';
+});
 
 // INIT
 load();

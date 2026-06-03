@@ -105,8 +105,19 @@ canvas{max-height:240px;}
   </div>
   <div class="header-right">
     <span class="header-info" id="hInfo">Cargando...</span>
-    <button class="btn btn-outline btn-sm" onclick="openImport()">⬆ Importar CSV</button>
-    <button class="btn btn-gold btn-sm" onclick="openAdd()">+ Agregar</button>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+      <div style="position:relative">
+        <button class="btn btn-outline btn-sm" onclick="toggleExportMenu()" id="btnExport">⬇ Exportar ▾</button>
+        <div id="exportMenu" style="display:none;position:absolute;right:0;top:36px;background:var(--surf);border:1px solid var(--border);border-radius:8px;padding:6px;z-index:200;min-width:180px;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+          <button onclick="exportCSV();toggleExportMenu()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:var(--white);font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">📊 Finanzas (CSV)</button>
+          <button onclick="exportarArriendos();toggleExportMenu()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:var(--white);font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">🚛 Arriendos (CSV)</button>
+          <button onclick="exportarFletes();toggleExportMenu()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:var(--white);font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">🚚 Fletes (CSV)</button>
+          <button onclick="exportarClientes();toggleExportMenu()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:var(--white);font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">👥 Clientes (CSV)</button>
+        </div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="openImport()">⬆ Importar SII / CSV</button>
+      <button class="btn btn-gold btn-sm" onclick="openAdd()">+ Agregar</button>
+    </div>
   </div>
 </div>
 
@@ -278,19 +289,35 @@ canvas{max-height:240px;}
 
 <!-- MODAL IMPORTAR -->
 <div class="modal-overlay" id="modalImport">
-  <div class="modal">
-    <h3>Importar CSV</h3>
-    <p style="font-size:11px;color:var(--muted);margin-bottom:14px">Columnas: fecha, tipo, categoria, descripcion, monto, documento, numDoc, medioPago</p>
-    <div class="fl" style="margin-bottom:12px"><label>Archivo CSV</label><input type="file" id="csvFile" accept=".csv" onchange="leerCSV(this)" style="padding:7px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--white);font-family:monospace;font-size:11px;"/></div>
-    <div id="csvPreview" style="display:none;margin-bottom:12px">
-      <div style="font-size:11px;color:var(--ok);margin-bottom:8px" id="csvCount"></div>
-      <div class="tbl-wrap" style="max-height:200px;overflow-y:auto">
-        <table id="tblPreview"><thead><tr><th>Fecha</th><th>Tipo</th><th>Desc</th><th>Monto</th></tr></thead><tbody></tbody></table>
+  <div class="modal" style="width:560px;max-width:95vw">
+    <h3>📥 Importar Datos</h3>
+    <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:12px;margin-bottom:14px;font-size:11px;color:var(--muted)">
+      <div style="color:var(--gold);font-weight:700;margin-bottom:6px">Formatos aceptados:</div>
+      <div>📋 <strong>ERP propio</strong> — CSV con columnas: fecha, tipo, categoria, descripcion, monto</div>
+      <div>📥 <strong>SII Compras</strong> — Archivo RCV_COMPRA del SII (separado por ;)</div>
+      <div>📤 <strong>SII Ventas</strong> — Archivo RCV_RESUMEN_VENTA del SII (separado por ;)</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px">
+      <div class="fl"><label>Período (para ventas SII)</label>
+        <input type="month" id="csvPeriodo" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--white);font-family:monospace;font-size:12px;outline:none"/>
+      </div>
+      <div class="fl"><label>Formato detectado</label>
+        <div id="csvTipo" style="padding:7px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:monospace;color:var(--muted)">— seleccione archivo —</div>
       </div>
     </div>
+    <div class="fl" style="margin-bottom:12px">
+      <label>Archivo CSV / SII</label>
+      <input type="file" id="csvFile" accept=".csv,.txt" onchange="leerCSV(this)" style="padding:7px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--white);font-family:monospace;font-size:11px;"/>
+    </div>
+    <div id="csvPreview" style="display:none;margin-bottom:12px">
+      <div style="font-size:11px;color:var(--ok);margin-bottom:8px;font-weight:700" id="csvCount"></div>
+      <div class="tbl-wrap" style="max-height:180px;overflow-y:auto">
+        <table id="tblPreview"><thead><tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Monto</th></tr></thead><tbody></tbody></table>
+      </div>
+      <div style="font-size:10px;color:var(--muted);margin-top:6px">* Mostrando primeros 5 registros. Se importarán todos.</div>
+    </div>
     <div style="display:flex;gap:8px;margin-top:12px">
-      <button class="btn btn-gold" style="flex:1" onclick="importarCSV('append')">➕ Agregar</button>
-      <button class="btn btn-outline" onclick="importarCSV('replace')">🔄 Reemplazar todo</button>
+      <button class="btn btn-gold" style="flex:1" onclick="importarCSV('append')">➕ Agregar a registros existentes</button>
       <button class="btn btn-outline" onclick="cerrarModal('modalImport')">Cancelar</button>
     </div>
   </div>
@@ -789,32 +816,92 @@ function leerCSV(input) {
   if (!file) return;
   var reader = new FileReader();
   reader.onload = function(e) {
-    var lines = e.target.result.split('\n').filter(function(l){return l.trim();});
-    if (lines.length < 2) { alert('Archivo vacío'); return; }
-    var headers = lines[0].split(',').map(function(h){return h.trim().toLowerCase().replace(/['"]/g,'');});
-    var fi = function(name) { return headers.findIndex(function(h){return h.indexOf(name)>=0;}); };
+    var texto = e.target.result;
+    // Detectar separador: SII usa ; , ERP usa ,
+    var primeraLinea = texto.split('\n')[0]||'';
+    var sep = (primeraLinea.split(';').length > primeraLinea.split(',').length) ? ';' : ',';
+    var lines = texto.split('\n').filter(function(l){return l.trim();});
+    if (lines.length < 2) { alert('Archivo vacío o sin datos'); return; }
+    var headers = lines[0].split(sep).map(function(h){return h.trim().toLowerCase().replace(/[\r"']/g,'');});
+    var fi = function(name){ return headers.findIndex(function(h){return h.indexOf(name)>=0;}); };
     csvPending = [];
     var tbody = document.querySelector('#tblPreview tbody');
     tbody.innerHTML = '';
-    for (var i=1; i<lines.length; i++) {
-      var cols = lines[i].split(',').map(function(c){return c.trim().replace(/['"]/g,'');});
-      var row = {
-        id: nextId++,
-        fecha: cols[fi('fecha')]||new Date().toISOString().split('T')[0],
-        tipo:  cols[fi('tipo')]||'Ingreso',
-        cat:   cols[fi('cat')]||'Otros Ingresos',
-        desc:  cols[fi('desc')]||'Importado',
-        monto: parseFloat((cols[fi('monto')]||'0').replace(/[^0-9.]/g,''))||0,
-        doc:'', numDoc:'', medioPago:'', cuenta:''
-      };
-      if (!row.monto) continue;
-      csvPending.push(row);
-      if (i<=5) tbody.innerHTML += '<tr><td>'+row.fecha+'</td><td>'+row.tipo+'</td><td>'+row.desc+'</td><td style="color:var(--ok)">'+clp(row.monto)+'</td></tr>';
+    var hoy = new Date().toISOString().split('T')[0];
+    var periodo = document.getElementById('csvPeriodo').value || hoy.substring(0,7);
+    // Detectar tipo de archivo
+    var esSII_Compra = headers.some(function(h){return h.indexOf('razon social')>=0||h.indexOf('rut proveedor')>=0||h.indexOf('razón social')>=0;});
+    var esSII_Venta  = headers.some(function(h){return h.indexOf('tipo documento')>=0||h.indexOf('total documentos')>=0;});
+
+    if (esSII_Compra) {
+      // ── SII COMPRAS ──
+      document.getElementById('csvTipo').textContent = '📥 SII Compras detectado';
+      document.getElementById('csvTipo').style.color = 'var(--danger)';
+      for (var i=1; i<lines.length; i++) {
+        var cols = lines[i].split(sep).map(function(c){return c.trim().replace(/[\r"']/g,'');});
+        if (cols.length < 10) continue;
+        // Fecha: dd/mm/yyyy → yyyy-mm-dd
+        var fechaRaw = cols[fi('fecha docto')]||cols[fi('fecha')]||'';
+        var fecha = hoy;
+        if (fechaRaw) {
+          var fp = fechaRaw.split('/');
+          if (fp.length===3) fecha = fp[2].substring(0,4)+'-'+fp[1].padStart(2,'0')+'-'+fp[0].padStart(2,'0');
+        }
+        var proveedor = cols[fi('razon social')]||cols[fi('razón social')]||'Proveedor SII';
+        var folio     = cols[fi('folio')]||'';
+        var neto      = parseFloat((cols[fi('monto neto')]||'0').replace(/[^0-9]/g,''))||0;
+        var iva       = parseFloat((cols[fi('iva recuperable')]||cols[fi('monto iva')]||'0').replace(/[^0-9]/g,''))||0;
+        var total     = parseFloat((cols[fi('monto total')]||'0').replace(/[^0-9]/g,''))||0;
+        var monto     = total||(neto+iva);
+        if (!monto) continue;
+        var row = {id:nextId++, fecha:fecha, tipo:'Egreso', cat:'Compras / Proveedores',
+          desc:'Compra '+proveedor+(folio?' N°'+folio:''), monto:monto,
+          doc:'Factura', numDoc:folio, medioPago:'', cuenta:''};
+        csvPending.push(row);
+        if (csvPending.length<=5) tbody.innerHTML += '<tr><td>'+fecha+'</td><td style="color:var(--danger)">Egreso</td><td>'+proveedor+'</td><td style="color:var(--danger)">'+clp(monto)+'</td></tr>';
+      }
+    } else if (esSII_Venta) {
+      // ── SII VENTAS ──
+      document.getElementById('csvTipo').textContent = '📤 SII Ventas detectado';
+      document.getElementById('csvTipo').style.color = 'var(--ok)';
+      for (var i=1; i<lines.length; i++) {
+        var cols = lines[i].split(sep).map(function(c){return c.trim().replace(/[\r"']/g,'');});
+        if (cols.length < 3) continue;
+        var tipoDoc = cols[0]||'Venta';
+        var neto    = parseFloat((cols[3]||'0').replace(/[^0-9]/g,''))||0;
+        var iva     = parseFloat((cols[4]||'0').replace(/[^0-9]/g,''))||0;
+        var total   = parseFloat((cols[5]||cols[4]||'0').replace(/[^0-9]/g,''))||0;
+        var monto   = total||(neto+iva);
+        if (!monto) continue;
+        var row = {id:nextId++, fecha:periodo+'-01', tipo:'Ingreso', cat:'Ventas SII',
+          desc:'Venta SII: '+tipoDoc, monto:monto,
+          doc:tipoDoc, numDoc:'', medioPago:'', cuenta:''};
+        csvPending.push(row);
+        tbody.innerHTML += '<tr><td>'+periodo+'</td><td style="color:var(--ok)">Ingreso</td><td>'+tipoDoc+'</td><td style="color:var(--ok)">'+clp(monto)+'</td></tr>';
+      }
+    } else {
+      // ── FORMATO ERP PROPIO ──
+      document.getElementById('csvTipo').textContent = '📋 Formato ERP detectado';
+      document.getElementById('csvTipo').style.color = 'var(--gold)';
+      for (var i=1; i<lines.length; i++) {
+        var cols = lines[i].split(sep).map(function(c){return c.trim().replace(/[\r"']/g,'');});
+        var row = {id:nextId++,
+          fecha: cols[fi('fecha')]||hoy,
+          tipo:  cols[fi('tipo')]||'Ingreso',
+          cat:   cols[fi('cat')]||cols[fi('categ')]||'Otros',
+          desc:  cols[fi('desc')]||'Importado',
+          monto: parseFloat((cols[fi('monto')]||'0').replace(/[^0-9]/g,''))||0,
+          doc: cols[fi('doc')]||'', numDoc: cols[fi('numdoc')]||'',
+          medioPago: cols[fi('medio')]||'', cuenta: cols[fi('cuenta')]||''};
+        if (!row.monto) continue;
+        csvPending.push(row);
+        if (csvPending.length<=5) tbody.innerHTML += '<tr><td>'+row.fecha+'</td><td>'+row.tipo+'</td><td>'+row.desc+'</td><td>'+clp(row.monto)+'</td></tr>';
+      }
     }
-    document.getElementById('csvCount').textContent = '✓ '+csvPending.length+' filas';
+    document.getElementById('csvCount').textContent = '✓ '+csvPending.length+' registros listos para importar';
     document.getElementById('csvPreview').style.display = 'block';
   };
-  reader.readAsText(file);
+  reader.readAsText(file, 'ISO-8859-1');
 }
 function importarCSV(modo) {
   if (!csvPending.length) return;
@@ -830,13 +917,70 @@ function exportCSV() {
     csv += '"'+r.fecha+'","'+r.tipo+'","'+r.cat+'","'+r.desc+'",'+r.monto+',"'+(r.doc||'')+'","'+(r.numDoc||'')+'","'+(r.medioPago||'')+'","'+(r.cuenta||'')+'"\n';
   });
   var a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = 'finanzas_'+EMP.nombre.replace(/\s/g,'_')+'_'+new Date().toISOString().split('T')[0]+'.csv';
+  a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
+  a.download = 'Finanzas_'+EMP.nombre.replace(/\s/g,'_')+'_'+new Date().toISOString().split('T')[0]+'.csv';
   a.click();
+}
+
+function exportarArriendos() {
+  try {
+    var arrKey = 'mss_arr'+EMP.id+'_arriendos';
+    var arr = JSON.parse(localStorage.getItem(arrKey)||'[]');
+    var csv = 'N°,Activo,Cliente,Inicio,Término,Días,Tarifa/día,Total,Pagado,Saldo,Estado\n';
+    arr.forEach(function(a){
+      var dias = Math.ceil((new Date(a.termino)-new Date(a.inicio))/(1000*60*60*24))+1;
+      csv += '"'+a.num+'","'+a.activoNombre+'","'+a.clienteNombre+'","'+a.inicio+'","'+a.termino+'",'+dias+','+a.tarifa+','+a.total+','+a.pagado+','+(a.total-a.pagado)+',"'+a.estado+'"\n';
+    });
+    var a2 = document.createElement('a');
+    a2.href = 'data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+    a2.download = 'Arriendos_'+EMP.nombre.replace(/\s/g,'_')+'_'+new Date().toISOString().split('T')[0]+'.csv';
+    a2.click();
+  } catch(e){ alert('Error al exportar arriendos'); }
+}
+
+function exportarClientes() {
+  try {
+    var cliKey = 'mss_arr'+EMP.id+'_clientes';
+    var cli = JSON.parse(localStorage.getItem(cliKey)||'[]');
+    var csv = 'Nombre,RUT,Giro,Contacto,Teléfono,Email,Dirección\n';
+    cli.forEach(function(c){
+      csv += '"'+c.nombre+'","'+(c.rut||'')+'","'+(c.giro||'')+'","'+(c.contacto||'')+'","'+(c.tel||'')+'","'+(c.email||'')+'","'+(c.dir||'')+'"\n';
+    });
+    var a2 = document.createElement('a');
+    a2.href = 'data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+    a2.download = 'Clientes_'+EMP.nombre.replace(/\s/g,'_')+'_'+new Date().toISOString().split('T')[0]+'.csv';
+    a2.click();
+  } catch(e){ alert('Error al exportar clientes'); }
+}
+
+function exportarFletes() {
+  try {
+    var flKey = 'mss_arr'+EMP.id+'_fletes';
+    var fl = JSON.parse(localStorage.getItem(flKey)||'[]');
+    var csv = 'N°,Fecha,Vehículo,Conductor,Origen,Destino,Carga,Km,Tarifa,Cliente,Estado\n';
+    fl.forEach(function(f){
+      csv += '"'+f.num+'","'+f.fecha+'","'+f.vehiculoNombre+'","'+f.conductor+'","'+f.origen+'","'+f.destino+'","'+f.carga+'",'+f.km+','+f.tarifa+',"'+f.clienteNombre+'","'+f.estado+'"\n';
+    });
+    var a2 = document.createElement('a');
+    a2.href = 'data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+    a2.download = 'Fletes_'+EMP.nombre.replace(/\s/g,'_')+'_'+new Date().toISOString().split('T')[0]+'.csv';
+    a2.click();
+  } catch(e){ alert('Error al exportar fletes'); }
 }
 
 // ── 14. MODAL ──
 function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
+function toggleExportMenu(){
+  var m=document.getElementById('exportMenu');
+  m.style.display = m.style.display==='none' ? 'block' : 'none';
+}
+document.addEventListener('click', function(e){
+  var btn=document.getElementById('btnExport');
+  var menu=document.getElementById('exportMenu');
+  if(menu && btn && !btn.contains(e.target) && !menu.contains(e.target)){
+    menu.style.display='none';
+  }
+});
 document.querySelectorAll('.modal-overlay').forEach(function(m){
   m.addEventListener('click', function(e){ if(e.target===m) m.classList.remove('open'); });
 });
