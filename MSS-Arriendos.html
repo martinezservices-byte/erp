@@ -107,7 +107,14 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
   <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
     <div style="position:relative">
       <button class="bgh" style="padding:6px 12px;font-size:11px" onclick="toggleExpMenu()" id="btnExp">⬇ Exportar ▾</button>
-      <div id="expMenu" style="display:none;position:absolute;right:0;top:36px;background:var(--surf);border:1px solid var(--b1);border-radius:8px;padding:6px;z-index:200;min-width:180px;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+      <div id="expMenu" style="display:none;position:absolute;right:0;top:36px;background:var(--surf);border:1px solid var(--b1);border-radius:8px;padding:6px;z-index:200;min-width:200px;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+        <div style="font-size:9px;color:var(--muted);padding:4px 10px;font-family:monospace;letter-spacing:1px">📄 PDF PROFESIONAL</div>
+        <button onclick="reporteArriendos();toggleExpMenu()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:var(--white);font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(245,158,11,0.1)'" onmouseout="this.style.background='none'">📋 Reporte Arriendos</button>
+        <button onclick="reporteFletes();toggleExpMenu()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:var(--white);font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(245,158,11,0.1)'" onmouseout="this.style.background='none'">🚚 Reporte Fletes</button>
+        <button onclick="reporteClientes();toggleExpMenu()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:var(--white);font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(245,158,11,0.1)'" onmouseout="this.style.background='none'">👥 Reporte Clientes</button>
+        <button onclick="reporteActivos();toggleExpMenu()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:var(--white);font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(245,158,11,0.1)'" onmouseout="this.style.background='none'">🔧 Inventario Activos</button>
+        <div style="height:1px;background:var(--b1);margin:4px 0"></div>
+        <div style="font-size:9px;color:var(--muted);padding:4px 10px;font-family:monospace;letter-spacing:1px">📊 CSV / EXCEL</div>
         <button onclick="expCSV('arriendos');toggleExpMenu()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:var(--white);font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">📋 Arriendos (CSV)</button>
         <button onclick="expCSV('fletes');toggleExpMenu()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:var(--white);font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">🚚 Fletes (CSV)</button>
         <button onclick="expCSV('clientes');toggleExpMenu()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:var(--white);font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">👥 Clientes (CSV)</button>
@@ -1811,6 +1818,273 @@ document.addEventListener('click',function(e){
   var menu=document.getElementById('expMenu');
   if(menu&&btn&&!btn.contains(e.target)&&!menu.contains(e.target)) menu.style.display='none';
 });
+
+// ══════════════════════════════════════════════
+// REPORTES PDF PROFESIONALES
+// ══════════════════════════════════════════════
+function getLogo(){
+  try{
+    const logos=JSON.parse(localStorage.getItem('mss_logos_v1')||'{}');
+    return logos[String(EMP.id)]||null;
+  }catch(e){return null;}
+}
+
+function estilosPDF(){
+  return `
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Arial',sans-serif;background:#f5f5f5;padding:20px;color:#1a1a1a;}
+    .page{background:white;max-width:800px;margin:0 auto;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.15);overflow:hidden;margin-bottom:20px;}
+    .header{background:#1a1a1a;color:white;padding:20px 28px;display:flex;justify-content:space-between;align-items:center;}
+    .header-left{display:flex;align-items:center;gap:16px;}
+    .logo-box{width:70px;height:55px;background:white;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:4px;}
+    .logo-box img{max-width:100%;max-height:100%;object-fit:contain;}
+    .logo-inicial{font-size:28px;font-weight:900;color:#F59E0B;}
+    .emp-nombre{font-size:15px;font-weight:900;margin-bottom:3px;}
+    .emp-info{font-size:10px;color:#aaa;}
+    .doc-num{text-align:right;}
+    .doc-titulo{font-size:22px;font-weight:900;color:#F59E0B;}
+    .doc-fecha{font-size:11px;color:#aaa;margin-top:3px;}
+    .body{padding:24px 28px;}
+    .seccion-titulo{font-size:11px;font-weight:700;color:#F59E0B;letter-spacing:2px;text-transform:uppercase;margin:20px 0 10px;border-bottom:1px solid #eee;padding-bottom:6px;}
+    table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:16px;}
+    th{background:#1a1a1a;color:white;padding:8px 10px;text-align:left;font-size:10px;letter-spacing:0.5px;}
+    td{padding:8px 10px;border-bottom:1px solid #f0f0f0;}
+    tr:nth-child(even){background:#fafafa;}
+    .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;}
+    .badge-ok{background:#d1fae5;color:#065f46;}
+    .badge-warn{background:#fef3c7;color:#92400e;}
+    .badge-info{background:#dbeafe;color:#1e40af;}
+    .badge-danger{background:#fee2e2;color:#991b1b;}
+    .totales{background:#1a1a1a;color:white;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;margin-top:8px;border-radius:6px;}
+    .total-item{text-align:center;}
+    .total-label{font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:1px;}
+    .total-valor{font-size:18px;font-weight:900;color:#F59E0B;margin-top:2px;}
+    .kpi-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+    .kpi{flex:1;min-width:120px;background:#f9f9f9;border-radius:8px;padding:12px;border:1px solid #eee;text-align:center;}
+    .kpi-label{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1px;}
+    .kpi-valor{font-size:20px;font-weight:900;color:#1a1a1a;margin-top:4px;}
+    .footer{background:#f5f5f5;padding:12px 28px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #eee;font-size:10px;color:#999;}
+    .btn-imprimir{display:block;margin:16px auto;padding:12px 36px;background:#F59E0B;color:#1a1a1a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
+    @media print{
+      body{background:white;padding:0;}
+      .btn-imprimir{display:none!important;}
+      .page{box-shadow:none;border-radius:0;max-width:100%;}
+      @page{margin:12mm;size:A4;}
+    }
+  `;
+}
+
+function headerPDF(titulo, subtitulo){
+  const logo = getLogo();
+  const logoHTML = logo
+    ? `<div class="logo-box"><img src="${logo}" alt="logo"/></div>`
+    : `<div class="logo-box"><div class="logo-inicial">${EMP.nombre.charAt(0)}</div></div>`;
+  const hoy = new Date().toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'}).toUpperCase();
+  return `
+    <div class="header">
+      <div class="header-left">
+        ${logoHTML}
+        <div>
+          <div class="emp-nombre">${EMP.nombre}</div>
+          <div class="emp-info">RUT: ${EMP.rut||'—'} &nbsp;|&nbsp; ${EMP.direccion||''}</div>
+          <div class="emp-info">${EMP.email||''} ${EMP.tel?'| Tel: '+EMP.tel:''}</div>
+        </div>
+      </div>
+      <div class="doc-num">
+        <div class="doc-titulo">${titulo}</div>
+        <div class="doc-fecha">${subtitulo||hoy}</div>
+      </div>
+    </div>`;
+}
+
+function footerPDF(){
+  const hoy = new Date().toLocaleDateString('es-CL');
+  return `<div class="footer"><span>${EMP.nombre} · RUT ${EMP.rut||''}</span><span>Generado: ${hoy}</span></div>`;
+}
+
+function abrirVentanaPDF(html, titulo){
+  const ventana = window.open('','_blank','width=900,height=700');
+  ventana.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/>
+    <title>${titulo} — ${EMP.nombre}</title>
+    <style>${estilosPDF()}</style></head><body>
+    <button class="btn-imprimir" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
+    ${html}
+    <button class="btn-imprimir" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
+    </body></html>`);
+  ventana.document.close();
+}
+
+function clpPDF(n){ return new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Math.round(n||0)); }
+function dfPDF(d){ try{return new Date(d+'T12:00:00').toLocaleDateString('es-CL');}catch(e){return d||'—';} }
+
+function badgePDF(estado){
+  const map={
+    'Activo':'badge-ok','Finalizado':'badge-info','Pendiente':'badge-warn','Cancelado':'badge-danger',
+    'Completado':'badge-ok','En Ruta':'badge-warn','Programado':'badge-info',
+    'Disponible':'badge-ok','Arrendado':'badge-warn','Mantención':'badge-danger'
+  };
+  return `<span class="badge ${map[estado]||'badge-info'}">${estado}</span>`;
+}
+
+// ── REPORTE ARRIENDOS ──
+function reporteArriendos(){
+  const ft = document.getElementById('filtEstadoArr')?.value||'';
+  const lista = ft ? ARRIENDOS.filter(a=>a.estado===ft) : ARRIENDOS;
+  const totTotal = lista.reduce((s,a)=>s+a.total,0);
+  const totPag   = lista.reduce((s,a)=>s+a.pagado,0);
+  const totSaldo = totTotal-totPag;
+  const activos  = lista.filter(a=>a.estado==='Activo').length;
+  const html = `
+  <div class="page">
+    ${headerPDF('REPORTE DE ARRIENDOS', 'Período: '+new Date().toLocaleDateString('es-CL',{month:'long',year:'numeric'}).toUpperCase())}
+    <div class="body">
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-label">Total Contratos</div><div class="kpi-valor">${lista.length}</div></div>
+        <div class="kpi"><div class="kpi-label">Activos</div><div class="kpi-valor" style="color:#059669">${activos}</div></div>
+        <div class="kpi"><div class="kpi-label">Facturado</div><div class="kpi-valor" style="font-size:14px">${clpPDF(totTotal)}</div></div>
+        <div class="kpi"><div class="kpi-label">Cobrado</div><div class="kpi-valor" style="font-size:14px;color:#059669">${clpPDF(totPag)}</div></div>
+        <div class="kpi"><div class="kpi-label">Por Cobrar</div><div class="kpi-valor" style="font-size:14px;color:${totSaldo>0?'#dc2626':'#059669'}">${clpPDF(totSaldo)}</div></div>
+      </div>
+      <div class="seccion-titulo">Detalle de Arriendos</div>
+      <table>
+        <thead><tr><th>N°</th><th>Activo</th><th>Cliente</th><th>Inicio</th><th>Término</th><th>Días</th><th>Tarifa/día</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Estado</th></tr></thead>
+        <tbody>
+          ${lista.map(a=>{
+            const dias=Math.ceil((new Date(a.termino)-new Date(a.inicio))/(1000*60*60*24))+1;
+            return `<tr>
+              <td style="font-weight:700;color:#F59E0B">${a.num}</td>
+              <td>${a.activoNombre}</td>
+              <td style="font-weight:600">${a.clienteNombre}</td>
+              <td>${dfPDF(a.inicio)}</td>
+              <td>${dfPDF(a.termino)}</td>
+              <td style="text-align:center">${dias}</td>
+              <td style="text-align:right">${clpPDF(a.tarifa)}</td>
+              <td style="text-align:right;font-weight:700">${clpPDF(a.total)}</td>
+              <td style="text-align:right;color:#059669">${clpPDF(a.pagado)}</td>
+              <td style="text-align:right;color:${a.total-a.pagado>0?'#dc2626':'#059669'}">${clpPDF(a.total-a.pagado)}</td>
+              <td>${badgePDF(a.estado)}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      <div class="totales">
+        <div class="total-item"><div class="total-label">Total Facturado</div><div class="total-valor">${clpPDF(totTotal)}</div></div>
+        <div class="total-item"><div class="total-label">Total Cobrado</div><div class="total-valor" style="color:#4ade80">${clpPDF(totPag)}</div></div>
+        <div class="total-item"><div class="total-label">Por Cobrar</div><div class="total-valor" style="color:${totSaldo>0?'#f87171':'#4ade80'}">${clpPDF(totSaldo)}</div></div>
+      </div>
+    </div>
+    ${footerPDF()}
+  </div>`;
+  abrirVentanaPDF(html,'Reporte de Arriendos');
+}
+
+// ── REPORTE FLETES ──
+function reporteFletes(){
+  const ft = document.getElementById('filtEstadoFl')?.value||'';
+  const lista = ft ? FLETES.filter(f=>f.estado===ft) : FLETES;
+  const totTarifa = lista.reduce((s,f)=>s+f.tarifa,0);
+  const totKm     = lista.reduce((s,f)=>s+(f.km||0),0);
+  const html = `
+  <div class="page">
+    ${headerPDF('REPORTE DE FLETES', new Date().toLocaleDateString('es-CL',{month:'long',year:'numeric'}).toUpperCase())}
+    <div class="body">
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-label">Total Fletes</div><div class="kpi-valor">${lista.length}</div></div>
+        <div class="kpi"><div class="kpi-label">Completados</div><div class="kpi-valor" style="color:#059669">${lista.filter(f=>f.estado==='Completado').length}</div></div>
+        <div class="kpi"><div class="kpi-label">Ingresos</div><div class="kpi-valor" style="font-size:14px">${clpPDF(totTarifa)}</div></div>
+        <div class="kpi"><div class="kpi-label">Km Totales</div><div class="kpi-valor">${totKm.toLocaleString('es-CL')}</div></div>
+      </div>
+      <div class="seccion-titulo">Detalle de Fletes</div>
+      <table>
+        <thead><tr><th>N°</th><th>Fecha</th><th>Vehículo</th><th>Conductor</th><th>Origen</th><th>Destino</th><th>Carga</th><th>Km</th><th>Tarifa</th><th>Cliente</th><th>Estado</th></tr></thead>
+        <tbody>
+          ${lista.map(f=>`<tr>
+            <td style="font-weight:700;color:#F59E0B">${f.num}</td>
+            <td>${dfPDF(f.fecha)}</td>
+            <td>${f.vehiculoNombre||'—'}</td>
+            <td>${f.conductor||'—'}</td>
+            <td style="color:#666">${f.origen||'—'}</td>
+            <td style="color:#666">${f.destino||'—'}</td>
+            <td>${f.carga||'—'}</td>
+            <td style="text-align:right">${(f.km||0).toLocaleString('es-CL')}</td>
+            <td style="text-align:right;font-weight:700;color:#059669">${clpPDF(f.tarifa)}</td>
+            <td>${f.clienteNombre||'—'}</td>
+            <td>${badgePDF(f.estado)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      <div class="totales">
+        <div class="total-item"><div class="total-label">Total Fletes</div><div class="total-valor">${lista.length}</div></div>
+        <div class="total-item"><div class="total-label">Km Totales</div><div class="total-valor">${totKm.toLocaleString('es-CL')}</div></div>
+        <div class="total-item"><div class="total-label">Ingresos Totales</div><div class="total-valor">${clpPDF(totTarifa)}</div></div>
+      </div>
+    </div>
+    ${footerPDF()}
+  </div>`;
+  abrirVentanaPDF(html,'Reporte de Fletes');
+}
+
+// ── REPORTE CLIENTES ──
+function reporteClientes(){
+  const html = `
+  <div class="page">
+    ${headerPDF('LISTADO DE CLIENTES', new Date().toLocaleDateString('es-CL',{month:'long',year:'numeric'}).toUpperCase())}
+    <div class="body">
+      <div class="seccion-titulo">Clientes Registrados — ${CLIENTES.length} total</div>
+      <table>
+        <thead><tr><th>Nombre / Razón Social</th><th>RUT</th><th>Giro</th><th>Contacto</th><th>Teléfono</th><th>Email</th><th>Arriendos</th><th>Fletes</th></tr></thead>
+        <tbody>
+          ${CLIENTES.map(c=>`<tr>
+            <td style="font-weight:700">${c.nombre}</td>
+            <td style="font-family:monospace">${c.rut||'—'}</td>
+            <td>${c.giro||'—'}</td>
+            <td>${c.contacto||'—'}</td>
+            <td>${c.tel||'—'}</td>
+            <td>${c.email||'—'}</td>
+            <td style="text-align:center;font-weight:700;color:#F59E0B">${ARRIENDOS.filter(a=>parseInt(a.clienteId)===parseInt(c.id)).length}</td>
+            <td style="text-align:center;font-weight:700;color:#38BDF8">${FLETES.filter(f=>parseInt(f.clienteId)===parseInt(c.id)).length}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    ${footerPDF()}
+  </div>`;
+  abrirVentanaPDF(html,'Listado de Clientes');
+}
+
+// ── REPORTE ACTIVOS ──
+function reporteActivos(){
+  const html = `
+  <div class="page">
+    ${headerPDF('INVENTARIO DE ACTIVOS', new Date().toLocaleDateString('es-CL',{month:'long',year:'numeric'}).toUpperCase())}
+    <div class="body">
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-label">Total Activos</div><div class="kpi-valor">${ACTIVOS.length}</div></div>
+        <div class="kpi"><div class="kpi-label">Disponibles</div><div class="kpi-valor" style="color:#059669">${ACTIVOS.filter(a=>a.estado==='Disponible').length}</div></div>
+        <div class="kpi"><div class="kpi-label">Arrendados</div><div class="kpi-valor" style="color:#F59E0B">${ACTIVOS.filter(a=>a.estado==='Arrendado').length}</div></div>
+        <div class="kpi"><div class="kpi-label">En Mantención</div><div class="kpi-valor" style="color:#dc2626">${ACTIVOS.filter(a=>a.estado==='Mantención').length}</div></div>
+      </div>
+      <div class="seccion-titulo">Detalle de Activos</div>
+      <table>
+        <thead><tr><th>Nombre</th><th>Tipo</th><th>Marca/Modelo</th><th>Año</th><th>Patente/Serie</th><th>Tarifa/día</th><th>Km/Horas</th><th>Estado</th></tr></thead>
+        <tbody>
+          ${ACTIVOS.map(a=>`<tr>
+            <td style="font-weight:700">${a.nombre}</td>
+            <td>${a.tipo||'—'}</td>
+            <td>${a.marca||'—'} ${a.modelo||''}</td>
+            <td>${a.anio||'—'}</td>
+            <td style="font-family:monospace;color:#F59E0B">${a.patente||'—'}</td>
+            <td style="text-align:right">${clpPDF(a.tarifaDia)}</td>
+            <td style="text-align:right">${(a.km||0).toLocaleString('es-CL')}</td>
+            <td>${badgePDF(a.estado)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    ${footerPDF()}
+  </div>`;
+  abrirVentanaPDF(html,'Inventario de Activos');
+}
 
 // INIT
 load();

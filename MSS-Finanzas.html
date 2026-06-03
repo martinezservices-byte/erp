@@ -109,6 +109,10 @@ canvas{max-height:240px;}
       <div style="position:relative">
         <button class="btn btn-outline btn-sm" onclick="toggleExportMenu()" id="btnExport">⬇ Exportar ▾</button>
         <div id="exportMenu" style="display:none;position:absolute;right:0;top:36px;background:var(--surf);border:1px solid var(--border);border-radius:8px;padding:6px;z-index:200;min-width:180px;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+          <div style="font-size:9px;color:var(--muted);padding:4px 10px;font-family:monospace;letter-spacing:1px">📄 PDF PROFESIONAL</div>
+          <button onclick="reporteFinanzas();toggleExportMenu()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:var(--white);font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(245,158,11,0.1)'" onmouseout="this.style.background='none'">📊 Reporte Financiero</button>
+          <div style="height:1px;background:rgba(201,168,76,0.15);margin:4px 0"></div>
+          <div style="font-size:9px;color:var(--muted);padding:4px 10px;font-family:monospace;letter-spacing:1px">📊 CSV / EXCEL</div>
           <button onclick="exportCSV();toggleExportMenu()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:var(--white);font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">📊 Finanzas (CSV)</button>
           <button onclick="exportarArriendos();toggleExportMenu()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:var(--white);font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">🚛 Arriendos (CSV)</button>
           <button onclick="exportarFletes();toggleExportMenu()" style="width:100%;text-align:left;padding:7px 10px;background:none;border:none;color:var(--white);font-size:11px;font-family:monospace;cursor:pointer;border-radius:5px" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">🚚 Fletes (CSV)</button>
@@ -985,7 +989,81 @@ document.querySelectorAll('.modal-overlay').forEach(function(m){
   m.addEventListener('click', function(e){ if(e.target===m) m.classList.remove('open'); });
 });
 
-// ── 15. INIT ──
+// ── 15. REPORTE PDF FINANZAS ──
+function reporteFinanzas(){
+  var logo = null;
+  try{ var logos=JSON.parse(localStorage.getItem('mss_logos_v1')||'{}'); logo=logos[String(EMP.id)]||null; }catch(e){}
+  var logoHTML = logo
+    ? '<div style="width:70px;height:55px;background:white;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:4px"><img src="'+logo+'" style="max-width:100%;max-height:100%;object-fit:contain"/></div>'
+    : '<div style="width:55px;height:55px;background:#F59E0B;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#1a1a1a">'+EMP.nombre.charAt(0)+'</div>';
+  var hoy = new Date().toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'}).toUpperCase();
+  var totVentas=ventas(), totEgresos=egresos(), totCapital=capital(), resultado2=totVentas-totEgresos;
+
+  // Balance por mes
+  var porMesData = porMes();
+  var mesesHtml = porMesData.slice(-6).map(function(m){
+    var res = m.ventas-m.egresos;
+    return '<tr>'
+      +'<td style="font-weight:600">'+m.mes+'</td>'
+      +'<td style="text-align:right;color:#059669">'+clp(m.ventas)+'</td>'
+      +'<td style="text-align:right;color:#dc2626">'+clp(m.egresos)+'</td>'
+      +'<td style="text-align:right;font-weight:700;color:'+(res>=0?'#059669':'#dc2626')+'">'+clp(res)+'</td>'
+      +'<td style="text-align:center"><span style="background:'+(res>=0?'#d1fae5':'#fee2e2')+';color:'+(res>=0?'#065f46':'#991b1b')+';padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700">'+(res>=0?'Positivo':'Negativo')+'</span></td>'
+      +'</tr>';
+  }).join('');
+
+  // Últimos 10 movimientos
+  var ultimos = DATA.slice().sort(function(a,b){return b.fecha.localeCompare(a.fecha);}).slice(0,10);
+  var movHtml = ultimos.map(function(r){
+    return '<tr>'
+      +'<td>'+r.fecha+'</td>'
+      +'<td><span style="background:'+(r.tipo==='Ingreso'?'#d1fae5':'#fee2e2')+';color:'+(r.tipo==='Ingreso'?'#065f46':'#991b1b')+';padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700">'+r.tipo+'</span></td>'
+      +'<td>'+r.cat+'</td>'
+      +'<td>'+r.desc+'</td>'
+      +'<td style="text-align:right;font-weight:700;color:'+(r.tipo==='Ingreso'?'#059669':'#dc2626')+'">'+clp(r.monto)+'</td>'
+      +'</tr>';
+  }).join('');
+
+  var html = '<div class="page">'
+    +'<div class="header" style="background:#1a1a1a;color:white;padding:20px 28px;display:flex;justify-content:space-between;align-items:center">'
+      +'<div style="display:flex;align-items:center;gap:16px">'+logoHTML
+        +'<div><div style="font-size:15px;font-weight:900;margin-bottom:3px">'+EMP.nombre+'</div>'
+        +'<div style="font-size:10px;color:#aaa">RUT: '+(EMP.rut||'—')+'&nbsp;|&nbsp;'+(EMP.direccion||'')+'</div>'
+        +'<div style="font-size:10px;color:#aaa">'+(EMP.email||'')+'</div></div></div>'
+      +'<div style="text-align:right"><div style="font-size:22px;font-weight:900;color:#F59E0B">REPORTE FINANCIERO</div>'
+      +'<div style="font-size:11px;color:#aaa;margin-top:3px">'+hoy+'</div></div>'
+    +'</div>'
+    +'<div style="padding:24px 28px">'
+      +'<div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">'
+        +'<div style="flex:1;min-width:120px;background:#f9f9f9;border-radius:8px;padding:12px;border:1px solid #eee;text-align:center"><div style="font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1px">Capital Invertido</div><div style="font-size:18px;font-weight:900;margin-top:4px">'+clp(totCapital)+'</div></div>'
+        +'<div style="flex:1;min-width:120px;background:#f9f9f9;border-radius:8px;padding:12px;border:1px solid #eee;text-align:center"><div style="font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1px">Ventas Reales</div><div style="font-size:18px;font-weight:900;color:#059669;margin-top:4px">'+clp(totVentas)+'</div></div>'
+        +'<div style="flex:1;min-width:120px;background:#f9f9f9;border-radius:8px;padding:12px;border:1px solid #eee;text-align:center"><div style="font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1px">Egresos Totales</div><div style="font-size:18px;font-weight:900;color:#dc2626;margin-top:4px">'+clp(totEgresos)+'</div></div>'
+        +'<div style="flex:1;min-width:120px;background:#f9f9f9;border-radius:8px;padding:12px;border:1px solid #eee;text-align:center"><div style="font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1px">Resultado</div><div style="font-size:18px;font-weight:900;color:'+(resultado2>=0?'#059669':'#dc2626')+';margin-top:4px">'+clp(resultado2)+'</div></div>'
+      +'</div>'
+      +'<div style="font-size:11px;font-weight:700;color:#F59E0B;letter-spacing:2px;text-transform:uppercase;margin:20px 0 10px;border-bottom:1px solid #eee;padding-bottom:6px">Balance Mensual</div>'
+      +'<table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:16px">'
+        +'<thead><tr style="background:#1a1a1a;color:white"><th style="padding:8px 10px;text-align:left">Mes</th><th style="padding:8px 10px;text-align:right">Ventas</th><th style="padding:8px 10px;text-align:right">Egresos</th><th style="padding:8px 10px;text-align:right">Resultado</th><th style="padding:8px 10px;text-align:center">Estado</th></tr></thead>'
+        +'<tbody>'+mesesHtml+'</tbody>'
+      +'</table>'
+      +'<div style="font-size:11px;font-weight:700;color:#F59E0B;letter-spacing:2px;text-transform:uppercase;margin:20px 0 10px;border-bottom:1px solid #eee;padding-bottom:6px">Últimos Movimientos</div>'
+      +'<table style="width:100%;border-collapse:collapse;font-size:11px">'
+        +'<thead><tr style="background:#1a1a1a;color:white"><th style="padding:8px 10px">Fecha</th><th style="padding:8px 10px">Tipo</th><th style="padding:8px 10px">Categoría</th><th style="padding:8px 10px">Descripción</th><th style="padding:8px 10px;text-align:right">Monto</th></tr></thead>'
+        +'<tbody>'+movHtml+'</tbody>'
+      +'</table>'
+    +'</div>'
+    +'<div style="background:#f5f5f5;padding:12px 28px;display:flex;justify-content:space-between;border-top:1px solid #eee;font-size:10px;color:#999">'
+      +'<span>'+EMP.nombre+' · RUT '+(EMP.rut||'')+'</span><span>Generado: '+new Date().toLocaleDateString('es-CL')+'</span>'
+    +'</div>'
+  +'</div>';
+
+  var ventana = window.open('','_blank','width=900,height=700');
+  ventana.document.write('<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/><title>Reporte Financiero — '+EMP.nombre+'</title>'
+    +'<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,sans-serif;background:#f5f5f5;padding:20px;}.page{background:white;max-width:800px;margin:0 auto;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.15);overflow:hidden;}.btn-p{display:block;margin:16px auto;padding:12px 36px;background:#F59E0B;color:#1a1a1a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}@media print{.btn-p{display:none!important;}body{background:white;padding:0;}@page{margin:12mm;size:A4;}}</style>'
+    +'</head><body><button class="btn-p" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>'+html+'<button class="btn-p" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button></body></html>');
+  ventana.document.close();
+}
+
+// ── 16. INIT ──
 cargar();
 sincronizarDesdeArriendos();
 renderTodo();
