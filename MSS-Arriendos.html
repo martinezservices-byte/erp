@@ -360,7 +360,7 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
       <option>Vehículo</option><option>Equipo</option><option>Maquinaria</option><option>Herramienta</option><option>Otro</option>
     </select></div>
     <div class="fl"><label>Categoría</label><select id="aCat" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
-      <option>Camión</option><option>Camioneta</option><option>Auto</option><option>Furgón</option>
+      <option>Camión</option><option>Camioneta</option><option>Auto</option><option>Furgón</option><option>Moto</option>
       <option>Excavadora</option><option>Retroexcavadora</option><option>Grúa</option>
       <option>Generador</option><option>Compresor</option><option>Herramienta Eléctrica</option><option>Otro</option>
     </select></div>
@@ -368,6 +368,7 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
     <div class="fl"><label>Modelo</label><input id="aModelo" type="text"/></div>
     <div class="fl"><label>Año</label><input id="aAnio" type="number" placeholder="2020"/></div>
     <div class="fl"><label>Patente / Serie</label><input id="aPatente" type="text"/></div>
+    <div class="fl"><label>N° Motor</label><input id="aMotor" type="text" placeholder="Ej: A404589303"/></div>
     <div class="fl"><label>Tarifa Diaria ($)</label><input id="aTarifaDia" type="number" value="0"/></div>
     <div class="fl"><label>Tarifa Semanal ($)</label><input id="aTarifaSem" type="number" value="0"/></div>
     <div class="fl"><label>Tarifa Mensual ($)</label><input id="aTarifaMes" type="number" value="0"/></div>
@@ -866,7 +867,7 @@ function rActivos(){
 
 function saveActivo(){
   const id=document.getElementById('aId').value;
-  const obj={nombre:document.getElementById('aNombre').value.trim(),tipo:document.getElementById('aTipo').value,cat:document.getElementById('aCat').value,marca:document.getElementById('aMarca').value,modelo:document.getElementById('aModelo').value,anio:document.getElementById('aAnio').value,patente:document.getElementById('aPatente').value,tarifaDia:parseFloat(document.getElementById('aTarifaDia').value)||0,tarifaSem:parseFloat(document.getElementById('aTarifaSem').value)||0,tarifaMes:parseFloat(document.getElementById('aTarifaMes').value)||0,km:parseFloat(document.getElementById('aKm').value)||0,proxMant:parseFloat(document.getElementById('aProxMant').value)||0,seguro:document.getElementById('aSeguro').value,revision:document.getElementById('aRevision').value,permiso:document.getElementById('aPermiso').value,valor:parseFloat(document.getElementById('aValor').value)||0,estado:document.getElementById('aEstado').value,obs:document.getElementById('aObs').value};
+  const obj={nombre:document.getElementById('aNombre').value.trim(),tipo:document.getElementById('aTipo').value,cat:document.getElementById('aCat').value,marca:document.getElementById('aMarca').value,modelo:document.getElementById('aModelo').value,anio:document.getElementById('aAnio').value,patente:document.getElementById('aPatente').value,motor:document.getElementById('aMotor').value,tarifaDia:parseFloat(document.getElementById('aTarifaDia').value)||0,tarifaSem:parseFloat(document.getElementById('aTarifaSem').value)||0,tarifaMes:parseFloat(document.getElementById('aTarifaMes').value)||0,km:parseFloat(document.getElementById('aKm').value)||0,proxMant:parseFloat(document.getElementById('aProxMant').value)||0,seguro:document.getElementById('aSeguro').value,revision:document.getElementById('aRevision').value,permiso:document.getElementById('aPermiso').value,valor:parseFloat(document.getElementById('aValor').value)||0,estado:document.getElementById('aEstado').value,obs:document.getElementById('aObs').value};
   if(!obj.nombre)return alert('Nombre requerido');
   if(id){const i=ACTIVOS.findIndex(a=>parseInt(a.id)===parseInt(id));if(i>=0)ACTIVOS[i]={...ACTIVOS[i],...obj};}
   else ACTIVOS.push({id:uid(),...obj});
@@ -884,6 +885,7 @@ function editActivo(id){
   document.getElementById('aModelo').value=a.modelo||'';
   document.getElementById('aAnio').value=a.anio||'';
   document.getElementById('aPatente').value=a.patente||'';
+  document.getElementById('aMotor').value=a.motor||'';
   document.getElementById('aTarifaDia').value=a.tarifaDia||0;
   document.getElementById('aTarifaSem').value=a.tarifaSem||0;
   document.getElementById('aTarifaMes').value=a.tarifaMes||0;
@@ -1018,12 +1020,14 @@ function delArriendo(id){
 // EMISIÓN AUTOMÁTICA DESDE ARRIENDO
 // ═══════════════════════════════════════════
 function esVehiculo(activo){
-  const tipo=(activo.tipo||activo.cat||activo.nombre||'').toLowerCase();
-  return tipo.includes('veh')||tipo.includes('auto')||tipo.includes('moto')||
-         tipo.includes('camion')||tipo.includes('camión')||tipo.includes('furgon')||
-         tipo.includes('furgón')||tipo.includes('pickup')||tipo.includes('van')||
-         tipo.includes('porter')||tipo.includes('truck')||tipo.includes('minibus')||
-         tipo.includes('microbus');
+  // Vehículo si el TIPO es "Vehículo" O si la categoría/nombre es de transporte
+  const tipo=(activo.tipo||'').toLowerCase();
+  const cat=(activo.cat||'').toLowerCase();
+  const nom=(activo.nombre||'').toLowerCase();
+  if(tipo==='vehículo'||tipo==='vehiculo') return true;
+  const palabras=['auto','moto','camion','camión','furgon','furgón','pickup',
+    'van','porter','truck','minibus','microbus','camioneta','vehiculo','vehículo'];
+  return palabras.some(p=>cat.includes(p)||nom.includes(p));
 }
 
 function estilosDoc(){
@@ -1124,7 +1128,7 @@ function emitirContrato(id){
         <div style="border:1px solid #ccc;border-radius:4px;padding:14px;margin-bottom:14px">
           <p style="font-size:11px;font-weight:900;text-transform:uppercase;margin-bottom:10px;border-bottom:1px solid #ccc;padding-bottom:6px">ANEXO: GUÍA DE ENTREGA Y ESTADO (ACTA DE RECEPCIÓN)</p>
           <ul style="font-size:10.5px;line-height:2.2;padding-left:24px">
-            <li><strong>Casco y Accesorios:</strong> _________________________________</li>
+            <li><strong>Accesorios:</strong> _________________________________</li>
             <li><strong>Nivel de Combustible:</strong> _________________________________</li>
             <li><strong>Observaciones de Estado (Daños/Rayas):</strong> _____________________________</li>
           </ul>
