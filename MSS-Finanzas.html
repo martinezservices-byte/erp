@@ -1000,13 +1000,17 @@ function reporteFinanzas(){
   var totVentas=ventas(), totEgresos=egresos(), totCapital=capital(), resultado2=totVentas-totEgresos;
 
   // Balance por mes
+  var MESES_N=['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   var porMesData = porMes();
-  var mesesHtml = porMesData.slice(-6).map(function(m){
-    var res = m.ventas-m.egresos;
+  var mesesHtml = porMesData.map(function(m){
+    var egr = m.egr||0;  // porMes() usa m.egr, NO m.egresos
+    var res = m.ventas - egr;
+    var partes = (m.mes||'').split('-');
+    var mesNombre = partes.length===2 ? (MESES_N[parseInt(partes[1])]||m.mes)+' '+partes[0] : m.mes;
     return '<tr>'
-      +'<td style="font-weight:600">'+m.mes+'</td>'
+      +'<td style="font-weight:600">'+mesNombre+'</td>'
       +'<td style="text-align:right;color:#059669">'+clp(m.ventas)+'</td>'
-      +'<td style="text-align:right;color:#dc2626">'+clp(m.egresos)+'</td>'
+      +'<td style="text-align:right;color:#dc2626">'+clp(egr)+'</td>'
       +'<td style="text-align:right;font-weight:700;color:'+(res>=0?'#059669':'#dc2626')+'">'+clp(res)+'</td>'
       +'<td style="text-align:center"><span style="background:'+(res>=0?'#d1fae5':'#fee2e2')+';color:'+(res>=0?'#065f46':'#991b1b')+';padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700">'+(res>=0?'Positivo':'Negativo')+'</span></td>'
       +'</tr>';
@@ -1016,7 +1020,7 @@ function reporteFinanzas(){
   var ultimos = DATA.slice().sort(function(a,b){return b.fecha.localeCompare(a.fecha);}).slice(0,10);
   var movHtml = ultimos.map(function(r){
     return '<tr>'
-      +'<td>'+r.fecha+'</td>'
+      +'<td>'+(r.fecha?r.fecha.split('-').reverse().join('-'):'-')+'</td>'
       +'<td><span style="background:'+(r.tipo==='Ingreso'?'#d1fae5':'#fee2e2')+';color:'+(r.tipo==='Ingreso'?'#065f46':'#991b1b')+';padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700">'+r.tipo+'</span></td>'
       +'<td>'+r.cat+'</td>'
       +'<td>'+r.desc+'</td>'
