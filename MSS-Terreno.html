@@ -302,6 +302,14 @@ select.fi{appearance:none;}
       <div style="font-size:12px;color:var(--muted)">Firma del cliente y generación del QR</div>
     </div>
 
+    <div class="card" id="cardEncargado" style="display:none">
+      <div class="card-title">👤 Encargado que recibe</div>
+      <div class="fg">
+        <label>Nombre de quien recibe el equipo</label>
+        <input class="fi" id="encargadoRecibe" type="text" placeholder="Ej: Gaudy Martínez / Joseph Pajuelo"/>
+      </div>
+    </div>
+
     <div class="card">
       <div class="card-title">Firma del cliente</div>
       <div class="firma-wrap" style="margin-bottom:10px">
@@ -484,7 +492,12 @@ function irPaso(n) {
     const cardF = document.getElementById('cardFotos');
     if(cardF) cardF.style.display = _estado.tipo === 'devolucion' ? 'block' : 'none';
   }
-  if (n === 4) initFirma();
+  if (n === 4) {
+    initFirma();
+    // Mostrar encargado solo en devolución
+    const cardEnc = document.getElementById('cardEncargado');
+    if(cardEnc) cardEnc.style.display = _estado.tipo === 'devolucion' ? 'block' : 'none';
+  }
   for (let i = 1; i <= 4; i++) {
     const el = document.getElementById('paso' + i);
     if (el) el.style.display = i === n ? 'block' : 'none';
@@ -664,12 +677,14 @@ function finalizar() {
   } catch(e){}
 
   // Link liviano: solo datos + firma mini (sin fotos)
+  const encargado = document.getElementById('encargadoRecibe')?.value || _estado.vendedor;
   const dataQR = {
     v:3, emp:empId, ctto:contratoId, tipo,
     chk:_estado.checklist, obs,
     gps:_estado.gps,
     vend:_estado.vendedor, vendTel:_estado.vendTel,
     cliNombre:_estado.cliNombre, cliTel:_estado.cliTel,
+    encargado: encargado,
     fecha:new Date().toISOString(),
     firma: firmaMin,
     nFotos: _estado.fotos.length
@@ -692,6 +707,32 @@ function finalizar() {
   // Agregar mensaje de fotos
   const sub = document.querySelector('.success-sub');
   if(sub) sub.innerHTML = 'Contrato <strong>'+contratoId+'</strong><br>Escanea el QR en el PC para cargar los datos'+msgFotos;
+
+  // Botón WhatsApp para enviar al cliente desde el celular
+  const cliTelLimpio = (_estado.cliTel||'').replace(/[^0-9]/g,'');
+  const cliWA = cliTelLimpio ? '56'+cliTelLimpio.replace(/^0+/,'').replace(/^56/,'') : '';
+  const tipoLabel = tipo==='entrega'?'Entrega':'Devolución';
+  const msgWA = encodeURIComponent(
+    '✅ *'+tipoLabel+' de Equipo — '+contratoId+'*\n\n'
+    +'Estimado/a '+(_estado.cliNombre||'cliente')+',\n'
+    +'Le informamos que la '+tipoLabel.toLowerCase()+' del equipo ha sido registrada correctamente.\n\n'
+    +'📋 *Contrato:* '+contratoId+'\n'
+    +'📅 *Fecha:* '+new Date().toLocaleDateString('es-CL')+'\n'
+    +'✅ *Estado:* '+(_estado.checklist==='optimo'?'Óptimo':_estado.checklist==='observaciones'?'Con Observaciones':'Requiere Mantención')+'\n'
+    +(encargado?'👤 *Recibe:* '+encargado+'\n':'')
+    +'\nGracias por su confianza.\n'
+    +'*Martinez y Pajuelo Arriendos SpA*'
+  );
+
+  // Mostrar botón WhatsApp si hay número
+  const qrSec = document.getElementById('qrSection');
+  if(qrSec && cliWA) {
+    const divWA = document.createElement('div');
+    divWA.style.cssText = 'margin-top:12px';
+    divWA.innerHTML = '<a href="https://wa.me/'+cliWA+'?text='+msgWA+'" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;background:#25D366;color:white;border-radius:8px;text-decoration:none;font-size:13px;font-weight:700">📱 Enviar comprobante al cliente por WhatsApp</a>';
+    qrSec.appendChild(divWA);
+  }
+
   toast('✅ Listo — datos y firma en el QR');
 }
 
