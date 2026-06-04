@@ -991,8 +991,14 @@ function editArriendo(id){
   document.getElementById('tArriendo').textContent='Editar Arriendo';
   document.getElementById('arId').value=id;
   document.getElementById('arNum').value=a.num;
-  document.getElementById('arActivo').value=a.activoId;
-  document.getElementById('arCliente').value=a.clienteId;
+  // Asignar activo y cliente con setTimeout para asegurar que poblarSelects() terminó
+  setTimeout(()=>{
+    const selA=document.getElementById('arActivo');
+    const selC=document.getElementById('arCliente');
+    // Buscar la opción que coincida con parseInt
+    Array.from(selA.options).forEach(o=>{if(parseInt(o.value)===parseInt(a.activoId)) selA.value=o.value;});
+    Array.from(selC.options).forEach(o=>{if(parseInt(o.value)===parseInt(a.clienteId)) selC.value=o.value;});
+  },0);
   document.getElementById('arInicio').value=a.inicio;
   document.getElementById('arTermino').value=a.termino;
   document.getElementById('arTipoTarifa').value=a.tipoTarifa;
