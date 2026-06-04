@@ -1062,7 +1062,7 @@ function reporteFinanzas(){
 
   var ventana = window.open('','_blank','width=900,height=700');
   ventana.document.write('<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/><title>Reporte Financiero — '+EMP.nombre+'</title>'
-    +'<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,sans-serif;background:#f5f5f5;padding:20px;}.page{background:white;max-width:800px;margin:0 auto;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.15);overflow:hidden;}.btn-p{display:block;margin:16px auto;padding:12px 36px;background:#F59E0B;color:#1a1a1a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}@media print{.btn-p{display:none!important;}body{background:white;padding:0;}@page{margin:12mm;size:A4;}}</style>'
+    +'<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,sans-serif;background:#f5f5f5;padding:20px;}.page{background:white;max-width:800px;margin:0 auto;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.15);overflow:hidden;}.btn-p{display:block;margin:16px auto;padding:12px 36px;background:#F59E0B;color:#1a1a1a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}@media print{.btn-p{display:none!important;}body{background:white;padding:0;}@page{margin:12mm;size:A4;}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}}</style>'
     +'</head><body><button class="btn-p" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>'+html+'<button class="btn-p" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button></body></html>');
   ventana.document.close();
 }
