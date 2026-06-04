@@ -74,7 +74,7 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
   body>*{display:none!important;}
   #docPrintArea{display:block!important;position:fixed;top:0;left:0;width:100%;background:white;}
   .doc-arr{box-shadow:none!important;border-radius:0!important;max-width:100%!important;}
-  .doc-arr-head,.doc-arr-table th{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}
   @page{margin:10mm;size:A4;}
 }
 </style>
@@ -1100,6 +1100,7 @@ function estilosDoc(){
     body{background:white;padding:0;}
     .doc{box-shadow:none;border-radius:0;margin:0;}
     @page{margin:10mm;size:letter;}
+    *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}
   }`;
 }
 
@@ -2365,6 +2366,7 @@ function estilosPDF(){
       .btn-imprimir{display:none!important;}
       .page{box-shadow:none;border-radius:0;max-width:100%;}
       @page{margin:12mm;size:A4;}
+      *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}
     }
   `;
 }
