@@ -2722,24 +2722,46 @@ rDash();
         const key = 'mss_evidencia_' + empId + '_' + data.ctto + '_' + data.tipo;
         localStorage.setItem(key, JSON.stringify(data));
 
-        // Buscar el arriendo correspondiente para vincular fotos por ID numérico
+        // Buscar el arriendo y vincular fotos con el ID numérico correcto
         load();
         const arrMatch = ARRIENDOS.find(a => a.num === data.ctto);
         if (arrMatch) {
-          // Guardar fotos con la clave que usa gestionarFotos (por ID numérico)
-          const keyFotos = 'mss_arr' + empId + '_fotos_' + data.tipo + '_' + arrMatch.id;
-          const fotasExist = JSON.parse(localStorage.getItem(keyFotos) || '[]');
-          // Las fotos vienen del celular guardadas con clave por número
-          const keyFotosCelular = 'mss_arr' + empId + '_fotos_' + data.tipo + '_' + data.ctto;
-          const fotosCelular = JSON.parse(localStorage.getItem(keyFotosCelular) || '[]');
-          if (fotosCelular.length > 0) {
-            localStorage.setItem(keyFotos, JSON.stringify(fotosCelular));
+          const idCorrecto = arrMatch.id;
+          // Buscar fotos en TODAS las claves posibles del celular
+          const posiblesClaves = [
+            'mss_arr' + empId + '_fotos_' + data.tipo + '_' + data.ctto,
+            'mss_arr' + empId + '_fotos_' + data.tipo + '_' + idCorrecto
+          ];
+          // Buscar también en todas las claves de fotos del mismo tipo
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k && k.includes('_fotos_' + data.tipo + '_') && !posiblesClaves.includes(k)) {
+              posiblesClaves.push(k);
+            }
           }
-          // Guardar firma
-          const keyFirmaCelular = 'mss_arr' + empId + '_firma_' + data.tipo + '_' + data.ctto;
-          const firma = localStorage.getItem(keyFirmaCelular);
-          if (firma) {
-            localStorage.setItem('mss_arr' + empId + '_firma_' + data.tipo + '_' + arrMatch.id, firma);
+          for (const kBuscar of posiblesClaves) {
+            const fotosStr = localStorage.getItem(kBuscar);
+            if (fotosStr) {
+              let fotos = [];
+              try { fotos = JSON.parse(fotosStr); } catch(e) {}
+              if (fotos.length > 0) {
+                // Guardar con el ID correcto
+                localStorage.setItem('mss_arr' + empId + '_fotos_' + data.tipo + '_' + idCorrecto, JSON.stringify(fotos));
+                break;
+              }
+            }
+          }
+          // Buscar firma en todas las claves posibles
+          const posiblesFirma = [
+            'mss_arr' + empId + '_firma_' + data.tipo + '_' + data.ctto,
+            'mss_arr' + empId + '_firma_' + data.tipo + '_' + idCorrecto
+          ];
+          for (const kFirma of posiblesFirma) {
+            const firma = localStorage.getItem(kFirma);
+            if (firma) {
+              localStorage.setItem('mss_arr' + empId + '_firma_' + data.tipo + '_' + idCorrecto, firma);
+              break;
+            }
           }
         }
 
