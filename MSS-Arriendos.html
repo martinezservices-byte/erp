@@ -1200,6 +1200,28 @@ function emitirContrato(id){
     // ══════════════════════════════════════════
     // VEHÍCULO — PÁGINA 2: ACTA DE ENTREGA
     // ══════════════════════════════════════════
+    // Precalcular sección datos del terreno
+    let _evVeh=null;
+    try{_evVeh=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_evidencia_entrega_'+a.id)||'null');}catch(e){}
+    const _firmaVeh=localStorage.getItem('mss_arr'+EMP.id+'_firma_entrega_'+a.id)||localStorage.getItem('mss_arr'+EMP.id+'_firma_entrega_'+a.num)||null;
+    const _secTerrenoVeh=(()=>{
+      if(!_evVeh) return '';
+      const chkMap={optimo:'✅ Óptimo',observaciones:'⚠ Con Observaciones',mantencion:'🔧 Requiere Mantención'};
+      return '<div style="border:0.5px solid #ccc;border-radius:4px;padding:10px 12px;margin-bottom:10px;background:#fafafa">'
+        +'<div style="font-size:9px;font-weight:700;color:#F59E0B;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">📱 Datos registrados desde terreno</div>'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px">'
+        +'<div><strong>Estado:</strong> '+(chkMap[_evVeh.checklist]||_evVeh.checklist)+'</div>'
+        +'<div><strong>Registrado por:</strong> '+(_evVeh.vendedor||'—')+'</div>'
+        +(_evVeh.gps?'<div><strong>GPS:</strong> '+_evVeh.gps.lat.toFixed(5)+', '+_evVeh.gps.lng.toFixed(5)+'</div><div><strong>Precisión:</strong> ±'+Math.round(_evVeh.gps.acc||0)+'m</div>':'')
+        +(_evVeh.obs?'<div style="grid-column:1/-1"><strong>Observaciones:</strong> '+_evVeh.obs+'</div>':'')
+        +(_evVeh.cliNombre?'<div><strong>Cliente:</strong> '+_evVeh.cliNombre+'</div>':'')
+        +(_evVeh.cliTel?'<div><strong>Tel:</strong> '+_evVeh.cliTel+'</div>':'')
+        +'<div><strong>Fecha:</strong> '+new Date(_evVeh.fecha).toLocaleString("es-CL")+'</div>'
+        +'</div>'
+        +(_firmaVeh?'<div style="margin-top:8px"><div style="font-size:9px;color:#666;margin-bottom:3px">FIRMA DIGITAL:</div><img src="'+_firmaVeh+'" style="max-height:55px;border:0.5px solid #ddd;border-radius:4px;background:white"/></div>':'')
+        +'</div>';
+    })();
+
     pag2=`<div class="doc">
       <div class="doc-head" style="align-items:center">
         <div style="display:flex;align-items:center;gap:12px">${logoHTML}
@@ -1254,28 +1276,7 @@ function emitirContrato(id){
 
         <div style="font-size:10px;margin:8px 0 4px"><strong>Recibe conforme (cliente):</strong> <span class="field-blank" style="min-width:220px">&nbsp;</span></div>
 
-        \${(()=>{
-          try{
-            const ev=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_evidencia_entrega_'+a.id)||'null');
-            if(!ev) return '';
-            const chkMap={optimo:'\u2705 \u00d3ptimo',observaciones:'\u26a0 Con Observaciones',mantencion:'\ud83d\udd27 Requiere Manten\u00f3cion'};
-            const firma=localStorage.getItem('mss_arr'+EMP.id+'_firma_entrega_'+a.id)
-              ||localStorage.getItem('mss_arr'+EMP.id+'_firma_entrega_'+a.num)||null;
-            return '<div style="border:0.5px solid #ccc;border-radius:4px;padding:10px 12px;margin-bottom:10px;background:#fafafa">'
-              +'<div style="font-size:9px;font-weight:700;color:#F59E0B;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">\ud83d\udcf1 Datos registrados desde terreno</div>'
-              +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px">'
-              +'<div><strong>Estado:</strong> '+(chkMap[ev.checklist]||ev.checklist)+'</div>'
-              +'<div><strong>Registrado por:</strong> '+(ev.vendedor||'\u2014')+'</div>'
-              +(ev.gps?'<div><strong>GPS:</strong> '+ev.gps.lat.toFixed(5)+', '+ev.gps.lng.toFixed(5)+'</div><div><strong>Precisi\u00f3n:</strong> \u00b1'+Math.round(ev.gps.acc||0)+'m</div>':'')
-              +(ev.obs?'<div style="grid-column:1/-1"><strong>Observaciones:</strong> '+ev.obs+'</div>':'')
-              +(ev.cliNombre?'<div><strong>Cliente:</strong> '+ev.cliNombre+'</div>':'')
-              +(ev.cliTel?'<div><strong>Tel:</strong> '+ev.cliTel+'</div>':'')
-              +'<div><strong>Fecha:</strong> '+new Date(ev.fecha).toLocaleString('es-CL')+'</div>'
-              +'</div>'
-              +(firma?'<div style="margin-top:8px"><div style="font-size:9px;color:#666;margin-bottom:3px">FIRMA DIGITAL:</div><img src="'+firma+'" style="max-height:55px;border:0.5px solid #ddd;border-radius:4px;background:white"/></div>':'')
-              +'</div>';
-          }catch(e){return '';}
-        })()}
+        ${_secTerrenoVeh}
 
         <div class="firmas">
           <div class="firma"><div class="firma-line"><div class="nombre">${emp.nombre}</div><div class="rut">RUT: ${emp.rut||''}</div><div class="rol">Arrendador</div></div></div>
@@ -1354,8 +1355,45 @@ function emitirContrato(id){
     // ══════════════════════════════════════════
     // MAQUINARIA — PÁGINA 2: ACTA DE ENTREGA
     // ══════════════════════════════════════════
+    // Precalcular sección datos del terreno para maquinaria
+    let _evMaq2=null;
+    try{_evMaq2=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_evidencia_entrega_'+a.id)||'null');}catch(e){}
+    const _firmaMaq=localStorage.getItem('mss_arr'+EMP.id+'_firma_entrega_'+a.id)||localStorage.getItem('mss_arr'+EMP.id+'_firma_entrega_'+a.num)||null;
+    const _secTerrenoMaq=(()=>{
+      if(!_evMaq2) return '';
+      const chkMap={optimo:'✅ Óptimo',observaciones:'⚠ Con Observaciones',mantencion:'🔧 Requiere Mantención'};
+      return '<div style="border:0.5px solid #ccc;border-radius:4px;padding:10px 12px;margin-bottom:10px;background:#fafafa">'
+        +'<div style="font-size:9px;font-weight:700;color:#F59E0B;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">📱 Datos registrados desde terreno</div>'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px">'
+        +'<div><strong>Estado:</strong> '+(chkMap[_evMaq2.checklist]||_evMaq2.checklist)+'</div>'
+        +'<div><strong>Registrado por:</strong> '+(_evMaq2.vendedor||'—')+'</div>'
+        +(_evMaq2.gps?'<div><strong>GPS:</strong> '+_evMaq2.gps.lat.toFixed(5)+', '+_evMaq2.gps.lng.toFixed(5)+'</div><div><strong>Precisión:</strong> ±'+Math.round(_evMaq2.gps.acc||0)+'m</div>':'')
+        +(_evMaq2.obs?'<div style="grid-column:1/-1"><strong>Observaciones:</strong> '+_evMaq2.obs+'</div>':'')
+        +(_evMaq2.cliNombre?'<div><strong>Cliente:</strong> '+_evMaq2.cliNombre+'</div>':'')
+        +(_evMaq2.cliTel?'<div><strong>Tel:</strong> '+_evMaq2.cliTel+'</div>':'')
+        +'<div><strong>Fecha:</strong> '+new Date(_evMaq2.fecha).toLocaleString("es-CL")+'</div>'
+        +'</div>'
+        +(_firmaMaq?'<div style="margin-top:8px"><div style="font-size:9px;color:#666;margin-bottom:3px">FIRMA DIGITAL:</div><img src="'+_firmaMaq+'" style="max-height:55px;border:0.5px solid #ddd;border-radius:4px;background:white"/></div>':'')
+        +'</div>';
+    })();
     const condDespacho=a.tipoDespacho==='flete'?'Con costo adicional':a.tipoDespacho==='despacho'?'Despacho sin costo':'Retira cliente';
     const esDespacho=a.tipoDespacho==='flete'||a.tipoDespacho==='despacho';
+
+    // Precalcular secciones condicionales
+    let _evMaq=null;
+    try{_evMaq=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_evidencia_entrega_'+a.id)||'null');}catch(e){}
+    const _chkMaqEstado=(()=>{
+      if(!_evMaq){return '<span class="chk">&nbsp;</span> Operativo &nbsp;<span class="chk">&nbsp;</span> Con observaciones';}
+      const m={optimo:'✅ Óptimo',observaciones:'⚠ Con Observaciones',mantencion:'🔧 Requiere Mantención'};
+      return '<strong>'+(m[_evMaq.checklist]||_evMaq.checklist)+'</strong>';
+    })();
+    const _secAccesorios=_evMaq?'':`<div class="sec-hdr">2. Accesorios y herramientas entregadas</div>
+        <div class="sec-body">
+          <div style="font-size:10px;margin-bottom:4px">Detalle: <span class="field-blank" style="min-width:320px">&nbsp;</span></div>
+          <div style="font-size:10px">Observaciones generales:</div>
+          <div class="obs-box">______________________________________________________________________</div>
+        </div>`;
+    const _secRecibeConf=_evMaq?'':`<div style="font-size:10px;margin:8px 0 4px"><strong>Recibe conforme (cliente):</strong> <span class="field-blank" style="min-width:220px">&nbsp;</span></div>`;
 
     pag2=`<div class="doc">
       <div class="doc-head" style="align-items:center">
@@ -1383,27 +1421,12 @@ function emitirContrato(id){
               <td style="text-align:center">1</td>
               <td style="font-weight:700">${activo.nombre||a.activoNombre}</td>
               <td>${marca} · ${serie}</td>
-              <td>${(()=>{
-                try{
-                  const ev=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_evidencia_entrega_'+a.id)||'null');
-                  if(ev){const m={optimo:'✅ Óptimo',observaciones:'⚠ Con Observaciones',mantencion:'🔧 Requiere Mantención'};return '<strong>'+(m[ev.checklist]||ev.checklist)+'</strong>';}
-                }catch(e){}
-                return '<span class="chk">&nbsp;</span> Operativo &nbsp;<span class="chk">&nbsp;</span> Con observaciones';
-              })()}</td>
+              <td>${_chkMaqEstado}</td>
             </tr></tbody>
           </table>
         </div>
 
-        \${(()=>{
-          try{const ev=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_evidencia_entrega_'+a.id)||'null');
-          if(ev) return '';}catch(e){}
-          return \`<div class="sec-hdr">2. Accesorios y herramientas entregadas</div>
-        <div class="sec-body">
-          <div style="font-size:10px;margin-bottom:4px">Detalle: <span class="field-blank" style="min-width:320px">&nbsp;</span></div>
-          <div style="font-size:10px">Observaciones generales:</div>
-          <div class="obs-box">______________________________________________________________________</div>
-        </div>\`;
-        })()}
+        ${_secAccesorios}
 
         <div class="sec-hdr">3. Datos de despacho</div>
         <div class="sec-body">
@@ -1416,34 +1439,9 @@ function emitirContrato(id){
           <div style="font-size:10px;padding:6px 0 0"><strong>Hora retiro estimada:</strong> <span class="field-blank" style="min-width:80px">&nbsp;</span></div>
         </div>
 
-        \${(()=>{
-          try{const ev=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_evidencia_entrega_'+a.id)||'null');
-          if(ev) return '';}catch(e){}
-          return '<div style="font-size:10px;margin:8px 0 4px"><strong>Recibe conforme (cliente):</strong> <span class=\'field-blank\' style=\'min-width:220px\'>&nbsp;</span></div>';
-        })()}
+        ${_secRecibeConf}
 
-        ${(()=>{
-          try{
-            const ev=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_evidencia_entrega_'+a.id)||'null');
-            if(!ev) return '';
-            const chkMap={optimo:'✅ Óptimo',observaciones:'⚠ Con Observaciones',mantencion:'🔧 Requiere Mantención'};
-            const firma=localStorage.getItem('mss_arr'+EMP.id+'_firma_entrega_'+a.id)
-              ||localStorage.getItem('mss_arr'+EMP.id+'_firma_entrega_'+a.num)||null;
-            return '<div style="border:0.5px solid #ccc;border-radius:4px;padding:10px 12px;margin-bottom:10px;background:#fafafa">'
-              +'<div style="font-size:9px;font-weight:700;color:#F59E0B;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">📱 Datos registrados desde terreno</div>'
-              +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px">'
-              +'<div><strong>Estado:</strong> '+(chkMap[ev.checklist]||ev.checklist)+'</div>'
-              +'<div><strong>Registrado por:</strong> '+(ev.vendedor||'—')+'</div>'
-              +(ev.gps?'<div><strong>GPS:</strong> '+ev.gps.lat.toFixed(5)+', '+ev.gps.lng.toFixed(5)+'</div><div><strong>Precisión:</strong> ±'+Math.round(ev.gps.acc||0)+'m</div>':'')
-              +(ev.obs?'<div style="grid-column:1/-1"><strong>Observaciones:</strong> '+ev.obs+'</div>':'')
-              +(ev.cliNombre?'<div><strong>Cliente:</strong> '+ev.cliNombre+'</div>':'')
-              +(ev.cliTel?'<div><strong>Tel:</strong> '+ev.cliTel+'</div>':'')
-              +'<div><strong>Fecha:</strong> '+new Date(ev.fecha).toLocaleString("es-CL")+'</div>'
-              +'</div>'
-              +(firma?'<div style="margin-top:8px"><div style="font-size:9px;color:#666;margin-bottom:3px">FIRMA DIGITAL:</div><img src="'+firma+'" style="max-height:55px;border:0.5px solid #ddd;border-radius:4px;background:white"/></div>':'')
-              +'</div>';
-          }catch(e){return '';}
-        })()}
+        ${_secTerrenoVeh}
 
         <div class="firmas">
           <div class="firma"><div class="firma-line"><div class="nombre">${emp.nombre}</div><div class="rut">RUT: ${emp.rut||''}</div><div class="rol">Arrendador</div></div></div>
