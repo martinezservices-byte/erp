@@ -1069,34 +1069,37 @@ function estilosDoc(){
   body{background:#f0f0f0;font-family:Arial,sans-serif;padding:20px;}
   .doc{background:white;max-width:760px;margin:0 auto 24px;border-radius:6px;box-shadow:0 2px 16px rgba(0,0,0,.12);overflow:hidden;page-break-after:always;}
   .doc:last-child{page-break-after:auto;}
-  .doc-head{border-bottom:2.5px solid #1a1a1a;padding:14px 22px;display:flex;justify-content:space-between;align-items:flex-start;}
-  .doc-head-emp{display:flex;flex-direction:column;gap:2px;}
-  .doc-title{text-align:center;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #1a1a1a;padding-bottom:8px;margin-bottom:14px;}
-  .clausula{margin-bottom:9px;font-size:10px;line-height:1.75;text-align:justify;}
+  .doc-head{border-bottom:2px solid #1a1a1a;padding:10px 18px;display:flex;justify-content:space-between;align-items:flex-start;}
+  .doc-head-emp{display:flex;flex-direction:column;gap:1px;}
+  .doc-title{text-align:center;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:1px;border-bottom:1.5px solid #1a1a1a;padding-bottom:6px;margin-bottom:10px;}
+  .clausula{margin-bottom:6px;font-size:9.5px;line-height:1.65;text-align:justify;}
   .clausula strong{font-weight:700;}
-  .doc-table{width:100%;border-collapse:collapse;margin:6px 0 10px;font-size:9.5px;}
-  .doc-table th{background:#1a1a1a;color:white;padding:6px 8px;text-align:left;}
-  .doc-table td{padding:6px 8px;border:0.5px solid #ccc;}
-  .sec-hdr{background:#1a1a1a;color:white;padding:5px 10px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;border-radius:4px 4px 0 0;}
-  .sec-body{border:0.5px solid #ccc;border-top:none;padding:10px 12px;margin-bottom:10px;border-radius:0 0 4px 4px;}
+  .doc-table{width:100%;border-collapse:collapse;margin:4px 0 8px;font-size:9px;}
+  .doc-table th{background:#1a1a1a;color:white;padding:5px 7px;text-align:left;}
+  .doc-table td{padding:5px 7px;border:0.5px solid #ccc;}
+  .sec-hdr{background:#1a1a1a;color:white;padding:4px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;border-radius:4px 4px 0 0;}
+  .sec-body{border:0.5px solid #ccc;border-top:none;padding:8px 12px;margin-bottom:8px;border-radius:0 0 4px 4px;}
   .grid2{display:grid;grid-template-columns:1fr 1fr;}
-  .cell{padding:6px 10px;border-bottom:0.5px solid #eee;font-size:10px;}
+  .cell{padding:5px 10px;border-bottom:0.5px solid #eee;font-size:9.5px;}
   .cell:nth-child(even){border-left:0.5px solid #eee;}
-  .chk-row{display:flex;align-items:flex-start;gap:6px;margin-bottom:5px;font-size:10px;line-height:1.6;}
+  .chk-row{display:flex;align-items:flex-start;gap:6px;margin-bottom:4px;font-size:9.5px;line-height:1.6;}
   .chk{display:inline-block;width:11px;height:11px;border:1px solid #666;border-radius:2px;text-align:center;font-size:8px;line-height:11px;flex-shrink:0;margin-top:2px;}
   .field-blank{display:inline-block;border-bottom:0.5px solid #888;min-width:120px;height:14px;vertical-align:bottom;}
-  .obs-box{border:0.5px solid #ccc;min-height:38px;border-radius:4px;padding:4px 8px;margin-top:4px;font-size:9px;color:#bbb;}
-  .firmas{display:flex;justify-content:space-around;margin-top:30px;padding-top:14px;border-top:2px solid #1a1a1a;}
-  .firma{text-align:center;min-width:170px;}
-  .firma-line{border-top:0.5px solid #1a1a1a;padding-top:5px;margin-top:38px;font-size:10px;line-height:1.7;}
-  .doc-footer{background:#f5f5f5;padding:7px 22px;font-size:9px;color:#777;border-top:1px solid #e0e0e0;text-align:center;}
-  .dev-sep{border:none;border-top:1px dashed #ccc;margin:20px 0;}
+  .obs-box{border:0.5px solid #ccc;min-height:34px;border-radius:4px;padding:4px 8px;margin-top:3px;font-size:9px;color:#bbb;}
+  .firmas{display:flex;justify-content:space-around;margin-top:24px;padding:0 20px;}
+  .firma{text-align:center;min-width:200px;}
+  .firma-line{border-top:1.5px solid #1a1a1a;padding-top:6px;margin-top:44px;font-size:10px;line-height:1.7;font-family:Arial,sans-serif;}
+  .firma-line .nombre{font-weight:700;font-size:10.5px;margin-bottom:1px;}
+  .firma-line .rut{color:#555;font-size:9px;}
+  .firma-line .rol{color:#888;font-size:8.5px;text-transform:uppercase;letter-spacing:0.5px;margin-top:1px;}
+  .doc-footer{background:#f5f5f5;padding:6px 18px;font-size:8.5px;color:#777;border-top:1px solid #e0e0e0;text-align:center;}
+  .dev-sep{border:none;border-top:1px dashed #ccc;margin:16px 0;}
   .btn-print{display:block;margin:14px auto;padding:11px 32px;background:#F59E0B;color:#1a1a1a;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;}
   @media print{
     .btn-print{display:none!important;}
     body{background:white;padding:0;}
     .doc{box-shadow:none;border-radius:0;margin:0;}
-    @page{margin:12mm;size:letter;}
+    @page{margin:10mm;size:letter;}
   }`;
 }
 
@@ -1150,7 +1153,7 @@ function emitirContrato(id){
     // ══════════════════════════════════════════
     pag1=`<div class="doc">
       ${headEmp}
-      <div style="padding:18px 22px">
+      <div style="padding:12px 18px">
         <div class="doc-title">CONTRATO ARRIENDO DE VEHÍCULOS N° ${numCtto}</div>
 
         <p class="clausula">En <strong>${ciudad}</strong>, a <strong>${fechaLarga}</strong>, entre <strong>${emp.nombre.toUpperCase()}</strong>, RUT <strong>${emp.rut||''}</strong>, representada por <strong>DOÑA ${(emp.contacto||'GAUDY MARTINEZ YOVERA').toUpperCase()}</strong>, RUT <strong>${emp.rut_rep||'23.918.699-8'}</strong>, domiciliada en ${emp.direccion||''}, en adelante <strong>"EL ARRENDADOR"</strong>; y Don(ña) <strong>${(cliente.nombre||'—').toUpperCase()}</strong>, RUT: <strong>${cliente.rut||'—'}</strong>, domiciliado en <strong>${cliente.dir||'—'}</strong>, Teléfono: <strong>${cliente.tel||'—'}</strong>, Email: <strong>${cliente.email||'—'}</strong>, en adelante <strong>"EL ARRENDATARIO"</strong>, se ha convenido lo siguiente:</p>
@@ -1173,7 +1176,7 @@ function emitirContrato(id){
         </div>
 
         <p class="clausula"><strong>CUARTO:</strong> El contrato rige por <strong>${dias} día(s)</strong>, con un valor día de <strong>${clp(a.tarifa)}</strong>, desde el <strong>${fIni}</strong> hasta el <strong>${fTer}</strong>. La renta se pagará por el periodo pactado.</p>
-        ${garantia>0?`<p class="clausula"><strong>Garantía:</strong> Se entrega una garantía de <strong>${clp(garantia)}</strong> mediante EFECTIVO [${chkEfec}] TRANSFERENCIA [${chkTran}]. Totalmente reembolsable si el vehículo se devuelve sin daños y con el mismo nivel de combustible.</p>`:''}
+        ${garantia>0?`<p class="clausula"><strong>Garantía:</strong> Se entrega una garantía de <strong>${clp(garantia)}</strong> mediante <span style="font-family:monospace">EFECTIVO [${chkEfec}]</span> <span style="font-family:monospace">TRANSFERENCIA [${chkTran}]</span>. Totalmente reembolsable si el vehículo se devuelve sin daños y con el mismo nivel de combustible.</p>`:''}
 
         <p class="clausula"><strong>QUINTO:</strong> Ante cualquier incumplimiento, el Arrendatario faculta al Arrendador para retirar el vehículo desde donde se encuentre, renunciando a cualquier acción de oposición.</p>
 
@@ -1186,8 +1189,8 @@ function emitirContrato(id){
         <p class="clausula"><strong>NOVENO:</strong> Para todos los efectos legales, las partes fijan domicilio en la ciudad de <strong>IQUIQUE/ALTO HOSPICIO</strong> y se someten a sus tribunales ordinarios.</p>
 
         <div class="firmas">
-          <div class="firma"><div class="firma-line"><div style="font-weight:700">Arrendador</div><div>${emp.nombre}</div><div style="color:#666">RUT: ${emp.rut||''}</div></div></div>
-          <div class="firma"><div class="firma-line"><div style="font-weight:700">Arrendatario</div><div>${(cliente.nombre||'—').toUpperCase()}</div><div style="color:#666">RUT: ${cliente.rut||'—'}</div></div></div>
+          <div class="firma"><div class="firma-line"><div class="nombre">${emp.nombre}</div><div class="rut">RUT: ${emp.rut||''}</div><div class="rol">Arrendador</div></div></div>
+          <div class="firma"><div class="firma-line"><div class="nombre">${(cliente.nombre||'—').toUpperCase()}</div><div class="rut">RUT: ${cliente.rut||'—'}</div><div class="rol">Arrendatario</div></div></div>
         </div>
       </div>
       ${footerDoc}
@@ -1207,7 +1210,7 @@ function emitirContrato(id){
           <div style="font-size:10px;color:#666">Contrato N° ${a.num} · ${fIni}</div>
         </div>
       </div>
-      <div style="padding:16px 22px">
+      <div style="padding:10px 18px">
         <div style="font-size:10px;color:#555;margin-bottom:12px">
           <strong>Cliente:</strong> ${(cliente.nombre||'—').toUpperCase()} &nbsp;·&nbsp; <strong>RUT:</strong> ${cliente.rut||'—'} &nbsp;·&nbsp;
           <strong>Vehículo:</strong> ${activo.nombre||a.activoNombre} &nbsp;·&nbsp; <strong>Patente:</strong> ${patente}
@@ -1251,8 +1254,8 @@ function emitirContrato(id){
         <div style="font-size:10px;margin:8px 0 4px"><strong>Recibe conforme (cliente):</strong> <span class="field-blank" style="min-width:220px">&nbsp;</span></div>
 
         <div class="firmas">
-          <div class="firma"><div class="firma-line"><div style="font-weight:700">Arrendador</div><div>${emp.nombre}</div><div style="color:#666">RUT: ${emp.rut||''}</div></div></div>
-          <div class="firma"><div class="firma-line"><div style="font-weight:700">Arrendatario</div><div>${(cliente.nombre||'—').toUpperCase()}</div><div style="color:#666">RUT: ${cliente.rut||'—'}</div></div></div>
+          <div class="firma"><div class="firma-line"><div class="nombre">${emp.nombre}</div><div class="rut">RUT: ${emp.rut||''}</div><div class="rol">Arrendador</div></div></div>
+          <div class="firma"><div class="firma-line"><div class="nombre">${(cliente.nombre||'—').toUpperCase()}</div><div class="rut">RUT: ${cliente.rut||'—'}</div><div class="rol">Arrendatario</div></div></div>
         </div>
       </div>
       ${footerDoc}
@@ -1264,7 +1267,7 @@ function emitirContrato(id){
     // ══════════════════════════════════════════
     pag1=`<div class="doc">
       ${headEmp}
-      <div style="padding:18px 22px">
+      <div style="padding:12px 18px">
         <div class="doc-title">CONTRATO DE ARRIENDO MAQUINARIA N° ${numCtto}</div>
 
         <p class="clausula">En <strong>${ciudad}</strong>, a <strong>${fechaLarga}</strong>, entre <strong>${emp.nombre.toUpperCase()}</strong>, RUT <strong>${emp.rut||''}</strong>, representada por <strong>DOÑA ${(emp.contacto||'GAUDY MARTINEZ YOVERA').toUpperCase()}</strong>, RUT <strong>${emp.rut_rep||'23.918.699-8'}</strong>, domiciliada en <strong>${emp.direccion||''}</strong>, en adelante <strong>"EL ARRENDADOR"</strong>; y Don(ña) <strong>${(cliente.nombre||'—').toUpperCase()}</strong>, RUT: <strong>${cliente.rut||'—'}</strong>, domiciliado en <strong>${cliente.dir||'—'}</strong>, Fono: <strong>${cliente.tel||'—'}</strong>, Email: <strong>${cliente.email||'—'}</strong>, en adelante <strong>"EL ARRENDATARIO"</strong>, se ha convenido el siguiente contrato:</p>
@@ -1285,14 +1288,23 @@ function emitirContrato(id){
           </tr></tbody>
         </table>
         <p class="clausula">La renta se pagará dentro de los primeros 5 días (o al término del periodo si es menor a un mes). El retardo generará el interés máximo convencional. La garantía será devuelta al término del contrato si el equipo es devuelto en buen estado.</p>
-        ${garantia>0?`<p class="clausula"><strong>Se deja constancia que se recibe GARANTÍA mediante</strong> EFECTIVO [${chkEfec}] TRANSFERENCIA [${chkTran}] a la cuenta de nuestra empresa, la cual será devuelta de la misma forma, siempre que el equipo sea devuelto en las mismas condiciones.</p>`:''}
+        ${garantia>0?`<p class="clausula"><strong>Se deja constancia que se recibe GARANTÍA mediante</strong> <span style="font-family:monospace">EFECTIVO [${chkEfec}]</span> <span style="font-family:monospace">TRANSFERENCIA [${chkTran}]</span> a la cuenta de nuestra empresa, la cual será devuelta de la misma forma, siempre que el equipo sea devuelto en las mismas condiciones.</p>`:''}
 
         <p class="clausula"><strong>CUARTO:</strong> El servicio de despacho y retiro operará bajo las siguientes condiciones:</p>
-        <table style="width:100%;border:none;margin-bottom:10px;font-size:10px;line-height:1.9">
-          <tr><td style="width:22px;text-align:center">[${chkFlete}]</td><td><strong>CON COSTO ADICIONAL.</strong> El cliente cancelará <strong>${clp(a.costoFlete||0)}</strong> por concepto de traslado de equipos (ida y vuelta).</td></tr>
-          <tr><td style="width:22px;text-align:center">[${chkRetira}]</td><td><strong>RETIRA CLIENTE.</strong> El arrendatario retira y devuelve el equipo por sus propios medios, asumiendo responsabilidad total por daños durante el transporte.</td></tr>
-          <tr><td style="width:22px;text-align:center">[${chkSinCost}]</td><td><strong>DESPACHO SIN COSTO ADICIONAL.</strong> El arrendador entrega y retira el equipo en la obra indicada sin costo extra.</td></tr>
-        </table>
+        <div style="margin-bottom:10px;font-size:10px;line-height:2">
+          <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:4px">
+            <span style="flex-shrink:0;font-family:monospace;min-width:22px">[${chkFlete}]</span>
+            <span><strong>CON COSTO ADICIONAL.</strong> El cliente cancelará <strong>${clp(a.costoFlete||0)}</strong> por concepto de traslado de equipos (ida y vuelta).</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:4px">
+            <span style="flex-shrink:0;font-family:monospace;min-width:22px">[${chkRetira}]</span>
+            <span><strong>RETIRA CLIENTE.</strong> El arrendatario retira y devuelve el equipo por sus propios medios, asumiendo responsabilidad total por daños durante el transporte.</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:4px">
+            <span style="flex-shrink:0;font-family:monospace;min-width:22px">[${chkSinCost}]</span>
+            <span><strong>DESPACHO SIN COSTO ADICIONAL.</strong> El arrendador entrega y retira el equipo en la obra indicada sin costo extra.</span>
+          </div>
+        </div>
 
         <p class="clausula"><strong>QUINTO:</strong> El contrato rige por <strong>${dias} día(s)</strong> desde el <strong>${fIni}</strong> hasta el <strong>${fTer}</strong>. Se entenderá renovado tácita y sucesivamente por periodos iguales, salvo aviso de término con 3 días de anticipación. El Arrendador podrá poner término inmediato en caso de urgencia según Art. 1967 del Código Civil.</p>
         <p class="clausula" style="font-style:italic">Se deja constancia que la maquinaria será entregada el día <strong>${fIni}</strong> a las <strong>${a.horaEntrega||'__:__ hrs'}</strong> y será devuelta por el arrendatario al cumplir el plazo <strong>${fTer}</strong>.</p>
@@ -1332,7 +1344,7 @@ function emitirContrato(id){
           <div style="font-size:10px;color:#666">Contrato N° ${a.num} · ${fIni}</div>
         </div>
       </div>
-      <div style="padding:16px 22px">
+      <div style="padding:10px 18px">
         <div style="font-size:10px;color:#555;margin-bottom:12px">
           <strong>Cliente:</strong> ${(cliente.nombre||'—').toUpperCase()} &nbsp;·&nbsp;
           <strong>RUT:</strong> ${cliente.rut||'—'} &nbsp;·&nbsp;
@@ -1376,8 +1388,8 @@ function emitirContrato(id){
         <div style="font-size:10px;margin:8px 0 4px"><strong>Recibe conforme (cliente):</strong> <span class="field-blank" style="min-width:220px">&nbsp;</span></div>
 
         <div class="firmas">
-          <div class="firma"><div class="firma-line"><div style="font-weight:700">Arrendador</div><div>${emp.nombre}</div><div style="color:#666">RUT: ${emp.rut||''}</div></div></div>
-          <div class="firma"><div class="firma-line"><div style="font-weight:700">Arrendatario</div><div>${(cliente.nombre||'—').toUpperCase()}</div><div style="color:#666">RUT: ${cliente.rut||'—'}</div></div></div>
+          <div class="firma"><div class="firma-line"><div class="nombre">${emp.nombre}</div><div class="rut">RUT: ${emp.rut||''}</div><div class="rol">Arrendador</div></div></div>
+          <div class="firma"><div class="firma-line"><div class="nombre">${(cliente.nombre||'—').toUpperCase()}</div><div class="rut">RUT: ${cliente.rut||'—'}</div><div class="rol">Arrendatario</div></div></div>
         </div>
       </div>
       ${footerDoc}
@@ -1547,7 +1559,7 @@ function emitirDevolucion(id){
           <div style="font-size:10px;color:#666">Ref. Contrato: ${a.num}</div>
         </div>
       </div>
-      <div style="padding:16px 22px">
+      <div style="padding:10px 18px">
 
         <div class="sec-hdr">1. Datos del cliente y vehículo</div>
         <div class="sec-body">
@@ -1599,8 +1611,8 @@ function emitirDevolucion(id){
         </div>`:''}
 
         <div class="firmas">
-          <div class="firma"><div class="firma-line"><div style="font-weight:700">Arrendador — Recibe</div><div>${emp.nombre}</div><div style="color:#666">RUT: ${emp.rut||''}</div></div></div>
-          <div class="firma"><div class="firma-line"><div style="font-weight:700">Arrendatario — Entrega</div><div>${(cliente.nombre||'—').toUpperCase()}</div><div style="color:#666">RUT: ${cliente.rut||'—'}</div></div></div>
+          <div class="firma"><div class="firma-line"><div class="nombre">${emp.nombre}</div><div class="rut">RUT: ${emp.rut||''}</div><div class="rol">Arrendador — Recibe</div></div></div>
+          <div class="firma"><div class="firma-line"><div class="nombre">${(cliente.nombre||'—').toUpperCase()}</div><div class="rut">RUT: ${cliente.rut||'—'}</div><div class="rol">Arrendatario — Entrega</div></div></div>
         </div>
       </div>
       ${footerDoc}
@@ -1619,7 +1631,7 @@ function emitirDevolucion(id){
           <div style="font-size:10px;color:#666">Ref. Contrato: ${a.num}</div>
         </div>
       </div>
-      <div style="padding:16px 22px">
+      <div style="padding:10px 18px">
 
         <div class="sec-hdr">1. Datos del cliente y equipo</div>
         <div class="sec-body">
@@ -1664,8 +1676,8 @@ function emitirDevolucion(id){
         </div>
 
         <div class="firmas">
-          <div class="firma"><div class="firma-line"><div style="font-weight:700">Arrendador — Recibe</div><div>${emp.nombre}</div><div style="color:#666">RUT: ${emp.rut||''}</div></div></div>
-          <div class="firma"><div class="firma-line"><div style="font-weight:700">Arrendatario — Entrega</div><div>${(cliente.nombre||'—').toUpperCase()}</div><div style="color:#666">RUT: ${cliente.rut||'—'}</div></div></div>
+          <div class="firma"><div class="firma-line"><div class="nombre">${emp.nombre}</div><div class="rut">RUT: ${emp.rut||''}</div><div class="rol">Arrendador — Recibe</div></div></div>
+          <div class="firma"><div class="firma-line"><div class="nombre">${(cliente.nombre||'—').toUpperCase()}</div><div class="rut">RUT: ${cliente.rut||'—'}</div><div class="rol">Arrendatario — Entrega</div></div></div>
         </div>
       </div>
       ${footerDoc}
