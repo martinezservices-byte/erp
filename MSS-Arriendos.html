@@ -1690,7 +1690,12 @@ function emitirDevolucion(id){
         <div class="sec-body">
           <div class="grid2">
             <div class="cell"><strong>Garantía recibida:</strong> ${clp(garantia)} (EFECTIVO [${chkEfec}] TRANSF. [${chkTran}])</div>
-            <div class="cell"><strong>Forma devolución:</strong> ${_evDev&&_evDev.devGarantia?(_evDev.devGarantia==='devuelta'?'💰 Devuelta completa':_evDev.devGarantia==='parcial'?'⚠ Devuelta parcial':'🔒 Retenida por daños'):'EFECTIVO ['+chkEfec+'] TRANSF. ['+chkTran+']'}</div>
+            <div class="cell"><strong>Forma devolución garantía:</strong><br>
+            ${(()=>{
+              const fg=_evDev&&_evDev.devFormaGar?_evDev.devFormaGar:(a.formaPagoGarantia||'').toLowerCase().includes('efectivo')?'efectivo':'transferencia';
+              return '<span style="font-family:monospace">EFECTIVO ['+(fg==='efectivo'?'X':' ')+'] &nbsp; TRANSFERENCIA ['+(fg==='transferencia'?'X':' ')+']</span>';
+            })()}
+          </div>
             <div class="cell"><strong>Monto devuelto:</strong> $ <span class="field-blank" style="min-width:90px">&nbsp;</span></div>
             <div class="cell"><strong>Monto retenido:</strong> $ <span class="field-blank" style="min-width:90px">&nbsp;</span></div>
           </div>
@@ -1739,7 +1744,12 @@ function emitirDevolucion(id){
         <div class="sec-body">
           <div class="grid2">
             <div class="cell"><strong>Garantía recibida:</strong> ${clp(garantia)} (EFECTIVO [${chkEfec}] TRANSF. [${chkTran}])</div>
-            <div class="cell"><strong>Forma devolución:</strong> ${_evDev&&_evDev.devGarantia?(_evDev.devGarantia==='devuelta'?'💰 Devuelta completa':_evDev.devGarantia==='parcial'?'⚠ Devuelta parcial':'🔒 Retenida por daños'):'EFECTIVO ['+chkEfec+'] TRANSF. ['+chkTran+']'}</div>
+            <div class="cell"><strong>Forma devolución garantía:</strong><br>
+            ${(()=>{
+              const fg=_evDev&&_evDev.devFormaGar?_evDev.devFormaGar:(a.formaPagoGarantia||'').toLowerCase().includes('efectivo')?'efectivo':'transferencia';
+              return '<span style="font-family:monospace">EFECTIVO ['+(fg==='efectivo'?'X':' ')+'] &nbsp; TRANSFERENCIA ['+(fg==='transferencia'?'X':' ')+']</span>';
+            })()}
+          </div>
             <div class="cell"><strong>Monto devuelto:</strong> $ <span class="field-blank" style="min-width:90px">&nbsp;</span></div>
             <div class="cell"><strong>Monto retenido:</strong> $ <span class="field-blank" style="min-width:90px">&nbsp;</span></div>
           </div>
@@ -2848,6 +2858,19 @@ function abrirModalDevolucion(id) {
             <option value="parcial">⚠ Devuelta parcial (con retención)</option>
             <option value="retenida">🔒 Retenida por daños</option>
           </select></div>
+        <div><label style="font-size:10px;color:#78716C;text-transform:uppercase;letter-spacing:1px;font-family:monospace">Forma devolución garantía</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+            <label id="lblEfectivo" onclick="selFormaGar('efectivo')" style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:8px;border:2px solid rgba(245,158,11,0.2);background:#04080F;cursor:pointer;transition:all .2s">
+              <div id="chkEfectivoGar" style="width:16px;height:16px;border-radius:4px;border:2px solid #78716C;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px"></div>
+              <span style="color:#FFFBEB;font-size:13px">💵 Efectivo</span>
+            </label>
+            <label id="lblTransfer" onclick="selFormaGar('transferencia')" style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:8px;border:2px solid rgba(245,158,11,0.2);background:#04080F;cursor:pointer;transition:all .2s">
+              <div id="chkTransferGar" style="width:16px;height:16px;border-radius:4px;border:2px solid #78716C;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px"></div>
+              <span style="color:#FFFBEB;font-size:13px">🏦 Transferencia</span>
+            </label>
+          </div>
+          <input type="hidden" id="devFormaGar" value="transferencia"/>
+        </div>
         <div><label style="font-size:10px;color:#78716C;text-transform:uppercase;letter-spacing:1px;font-family:monospace">Observaciones / daños</label>
           <textarea id="devObsERP" rows="3" placeholder="Describe el estado, daños o notas..."
             style="width:100%;margin-top:4px;padding:9px;background:#04080F;border:1px solid rgba(245,158,11,0.2);border-radius:7px;color:#FFFBEB;font-size:13px;outline:none;resize:vertical"></textarea></div>
@@ -2861,7 +2884,57 @@ function abrirModalDevolucion(id) {
         </button>
       </div>
     </div>`;
+  // Cargar datos guardados si existen
+  const evKeyLoad = 'mss_arr'+EMP.id+'_evidencia_devolucion_'+id;
+  let evSaved = null;
+  try { evSaved = JSON.parse(localStorage.getItem(evKeyLoad)||'null'); } catch(e){}
+
+  if(evSaved) {
+    // Cargar datos guardados
+    if(evSaved.encargado) document.getElementById('devEncargado').value = evSaved.encargado;
+    if(evSaved.rutEnc)    document.getElementById('devRutEnc').value    = evSaved.rutEnc;
+    if(evSaved.devFecha)  document.getElementById('devFechaERP').value  = evSaved.devFecha;
+    if(evSaved.devHora)   document.getElementById('devHoraERP').value   = evSaved.devHora;
+    if(evSaved.checklist) document.getElementById('devEstadoERP').value = evSaved.checklist;
+    if(evSaved.devAccesorios) document.getElementById('devAccERP').value = evSaved.devAccesorios;
+    if(evSaved.devGarantia)   document.getElementById('devGarERP').value = evSaved.devGarantia;
+    if(evSaved.obs)       document.getElementById('devObsERP').value    = evSaved.obs;
+    // Cambiar botón a "Actualizar"
+    const btnGen = modal.querySelector('button[onclick*="generarDevolucionERP"]');
+    if(btnGen) btnGen.innerHTML = '🔄 Actualizar y generar PDF';
+    // Forma garantía
+    const fg = evSaved.devFormaGar || ((a.formaPagoGarantia||'').toLowerCase().includes('efectivo')?'efectivo':'transferencia');
+    setTimeout(()=>selFormaGar(fg),50);
+  } else {
+    // Primera vez — pre-seleccionar según el arriendo
+    const fgDefault = (a.formaPagoGarantia||'').toLowerCase().includes('efectivo')?'efectivo':'transferencia';
+    setTimeout(()=>selFormaGar(fgDefault),50);
+    const btnGen = modal.querySelector('button[onclick*="generarDevolucionERP"]');
+    if(btnGen) btnGen.innerHTML = '🔄 Generar Comprobante PDF';
+  }
+
   modal.style.display = 'flex';
+}
+
+function selFormaGar(tipo){
+  document.getElementById('devFormaGar').value = tipo;
+  // Efectivo
+  const lblEf = document.getElementById('lblEfectivo');
+  const chkEf = document.getElementById('chkEfectivoGar');
+  // Transferencia
+  const lblTr = document.getElementById('lblTransfer');
+  const chkTr = document.getElementById('chkTransferGar');
+  if(tipo==='efectivo'){
+    lblEf.style.borderColor='#F59E0B'; lblEf.style.background='rgba(245,158,11,0.1)';
+    chkEf.style.background='#F59E0B'; chkEf.style.borderColor='#F59E0B'; chkEf.innerHTML='✓';
+    lblTr.style.borderColor='rgba(245,158,11,0.2)'; lblTr.style.background='#04080F';
+    chkTr.style.background=''; chkTr.style.borderColor='#78716C'; chkTr.innerHTML='';
+  } else {
+    lblTr.style.borderColor='#F59E0B'; lblTr.style.background='rgba(245,158,11,0.1)';
+    chkTr.style.background='#F59E0B'; chkTr.style.borderColor='#F59E0B'; chkTr.innerHTML='✓';
+    lblEf.style.borderColor='rgba(245,158,11,0.2)'; lblEf.style.background='#04080F';
+    chkEf.style.background=''; chkEf.style.borderColor='#78716C'; chkEf.innerHTML='';
+  }
 }
 
 function generarDevolucionERP(id) {
@@ -2878,6 +2951,7 @@ function generarDevolucionERP(id) {
   localStorage.setItem(evKey, JSON.stringify({
     checklist: estado, obs, encargado, rutEnc,
     devFecha: fecha, devHora: hora,
+    devFormaGar: document.getElementById('devFormaGar').value||'transferencia',
     devAccesorios: accesorios, devGarantia: garantia,
     vendedor: encargado, fecha: new Date().toISOString()
   }));
