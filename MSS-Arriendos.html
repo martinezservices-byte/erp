@@ -404,7 +404,7 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
     <div class="fl"><label>Tarifa ($)</label><input id="arTarifa" type="number" oninput="calcArriendo()"/></div>
     <div class="fl"><label>Total Calculado ($)</label><input id="arTotal" type="number" readonly style="color:var(--acc);font-weight:700"/></div>
     <div class="fl"><label>Monto Pagado ($)</label><input id="arPagado" type="number" value="0"/></div>
-    <div class="fl"><label>Lugar de Uso / Obra</label><input id="arLugar" type="text"/></div>
+    <div class="fl"><label>Lugar de Uso / Obra <span style="color:var(--danger)">*</span></label><input id="arLugar" type="text" placeholder="Ej: Santa Marta 4237, Alto Hospicio" required/></div>
     <div class="fl"><label>Responsable Cliente</label><input id="arResp" type="text"/></div>
     <div class="fl"><label>Estado</label><select id="arEstado" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
       <option>Activo</option><option>Pendiente</option><option>Finalizado</option><option>Cancelado</option>
@@ -456,6 +456,13 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
     </div>
   </div>
   <div style="display:flex;gap:8px;margin-top:14px">
+    <div style="border-top:1px solid var(--b1);margin-top:12px;padding-top:10px">
+      <div style="font-size:10px;color:var(--muted);font-family:monospace;letter-spacing:0.5px;margin-bottom:6px">📷 FOTOS DEL ESTADO DEL EQUIPO <span style="color:var(--b1)">(opcional · máx. 5 · quedan vinculadas al contrato)</span></div>
+      <input type="file" id="arFotos" accept="image/*" multiple style="display:none" onchange="previewFotos(this)"/>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center" id="fotosPreview">
+        <button type="button" onclick="document.getElementById('arFotos').click()" style="padding:8px 14px;border-radius:6px;border:1px dashed var(--b1);background:none;color:var(--muted);font-size:11px;cursor:pointer">+ Agregar fotos</button>
+      </div>
+    </div>
     <button class="bg" style="flex:1" onclick="saveArriendo()">Guardar</button>
     <button class="bgh" onclick="C('moArriendo')">Cancelar</button>
   </div>
@@ -798,10 +805,28 @@ function rDash(){
   // Alertas
   const hoyDate=new Date(HOY);
   const alertas=[];
-  ARRIENDOS.filter(a=>a.estado==='Activo').forEach(a=>{
-    const dias=Math.ceil((new Date(a.termino)-hoyDate)/(1000*60*60*24));
-    if(dias<=3&&dias>=0) alertas.push({tipo:'warning',msg:`Arriendo ${a.num} vence en ${dias} día(s) — ${a.activoNombre} · ${a.clienteNombre}`});
-    if(dias<0) alertas.push({tipo:'danger',msg:`Arriendo ${a.num} VENCIDO hace ${Math.abs(dias)} días — ${a.activoNombre} · ${a.clienteNombre}`});
+
+  // ── ARRIENDOS: vencimientos y cobros pendientes ──
+  ARRIENDOS.forEach(a=>{
+    if(a.estado==='Activo'||a.estado==='Pendiente'){
+      const dias=Math.ceil((new Date(a.termino)-hoyDate)/(1000*60*60*24));
+      if(dias<0)       alertas.push({tipo:'danger', msg:`🚨 ARRIENDO VENCIDO ${a.num} — ${a.activoNombre} · ${a.clienteNombre} · Venció el ${df(a.termino)}`});
+      else if(dias===0) alertas.push({tipo:'danger', msg:`⏰ ARRIENDO VENCE HOY — ${a.num} · ${a.activoNombre} · ${a.clienteNombre}`});
+      else if(dias<=3)  alertas.push({tipo:'danger', msg:`⚠ Arriendo ${a.num} vence en ${dias} día(s) — ${a.activoNombre} · ${a.clienteNombre}`});
+      else if(dias<=7)  alertas.push({tipo:'warning',msg:`📅 Arriendo ${a.num} vence en ${dias} días — ${a.activoNombre} · ${a.clienteNombre}`});
+    }
+    // Saldo pendiente en arriendos finalizados
+    const saldo=(a.total||0)-(a.pagado||0);
+    if((a.estado==='Finalizado'||a.estado==='Activo')&&saldo>0)
+      alertas.push({tipo:'warning',msg:`💰 Cobro pendiente ${a.num} — ${a.clienteNombre} · Debe ${clp(saldo)}`});
+  });
+
+  // ── FLETES: pendientes de completar ──
+  FLETES.forEach(f=>{
+    if(f.estado==='Programado'||f.estado==='En Ruta'){
+      const diasF=Math.ceil((hoyDate-new Date(f.fecha))/(1000*60*60*24));
+      if(diasF>3) alertas.push({tipo:'warning',msg:`🚚 Flete ${f.num} sin completar hace ${diasF} días — ${f.clienteNombre||'Particular'}`});
+    }
   });
   ACTIVOS.forEach(a=>{
     const lim7  = new Date(new Date().setDate(hoyDate.getDate()+7));
@@ -829,9 +854,12 @@ function rDash(){
     if(a.proxMant&&a.km&&a.km>=a.proxMant)
       alertas.push({tipo:'warning',msg:`🔧 Mantención pendiente — ${a.nombre} · Km actuales: ${a.km.toLocaleString('es-CL')} / Próxima: ${a.proxMant.toLocaleString('es-CL')}`});
   });
+  // Ordenar alertas: danger primero, luego warning
+  alertas.sort((a,b)=>a.tipo==='danger'&&b.tipo!=='danger'?-1:1);
   document.getElementById('dashAlertas').innerHTML=alertas.length===0
-    ?'<div style="color:var(--ok);font-size:12px;padding:8px">✓ Sin alertas pendientes</div>'
-    :alertas.map(a=>`<div style="padding:8px 12px;background:rgba(${a.tipo==='danger'?'239,68,68':'245,158,11'},0.08);border:1px solid rgba(${a.tipo==='danger'?'239,68,68':'245,158,11'},0.3);border-radius:8px;margin-bottom:6px;font-size:11px;color:${a.tipo==='danger'?'var(--danger)':'var(--warn)'}">⚠ ${a.msg}</div>`).join('');
+    ?'<div style="color:var(--ok);font-size:12px;padding:8px 10px;display:flex;align-items:center;gap:6px"><span style="font-size:16px">✅</span> Sin alertas pendientes — todo al día</div>'
+    :`<div style="font-size:10px;color:var(--muted);margin-bottom:8px;font-family:monospace;letter-spacing:1px">${alertas.length} ALERTA${alertas.length>1?'S':''}</div>`
+    +alertas.map(a=>`<div style="padding:8px 12px;background:rgba(${a.tipo==='danger'?'239,68,68':'245,158,11'},0.08);border:1px solid rgba(${a.tipo==='danger'?'239,68,68':'245,158,11'},0.25);border-radius:8px;margin-bottom:6px;font-size:11px;color:${a.tipo==='danger'?'var(--danger)':'var(--warn)'};line-height:1.5">${a.msg}</div>`).join('');
 }
 
 // ACTIVOS
@@ -952,6 +980,7 @@ function rArriendos(){
         <td>${badge(a.estado,EC[a.estado]||'#5A7090')}</td>
         <td><div style="display:flex;gap:3px;flex-wrap:wrap">
           <button class="bsm be" onclick="editArriendo(${a.id})">✎</button>
+          <button class="bsm" style="background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:#818CF8;font-size:11px" onclick="verFotosContrato(${a.id},'${a.num}')" title="Ver fotos del contrato">📷</button>
           <button class="bsm" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--acc);padding:3px 7px;border-radius:5px;font-size:9px;cursor:pointer" onclick="emitirContrato(${a.id})" title="Contrato">📋</button>
           <button class="bsm" style="background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.3);color:var(--info);padding:3px 7px;border-radius:5px;font-size:9px;cursor:pointer" onclick="emitirGuia(${a.id})" title="Guía Entrega">📦</button>
           <button class="bsm" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:var(--ok);padding:3px 7px;border-radius:5px;font-size:9px;cursor:pointer" onclick="emitirDevolucion(${a.id})" title="Comprobante Devolución">🔄</button>
@@ -963,6 +992,15 @@ function rArriendos(){
 
 function saveArriendo(){
   const id=document.getElementById('arId').value;
+  // Validar campo obligatorio Lugar
+  const lugarVal=document.getElementById('arLugar').value.trim();
+  if(!lugarVal){
+    document.getElementById('arLugar').style.border='2px solid var(--danger)';
+    document.getElementById('arLugar').focus();
+    document.getElementById('arLugar').placeholder='⚠ Campo obligatorio — ingrese dirección exacta';
+    setTimeout(()=>{document.getElementById('arLugar').style.border='';},3000);
+    return;
+  }
   const aId=parseInt(document.getElementById('arActivo').value)||0;
   const cId=parseInt(document.getElementById('arCliente').value)||0;
   const activo=ACTIVOS.find(x=>parseInt(x.id)===aId);
@@ -974,6 +1012,8 @@ function saveArriendo(){
   else{const newObj={id:uid(),...obj};ARRIENDOS.push(newObj);savedObj=newObj;}
   if(activo&&obj.estado==='Activo'){activo.estado='Arrendado';save();}
   if(savedObj) syncFinanzas('arriendo', savedObj, 'save');
+  const savedId=obj.id;
+  guardarFotosContrato(savedId);
   save();C('moArriendo');rArriendos();
 }
 
@@ -1006,6 +1046,7 @@ function editArriendo(id){
   if(document.getElementById('arCostoFlete')) document.getElementById('arCostoFlete').value=a.costoFlete||0;
   if(document.getElementById('arHoraEntrega')) document.getElementById('arHoraEntrega').value=a.horaEntrega||'';
   if(document.getElementById('arHoraRetiro')) document.getElementById('arHoraRetiro').value=a.horaRetiro||'';
+  cargarFotosContrato(a.id);
   O('moArriendo');
 }
 function delArriendo(id){
@@ -1939,7 +1980,12 @@ function O(id){
 }
 function C(id){
   // Al cerrar, limpiar IDs para que próxima apertura sea "Nuevo"
-  if(id==='moArriendo') document.getElementById('arId').value='';
+  if(id==='moArriendo'){
+    document.getElementById('arId').value='';
+    _fotosTemp=[];
+    const fp=document.getElementById('fotosPreview');
+    if(fp) fp.innerHTML='<button type="button" onclick="document.getElementById(\'arFotos\').click()" style="padding:8px 14px;border-radius:6px;border:1px dashed var(--b1);background:none;color:var(--muted);font-size:11px;cursor:pointer">+ Agregar fotos</button>';
+  }
   if(id==='moFlete')    document.getElementById('flId').value='';
   if(id==='moActivo')   document.getElementById('aId').value='';
   if(id==='moCliente')  document.getElementById('cliId').value='';
@@ -2499,6 +2545,73 @@ function reporteActivos(){
     ${footerPDF()}
   </div>`;
   abrirVentanaPDF(html,'Inventario de Activos');
+}
+
+// ═══════════════════════════════════════════════════
+// FOTOS VINCULADAS A CONTRATOS
+// ═══════════════════════════════════════════════════
+let _fotosTemp = []; // fotos del arriendo en edición
+
+function previewFotos(input){
+  const files = Array.from(input.files);
+  if(files.length + _fotosTemp.length > 5){
+    alert('Máximo 5 fotos por contrato');
+    return;
+  }
+  files.forEach(file=>{
+    const reader = new FileReader();
+    reader.onload = function(e){
+      _fotosTemp.push(e.target.result);
+      renderFotosPreview();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderFotosPreview(){
+  const div = document.getElementById('fotosPreview');
+  if(!div) return;
+  div.innerHTML = _fotosTemp.map((src,i)=>`
+    <div style="position:relative;display:inline-block">
+      <img src="${src}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;border:1px solid var(--b1)"/>
+      <button onclick="_fotosTemp.splice(${i},1);renderFotosPreview()" style="position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:var(--danger);border:none;color:white;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>`).join('')
+  + (_fotosTemp.length < 5 ? `<button type="button" onclick="document.getElementById('arFotos').click()" style="padding:8px 14px;border-radius:6px;border:1px dashed var(--b1);background:none;color:var(--muted);font-size:11px;cursor:pointer;width:70px;height:70px">+</button>` : '');
+}
+
+function guardarFotosContrato(arriendoId){
+  if(!_fotosTemp.length) return;
+  const key = 'mss_arr'+EMP.id+'_fotos_'+arriendoId;
+  localStorage.setItem(key, JSON.stringify(_fotosTemp));
+  _fotosTemp = [];
+}
+
+function cargarFotosContrato(arriendoId){
+  _fotosTemp = [];
+  const key = 'mss_arr'+EMP.id+'_fotos_'+arriendoId;
+  try{ _fotosTemp = JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){}
+  renderFotosPreview();
+}
+
+function verFotosContrato(arriendoId, numContrato){
+  const key = 'mss_arr'+EMP.id+'_fotos_'+arriendoId;
+  let fotos = [];
+  try{ fotos = JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){}
+  if(!fotos.length){ alert('Sin fotos registradas para este contrato'); return; }
+  const v = window.open('','_blank','width=800,height=600');
+  v.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Fotos ${numContrato}</title>
+  <style>body{background:#1a1a1a;padding:20px;font-family:Arial,sans-serif;}
+  h3{color:#F59E0B;margin-bottom:16px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+  img{width:100%;border-radius:8px;border:1px solid #333}
+  .btn{display:block;margin:16px auto;padding:10px 28px;background:#F59E0B;color:#1a1a1a;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer}
+  @media print{.btn{display:none!important}}
+  </style></head><body>
+  <h3>📷 Fotos del contrato ${numContrato}</h3>
+  <div class="grid">${fotos.map((src,i)=>`<div><img src="${src}"/><p style="color:#aaa;font-size:10px;margin-top:4px;text-align:center">Foto ${i+1}</p></div>`).join('')}</div>
+  <button class="btn" onclick="window.print()">🖨 Imprimir fotos</button>
+  </body></html>`);
+  v.document.close();
 }
 
 // INIT
