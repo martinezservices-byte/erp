@@ -2718,11 +2718,36 @@ rDash();
       if (confirm(msg)) {
         // Guardar evidencia en localStorage
         const empId = data.emp || EMP.id;
+        // Guardar evidencia con clave por número de contrato
         const key = 'mss_evidencia_' + empId + '_' + data.ctto + '_' + data.tipo;
         localStorage.setItem(key, JSON.stringify(data));
+
+        // Buscar el arriendo correspondiente para vincular fotos por ID numérico
+        load();
+        const arrMatch = ARRIENDOS.find(a => a.num === data.ctto);
+        if (arrMatch) {
+          // Guardar fotos con la clave que usa gestionarFotos (por ID numérico)
+          const keyFotos = 'mss_arr' + empId + '_fotos_' + data.tipo + '_' + arrMatch.id;
+          const fotasExist = JSON.parse(localStorage.getItem(keyFotos) || '[]');
+          // Las fotos vienen del celular guardadas con clave por número
+          const keyFotosCelular = 'mss_arr' + empId + '_fotos_' + data.tipo + '_' + data.ctto;
+          const fotosCelular = JSON.parse(localStorage.getItem(keyFotosCelular) || '[]');
+          if (fotosCelular.length > 0) {
+            localStorage.setItem(keyFotos, JSON.stringify(fotosCelular));
+          }
+          // Guardar firma
+          const keyFirmaCelular = 'mss_arr' + empId + '_firma_' + data.tipo + '_' + data.ctto;
+          const firma = localStorage.getItem(keyFirmaCelular);
+          if (firma) {
+            localStorage.setItem('mss_arr' + empId + '_firma_' + data.tipo + '_' + arrMatch.id, firma);
+          }
+        }
+
         // Limpiar URL
         window.history.replaceState({}, '', window.location.pathname);
-        alert('✅ Datos del celular cargados correctamente al contrato ' + data.ctto);
+
+        const infoExtra = arrMatch ? '\nFotos y firma vinculadas al contrato ✓' : '\n(Abre el ERP en el mismo navegador del celular para ver las fotos)';
+        alert('✅ Datos del celular cargados correctamente al contrato ' + data.ctto + infoExtra);
         // Ir a tab arriendos
         T('arriendos');
         rArriendos();
