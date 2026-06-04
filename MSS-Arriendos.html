@@ -2695,6 +2695,41 @@ function eliminarFotoModal(idx){
 // INIT
 load();
 rDash();
+
+// ── RECEPTOR DE DATOS DESDE MSS-FotoMovil (QR) ──
+(function(){
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get('cargar');
+    if (!raw) return;
+    const data = JSON.parse(atob(raw));
+    if (!data || !data.ctto) return;
+    // Mostrar modal de confirmación
+    setTimeout(() => {
+      const msg = '📱 Datos recibidos desde celular:\n\n'
+        + 'Contrato: ' + data.ctto + '\n'
+        + 'Tipo: ' + (data.tipo === 'entrega' ? 'Entrega' : 'Devolución') + '\n'
+        + 'Estado equipo: ' + data.chk + '\n'
+        + (data.gps ? 'GPS: ' + data.gps.lat.toFixed(4) + ', ' + data.gps.lng.toFixed(4) + '\n' : '')
+        + (data.obs ? 'Obs: ' + data.obs + '\n' : '')
+        + (data.cliNombre ? 'Cliente: ' + data.cliNombre + '\n' : '')
+        + (data.cliTel ? 'Tel: ' + data.cliTel + '\n' : '')
+        + '\n¿Cargar estos datos al contrato?';
+      if (confirm(msg)) {
+        // Guardar evidencia en localStorage
+        const empId = data.emp || EMP.id;
+        const key = 'mss_evidencia_' + empId + '_' + data.ctto + '_' + data.tipo;
+        localStorage.setItem(key, JSON.stringify(data));
+        // Limpiar URL
+        window.history.replaceState({}, '', window.location.pathname);
+        alert('✅ Datos del celular cargados correctamente al contrato ' + data.ctto);
+        // Ir a tab arriendos
+        T('arriendos');
+        rArriendos();
+      }
+    }, 1000);
+  } catch(e) {}
+})();
 </script>
 </body>
 </html>

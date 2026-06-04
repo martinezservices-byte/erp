@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#0A0F1C"/>
+<title>M&P — Terreno</title>
+<style>
+:root{
+  --bg:#0A0F1C;--surf:#111827;--surf2:#1F2937;
+  --gold:#F59E0B;--gold2:#FCD34D;
+  --ok:#10B981;--danger:#EF4444;--info:#38BDF8;
+  --text:#F9FAFB;--muted:#9CA3AF;--border:rgba(255,255,255,0.08);
+  --r:14px;--r2:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;overflow-x:hidden;}
+body{padding-bottom:80px;}
+
+/* HEADER */
+.hdr{background:var(--surf);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+.hdr-logo{width:36px;height:36px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#0A0F1C;flex-shrink:0;}
+.hdr-title{font-size:14px;font-weight:700;color:var(--text);}
+.hdr-sub{font-size:11px;color:var(--muted);}
+
+/* TABS */
+.tabs{display:flex;background:var(--surf);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex:1;min-width:120px;padding:12px 8px;text-align:center;font-size:12px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all .2s;}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* SCREENS */
+.screen{display:none;padding:16px;}
+.screen.on{display:block;}
+
+/* CARDS */
+.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;}
+.card-title{font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+
+/* FORM */
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+.fg label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.fi{background:var(--surf2);border:1px solid var(--border);border-radius:var(--r2);padding:11px 13px;color:var(--text);font-size:14px;width:100%;outline:none;transition:border .2s;}
+.fi:focus{border-color:var(--gold);}
+select.fi{appearance:none;}
+
+/* BOTONES */
+.btn{width:100%;padding:14px;border-radius:var(--r2);border:none;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-gold{background:var(--gold);color:#0A0F1C;}
+.btn-gold:active{background:var(--gold2);}
+.btn-outline{background:none;border:1px solid var(--border);color:var(--muted);}
+.btn-ok{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:var(--ok);}
+.btn-danger{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:var(--danger);}
+.btn-sm{padding:9px 14px;font-size:12px;border-radius:8px;width:auto;}
+
+/* CHECKLIST */
+.chk-grid{display:flex;flex-direction:column;gap:8px;}
+.chk-item{background:var(--surf2);border:2px solid var(--border);border-radius:var(--r2);padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s;}
+.chk-item.on.verde{border-color:var(--ok);background:rgba(16,185,129,0.08);}
+.chk-item.on.amarillo{border-color:var(--gold);background:rgba(245,158,11,0.08);}
+.chk-item.on.rojo{border-color:var(--danger);background:rgba(239,68,68,0.08);}
+.chk-icon{font-size:22px;flex-shrink:0;}
+.chk-text{font-size:13px;font-weight:600;}
+.chk-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.chk-dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);margin-left:auto;flex-shrink:0;transition:all .2s;}
+.chk-item.on.verde .chk-dot{background:var(--ok);border-color:var(--ok);}
+.chk-item.on.amarillo .chk-dot{background:var(--gold);border-color:var(--gold);}
+.chk-item.on.rojo .chk-dot{background:var(--danger);border-color:var(--danger);}
+
+/* FOTOS */
+.foto-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.foto-slot{aspect-ratio:1;background:var(--surf2);border:1.5px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;position:relative;overflow:hidden;}
+.foto-slot img{width:100%;height:100%;object-fit:cover;}
+.foto-slot .del{position:absolute;top:4px;right:4px;width:20px;height:20px;background:rgba(239,68,68,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;border:none;color:white;cursor:pointer;}
+
+/* CANVAS FIRMA */
+#canvasFirma{background:white;border-radius:10px;width:100%;touch-action:none;display:block;}
+.firma-wrap{background:white;border-radius:10px;overflow:hidden;position:relative;}
+.firma-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:12px;color:#ccc;pointer-events:none;text-align:center;}
+
+/* GPS */
+.gps-box{background:var(--surf2);border:1px solid var(--border);border-radius:var(--r2);padding:12px;display:flex;align-items:center;gap:10px;}
+.gps-icon{font-size:20px;}
+.gps-text{font-size:12px;line-height:1.5;flex:1;}
+.gps-coords{font-size:10px;color:var(--ok);font-family:monospace;margin-top:2px;}
+
+/* EQUIPOS */
+.equipo-card{background:var(--surf2);border:1px solid var(--border);border-radius:var(--r2);padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.eq-icon{font-size:24px;flex-shrink:0;}
+.eq-nombre{font-size:13px;font-weight:700;}
+.eq-info{font-size:11px;color:var(--muted);margin-top:2px;}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+.badge-ok{background:rgba(16,185,129,0.15);color:var(--ok);}
+.badge-warn{background:rgba(245,158,11,0.15);color:var(--gold);}
+.badge-danger{background:rgba(239,68,68,0.15);color:var(--danger);}
+
+/* QR */
+.qr-wrap{background:white;padding:16px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;margin:16px 0;}
+#qrCanvas{max-width:220px;max-height:220px;}
+
+/* RESERVA */
+.reserva-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.3);color:var(--info);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;}
+
+/* TOAST */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#1F2937;border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* NAV BOTTOM */
+.nav-bot{position:fixed;bottom:0;left:0;right:0;background:var(--surf);border-top:1px solid var(--border);display:flex;z-index:100;}
+.nav-item{flex:1;padding:10px 4px;text-align:center;cursor:pointer;transition:all .2s;}
+.nav-item .ni{font-size:20px;margin-bottom:2px;}
+.nav-item .nl{font-size:10px;color:var(--muted);}
+.nav-item.on .nl{color:var(--gold);}
+
+/* STEPS */
+.step-bar{display:flex;gap:4px;margin-bottom:16px;}
+.step{flex:1;height:3px;border-radius:2px;background:var(--surf2);}
+.step.on{background:var(--gold);}
+.step.done{background:var(--ok);}
+
+/* SPINNER */
+.spin{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.2);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* SUCCESS */
+.success-wrap{text-align:center;padding:32px 16px;}
+.success-icon{font-size:64px;margin-bottom:16px;}
+.success-title{font-size:20px;font-weight:900;margin-bottom:8px;}
+.success-sub{font-size:13px;color:var(--muted);line-height:1.6;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-logo">M</div>
+  <div>
+    <div class="hdr-title" id="hdrTitle">M&P Arriendos</div>
+    <div class="hdr-sub" id="hdrSub">Campo · Evidencias</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab on" onclick="cambiarTab('evidencia',this)">📋 Evidencia</div>
+  <div class="tab" onclick="cambiarTab('equipos',this)">🔧 Equipos</div>
+  <div class="tab" onclick="cambiarTab('reserva',this)">📅 Reservar</div>
+</div>
+
+<!-- ═══════════════════════════════════ -->
+<!-- SCREEN 1: EVIDENCIA                -->
+<!-- ═══════════════════════════════════ -->
+<div class="screen on" id="sc-evidencia">
+
+  <!-- PASO 1: Datos contrato -->
+  <div id="paso1">
+    <div style="margin-bottom:16px">
+      <div class="step-bar"><div class="step on" id="s1"></div><div class="step" id="s2"></div><div class="step" id="s3"></div><div class="step" id="s4"></div></div>
+      <div style="font-size:16px;font-weight:900;margin-bottom:4px">Identificación</div>
+      <div style="font-size:12px;color:var(--muted)">Datos del contrato y vendedor</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Empresa</div>
+      <div class="fg">
+        <label>Seleccionar empresa</label>
+        <select class="fi" id="selEmpresa">
+          <option value="3">Martinez y Pajuelo Arriendos SpA</option>
+          <option value="1">Martinez Services Spa</option>
+          <option value="2">Condominio Pioneros 2</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>N° Contrato</label>
+        <input class="fi" id="numContrato" type="text" placeholder="Ej: ARR-1006" autocapitalize="characters"/>
+      </div>
+      <div class="fg">
+        <label>Tipo de acto</label>
+        <select class="fi" id="tipoActo">
+          <option value="entrega">📦 Entrega de equipo</option>
+          <option value="devolucion">🔄 Devolución de equipo</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Vendedor / Encargado</div>
+      <div class="fg">
+        <label>Nombre</label>
+        <input class="fi" id="vendNombre" type="text" placeholder="Tu nombre"/>
+      </div>
+      <div class="fg">
+        <label>Teléfono</label>
+        <input class="fi" id="vendTel" type="tel" placeholder="+56 9..."/>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Cliente (opcional — para reservas nuevas)</div>
+      <div class="fg">
+        <label>Nombre cliente</label>
+        <input class="fi" id="cliNombreM" type="text" placeholder="Nombre completo"/>
+      </div>
+      <div class="fg">
+        <label>Teléfono cliente</label>
+        <input class="fi" id="cliTelM" type="tel" placeholder="+56 9..."/>
+      </div>
+    </div>
+
+    <button class="btn btn-gold" onclick="irPaso(2)">Continuar →</button>
+  </div>
+
+  <!-- PASO 2: Checklist + GPS -->
+  <div id="paso2" style="display:none">
+    <div style="margin-bottom:16px">
+      <div class="step-bar"><div class="step done" id="s1b"></div><div class="step on" id="s2b"></div><div class="step" id="s3b"></div><div class="step" id="s4b"></div></div>
+      <div style="font-size:16px;font-weight:900;margin-bottom:4px">Estado del Equipo</div>
+      <div style="font-size:12px;color:var(--muted)">Marca el estado y obtén el GPS</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Checklist de estado</div>
+      <div class="chk-grid">
+        <div class="chk-item verde" id="chkOptimo" onclick="selEstado('optimo')">
+          <div class="chk-icon">✅</div>
+          <div><div class="chk-text">Óptimo</div><div class="chk-sub">Sin daños, funciona perfecto</div></div>
+          <div class="chk-dot"></div>
+        </div>
+        <div class="chk-item amarillo" id="chkObs" onclick="selEstado('observaciones')">
+          <div class="chk-icon">⚠️</div>
+          <div><div class="chk-text">Con Observaciones</div><div class="chk-sub">Daños menores o detalles</div></div>
+          <div class="chk-dot"></div>
+        </div>
+        <div class="chk-item rojo" id="chkMant" onclick="selEstado('mantencion')">
+          <div class="chk-icon">🔧</div>
+          <div><div class="chk-text">Requiere Mantención</div><div class="chk-sub">No operativo o daño mayor</div></div>
+          <div class="chk-dot"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Observaciones</div>
+      <textarea class="fi" id="obsTexto" rows="3" placeholder="Describe daños, detalles o notas importantes..."></textarea>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📍 Geolocalización GPS</div>
+      <div class="gps-box" id="gpsBox">
+        <div class="gps-icon">📍</div>
+        <div class="gps-text">
+          <div id="gpsStatus">Presiona para obtener ubicación</div>
+          <div class="gps-coords" id="gpsCoords"></div>
+        </div>
+        <button class="btn btn-sm btn-outline" onclick="obtenerGPS()" id="btnGPS">GPS</button>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-outline" onclick="irPaso(1)" style="flex:1">← Volver</button>
+      <button class="btn btn-gold" onclick="irPaso(3)" style="flex:2">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- PASO 3: Fotos -->
+  <div id="paso3" style="display:none">
+    <div style="margin-bottom:16px">
+      <div class="step-bar"><div class="step done"></div><div class="step done"></div><div class="step on"></div><div class="step"></div></div>
+      <div style="font-size:16px;font-weight:900;margin-bottom:4px">Evidencia Fotográfica</div>
+      <div style="font-size:12px;color:var(--muted)">Sube hasta 5 fotos del estado del equipo</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Fotos del equipo</div>
+      <div class="foto-grid" id="fotoGrid">
+        <div class="foto-slot" onclick="tomarFoto()" id="addFotoBtn">📷</div>
+      </div>
+      <input type="file" id="inputFoto" accept="image/*" capture="environment" multiple style="display:none" onchange="procesarFotos(this)"/>
+      <button class="btn btn-outline" onclick="document.getElementById('inputFoto').click()">
+        📁 Elegir desde galería
+      </button>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-outline" onclick="irPaso(2)" style="flex:1">← Volver</button>
+      <button class="btn btn-gold" onclick="irPaso(4)" style="flex:2">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- PASO 4: Firma + QR -->
+  <div id="paso4" style="display:none">
+    <div style="margin-bottom:16px">
+      <div class="step-bar"><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step on"></div></div>
+      <div style="font-size:16px;font-weight:900;margin-bottom:4px">Firma y Finalizar</div>
+      <div style="font-size:12px;color:var(--muted)">Firma del cliente y generación del QR</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Firma del cliente</div>
+      <div class="firma-wrap" style="margin-bottom:10px">
+        <canvas id="canvasFirma" height="150"></canvas>
+        <div class="firma-hint" id="firmaHint">✍️ Firma aquí con el dedo</div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="limpiarFirma()" style="width:auto">🗑 Borrar firma</button>
+    </div>
+
+    <div id="qrSection" style="display:none">
+      <div class="card">
+        <div class="card-title">✅ QR generado — escanea desde el PC</div>
+        <div class="qr-wrap"><canvas id="qrCanvas"></canvas></div>
+        <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:12px">
+          Escanea este QR desde el PC para cargar los datos al contrato automáticamente
+        </div>
+        <button class="btn btn-gold" onclick="copiarLink()">📋 Copiar link</button>
+      </div>
+      <div class="success-wrap">
+        <div class="success-icon">🎉</div>
+        <div class="success-title">¡Evidencia registrada!</div>
+        <div class="success-sub">Contrato <strong id="numContratoOK"></strong><br>Escanea el QR en el PC para cargar los datos</div>
+      </div>
+    </div>
+
+    <div id="btnFinalizar" style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-outline" onclick="irPaso(3)" style="flex:1">← Volver</button>
+      <button class="btn btn-gold" onclick="finalizar()" style="flex:2">🎯 Generar QR</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════ -->
+<!-- SCREEN 2: EQUIPOS DISPONIBLES     -->
+<!-- ═══════════════════════════════════ -->
+<div class="screen" id="sc-equipos">
+  <div style="margin-bottom:16px">
+    <div style="font-size:16px;font-weight:900;margin-bottom:4px">Equipos Disponibles</div>
+    <div style="font-size:12px;color:var(--muted)">Consulta en tiempo real desde el ERP</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Empresa</div>
+    <select class="fi" id="selEmpresaEq" onchange="cargarEquipos()">
+      <option value="3">Martinez y Pajuelo Arriendos SpA</option>
+      <option value="1">Martinez Services Spa</option>
+      <option value="2">Condominio Pioneros 2</option>
+    </select>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <button class="btn btn-sm btn-ok" onclick="filtrarEquipos('Disponible')" id="fDisp" style="flex:1">✅ Disponibles</button>
+    <button class="btn btn-sm btn-outline" onclick="filtrarEquipos('Arrendado')" id="fArr" style="flex:1">🔒 Arrendados</button>
+    <button class="btn btn-sm btn-outline" onclick="filtrarEquipos('')" id="fTodo" style="flex:1">📋 Todos</button>
+  </div>
+
+  <div id="listaEquipos">
+    <div style="text-align:center;padding:32px;color:var(--muted)">
+      <div style="font-size:32px;margin-bottom:8px">🔧</div>
+      <div>Abre el ERP primero para ver los equipos</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ -->
+<!-- SCREEN 3: RESERVAR                -->
+<!-- ═══════════════════════════════════ -->
+<div class="screen" id="sc-reserva">
+  <div style="margin-bottom:16px">
+    <div style="font-size:16px;font-weight:900;margin-bottom:4px">Nueva Reserva</div>
+    <div style="font-size:12px;color:var(--muted)">Se sincroniza automáticamente con el ERP</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Datos de la reserva</div>
+    <div class="fg">
+      <label>Empresa</label>
+      <select class="fi" id="selEmpresaRes">
+        <option value="3">Martinez y Pajuelo Arriendos SpA</option>
+        <option value="1">Martinez Services Spa</option>
+        <option value="2">Condominio Pioneros 2</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>Equipo / Activo</label>
+      <input class="fi" id="resEquipo" type="text" placeholder="Nombre del equipo"/>
+    </div>
+    <div class="fg">
+      <label>Cliente</label>
+      <input class="fi" id="resCliente" type="text" placeholder="Nombre del cliente"/>
+    </div>
+    <div class="fg">
+      <label>Teléfono cliente</label>
+      <input class="fi" id="resTel" type="tel" placeholder="+56 9..."/>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="fg">
+        <label>Fecha inicio</label>
+        <input class="fi" id="resFechaIni" type="date"/>
+      </div>
+      <div class="fg">
+        <label>Fecha término</label>
+        <input class="fi" id="resFechaFin" type="date"/>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Tarifa/día ($)</label>
+      <input class="fi" id="resTarifa" type="number" placeholder="Ej: 15000"/>
+    </div>
+    <div class="fg">
+      <label>Lugar / Obra</label>
+      <input class="fi" id="resLugar" type="text" placeholder="Dirección exacta de la obra"/>
+    </div>
+    <div class="fg">
+      <label>Observaciones</label>
+      <textarea class="fi" id="resObs" rows="2" placeholder="Notas adicionales..."></textarea>
+    </div>
+  </div>
+
+  <button class="btn btn-gold" onclick="guardarReserva()">📅 Guardar Reserva en ERP</button>
+  <div id="reservaOK" style="display:none;margin-top:12px">
+    <div class="card" style="border-color:rgba(16,185,129,0.3);background:rgba(16,185,129,0.05)">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="font-size:28px">✅</div>
+        <div>
+          <div style="font-weight:700;font-size:13px">Reserva guardada</div>
+          <div style="font-size:11px;color:var(--muted)" id="reservaOKTxt"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+// ESTADO GLOBAL
+// ═══════════════════════════════════════════════
+let _estado = {
+  empresa: '3', contrato: '', tipo: 'entrega',
+  vendedor: '', vendTel: '', cliNombre: '', cliTel: '',
+  checklist: 'optimo', obs: '', gps: null,
+  fotos: [], firma: null
+};
+let _firmaCtx, _firmaDibujando = false;
+let _filtroEq = 'Disponible';
+
+// ═══════════════════════════════════════════════
+// TABS Y NAVEGACIÓN
+// ═══════════════════════════════════════════════
+function cambiarTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('sc-' + id).classList.add('on');
+  if (id === 'equipos') cargarEquipos();
+}
+
+function irPaso(n) {
+  if (n === 2) {
+    const num = document.getElementById('numContrato').value.trim();
+    const vend = document.getElementById('vendNombre').value.trim();
+    if (!num) { toast('⚠ Ingresa el N° de contrato'); return; }
+    if (!vend) { toast('⚠ Ingresa tu nombre'); return; }
+    _estado.empresa = document.getElementById('selEmpresa').value;
+    _estado.contrato = num.toUpperCase();
+    _estado.tipo = document.getElementById('tipoActo').value;
+    _estado.vendedor = vend;
+    _estado.vendTel = document.getElementById('vendTel').value;
+    _estado.cliNombre = document.getElementById('cliNombreM').value;
+    _estado.cliTel = document.getElementById('cliTelM').value;
+    // Actualizar header
+    document.getElementById('hdrSub').textContent = _estado.contrato + ' · ' + (_estado.tipo === 'entrega' ? 'Entrega' : 'Devolución');
+  }
+  if (n === 4) initFirma();
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById('paso' + i);
+    if (el) el.style.display = i === n ? 'block' : 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════
+// CHECKLIST
+// ═══════════════════════════════════════════════
+function selEstado(estado) {
+  _estado.checklist = estado;
+  ['optimo','observaciones','mantencion'].forEach(e => {
+    const el = document.getElementById('chk' + e.charAt(0).toUpperCase() + e.slice(1));
+    if (el) el.classList.remove('on');
+  });
+  const map = {optimo:'chkOptimo', observaciones:'chkObs', mantencion:'chkMant'};
+  document.getElementById(map[estado])?.classList.add('on');
+}
+selEstado('optimo');
+
+// ═══════════════════════════════════════════════
+// GPS
+// ═══════════════════════════════════════════════
+function obtenerGPS() {
+  const btn = document.getElementById('btnGPS');
+  const status = document.getElementById('gpsStatus');
+  const coords = document.getElementById('gpsCoords');
+  btn.innerHTML = '<span class="spin"></span>';
+  btn.disabled = true;
+  status.textContent = 'Obteniendo ubicación...';
+  if (!navigator.geolocation) {
+    status.textContent = 'GPS no disponible en este dispositivo';
+    btn.textContent = 'Error';
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      _estado.gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: pos.coords.accuracy };
+      status.textContent = '✅ Ubicación obtenida';
+      coords.textContent = `Lat: ${pos.coords.latitude.toFixed(6)} | Lng: ${pos.coords.longitude.toFixed(6)} | Precisión: ${Math.round(pos.coords.accuracy)}m`;
+      btn.textContent = '✓';
+      btn.disabled = false;
+      document.getElementById('gpsBox').style.borderColor = 'rgba(16,185,129,0.5)';
+      toast('📍 GPS registrado correctamente');
+    },
+    err => {
+      status.textContent = 'No se pudo obtener el GPS — intenta de nuevo';
+      btn.textContent = 'Reintentar';
+      btn.disabled = false;
+    },
+    { enableHighAccuracy: true, timeout: 15000 }
+  );
+}
+
+// ═══════════════════════════════════════════════
+// FOTOS
+// ═══════════════════════════════════════════════
+function tomarFoto() {
+  const input = document.getElementById('inputFoto');
+  input.setAttribute('capture', 'environment');
+  input.click();
+}
+
+function procesarFotos(input) {
+  const files = Array.from(input.files);
+  const restante = 5 - _estado.fotos.length;
+  if (files.length > restante) { toast('⚠ Máximo 5 fotos en total'); }
+  const porProcesar = files.slice(0, restante);
+  let pend = porProcesar.length;
+  if (!pend) return;
+  porProcesar.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      // Comprimir imagen
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxW = 800;
+        const ratio = Math.min(maxW / img.width, maxW / img.height, 1);
+        canvas.width = img.width * ratio;
+        canvas.height = img.height * ratio;
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        _estado.fotos.push(canvas.toDataURL('image/jpeg', 0.7));
+        pend--;
+        if (pend === 0) renderFotos();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function renderFotos() {
+  const grid = document.getElementById('fotoGrid');
+  grid.innerHTML = _estado.fotos.map((src, i) => `
+    <div class="foto-slot">
+      <img src="${src}"/>
+      <button class="del" onclick="_estado.fotos.splice(${i},1);renderFotos()">✕</button>
+    </div>`).join('');
+  if (_estado.fotos.length < 5) {
+    grid.innerHTML += '<div class="foto-slot" onclick="tomarFoto()" id="addFotoBtn">📷</div>';
+  }
+}
+
+// ═══════════════════════════════════════════════
+// FIRMA DIGITAL
+// ═══════════════════════════════════════════════
+function initFirma() {
+  const canvas = document.getElementById('canvasFirma');
+  canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+  canvas.height = 150 * window.devicePixelRatio;
+  canvas.style.height = '150px';
+  _firmaCtx = canvas.getContext('2d');
+  _firmaCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  _firmaCtx.strokeStyle = '#1a1a1a';
+  _firmaCtx.lineWidth = 2.5;
+  _firmaCtx.lineCap = 'round';
+  _firmaCtx.lineJoin = 'round';
+
+  const getPos = e => {
+    const rect = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: src.clientX - rect.left, y: src.clientY - rect.top };
+  };
+  canvas.addEventListener('mousedown', e => { _firmaDibujando = true; const p = getPos(e); _firmaCtx.beginPath(); _firmaCtx.moveTo(p.x, p.y); ocultarHint(); });
+  canvas.addEventListener('mousemove', e => { if (!_firmaDibujando) return; const p = getPos(e); _firmaCtx.lineTo(p.x, p.y); _firmaCtx.stroke(); });
+  canvas.addEventListener('mouseup', () => { _firmaDibujando = false; });
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); _firmaDibujando = true; const p = getPos(e); _firmaCtx.beginPath(); _firmaCtx.moveTo(p.x, p.y); ocultarHint(); }, { passive: false });
+  canvas.addEventListener('touchmove', e => { e.preventDefault(); if (!_firmaDibujando) return; const p = getPos(e); _firmaCtx.lineTo(p.x, p.y); _firmaCtx.stroke(); }, { passive: false });
+  canvas.addEventListener('touchend', () => { _firmaDibujando = false; });
+}
+
+function ocultarHint() { document.getElementById('firmaHint').style.display = 'none'; }
+
+function limpiarFirma() {
+  if (!_firmaCtx) return;
+  const canvas = document.getElementById('canvasFirma');
+  _firmaCtx.clearRect(0, 0, canvas.width / window.devicePixelRatio, canvas.height / window.devicePixelRatio);
+  document.getElementById('firmaHint').style.display = 'block';
+}
+
+// ═══════════════════════════════════════════════
+// FINALIZAR — generar QR
+// ═══════════════════════════════════════════════
+function finalizar() {
+  // Capturar firma
+  const canvas = document.getElementById('canvasFirma');
+  _estado.firma = canvas.toDataURL('image/png', 0.8);
+
+  // Guardar en localStorage (para el mismo dispositivo / misma sesión)
+  const empId = _estado.empresa;
+  const contratoId = _estado.contrato;
+  const tipo = _estado.tipo;
+
+  // Guardar fotos
+  if (_estado.fotos.length > 0) {
+    try { localStorage.setItem('mss_arr' + empId + '_fotos_' + tipo + '_' + contratoId, JSON.stringify(_estado.fotos)); } catch(e) {}
+  }
+  // Guardar firma
+  try { localStorage.setItem('mss_arr' + empId + '_firma_' + tipo + '_' + contratoId, _estado.firma); } catch(e) {}
+  // Guardar evidencia completa
+  const evidencia = {
+    contrato: contratoId, empresa: empId, tipo: tipo,
+    checklist: _estado.checklist, obs: _estado.obs || document.getElementById('obsTexto').value,
+    gps: _estado.gps, vendedor: _estado.vendedor, vendTel: _estado.vendTel,
+    cliNombre: _estado.cliNombre, cliTel: _estado.cliTel,
+    fecha: new Date().toISOString(), fotos: _estado.fotos.length
+  };
+  try { localStorage.setItem('mss_evidencia_' + empId + '_' + contratoId + '_' + tipo, JSON.stringify(evidencia)); } catch(e) {}
+
+  // Generar QR con los datos (sin fotos para que sea liviano)
+  const dataQR = {
+    v: 1, emp: empId, ctto: contratoId, tipo: tipo,
+    chk: _estado.checklist, obs: evidencia.obs,
+    gps: _estado.gps,
+    vend: _estado.vendedor, vendTel: _estado.vendTel,
+    cliNombre: _estado.cliNombre, cliTel: _estado.cliTel,
+    fecha: evidencia.fecha
+  };
+
+  const urlBase = window.location.href.split('/MSS-Terreno')[0];
+  const linkQR = urlBase + '/MSS-Arriendos.html?cargar=' + encodeURIComponent(btoa(JSON.stringify(dataQR)));
+  _linkQR = linkQR;
+
+  generarQR(linkQR);
+
+  document.getElementById('numContratoOK').textContent = contratoId;
+  document.getElementById('btnFinalizar').style.display = 'none';
+  document.getElementById('qrSection').style.display = 'block';
+  toast('✅ Evidencia registrada');
+}
+
+let _linkQR = '';
+
+function copiarLink() {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(_linkQR).then(() => toast('📋 Link copiado'));
+  } else {
+    toast('Copia el link manualmente: ' + _linkQR.substring(0, 50) + '...');
+  }
+}
+
+// ═══════════════════════════════════════════════
+// GENERADOR QR (sin librerías externas)
+// ═══════════════════════════════════════════════
+function generarQR(texto) {
+  // QR simplificado usando API pública compatible con GitHub Pages
+  const canvas = document.getElementById('qrCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = 220; canvas.height = 220;
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, 220, 220);
+
+  // Usar imagen de QR desde API
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => ctx.drawImage(img, 0, 0, 220, 220);
+  img.onerror = () => {
+    // Fallback: mostrar texto
+    ctx.fillStyle = '#1a1a1a';
+    ctx.font = '10px monospace';
+    ctx.fillText('QR no disponible', 10, 110);
+    ctx.fillText('Copia el link abajo', 10, 125);
+  };
+  img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(texto);
+}
+
+// ═══════════════════════════════════════════════
+// EQUIPOS DISPONIBLES
+// ═══════════════════════════════════════════════
+function cargarEquipos() {
+  const empId = document.getElementById('selEmpresaEq').value;
+  let activos = [];
+  try {
+    const keys = ['mss_arr' + empId + '_activos', 'mss_activos_' + empId];
+    for (const k of keys) {
+      const d = localStorage.getItem(k);
+      if (d) { activos = JSON.parse(d); break; }
+    }
+  } catch(e) {}
+
+  // También buscar en cualquier key que contenga activos
+  if (!activos.length) {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.includes('arr' + empId) && k.includes('activo')) {
+        try { activos = JSON.parse(localStorage.getItem(k) || '[]'); if (activos.length) break; } catch(e) {}
+      }
+    }
+  }
+
+  const lista = document.getElementById('listaEquipos');
+  if (!activos.length) {
+    lista.innerHTML = `<div style="text-align:center;padding:24px;color:var(--muted)">
+      <div style="font-size:32px;margin-bottom:8px">🔧</div>
+      <div style="font-size:13px">Abre el ERP en el mismo navegador para ver los equipos</div>
+      <div style="font-size:11px;margin-top:8px;color:var(--muted)">Los datos se leen desde el mismo localStorage</div>
+    </div>`;
+    return;
+  }
+
+  const filtrados = _filtroEq ? activos.filter(a => a.estado === _filtroEq) : activos;
+  if (!filtrados.length) {
+    lista.innerHTML = `<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">Sin equipos con estado "${_filtroEq}"</div>`;
+    return;
+  }
+
+  const clp = n => '$' + Math.round(n || 0).toLocaleString('es-CL');
+  lista.innerHTML = filtrados.map(a => {
+    const badge = a.estado === 'Disponible' ? 'badge-ok' : a.estado === 'Arrendado' ? 'badge-danger' : 'badge-warn';
+    return `<div class="equipo-card">
+      <div class="eq-icon">🔧</div>
+      <div style="flex:1">
+        <div class="eq-nombre">${a.nombre}</div>
+        <div class="eq-info">${a.tipo || ''} ${a.marca ? '· ' + a.marca : ''} ${a.patente ? '· ' + a.patente : ''}</div>
+        <div style="margin-top:4px;display:flex;align-items:center;gap:8px">
+          <span class="badge ${badge}">${a.estado}</span>
+          ${a.tarifaDia ? `<span style="font-size:11px;color:var(--gold);font-weight:700">${clp(a.tarifaDia)}/día</span>` : ''}
+        </div>
+      </div>
+      <button class="btn btn-sm btn-outline" onclick="preReserva('${a.nombre}',${a.tarifaDia||0})">Reservar</button>
+    </div>`;
+  }).join('');
+}
+
+function filtrarEquipos(estado) {
+  _filtroEq = estado;
+  ['fDisp','fArr','fTodo'].forEach(id => document.getElementById(id)?.classList.remove('btn-ok','btn-warn'));
+  const map = { 'Disponible': 'fDisp', 'Arrendado': 'fArr', '': 'fTodo' };
+  document.getElementById(map[estado])?.classList.add('btn-ok');
+  cargarEquipos();
+}
+
+function preReserva(nombre, tarifa) {
+  document.getElementById('resEquipo').value = nombre;
+  document.getElementById('resTarifa').value = tarifa;
+  cambiarTab('reserva', document.querySelectorAll('.tab')[2]);
+  toast('📅 Completa los datos para reservar');
+}
+
+// ═══════════════════════════════════════════════
+// RESERVAS
+// ═══════════════════════════════════════════════
+function guardarReserva() {
+  const empId = document.getElementById('selEmpresaRes').value;
+  const equipo = document.getElementById('resEquipo').value.trim();
+  const cliente = document.getElementById('resCliente').value.trim();
+  const tel = document.getElementById('resTel').value.trim();
+  const ini = document.getElementById('resFechaIni').value;
+  const fin = document.getElementById('resFechaFin').value;
+  const tarifa = parseInt(document.getElementById('resTarifa').value) || 0;
+  const lugar = document.getElementById('resLugar').value.trim();
+  const obs = document.getElementById('resObs').value.trim();
+
+  if (!equipo || !cliente || !ini || !fin) {
+    toast('⚠ Completa equipo, cliente y fechas'); return;
+  }
+
+  // Guardar reserva en localStorage para que aparezca en el ERP
+  const key = 'mss_reservas_' + empId;
+  let reservas = [];
+  try { reservas = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
+  const nueva = {
+    id: Date.now(), empId, equipo, cliente, tel, ini, fin, tarifa, lugar, obs,
+    estado: 'Reservada', fechaCreacion: new Date().toISOString(),
+    vendedor: _estado.vendedor || 'Campo'
+  };
+  reservas.push(nueva);
+  try {
+    localStorage.setItem(key, JSON.stringify(reservas));
+    document.getElementById('reservaOKTxt').textContent = cliente + ' · ' + equipo + ' · ' + ini + ' al ' + fin;
+    document.getElementById('reservaOK').style.display = 'block';
+    // Limpiar form
+    ['resEquipo','resCliente','resTel','resFechaIni','resFechaFin','resTarifa','resLugar','resObs'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    toast('✅ Reserva guardada en el ERP');
+  } catch(e) { toast('⚠ Error al guardar'); }
+}
+
+// ═══════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════
+function toast(msg, dur = 2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+// Fecha mínima hoy en reservas
+document.getElementById('resFechaIni').min = new Date().toISOString().split('T')[0];
+document.getElementById('resFechaFin').min = new Date().toISOString().split('T')[0];
+</script>
+</body>
+</html>
