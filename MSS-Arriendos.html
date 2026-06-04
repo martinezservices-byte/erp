@@ -452,17 +452,12 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
       </div>
       <div class="fl"><label>Costo Flete ($)</label><input id="arCostoFlete" type="number" value="0"/></div>
       <div class="fl"><label>Hora Entrega</label><input id="arHoraEntrega" type="text" placeholder="Ej: 18:00 PM"/></div>
-      <div class="fl"><label>Hora Retiro</label><input id="arHoraRetiro" type="text" placeholder="Ej: 10:00 AM"/></div>
+      <div class="fl"><label>Hora Retiro Est.</label><input id="arHoraRetiro" type="text" placeholder="Ej: 10:00 AM"/></div>
+      <div class="fl"><label>Conductor (si despacha)</label><input id="arConductor" type="text" placeholder="Nombre del conductor"/></div>
+      <div class="fl"><label>Patente Vehículo Traslado</label><input id="arPatenteTraslado" type="text" placeholder="Ej: ABCD12"/></div>
     </div>
   </div>
   <div style="display:flex;gap:8px;margin-top:14px">
-    <div style="border-top:1px solid var(--b1);margin-top:12px;padding-top:10px">
-      <div style="font-size:10px;color:var(--muted);font-family:monospace;letter-spacing:0.5px;margin-bottom:6px">📷 FOTOS DEL ESTADO DEL EQUIPO <span style="color:var(--b1)">(opcional · máx. 5 · quedan vinculadas al contrato)</span></div>
-      <input type="file" id="arFotos" accept="image/*" multiple style="display:none" onchange="previewFotos(this)"/>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center" id="fotosPreview">
-        <button type="button" onclick="document.getElementById('arFotos').click()" style="width:68px;height:68px;border-radius:6px;border:1px dashed var(--b1);background:none;color:var(--muted);font-size:20px;cursor:pointer">+</button>
-      </div>
-    </div>
     <button class="bg" style="flex:1" onclick="saveArriendo()">Guardar</button>
     <button class="bgh" onclick="C('moArriendo')">Cancelar</button>
   </div>
@@ -959,8 +954,8 @@ function rArriendos(){
         <td>${badge(a.estado,EC[a.estado]||'#5A7090')}</td>
         <td><div style="display:flex;gap:3px;flex-wrap:wrap">
           <button class="bsm be" onclick="editArriendo(${a.id})">✎</button>
-          <button class="bsm" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--acc);padding:3px 7px;border-radius:5px;font-size:9px;cursor:pointer" onclick="emitirContrato(${a.id})" title="Contrato PDF">📋</button>
-          <button class="bsm" style="background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:#818CF8;padding:3px 7px;border-radius:5px;font-size:9px;cursor:pointer" onclick="gestionarFotos(${a.id},'${a.num}')" title="Fotos del contrato">📷</button>
+          <button class="bsm" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--acc);padding:3px 7px;border-radius:5px;font-size:9px;cursor:pointer" onclick="emitirContrato(${a.id})" title="Contrato">📋</button>
+          <button class="bsm" style="background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.3);color:var(--info);padding:3px 7px;border-radius:5px;font-size:9px;cursor:pointer" onclick="emitirGuia(${a.id})" title="Guía Entrega">📦</button>
           <button class="bsm" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:var(--ok);padding:3px 7px;border-radius:5px;font-size:9px;cursor:pointer" onclick="emitirDevolucion(${a.id})" title="Comprobante Devolución">🔄</button>
           <button class="bsm bd" onclick="delArriendo(${a.id})">✕</button>
         </div></td>
@@ -974,14 +969,13 @@ function saveArriendo(){
   const cId=parseInt(document.getElementById('arCliente').value)||0;
   const activo=ACTIVOS.find(x=>parseInt(x.id)===aId);
   const cliente=CLIENTES.find(x=>parseInt(x.id)===cId);
-  const obj={num:document.getElementById('arNum').value||'ARR-'+(ARRIENDOS.length+1).toString().padStart(3,'0'),activoId:aId,activoNombre:activo?.nombre||'—',clienteId:cId,clienteNombre:cliente?.nombre||'—',inicio:document.getElementById('arInicio').value,termino:document.getElementById('arTermino').value,tipoTarifa:document.getElementById('arTipoTarifa').value,tarifa:parseFloat(document.getElementById('arTarifa').value)||0,total:parseFloat(document.getElementById('arTotal').value)||0,pagado:parseFloat(document.getElementById('arPagado').value)||0,lugar:document.getElementById('arLugar').value,resp:document.getElementById('arResp').value,estado:document.getElementById('arEstado').value,obs:document.getElementById('arObs').value,garantia:parseFloat(document.getElementById('arGarantia').value)||0,formaPagoGarantia:document.getElementById('arFormaPagoGarantia').value,estadoGarantia:document.getElementById('arEstadoGarantia').value,formaPago:document.getElementById('arFormaPago').value,estadoPago:document.getElementById('arEstadoPago').value,tipoDoc:document.getElementById('arTipoDoc').value,numDoc:document.getElementById('arNumDoc').value,tipoDespacho:document.getElementById('arTipoDespacho')?.value||'retira',costoFlete:parseFloat(document.getElementById('arCostoFlete')?.value)||0,horaEntrega:document.getElementById('arHoraEntrega')?.value||'',horaRetiro:document.getElementById('arHoraRetiro')?.value||''};
+  const obj={num:document.getElementById('arNum').value||'ARR-'+(ARRIENDOS.length+1).toString().padStart(3,'0'),activoId:aId,activoNombre:activo?.nombre||'—',clienteId:cId,clienteNombre:cliente?.nombre||'—',inicio:document.getElementById('arInicio').value,termino:document.getElementById('arTermino').value,tipoTarifa:document.getElementById('arTipoTarifa').value,tarifa:parseFloat(document.getElementById('arTarifa').value)||0,total:parseFloat(document.getElementById('arTotal').value)||0,pagado:parseFloat(document.getElementById('arPagado').value)||0,lugar:document.getElementById('arLugar').value,resp:document.getElementById('arResp').value,estado:document.getElementById('arEstado').value,obs:document.getElementById('arObs').value,garantia:parseFloat(document.getElementById('arGarantia').value)||0,formaPagoGarantia:document.getElementById('arFormaPagoGarantia').value,estadoGarantia:document.getElementById('arEstadoGarantia').value,formaPago:document.getElementById('arFormaPago').value,estadoPago:document.getElementById('arEstadoPago').value,tipoDoc:document.getElementById('arTipoDoc').value,numDoc:document.getElementById('arNumDoc').value,tipoDespacho:document.getElementById('arTipoDespacho')?.value||'retira',costoFlete:parseFloat(document.getElementById('arCostoFlete')?.value)||0,horaEntrega:document.getElementById('arHoraEntrega')?.value||'',horaRetiro:document.getElementById('arHoraRetiro')?.value||'',conductor:document.getElementById('arConductor')?.value||'',patenteTraslado:document.getElementById('arPatenteTraslado')?.value||''};
   if(!obj.activoNombre||obj.activoNombre==='—')return alert('Selecciona un activo');
   let savedObj;
   if(id){const i=ARRIENDOS.findIndex(a=>parseInt(a.id)===parseInt(id));if(i>=0){ARRIENDOS[i]={...ARRIENDOS[i],...obj};savedObj=ARRIENDOS[i];}}
   else{const newObj={id:uid(),...obj};ARRIENDOS.push(newObj);savedObj=newObj;}
   if(activo&&obj.estado==='Activo'){activo.estado='Arrendado';save();}
   if(savedObj) syncFinanzas('arriendo', savedObj, 'save');
-  guardarFotosContrato(obj.id);
   save();C('moArriendo');rArriendos();
 }
 
@@ -991,14 +985,8 @@ function editArriendo(id){
   document.getElementById('tArriendo').textContent='Editar Arriendo';
   document.getElementById('arId').value=id;
   document.getElementById('arNum').value=a.num;
-  // Asignar activo y cliente con setTimeout para asegurar que poblarSelects() terminó
-  setTimeout(()=>{
-    const selA=document.getElementById('arActivo');
-    const selC=document.getElementById('arCliente');
-    // Buscar la opción que coincida con parseInt
-    Array.from(selA.options).forEach(o=>{if(parseInt(o.value)===parseInt(a.activoId)) selA.value=o.value;});
-    Array.from(selC.options).forEach(o=>{if(parseInt(o.value)===parseInt(a.clienteId)) selC.value=o.value;});
-  },0);
+  document.getElementById('arActivo').value=a.activoId;
+  document.getElementById('arCliente').value=a.clienteId;
   document.getElementById('arInicio').value=a.inicio;
   document.getElementById('arTermino').value=a.termino;
   document.getElementById('arTipoTarifa').value=a.tipoTarifa;
@@ -1020,7 +1008,8 @@ function editArriendo(id){
   if(document.getElementById('arCostoFlete')) document.getElementById('arCostoFlete').value=a.costoFlete||0;
   if(document.getElementById('arHoraEntrega')) document.getElementById('arHoraEntrega').value=a.horaEntrega||'';
   if(document.getElementById('arHoraRetiro')) document.getElementById('arHoraRetiro').value=a.horaRetiro||'';
-  cargarFotosContrato(a.id);
+  if(document.getElementById('arConductor')) document.getElementById('arConductor').value=a.conductor||'';
+  if(document.getElementById('arPatenteTraslado')) document.getElementById('arPatenteTraslado').value=a.patenteTraslado||'';
   O('moArriendo');
 }
 function delArriendo(id){
@@ -1223,7 +1212,7 @@ function emitirContrato(id){
         <div class="sec-body">
           <div class="grid2">
             <div class="cell"><strong>Modo traslado:</strong><br><span class="field-blank">&nbsp;</span></div>
-            <div class="cell"><strong>Patente vehículo traslado:</strong><br><span class="field-blank" style="min-width:80px">&nbsp;</span></div>
+            <div class="cell"><strong>Patente vehículo traslado:</strong><br>${a.patenteTraslado?`<strong>${a.patenteTraslado}</strong>`:`<span class="field-blank" style="min-width:80px">&nbsp;</span>`}</div>
             <div class="cell"><strong>Destino:</strong> ${a.lugar||'—'}</div>
             <div class="cell"><strong>Hora traslado:</strong><br><span class="field-blank" style="min-width:60px">&nbsp;</span></div>
           </div>
@@ -1348,8 +1337,8 @@ function emitirContrato(id){
           <div class="grid2">
             <div class="cell"><strong>Modalidad:</strong> ${condDespacho}</div>
             <div class="cell"><strong>Hora entrega estipulada:</strong> ${a.horaEntrega||'__:__ hrs'}</div>
-            <div class="cell"><strong>Nombre conductor:</strong>${esDespacho?` <span class="field-blank">&nbsp;</span>`:'&nbsp;N/A'}</div>
-            <div class="cell"><strong>Patente vehículo:</strong>${esDespacho?` <span class="field-blank" style="min-width:70px">&nbsp;</span>`:'&nbsp;N/A'}</div>
+            <div class="cell"><strong>Nombre conductor:</strong>${esDespacho?(a.conductor?` <strong>${a.conductor}</strong>`:` <span class="field-blank">&nbsp;</span>`):'&nbsp;N/A'}</div>
+            <div class="cell"><strong>Patente vehículo:</strong>${esDespacho?(a.patenteTraslado?` <strong>${a.patenteTraslado}</strong>`:` <span class="field-blank" style="min-width:70px">&nbsp;</span>`):'&nbsp;N/A'}</div>
           </div>
           <div style="font-size:10px;padding:6px 0 0"><strong>Hora retiro estimada:</strong> <span class="field-blank" style="min-width:80px">&nbsp;</span></div>
         </div>
@@ -1954,12 +1943,7 @@ function O(id){
 }
 function C(id){
   // Al cerrar, limpiar IDs para que próxima apertura sea "Nuevo"
-  if(id==='moArriendo'){
-    document.getElementById('arId').value='';
-    _fotosTemp=[];
-    const fp=document.getElementById('fotosPreview');
-    if(fp) fp.innerHTML='<button type="button" onclick="document.getElementById(\'arFotos\').click()" style="width:68px;height:68px;border-radius:6px;border:1px dashed var(--b1);background:none;color:var(--muted);font-size:20px;cursor:pointer">+</button>';
-  }
+  if(id==='moArriendo') document.getElementById('arId').value='';
   if(id==='moFlete')    document.getElementById('flId').value='';
   if(id==='moActivo')   document.getElementById('aId').value='';
   if(id==='moCliente')  document.getElementById('cliId').value='';
@@ -2519,119 +2503,6 @@ function reporteActivos(){
     ${footerPDF()}
   </div>`;
   abrirVentanaPDF(html,'Inventario de Activos');
-}
-
-// ═══════════════════════════════════════════════════════
-// FOTOS VINCULADAS A CONTRATOS
-// ═══════════════════════════════════════════════════════
-let _fotosTemp=[], _gestionFotosId=null, _gestionFotosNum='';
-
-function previewFotos(input){
-  const files=Array.from(input.files);
-  if(files.length+_fotosTemp.length>5){alert('Máximo 5 fotos por contrato');return;}
-  files.forEach(file=>{
-    const r=new FileReader();
-    r.onload=function(e){_fotosTemp.push(e.target.result);renderFotosPreview();};
-    r.readAsDataURL(file);
-  });
-}
-
-function renderFotosPreview(){
-  const div=document.getElementById('fotosPreview');if(!div)return;
-  div.innerHTML=_fotosTemp.map((src,i)=>`
-    <div style="position:relative;display:inline-block">
-      <img src="${src}" style="width:68px;height:68px;object-fit:cover;border-radius:6px;border:1px solid var(--b1)"/>
-      <button onclick="_fotosTemp.splice(${i},1);renderFotosPreview()" style="position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:var(--danger);border:none;color:white;font-size:9px;cursor:pointer">✕</button>
-    </div>`).join('')
-  +(_fotosTemp.length<5?`<button type="button" onclick="document.getElementById('arFotos').click()" style="width:68px;height:68px;border-radius:6px;border:1px dashed var(--b1);background:none;color:var(--muted);font-size:20px;cursor:pointer">+</button>`:'');
-}
-
-function guardarFotosContrato(arriendoId){
-  if(!_fotosTemp.length)return;
-  localStorage.setItem('mss_arr'+EMP.id+'_fotos_'+arriendoId,JSON.stringify(_fotosTemp));
-  _fotosTemp=[];
-}
-
-function cargarFotosContrato(arriendoId){
-  _fotosTemp=[];
-  try{_fotosTemp=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_fotos_'+arriendoId)||'[]');}catch(e){}
-  renderFotosPreview();
-}
-
-// Modal gestión fotos desde la tabla
-function gestionarFotos(arriendoId, numContrato){
-  _gestionFotosId=arriendoId; _gestionFotosNum=numContrato;
-  let modal=document.getElementById('moFotos');
-  if(!modal){
-    modal=document.createElement('div');
-    modal.id='moFotos';
-    modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
-    modal.innerHTML=`
-      <div style="background:#08101C;border-radius:13px;padding:22px;border:1px solid rgba(245,158,11,0.3);width:520px;max-height:90vh;overflow-y:auto">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-          <div>
-            <div style="font-size:14px;font-weight:900;color:#FFFBEB" id="moFotosTitulo">📷 Fotos</div>
-            <div style="font-size:10px;color:#78716C;margin-top:2px" id="moFotosCount"></div>
-          </div>
-          <button onclick="document.getElementById('moFotos').style.display='none'" style="background:none;border:none;color:#78716C;font-size:20px;cursor:pointer;line-height:1">✕</button>
-        </div>
-        <div id="moFotosGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;min-height:60px"></div>
-        <div style="display:flex;gap:8px">
-          <button onclick="document.getElementById('inputFotoModal').click()" style="flex:1;padding:10px;border-radius:7px;border:1px dashed rgba(245,158,11,0.4);background:none;color:#F59E0B;font-size:12px;font-weight:700;cursor:pointer">📷 Agregar foto</button>
-          <button onclick="document.getElementById('moFotos').style.display='none'" style="padding:10px 18px;border-radius:7px;border:1px solid rgba(255,255,255,0.1);background:none;color:#78716C;font-size:12px;cursor:pointer">Cerrar</button>
-        </div>
-        <input type="file" id="inputFotoModal" accept="image/*" multiple style="display:none" onchange="agregarFotoDesdeModal(this)"/>
-      </div>`;
-    document.body.appendChild(modal);
-  }
-  document.getElementById('moFotosTitulo').textContent='📷 Fotos — Contrato '+numContrato;
-  renderFotosModal(arriendoId);
-  modal.style.display='flex';
-}
-
-function renderFotosModal(arriendoId){
-  const key='mss_arr'+EMP.id+'_fotos_'+(arriendoId||_gestionFotosId);
-  let fotos=[];
-  try{fotos=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){}
-  const count=document.getElementById('moFotosCount');
-  if(count) count.textContent=fotos.length+' foto(s) guardada(s) · máx. 5';
-  const grid=document.getElementById('moFotosGrid');if(!grid)return;
-  grid.innerHTML=fotos.length===0
-    ?`<div style="grid-column:1/-1;text-align:center;padding:24px;color:#78716C;font-size:12px">Sin fotos aún — haz clic en "Agregar foto" para subir</div>`
-    :fotos.map((src,i)=>`
-      <div style="position:relative">
-        <img src="${src}" style="width:100%;height:130px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,0.1)"/>
-        <button onclick="eliminarFotoModal(${i})" style="position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(239,68,68,0.9);border:none;color:white;font-size:10px;cursor:pointer">✕</button>
-        <div style="font-size:9px;color:#78716C;text-align:center;margin-top:3px">Foto ${i+1}</div>
-      </div>`).join('');
-}
-
-function agregarFotoDesdeModal(input){
-  const files=Array.from(input.files);
-  const key='mss_arr'+EMP.id+'_fotos_'+_gestionFotosId;
-  let fotos=[];
-  try{fotos=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){}
-  if(files.length+fotos.length>5){alert('Máximo 5 fotos. Tienes '+fotos.length+' actualmente.');return;}
-  let pend=files.length;
-  files.forEach(file=>{
-    const r=new FileReader();
-    r.onload=function(e){
-      fotos.push(e.target.result);pend--;
-      if(pend===0){localStorage.setItem(key,JSON.stringify(fotos));renderFotosModal(_gestionFotosId);}
-    };
-    r.readAsDataURL(file);
-  });
-  input.value='';
-}
-
-function eliminarFotoModal(idx){
-  if(!confirm('¿Eliminar esta foto?'))return;
-  const key='mss_arr'+EMP.id+'_fotos_'+_gestionFotosId;
-  let fotos=[];
-  try{fotos=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){}
-  fotos.splice(idx,1);
-  localStorage.setItem(key,JSON.stringify(fotos));
-  renderFotosModal(_gestionFotosId);
 }
 
 // INIT
