@@ -1211,7 +1211,7 @@ function emitirContrato(id){
         +'<div style="font-size:9px;font-weight:700;color:#F59E0B;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">📱 Datos registrados desde terreno</div>'
         +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px">'
         +'<div><strong>Estado:</strong> '+(chkMap[_evVeh.checklist]||_evVeh.checklist)+'</div>'
-        +'<div><strong>Registrado por:</strong> '+(_evVeh.vendedor||'—')+'</div>'
+        +'<div><strong>Recibido por:</strong> '+(_evVeh.vendedor||'—')+'</div>'
         +(_evVeh.gps?'<div><strong>GPS:</strong> '+_evVeh.gps.lat.toFixed(5)+', '+_evVeh.gps.lng.toFixed(5)+'</div><div><strong>Precisión:</strong> ±'+Math.round(_evVeh.gps.acc||0)+'m</div>':'')
         +(_evVeh.obs?'<div style="grid-column:1/-1"><strong>Observaciones:</strong> '+_evVeh.obs+'</div>':'')
         +(_evVeh.cliNombre?'<div><strong>Cliente:</strong> '+_evVeh.cliNombre+'</div>':'')
@@ -1366,7 +1366,7 @@ function emitirContrato(id){
         +'<div style="font-size:9px;font-weight:700;color:#F59E0B;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">📱 Datos registrados desde terreno</div>'
         +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px">'
         +'<div><strong>Estado:</strong> '+(chkMap[_evMaq2.checklist]||_evMaq2.checklist)+'</div>'
-        +'<div><strong>Registrado por:</strong> '+(_evMaq2.vendedor||'—')+'</div>'
+        +'<div><strong>Recibido por:</strong> '+(_evMaq2.vendedor||'—')+'</div>'
         +(_evMaq2.gps?'<div><strong>GPS:</strong> '+_evMaq2.gps.lat.toFixed(5)+', '+_evMaq2.gps.lng.toFixed(5)+'</div><div><strong>Precisión:</strong> ±'+Math.round(_evMaq2.gps.acc||0)+'m</div>':'')
         +(_evMaq2.obs?'<div style="grid-column:1/-1"><strong>Observaciones:</strong> '+_evMaq2.obs+'</div>':'')
         +(_evMaq2.cliNombre?'<div><strong>Cliente:</strong> '+_evMaq2.cliNombre+'</div>':'')
@@ -1623,7 +1623,7 @@ function emitirDevolucion(id){
         <div style="font-size:9px;font-weight:700;color:#F59E0B;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">📱 Estado registrado desde terreno</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px">
           <div><strong>Estado:</strong> ${_chkDevMap[_evDev.checklist]||_evDev.checklist}</div>
-          <div><strong>Registrado por:</strong> ${_evDev.encargado||_evDev.vendedor||'—'}</div>
+          <div><strong>Recibido por:</strong> ${_evDev.encargado||_evDev.vendedor||'—'}</div>
           ${_evDev.gps?`<div><strong>GPS:</strong> ${_evDev.gps.lat.toFixed(5)}, ${_evDev.gps.lng.toFixed(5)}</div><div><strong>Precisión:</strong> ±${Math.round(_evDev.gps.acc||0)}m</div>`:''}
           ${_evDev.obs?`<div style="grid-column:1/-1"><strong>Observaciones:</strong> ${_evDev.obs}</div>`:''}
           <div><strong>Fecha:</strong> ${new Date(_evDev.fecha).toLocaleString('es-CL')}</div>
@@ -1680,7 +1680,7 @@ function emitirDevolucion(id){
             <div class="cell"><strong>Cliente:</strong> ${(cliente.nombre||'—').toUpperCase()}</div>
             <div class="cell"><strong>RUT:</strong> ${cliente.rut||'—'}</div>
             <div class="cell"><strong>Vehículo:</strong> ${activo.nombre||a.activoNombre} · Patente: ${patente}</div>
-            <div class="cell"><strong>Fecha devolución:</strong> ___ / ___ / 2026 &nbsp;&nbsp; <strong>Hora:</strong> ___:___</div>
+            <div class="cell"><strong>Fecha devolución:</strong> ${_evDev&&_evDev.devFecha?_evDev.devFecha.split('-').reverse().join('-'):' ___ / ___ / 2026'} &nbsp;&nbsp; <strong>Hora:</strong> ${_evDev&&_evDev.devHora?_evDev.devHora+' hrs':'___:___'}</div>
           </div>
         </div>
 
@@ -1690,7 +1690,7 @@ function emitirDevolucion(id){
         <div class="sec-body">
           <div class="grid2">
             <div class="cell"><strong>Garantía recibida:</strong> ${clp(garantia)} (EFECTIVO [${chkEfec}] TRANSF. [${chkTran}])</div>
-            <div class="cell"><strong>Forma devolución:</strong> EFECTIVO [${chkEfec}] TRANSF. [${chkTran}]</div>
+            <div class="cell"><strong>Forma devolución:</strong> ${_evDev&&_evDev.devGarantia?(_evDev.devGarantia==='devuelta'?'💰 Devuelta completa':_evDev.devGarantia==='parcial'?'⚠ Devuelta parcial':'🔒 Retenida por daños'):'EFECTIVO ['+chkEfec+'] TRANSF. ['+chkTran+']'}</div>
             <div class="cell"><strong>Monto devuelto:</strong> $ <span class="field-blank" style="min-width:90px">&nbsp;</span></div>
             <div class="cell"><strong>Monto retenido:</strong> $ <span class="field-blank" style="min-width:90px">&nbsp;</span></div>
           </div>
@@ -1729,7 +1729,7 @@ function emitirDevolucion(id){
             <div class="cell"><strong>Cliente:</strong> ${(cliente.nombre||'—').toUpperCase()}</div>
             <div class="cell"><strong>RUT:</strong> ${cliente.rut||'—'}</div>
             <div class="cell"><strong>Equipo:</strong> ${activo.nombre||a.activoNombre} · ${serie}</div>
-            <div class="cell"><strong>Fecha devolución:</strong> ___ / ___ / 2026 &nbsp;&nbsp; <strong>Hora:</strong> ___:___</div>
+            <div class="cell"><strong>Fecha devolución:</strong> ${_evDev&&_evDev.devFecha?_evDev.devFecha.split('-').reverse().join('-'):' ___ / ___ / 2026'} &nbsp;&nbsp; <strong>Hora:</strong> ${_evDev&&_evDev.devHora?_evDev.devHora+' hrs':'___:___'}</div>
           </div>
         </div>
 
@@ -1739,7 +1739,7 @@ function emitirDevolucion(id){
         <div class="sec-body">
           <div class="grid2">
             <div class="cell"><strong>Garantía recibida:</strong> ${clp(garantia)} (EFECTIVO [${chkEfec}] TRANSF. [${chkTran}])</div>
-            <div class="cell"><strong>Forma devolución:</strong> EFECTIVO [${chkEfec}] TRANSF. [${chkTran}]</div>
+            <div class="cell"><strong>Forma devolución:</strong> ${_evDev&&_evDev.devGarantia?(_evDev.devGarantia==='devuelta'?'💰 Devuelta completa':_evDev.devGarantia==='parcial'?'⚠ Devuelta parcial':'🔒 Retenida por daños'):'EFECTIVO ['+chkEfec+'] TRANSF. ['+chkTran+']'}</div>
             <div class="cell"><strong>Monto devuelto:</strong> $ <span class="field-blank" style="min-width:90px">&nbsp;</span></div>
             <div class="cell"><strong>Monto retenido:</strong> $ <span class="field-blank" style="min-width:90px">&nbsp;</span></div>
           </div>
