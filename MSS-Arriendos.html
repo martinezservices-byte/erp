@@ -2842,16 +2842,7 @@ rDash();
         // Limpiar URL
         window.history.replaceState({}, '', window.location.pathname);
 
-        // Guardar fotos que vienen EN el link
-        if (data.fotos && data.fotos.length > 0) {
-          const keyF = 'mss_arr' + empId + '_fotos_' + data.tipo + '_' + (arrMatch ? arrMatch.id : data.ctto);
-          const keyFNum = 'mss_arr' + empId + '_fotos_' + data.tipo + '_' + data.ctto;
-          try {
-            localStorage.setItem(keyF, JSON.stringify(data.fotos));
-            localStorage.setItem(keyFNum, JSON.stringify(data.fotos));
-          } catch(e) {}
-        }
-        // Guardar firma que viene EN el link
+        // Guardar firma que viene EN el link (fotos van por localStorage del celular)
         if (data.firma) {
           const keyFirma = 'mss_arr' + empId + '_firma_' + data.tipo + '_' + (arrMatch ? arrMatch.id : data.ctto);
           const keyFirmaNum = 'mss_arr' + empId + '_firma_' + data.tipo + '_' + data.ctto;
@@ -2874,8 +2865,12 @@ rDash();
           fecha: data.fecha || new Date().toISOString()
         }));
 
-        const infoExtra = arrMatch ? '\nFotos, firma y datos del terreno vinculados ✓' : '\n(Abre el ERP en el mismo navegador del celular para ver las fotos)';
-        alert('✅ Datos del celular cargados al contrato ' + data.ctto + infoExtra);
+        const nFotos = data.nFotos || 0;
+        const msgFotos = nFotos > 0
+          ? '\n\n📷 ' + nFotos + ' foto(s) disponibles en el celular.\nAbre 📷 en el arriendo para verlas si usas el mismo navegador.'
+          : '';
+        const infoExtra = arrMatch ? '\n✓ Firma y datos del terreno cargados' : '';
+        alert('✅ Datos cargados al contrato ' + data.ctto + infoExtra + msgFotos);
         T('arriendos');
         rArriendos();
       }

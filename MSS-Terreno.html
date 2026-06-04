@@ -624,70 +624,70 @@ function limpiarFirma() {
 // FINALIZAR — generar QR
 // ═══════════════════════════════════════════════
 function finalizar() {
-  // Capturar firma
   const canvas = document.getElementById('canvasFirma');
-  _estado.firma = canvas.toDataURL('image/jpeg', 0.6); // JPEG más liviano
-
   const empId = _estado.empresa;
   const contratoId = _estado.contrato;
   const tipo = _estado.tipo;
   const obs = document.getElementById('obsTexto').value || '';
 
-  // Comprimir fotos aún más para que quepan en el link
-  const fotosComprimidas = _estado.fotos.map(f => {
+  // Comprimir firma a tamaño mínimo (solo trazos b/n)
+  const firmaMin = (()=>{
     try {
-      const img = new Image();
-      const c = document.createElement('canvas');
-      return new Promise(resolve => {
-        img.onload = () => {
-          const max = 400;
-          const r = Math.min(max/img.width, max/img.height, 1);
-          c.width = img.width*r; c.height = img.height*r;
-          c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-          resolve(c.toDataURL('image/jpeg', 0.5));
-        };
-        img.src = f;
-      });
-    } catch(e) { return Promise.resolve(f); }
-  });
+      const c2 = document.createElement('canvas');
+      c2.width = 200; c2.height = 60;
+      const ctx2 = c2.getContext('2d');
+      ctx2.fillStyle = 'white';
+      ctx2.fillRect(0,0,200,60);
+      ctx2.drawImage(canvas, 0, 0, 200, 60);
+      return c2.toDataURL('image/jpeg', 0.3);
+    } catch(e) { return null; }
+  })();
 
-  Promise.all(fotosComprimidas).then(fotos => {
-    // Datos completos incluyendo fotos y firma
-    const dataQR = {
-      v: 2, emp: empId, ctto: contratoId, tipo: tipo,
-      chk: _estado.checklist, obs: obs,
-      gps: _estado.gps,
-      vend: _estado.vendedor, vendTel: _estado.vendTel,
-      cliNombre: _estado.cliNombre, cliTel: _estado.cliTel,
-      fecha: new Date().toISOString(),
-      fotos: fotos,
-      firma: _estado.firma
-    };
+  // Guardar en localStorage del celular
+  try {
+    if(_estado.fotos.length>0)
+      localStorage.setItem('mss_arr'+empId+'_fotos_'+tipo+'_'+contratoId, JSON.stringify(_estado.fotos));
+    if(firmaMin)
+      localStorage.setItem('mss_arr'+empId+'_firma_'+tipo+'_'+contratoId, firmaMin);
+    localStorage.setItem('mss_evidencia_'+empId+'_'+contratoId+'_'+tipo, JSON.stringify({
+      contrato:contratoId, empresa:empId, tipo,
+      checklist:_estado.checklist, obs,
+      gps:_estado.gps, vendedor:_estado.vendedor, vendTel:_estado.vendTel,
+      cliNombre:_estado.cliNombre, cliTel:_estado.cliTel,
+      fecha:new Date().toISOString(), fotos:_estado.fotos.length
+    }));
+  } catch(e){}
 
-    // Guardar también en localStorage del celular como respaldo
-    try {
-      localStorage.setItem('mss_arr'+empId+'_fotos_'+tipo+'_'+contratoId, JSON.stringify(fotos));
-      localStorage.setItem('mss_arr'+empId+'_firma_'+tipo+'_'+contratoId, _estado.firma);
-      localStorage.setItem('mss_evidencia_'+empId+'_'+contratoId+'_'+tipo, JSON.stringify({
-        contrato: contratoId, empresa: empId, tipo, checklist: _estado.checklist,
-        obs, gps: _estado.gps, vendedor: _estado.vendedor, vendTel: _estado.vendTel,
-        cliNombre: _estado.cliNombre, cliTel: _estado.cliTel,
-        fecha: dataQR.fecha, fotos: fotos.length
-      }));
-    } catch(e) {}
+  // Link liviano: solo datos + firma mini (sin fotos)
+  const dataQR = {
+    v:3, emp:empId, ctto:contratoId, tipo,
+    chk:_estado.checklist, obs,
+    gps:_estado.gps,
+    vend:_estado.vendedor, vendTel:_estado.vendTel,
+    cliNombre:_estado.cliNombre, cliTel:_estado.cliTel,
+    fecha:new Date().toISOString(),
+    firma: firmaMin,
+    nFotos: _estado.fotos.length
+  };
 
-    // El link lleva todo — fotos, firma y datos
-    const jsonStr = JSON.stringify(dataQR);
-    const urlBase = window.location.href.split('/MSS-Terreno')[0];
-    const linkQR = urlBase + '/MSS-Arriendos.html?cargar=' + encodeURIComponent(btoa(unescape(encodeURIComponent(jsonStr))));
-    _linkQR = linkQR;
+  const urlBase = window.location.href.split('/MSS-Terreno')[0];
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(dataQR))));
+  const linkQR = urlBase + '/MSS-Arriendos.html?cargar=' + encodeURIComponent(encoded);
+  _linkQR = linkQR;
 
-    generarQR(linkQR);
-    document.getElementById('numContratoOK').textContent = contratoId;
-    document.getElementById('btnFinalizar').style.display = 'none';
-    document.getElementById('qrSection').style.display = 'block';
-    toast('✅ Todo listo — fotos y firma incluidas');
-  });
+  // Mostrar también cantidad de fotos pendientes
+  const msgFotos = _estado.fotos.length > 0
+    ? '<div style="margin-top:8px;font-size:11px;color:var(--gold)">📷 '+_estado.fotos.length+' foto(s) guardada(s) en este dispositivo</div>'
+    : '';
+
+  generarQR(linkQR);
+  document.getElementById('numContratoOK').textContent = contratoId;
+  document.getElementById('btnFinalizar').style.display = 'none';
+  document.getElementById('qrSection').style.display = 'block';
+  // Agregar mensaje de fotos
+  const sub = document.querySelector('.success-sub');
+  if(sub) sub.innerHTML = 'Contrato <strong>'+contratoId+'</strong><br>Escanea el QR en el PC para cargar los datos'+msgFotos;
+  toast('✅ Listo — datos y firma en el QR');
 }
 
 let _linkQR = '';
