@@ -1383,10 +1383,13 @@ function emitirContrato(id){
               <td style="text-align:center">1</td>
               <td style="font-weight:700">${activo.nombre||a.activoNombre}</td>
               <td>${marca} · ${serie}</td>
-              <td>
-                <span class="chk">&nbsp;</span> Operativo &nbsp;
-                <span class="chk">&nbsp;</span> Con observaciones
-              </td>
+              <td>${(()=>{
+                try{
+                  const ev=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_evidencia_entrega_'+a.id)||'null');
+                  if(ev){const m={optimo:'✅ Óptimo',observaciones:'⚠ Con Observaciones',mantencion:'🔧 Requiere Mantención'};return '<strong>'+(m[ev.checklist]||ev.checklist)+'</strong>';}
+                }catch(e){}
+                return '<span class="chk">&nbsp;</span> Operativo &nbsp;<span class="chk">&nbsp;</span> Con observaciones';
+              })()}</td>
             </tr></tbody>
           </table>
         </div>
@@ -2770,7 +2773,10 @@ rDash();
     const params = new URLSearchParams(window.location.search);
     const raw = params.get('cargar');
     if (!raw) return;
-    const data = JSON.parse(atob(raw));
+    // Decodificar UTF-8 para soportar fotos y firma en el link
+    let data;
+    try { data = JSON.parse(decodeURIComponent(escape(atob(raw)))); }
+    catch(e) { data = JSON.parse(atob(raw)); }
     if (!data || !data.ctto) return;
     // Mostrar modal de confirmación
     setTimeout(() => {
@@ -2835,6 +2841,25 @@ rDash();
 
         // Limpiar URL
         window.history.replaceState({}, '', window.location.pathname);
+
+        // Guardar fotos que vienen EN el link
+        if (data.fotos && data.fotos.length > 0) {
+          const keyF = 'mss_arr' + empId + '_fotos_' + data.tipo + '_' + (arrMatch ? arrMatch.id : data.ctto);
+          const keyFNum = 'mss_arr' + empId + '_fotos_' + data.tipo + '_' + data.ctto;
+          try {
+            localStorage.setItem(keyF, JSON.stringify(data.fotos));
+            localStorage.setItem(keyFNum, JSON.stringify(data.fotos));
+          } catch(e) {}
+        }
+        // Guardar firma que viene EN el link
+        if (data.firma) {
+          const keyFirma = 'mss_arr' + empId + '_firma_' + data.tipo + '_' + (arrMatch ? arrMatch.id : data.ctto);
+          const keyFirmaNum = 'mss_arr' + empId + '_firma_' + data.tipo + '_' + data.ctto;
+          try {
+            localStorage.setItem(keyFirma, data.firma);
+            localStorage.setItem(keyFirmaNum, data.firma);
+          } catch(e) {}
+        }
 
         // Guardar evidencia completa para usar en el acta PDF
         const keyEv = 'mss_arr' + empId + '_evidencia_' + data.tipo + '_' + (arrMatch ? arrMatch.id : data.ctto);

@@ -626,49 +626,68 @@ function limpiarFirma() {
 function finalizar() {
   // Capturar firma
   const canvas = document.getElementById('canvasFirma');
-  _estado.firma = canvas.toDataURL('image/png', 0.8);
+  _estado.firma = canvas.toDataURL('image/jpeg', 0.6); // JPEG más liviano
 
-  // Guardar en localStorage (para el mismo dispositivo / misma sesión)
   const empId = _estado.empresa;
   const contratoId = _estado.contrato;
   const tipo = _estado.tipo;
+  const obs = document.getElementById('obsTexto').value || '';
 
-  // Guardar fotos
-  if (_estado.fotos.length > 0) {
-    try { localStorage.setItem('mss_arr' + empId + '_fotos_' + tipo + '_' + contratoId, JSON.stringify(_estado.fotos)); } catch(e) {}
-  }
-  // Guardar firma
-  try { localStorage.setItem('mss_arr' + empId + '_firma_' + tipo + '_' + contratoId, _estado.firma); } catch(e) {}
-  // Guardar evidencia completa
-  const evidencia = {
-    contrato: contratoId, empresa: empId, tipo: tipo,
-    checklist: _estado.checklist, obs: _estado.obs || document.getElementById('obsTexto').value,
-    gps: _estado.gps, vendedor: _estado.vendedor, vendTel: _estado.vendTel,
-    cliNombre: _estado.cliNombre, cliTel: _estado.cliTel,
-    fecha: new Date().toISOString(), fotos: _estado.fotos.length
-  };
-  try { localStorage.setItem('mss_evidencia_' + empId + '_' + contratoId + '_' + tipo, JSON.stringify(evidencia)); } catch(e) {}
+  // Comprimir fotos aún más para que quepan en el link
+  const fotosComprimidas = _estado.fotos.map(f => {
+    try {
+      const img = new Image();
+      const c = document.createElement('canvas');
+      return new Promise(resolve => {
+        img.onload = () => {
+          const max = 400;
+          const r = Math.min(max/img.width, max/img.height, 1);
+          c.width = img.width*r; c.height = img.height*r;
+          c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+          resolve(c.toDataURL('image/jpeg', 0.5));
+        };
+        img.src = f;
+      });
+    } catch(e) { return Promise.resolve(f); }
+  });
 
-  // Generar QR con los datos (sin fotos para que sea liviano)
-  const dataQR = {
-    v: 1, emp: empId, ctto: contratoId, tipo: tipo,
-    chk: _estado.checklist, obs: evidencia.obs,
-    gps: _estado.gps,
-    vend: _estado.vendedor, vendTel: _estado.vendTel,
-    cliNombre: _estado.cliNombre, cliTel: _estado.cliTel,
-    fecha: evidencia.fecha
-  };
+  Promise.all(fotosComprimidas).then(fotos => {
+    // Datos completos incluyendo fotos y firma
+    const dataQR = {
+      v: 2, emp: empId, ctto: contratoId, tipo: tipo,
+      chk: _estado.checklist, obs: obs,
+      gps: _estado.gps,
+      vend: _estado.vendedor, vendTel: _estado.vendTel,
+      cliNombre: _estado.cliNombre, cliTel: _estado.cliTel,
+      fecha: new Date().toISOString(),
+      fotos: fotos,
+      firma: _estado.firma
+    };
 
-  const urlBase = window.location.href.split('/MSS-Terreno')[0];
-  const linkQR = urlBase + '/MSS-Arriendos.html?cargar=' + encodeURIComponent(btoa(JSON.stringify(dataQR)));
-  _linkQR = linkQR;
+    // Guardar también en localStorage del celular como respaldo
+    try {
+      localStorage.setItem('mss_arr'+empId+'_fotos_'+tipo+'_'+contratoId, JSON.stringify(fotos));
+      localStorage.setItem('mss_arr'+empId+'_firma_'+tipo+'_'+contratoId, _estado.firma);
+      localStorage.setItem('mss_evidencia_'+empId+'_'+contratoId+'_'+tipo, JSON.stringify({
+        contrato: contratoId, empresa: empId, tipo, checklist: _estado.checklist,
+        obs, gps: _estado.gps, vendedor: _estado.vendedor, vendTel: _estado.vendTel,
+        cliNombre: _estado.cliNombre, cliTel: _estado.cliTel,
+        fecha: dataQR.fecha, fotos: fotos.length
+      }));
+    } catch(e) {}
 
-  generarQR(linkQR);
+    // El link lleva todo — fotos, firma y datos
+    const jsonStr = JSON.stringify(dataQR);
+    const urlBase = window.location.href.split('/MSS-Terreno')[0];
+    const linkQR = urlBase + '/MSS-Arriendos.html?cargar=' + encodeURIComponent(btoa(unescape(encodeURIComponent(jsonStr))));
+    _linkQR = linkQR;
 
-  document.getElementById('numContratoOK').textContent = contratoId;
-  document.getElementById('btnFinalizar').style.display = 'none';
-  document.getElementById('qrSection').style.display = 'block';
-  toast('✅ Evidencia registrada');
+    generarQR(linkQR);
+    document.getElementById('numContratoOK').textContent = contratoId;
+    document.getElementById('btnFinalizar').style.display = 'none';
+    document.getElementById('qrSection').style.display = 'block';
+    toast('✅ Todo listo — fotos y firma incluidas');
+  });
 }
 
 let _linkQR = '';
