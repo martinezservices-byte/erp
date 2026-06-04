@@ -1218,7 +1218,7 @@ function emitirContrato(id){
         +(_evVeh.cliTel?'<div><strong>Tel:</strong> '+_evVeh.cliTel+'</div>':'')
         +'<div><strong>Fecha:</strong> '+new Date(_evVeh.fecha).toLocaleString("es-CL")+'</div>'
         +'</div>'
-        +(_firmaVeh?'<div style="margin-top:8px"><div style="font-size:9px;color:#666;margin-bottom:3px">FIRMA DIGITAL:</div><img src="'+_firmaVeh+'" style="max-height:55px;border:0.5px solid #ddd;border-radius:4px;background:white"/></div>':'')
+        +(_firmaVeh?'<div style="margin-top:8px"><div style="font-size:9px;color:#666;margin-bottom:3px">FIRMA DIGITAL:</div><img src="'+_firmaVeh+'" style="max-height:100px;max-width:280px;display:block;border:0.5px solid #ddd;border-radius:4px;background:white"/></div>':'')
         +'</div>';
     })();
 
@@ -1373,7 +1373,7 @@ function emitirContrato(id){
         +(_evMaq2.cliTel?'<div><strong>Tel:</strong> '+_evMaq2.cliTel+'</div>':'')
         +'<div><strong>Fecha:</strong> '+new Date(_evMaq2.fecha).toLocaleString("es-CL")+'</div>'
         +'</div>'
-        +(_firmaMaq?'<div style="margin-top:8px"><div style="font-size:9px;color:#666;margin-bottom:3px">FIRMA DIGITAL:</div><img src="'+_firmaMaq+'" style="max-height:55px;border:0.5px solid #ddd;border-radius:4px;background:white"/></div>':'')
+        +(_firmaMaq?'<div style="margin-top:8px"><div style="font-size:9px;color:#666;margin-bottom:3px">FIRMA DIGITAL:</div><img src="'+_firmaMaq+'" style="max-height:100px;max-width:280px;display:block;border:0.5px solid #ddd;border-radius:4px;background:white"/></div>':'')
         +'</div>';
     })();
     const condDespacho=a.tipoDespacho==='flete'?'Con costo adicional':a.tipoDespacho==='despacho'?'Despacho sin costo':'Retira cliente';
@@ -1602,6 +1602,59 @@ function emitirDevolucion(id){
   const chkTran=(a.formaPagoGarantia||'').toLowerCase().includes('transfer')?'X':'&nbsp;';
   const patente=activo.patente||'—';
   const serie=activo.patente||activo.serie||'S/S';
+
+  // Precalcular evidencia de DEVOLUCIÓN desde terreno
+  let _evDev=null;
+  try{_evDev=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_evidencia_devolucion_'+a.id)||
+             localStorage.getItem('mss_arr'+EMP.id+'_evidencia_devolucion_'+a.num)||'null');}catch(e){}
+  const _firmaDev=localStorage.getItem('mss_arr'+EMP.id+'_firma_devolucion_'+a.id)||
+                  localStorage.getItem('mss_arr'+EMP.id+'_firma_devolucion_'+a.num)||null;
+
+  // Fotos devolución
+  let _fotosDevArr=[];
+  try{_fotosDevArr=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_fotos_devolucion_'+a.id)||
+                  localStorage.getItem('mss_arr'+EMP.id+'_fotos_devolucion_'+a.num)||'[]');}catch(e){}
+
+  const _chkDevMap={optimo:'✅ Óptimo',observaciones:'⚠ Con Observaciones',mantencion:'🔧 Requiere Mantención'};
+
+  // Sección estado al recibir — automático si hay datos terreno, manual si no
+  const _secEstadoDev=_evDev
+    ?`<div style="background:#fafafa;border:0.5px solid #ccc;border-radius:4px;padding:10px 12px;margin-bottom:10px">
+        <div style="font-size:9px;font-weight:700;color:#F59E0B;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">📱 Estado registrado desde terreno</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px">
+          <div><strong>Estado:</strong> ${_chkDevMap[_evDev.checklist]||_evDev.checklist}</div>
+          <div><strong>Registrado por:</strong> ${_evDev.vendedor||'—'}</div>
+          ${_evDev.gps?`<div><strong>GPS:</strong> ${_evDev.gps.lat.toFixed(5)}, ${_evDev.gps.lng.toFixed(5)}</div><div><strong>Precisión:</strong> ±${Math.round(_evDev.gps.acc||0)}m</div>`:''}
+          ${_evDev.obs?`<div style="grid-column:1/-1"><strong>Observaciones:</strong> ${_evDev.obs}</div>`:''}
+          <div><strong>Fecha:</strong> ${new Date(_evDev.fecha).toLocaleString('es-CL')}</div>
+        </div>
+        ${_firmaDev?`<div style="margin-top:8px"><div style="font-size:9px;color:#666;margin-bottom:4px">FIRMA DIGITAL DEL CLIENTE:</div><img src="${_firmaDev}" style="max-height:100px;max-width:280px;display:block;border:0.5px solid #ddd;border-radius:4px;background:white"/></div>`:''}
+      </div>`
+    :`<div class="sec-hdr">2. Estado al recibir</div>
+      <div class="sec-body">
+        <div class="chk-row"><strong style="min-width:105px">Estado equipo:</strong>
+          <span class="chk">&nbsp;</span> Óptimo &nbsp;&nbsp;
+          <span class="chk">&nbsp;</span> Con daños &nbsp;&nbsp;
+          <span class="chk">&nbsp;</span> Sucio
+        </div>
+        <div class="chk-row"><strong style="min-width:105px">Accesorios:</strong>
+          <span class="chk">&nbsp;</span> Completos &nbsp;&nbsp;
+          <span class="chk">&nbsp;</span> Faltantes: <span class="field-blank" style="min-width:180px">&nbsp;</span>
+        </div>
+        <div style="font-size:10px;margin-top:6px"><strong>Observaciones / daños nuevos:</strong></div>
+        <div class="obs-box">______________________________________________________________________<br>______________________________________________________________________</div>
+      </div>`;
+
+  // Sección fotos devolución
+  const _secFotosDev=_fotosDevArr.length>0
+    ?`<div style="margin-bottom:12px">
+        <div style="font-size:9px;font-weight:700;color:#F59E0B;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">📷 Evidencia Fotográfica — Devolución</div>
+        <div style="display:grid;grid-template-columns:repeat(${Math.min(_fotosDevArr.length,3)},1fr);gap:8px">
+          ${_fotosDevArr.map((src,i)=>`<div style="text-align:center"><img src="${src}" style="width:100%;height:130px;object-fit:cover;border-radius:6px;border:0.5px solid #ddd"/><div style="font-size:8px;color:#888;margin-top:2px">Foto ${i+1}</div></div>`).join('')}
+        </div>
+      </div>`
+    :'';
+
   const footerDoc=`<div class="doc-footer">${emp.nombre} · RUT ${emp.rut||''} · ${emp.direccion||''}</div>`;
 
   let html='';
@@ -1631,31 +1684,7 @@ function emitirDevolucion(id){
           </div>
         </div>
 
-        <div class="sec-hdr">2. Estado al recibir</div>
-        <div class="sec-body">
-          <div class="chk-row"><strong style="min-width:105px">Estado general:</strong>
-            <span class="chk">&nbsp;</span> Óptimo &nbsp;&nbsp;
-            <span class="chk">&nbsp;</span> Con daños &nbsp;&nbsp;
-            <span class="chk">&nbsp;</span> Sucio
-          </div>
-          <div class="chk-row"><strong style="min-width:105px">Combustible:</strong>
-            <span class="chk">&nbsp;</span> Lleno &nbsp;&nbsp;
-            <span class="chk">&nbsp;</span> Medio &nbsp;&nbsp;
-            <span class="chk">&nbsp;</span> Bajo &nbsp;&nbsp;
-            <span class="chk">&nbsp;</span> Vacío
-          </div>
-          <div class="chk-row"><strong style="min-width:105px">Documentación:</strong>
-            <span class="chk">&nbsp;</span> Permiso Circulación &nbsp;&nbsp;
-            <span class="chk">&nbsp;</span> SOAP &nbsp;&nbsp;
-            <span class="chk">&nbsp;</span> Rev. Técnica
-          </div>
-          <div class="chk-row"><strong style="min-width:105px">Accesorios:</strong>
-            <span class="chk">&nbsp;</span> Completos &nbsp;&nbsp;
-            <span class="chk">&nbsp;</span> Faltantes: <span class="field-blank" style="min-width:180px">&nbsp;</span>
-          </div>
-          <div style="font-size:10px;margin-top:6px"><strong>Observaciones / daños nuevos:</strong></div>
-          <div class="obs-box">______________________________________________________________________<br>______________________________________________________________________</div>
-        </div>
+        ${_secEstadoDev}
 
         ${garantia>0?`<div class="sec-hdr">3. Liquidación de garantía</div>
         <div class="sec-body">
@@ -1670,6 +1699,7 @@ function emitirDevolucion(id){
           </div>
         </div>`:''}
 
+        ${_secFotosDev}
         <div class="firmas">
           <div class="firma"><div class="firma-line"><div class="nombre">${emp.nombre}</div><div class="rut">RUT: ${emp.rut||''}</div><div class="rol">Arrendador — Recibe</div></div></div>
           <div class="firma"><div class="firma-line"><div class="nombre">${(cliente.nombre||'—').toUpperCase()}</div><div class="rut">RUT: ${cliente.rut||'—'}</div><div class="rol">Arrendatario — Entrega</div></div></div>
@@ -1703,20 +1733,7 @@ function emitirDevolucion(id){
           </div>
         </div>
 
-        <div class="sec-hdr">2. Estado al recibir</div>
-        <div class="sec-body">
-          <div class="chk-row"><strong style="min-width:105px">Estado equipo:</strong>
-            <span class="chk">&nbsp;</span> Óptimo &nbsp;&nbsp;
-            <span class="chk">&nbsp;</span> Con daños &nbsp;&nbsp;
-            <span class="chk">&nbsp;</span> Sucio
-          </div>
-          <div class="chk-row"><strong style="min-width:105px">Accesorios:</strong>
-            <span class="chk">&nbsp;</span> Completos &nbsp;&nbsp;
-            <span class="chk">&nbsp;</span> Faltantes: <span class="field-blank" style="min-width:180px">&nbsp;</span>
-          </div>
-          <div style="font-size:10px;margin-top:6px"><strong>Observaciones / daños nuevos:</strong></div>
-          <div class="obs-box">______________________________________________________________________<br>______________________________________________________________________</div>
-        </div>
+        ${_secEstadoDev}
 
         ${garantia>0?`<div class="sec-hdr">3. Liquidación de garantía</div>
         <div class="sec-body">
@@ -1745,33 +1762,8 @@ function emitirDevolucion(id){
   }
 
   // ── FOTOS ENTREGA Y DEVOLUCIÓN ──
-  let fotosEntrega=[], fotosDevol=[];
-  try{fotosEntrega=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_fotos_entrega_'+id)||'[]');}catch(e){}
-  try{fotosDevol=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_fotos_devolucion_'+id)||'[]');}catch(e){}
-
-  const seccionFotos=(fotos,titulo,color)=>{
-    if(!fotos.length) return '';
-    return `<div style="margin-top:16px">
-      <div style="background:${color};color:white;padding:5px 10px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;border-radius:4px 4px 0 0">${titulo}</div>
-      <div style="border:0.5px solid #ccc;border-top:none;padding:10px 12px;border-radius:0 0 4px 4px">
-        <div style="display:grid;grid-template-columns:repeat(${Math.min(fotos.length,3)},1fr);gap:8px">
-          ${fotos.map((src,i)=>`
-            <div style="text-align:center">
-              <img src="${src}" style="width:100%;height:140px;object-fit:cover;border-radius:6px;border:0.5px solid #ddd"/>
-              <div style="font-size:8px;color:#888;margin-top:3px">Foto ${i+1}</div>
-            </div>`).join('')}
-        </div>
-      </div>
-    </div>`;
-  };
-
-  const htmlFotos = seccionFotos(fotosEntrega,'📷 Evidencia Fotográfica — Entrega','#1a1a1a')
-                  + seccionFotos(fotosDevol,'📸 Evidencia Fotográfica — Devolución','#374151');
-
-  // Insertar fotos antes de las firmas
-  const htmlFinal = htmlFotos
-    ? html.replace('<div class="firmas">', htmlFotos+'<div class="firmas">')
-    : html;
+  // Usar fotos precalculadas del terreno
+  const htmlFinal = html;
 
   const ventana=window.open('','_blank','width=820,height=700');
   ventana.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/>

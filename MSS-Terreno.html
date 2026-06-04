@@ -267,12 +267,12 @@ select.fi{appearance:none;}
   <div id="paso3" style="display:none">
     <div style="margin-bottom:16px">
       <div class="step-bar"><div class="step done"></div><div class="step done"></div><div class="step on"></div><div class="step"></div></div>
-      <div style="font-size:16px;font-weight:900;margin-bottom:4px">Evidencia Fotográfica</div>
-      <div style="font-size:12px;color:var(--muted)">Sube hasta 5 fotos del estado del equipo</div>
+      <div style="font-size:16px;font-weight:900;margin-bottom:4px" id="tituloPaso3">Evidencia Fotográfica</div>
+      <div style="font-size:12px;color:var(--muted)" id="subtituloPaso3">Sube hasta 5 fotos del estado del equipo al devolver</div>
     </div>
 
-    <div class="card">
-      <div class="card-title">Fotos del equipo <span style="font-size:10px;color:var(--muted);font-weight:400">(máx. 5)</span></div>
+    <div class="card" id="cardFotos" style="display:none">
+      <div class="card-title">📸 Fotos del estado del equipo <span style="font-size:10px;color:var(--muted);font-weight:400">(máx. 5 · solo en devolución)</span></div>
       <div class="foto-grid" id="fotoGrid">
         <div class="foto-slot" onclick="document.getElementById('inputFotoCamera').click()">📷</div>
       </div>
@@ -478,6 +478,11 @@ function irPaso(n) {
     _estado.cliTel = document.getElementById('cliTelM').value;
     // Actualizar header
     document.getElementById('hdrSub').textContent = _estado.contrato + ' · ' + (_estado.tipo === 'entrega' ? 'Entrega' : 'Devolución');
+  }
+  if (n === 3) {
+    // Mostrar fotos solo en devolución
+    const cardF = document.getElementById('cardFotos');
+    if(cardF) cardF.style.display = _estado.tipo === 'devolucion' ? 'block' : 'none';
   }
   if (n === 4) initFirma();
   for (let i = 1; i <= 4; i++) {
