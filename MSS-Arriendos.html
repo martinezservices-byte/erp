@@ -1218,7 +1218,7 @@ function emitirContrato(id){
         +(_evVeh.cliTel?'<div><strong>Tel:</strong> '+_evVeh.cliTel+'</div>':'')
         +'<div><strong>Fecha:</strong> '+new Date(_evVeh.fecha).toLocaleString("es-CL")+'</div>'
         +'</div>'
-        +(_firmaVeh?'<div style="margin-top:8px"><div style="font-size:9px;color:#666;margin-bottom:3px">FIRMA DIGITAL:</div><img src="'+_firmaVeh+'" style="max-height:100px;max-width:280px;display:block;border:0.5px solid #ddd;border-radius:4px;background:white"/></div>':'')
+        +(_firmaVeh?'<div style="margin-top:8px"><div style="font-size:9px;color:#666;margin-bottom:3px">FIRMA DIGITAL:</div><img src="'+_firmaVeh+'" style="max-height:130px;max-width:340px;display:block;margin-top:4px;border:1px solid #ccc;border-radius:4px;background:white;padding:4px"/></div>':'')
         +'</div>';
     })();
 
@@ -1373,7 +1373,7 @@ function emitirContrato(id){
         +(_evMaq2.cliTel?'<div><strong>Tel:</strong> '+_evMaq2.cliTel+'</div>':'')
         +'<div><strong>Fecha:</strong> '+new Date(_evMaq2.fecha).toLocaleString("es-CL")+'</div>'
         +'</div>'
-        +(_firmaMaq?'<div style="margin-top:8px"><div style="font-size:9px;color:#666;margin-bottom:3px">FIRMA DIGITAL:</div><img src="'+_firmaMaq+'" style="max-height:100px;max-width:280px;display:block;border:0.5px solid #ddd;border-radius:4px;background:white"/></div>':'')
+        +(_firmaMaq?'<div style="margin-top:8px"><div style="font-size:9px;color:#666;margin-bottom:3px">FIRMA DIGITAL:</div><img src="'+_firmaMaq+'" style="max-height:130px;max-width:340px;display:block;margin-top:4px;border:1px solid #ccc;border-radius:4px;background:white;padding:4px"/></div>':'')
         +'</div>';
     })();
     const condDespacho=a.tipoDespacho==='flete'?'Con costo adicional':a.tipoDespacho==='despacho'?'Despacho sin costo':'Retira cliente';
@@ -1629,7 +1629,7 @@ function emitirDevolucion(id){
           ${_evDev.obs?`<div style="grid-column:1/-1"><strong>Observaciones:</strong> ${_evDev.obs}</div>`:''}
           <div><strong>Fecha:</strong> ${new Date(_evDev.fecha).toLocaleString('es-CL')}</div>
         </div>
-        ${_firmaDev?`<div style="margin-top:8px"><div style="font-size:9px;color:#666;margin-bottom:4px">FIRMA DIGITAL DEL CLIENTE:</div><img src="${_firmaDev}" style="max-height:100px;max-width:280px;display:block;border:0.5px solid #ddd;border-radius:4px;background:white"/></div>`:''}
+        ${_firmaDev?`<div style="margin-top:8px"><div style="font-size:9px;color:#666;margin-bottom:4px">FIRMA DIGITAL DEL CLIENTE:</div><img src="${_firmaDev}" style="max-height:130px;max-width:340px;display:block;margin-top:4px;border:1px solid #ccc;border-radius:4px;background:white;padding:4px"/></div>`:''}
       </div>`
     :`<div class="sec-hdr">2. Estado al recibir</div>
       <div class="sec-body">
@@ -1797,7 +1797,6 @@ function emitirDevolucion(id){
   <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
   ${botonesEnvio}
   ${htmlFinal}
-  ${botonesEnvio}
   <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
   </body></html>`);
   ventana.document.close();
@@ -2892,6 +2891,10 @@ rDash();
           cliNombre: data.cliNombre || '',
           cliTel: data.cliTel || '',
           encargado: data.encargado || '',
+          devFecha: data.devFecha || '',
+          devHora: data.devHora || '',
+          devAccesorios: data.devAccesorios || '',
+          devGarantia: data.devGarantia || '',
           fecha: data.fecha || new Date().toISOString()
         }));
 
