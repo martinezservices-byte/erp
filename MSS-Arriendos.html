@@ -1394,12 +1394,16 @@ function emitirContrato(id){
           </table>
         </div>
 
-        <div class="sec-hdr">2. Accesorios y herramientas entregadas</div>
+        \${(()=>{
+          try{const ev=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_evidencia_entrega_'+a.id)||'null');
+          if(ev) return '';}catch(e){}
+          return \`<div class="sec-hdr">2. Accesorios y herramientas entregadas</div>
         <div class="sec-body">
           <div style="font-size:10px;margin-bottom:4px">Detalle: <span class="field-blank" style="min-width:320px">&nbsp;</span></div>
           <div style="font-size:10px">Observaciones generales:</div>
           <div class="obs-box">______________________________________________________________________</div>
-        </div>
+        </div>\`;
+        })()}
 
         <div class="sec-hdr">3. Datos de despacho</div>
         <div class="sec-body">
@@ -1412,7 +1416,11 @@ function emitirContrato(id){
           <div style="font-size:10px;padding:6px 0 0"><strong>Hora retiro estimada:</strong> <span class="field-blank" style="min-width:80px">&nbsp;</span></div>
         </div>
 
-        <div style="font-size:10px;margin:8px 0 4px"><strong>Recibe conforme (cliente):</strong> <span class="field-blank" style="min-width:220px">&nbsp;</span></div>
+        \${(()=>{
+          try{const ev=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_evidencia_entrega_'+a.id)||'null');
+          if(ev) return '';}catch(e){}
+          return '<div style="font-size:10px;margin:8px 0 4px"><strong>Recibe conforme (cliente):</strong> <span class=\'field-blank\' style=\'min-width:220px\'>&nbsp;</span></div>';
+        })()}
 
         ${(()=>{
           try{
