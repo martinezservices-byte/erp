@@ -1441,7 +1441,7 @@ function emitirContrato(id){
 
         ${_secRecibeConf}
 
-        ${_secTerrenoVeh}
+        ${_secTerrenoMaq}
 
         <div class="firmas">
           <div class="firma"><div class="firma-line"><div class="nombre">${emp.nombre}</div><div class="rut">RUT: ${emp.rut||''}</div><div class="rol">Arrendador</div></div></div>
@@ -1453,6 +1453,10 @@ function emitirContrato(id){
   }
 
   const ventana=window.open('','_blank','width=920,height=750');
+  if(!ventana||ventana.closed){
+    alert('⚠ El navegador bloqueó la ventana emergente.\nHaz clic en el icono de bloqueo en la barra de dirección y permite las ventanas emergentes para este sitio.');
+    return;
+  }
   ventana.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/>
   <title>Contrato ${a.num}</title>
   <style>${estilosDoc()}</style></head><body>
