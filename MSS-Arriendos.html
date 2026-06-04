@@ -979,7 +979,7 @@ function rArriendos(){
           <button class="bsm" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--acc);padding:3px 7px;border-radius:5px;font-size:9px;cursor:pointer" onclick="emitirContrato(${a.id})" title="Contrato PDF">📋</button>
           <button class="bsm" style="background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:#818CF8;padding:3px 7px;border-radius:5px;font-size:9px;cursor:pointer" onclick="gestionarFotos(${a.id},'${a.num}','entrega')" title="Fotos Entrega">📷</button>
           <button class="bsm" style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#10B981;padding:3px 7px;border-radius:5px;font-size:9px;cursor:pointer" onclick="gestionarFotos(${a.id},'${a.num}','devolucion')" title="Fotos Devolución">📸</button>
-          <button class="bsm" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:var(--ok);padding:3px 7px;border-radius:5px;font-size:9px;cursor:pointer" onclick="emitirDevolucion(${a.id})" title="Comprobante Devolución">🔄</button>
+          <button class="bsm" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:var(--ok);padding:3px 7px;border-radius:5px;font-size:9px;cursor:pointer" onclick="abrirModalDevolucion(${a.id})" title="Comprobante Devolución">🔄</button>
           <button class="bsm bd" onclick="delArriendo(${a.id})">✕</button>
         </div></td>
       </tr>`;}).join('');
@@ -1785,17 +1785,19 @@ function emitirDevolucion(id){
     ? 'mailto:'+cliente.email+'?subject=Comprobante+Devolución+'+a.num+'&body='+encodeURIComponent('Estimado/a '+cliente.nombre+',\n\nAdjuntamos el comprobante de devolución del contrato '+a.num+'.\n\nGracias por su confianza.\n\n'+emp.nombre)
     : '';
 
-  const botonesEnvio = `
+  const botonesEnvio = (cliWANum||emailLink) ? `
     <div style="display:flex;gap:10px;margin:16px auto;max-width:600px;padding:0 20px;flex-wrap:wrap">
       ${cliWANum?`<a href="https://wa.me/${cliWANum}?text=${msgDevWA}" target="_blank" style="flex:1;min-width:160px;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;background:#25D366;color:white;border-radius:8px;text-decoration:none;font-size:13px;font-weight:700">📱 WhatsApp al cliente</a>`:''}
-      ${emailLink?`<a href="${emailLink}" style="flex:1;min-width:160px;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;background:#3B82F6;color:white;border-radius:8px;text-decoration:none;font-size:13px;font-weight:700">📧 Enviar por Email</a>`:''}
-    </div>`;
+      ${emailLink?`<a href="${emailLink}" style="flex:1;min-width:160px;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;background:#3B82F6;color:white;border-radius:8px;text-decoration:none;font-size:13px;font-weight:700">📧 Email al cliente</a>`:''}
+    </div>` : '';
 
   ventana.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/>
   <title>Devolución ${a.num}</title>
-  <style>${estilosDoc()}</style></head><body>
+  <style>${estilosDoc()}
+  @media print { .no-print { display:none!important; } }
+  </style></head><body>
+  <div class="no-print">${botonesEnvio}</div>
   <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
-  ${botonesEnvio}
   ${htmlFinal}
   <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
   </body></html>`);
@@ -2789,6 +2791,104 @@ function eliminarFotoModal(idx){
   fotos.splice(idx,1);
   localStorage.setItem(key,JSON.stringify(fotos));
   renderFotosModal(_gestionFotosId,_gestionFotosTipo);
+}
+
+// ═══════════════════════════════════════════════════
+// MODAL DEVOLUCIÓN — se llena desde el ERP directamente
+// ═══════════════════════════════════════════════════
+function abrirModalDevolucion(id) {
+  const a = ARRIENDOS.find(x=>parseInt(x.id)===parseInt(id));
+  if(!a) return;
+  const cliente = CLIENTES.find(x=>parseInt(x.id)===parseInt(a.clienteId))||{};
+  const activo  = ACTIVOS.find(x=>parseInt(x.id)===parseInt(a.activoId))||{};
+  const hoy = new Date().toISOString().split('T')[0];
+  const hora = new Date().toTimeString().slice(0,5);
+
+  let modal = document.getElementById('moDevolucionERP');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'moDevolucionERP';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto';
+    document.body.appendChild(modal);
+  }
+  modal.innerHTML = `
+    <div style="background:#08101C;border-radius:13px;padding:22px;border:1px solid rgba(245,158,11,0.3);width:520px;max-height:90vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div>
+          <div style="font-size:14px;font-weight:900;color:#FFFBEB">🔄 Comprobante de Devolución</div>
+          <div style="font-size:11px;color:#78716C;margin-top:2px">${a.num} · ${cliente.nombre||'—'} · ${activo.nombre||a.activoNombre}</div>
+        </div>
+        <button onclick="document.getElementById('moDevolucionERP').style.display='none'" style="background:none;border:none;color:#78716C;font-size:20px;cursor:pointer">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><label style="font-size:10px;color:#78716C;text-transform:uppercase;letter-spacing:1px;font-family:monospace">Encargado que recibe</label>
+            <input id="devEncargado" type="text" value="${EMP.contacto||''}" placeholder="Gaudy / Joseph / otro"
+              style="width:100%;margin-top:4px;padding:9px;background:#04080F;border:1px solid rgba(245,158,11,0.2);border-radius:7px;color:#FFFBEB;font-size:13px;outline:none"/></div>
+          <div><label style="font-size:10px;color:#78716C;text-transform:uppercase;letter-spacing:1px;font-family:monospace">RUT encargado</label>
+            <input id="devRutEnc" type="text" value="${EMP.rut_rep||''}" placeholder="12.345.678-9"
+              style="width:100%;margin-top:4px;padding:9px;background:#04080F;border:1px solid rgba(245,158,11,0.2);border-radius:7px;color:#FFFBEB;font-size:13px;outline:none"/></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><label style="font-size:10px;color:#78716C;text-transform:uppercase;letter-spacing:1px;font-family:monospace">Fecha devolución</label>
+            <input id="devFechaERP" type="date" value="${hoy}"
+              style="width:100%;margin-top:4px;padding:9px;background:#04080F;border:1px solid rgba(245,158,11,0.2);border-radius:7px;color:#FFFBEB;font-size:13px;outline:none"/></div>
+          <div><label style="font-size:10px;color:#78716C;text-transform:uppercase;letter-spacing:1px;font-family:monospace">Hora</label>
+            <input id="devHoraERP" type="time" value="${hora}"
+              style="width:100%;margin-top:4px;padding:9px;background:#04080F;border:1px solid rgba(245,158,11,0.2);border-radius:7px;color:#FFFBEB;font-size:13px;outline:none"/></div>
+        </div>
+        <div><label style="font-size:10px;color:#78716C;text-transform:uppercase;letter-spacing:1px;font-family:monospace">Estado del equipo</label>
+          <select id="devEstadoERP" style="width:100%;margin-top:4px;padding:9px;background:#04080F;border:1px solid rgba(245,158,11,0.2);border-radius:7px;color:#FFFBEB;font-size:13px;outline:none">
+            <option value="optimo">✅ Óptimo — sin daños</option>
+            <option value="observaciones">⚠ Con observaciones / daños menores</option>
+            <option value="danado">🔴 Con daños mayores</option>
+          </select></div>
+        <div><label style="font-size:10px;color:#78716C;text-transform:uppercase;letter-spacing:1px;font-family:monospace">Accesorios</label>
+          <select id="devAccERP" style="width:100%;margin-top:4px;padding:9px;background:#04080F;border:1px solid rgba(245,158,11,0.2);border-radius:7px;color:#FFFBEB;font-size:13px;outline:none">
+            <option value="completos">✅ Completos</option>
+            <option value="faltantes">⚠ Con faltantes</option>
+          </select></div>
+        <div><label style="font-size:10px;color:#78716C;text-transform:uppercase;letter-spacing:1px;font-family:monospace">Garantía</label>
+          <select id="devGarERP" style="width:100%;margin-top:4px;padding:9px;background:#04080F;border:1px solid rgba(245,158,11,0.2);border-radius:7px;color:#FFFBEB;font-size:13px;outline:none">
+            <option value="devuelta">💰 Devuelta completa</option>
+            <option value="parcial">⚠ Devuelta parcial (con retención)</option>
+            <option value="retenida">🔒 Retenida por daños</option>
+          </select></div>
+        <div><label style="font-size:10px;color:#78716C;text-transform:uppercase;letter-spacing:1px;font-family:monospace">Observaciones / daños</label>
+          <textarea id="devObsERP" rows="3" placeholder="Describe el estado, daños o notas..."
+            style="width:100%;margin-top:4px;padding:9px;background:#04080F;border:1px solid rgba(245,158,11,0.2);border-radius:7px;color:#FFFBEB;font-size:13px;outline:none;resize:vertical"></textarea></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button onclick="generarDevolucionERP(${id})" style="flex:1;padding:11px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:13px;background:#F59E0B;color:#1a1a1a">
+          🔄 Generar Comprobante PDF
+        </button>
+        <button onclick="document.getElementById('moDevolucionERP').style.display='none'" style="padding:11px 18px;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px;background:transparent;border:1px solid rgba(245,158,11,0.2);color:#F59E0B">
+          Cancelar
+        </button>
+      </div>
+    </div>`;
+  modal.style.display = 'flex';
+}
+
+function generarDevolucionERP(id) {
+  const encargado = document.getElementById('devEncargado').value||EMP.contacto||'—';
+  const rutEnc    = document.getElementById('devRutEnc').value||EMP.rut_rep||'—';
+  const fecha     = document.getElementById('devFechaERP').value||'';
+  const hora      = document.getElementById('devHoraERP').value||'';
+  const estado    = document.getElementById('devEstadoERP').value||'optimo';
+  const accesorios= document.getElementById('devAccERP').value||'completos';
+  const garantia  = document.getElementById('devGarERP').value||'devuelta';
+  const obs       = document.getElementById('devObsERP').value||'';
+  // Guardar en localStorage para que aparezca en el acta
+  const evKey = 'mss_arr'+EMP.id+'_evidencia_devolucion_'+id;
+  localStorage.setItem(evKey, JSON.stringify({
+    checklist: estado, obs, encargado, rutEnc,
+    devFecha: fecha, devHora: hora,
+    devAccesorios: accesorios, devGarantia: garantia,
+    vendedor: encargado, fecha: new Date().toISOString()
+  }));
+  document.getElementById('moDevolucionERP').style.display='none';
+  emitirDevolucion(id);
 }
 
 // INIT

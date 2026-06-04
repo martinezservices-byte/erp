@@ -302,42 +302,7 @@ select.fi{appearance:none;}
       <div style="font-size:12px;color:var(--muted)">Firma del cliente y generación del QR</div>
     </div>
 
-    <div class="card" id="cardDevolucion" style="display:none">
-      <div class="card-title">📋 Datos de la devolución</div>
-      <div class="fg">
-        <label>Encargado que recibe el equipo</label>
-        <input class="fi" id="encargadoRecibe" type="text" placeholder="Ej: Gaudy Martínez / Joseph Pajuelo"/>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <div class="fg">
-          <label>Fecha devolución</label>
-          <input class="fi" id="devFecha" type="date"/>
-        </div>
-        <div class="fg">
-          <label>Hora</label>
-          <input class="fi" id="devHora" type="time" placeholder="HH:MM"/>
-        </div>
-      </div>
-      <div class="fg">
-        <label>Estado accesorios</label>
-        <select class="fi" id="devAccesorios">
-          <option value="completos">✅ Completos</option>
-          <option value="faltantes">⚠ Con faltantes</option>
-        </select>
-      </div>
-      <div class="fg">
-        <label>Garantía</label>
-        <select class="fi" id="devGarantia">
-          <option value="devuelta">💰 Devuelta completa</option>
-          <option value="parcial">⚠ Devuelta parcial (con retención)</option>
-          <option value="retenida">🔒 Retenida (daños)</option>
-        </select>
-      </div>
-      <div class="fg">
-        <label>Observaciones / daños nuevos</label>
-        <textarea class="fi" id="devObs" rows="3" placeholder="Describe daños, faltantes u observaciones..."></textarea>
-      </div>
-    </div>
+
 
     <div class="card">
       <div class="card-title">Firma del cliente</div>
@@ -523,17 +488,6 @@ function irPaso(n) {
   }
   if (n === 4) {
     initFirma();
-    // Mostrar datos devolución solo cuando es devolución
-    const cardDev = document.getElementById('cardDevolucion');
-    if(cardDev) cardDev.style.display = _estado.tipo === 'devolucion' ? 'block' : 'none';
-    // Pre-llenar fecha de hoy
-    const devFecha = document.getElementById('devFecha');
-    if(devFecha && !devFecha.value) devFecha.value = new Date().toISOString().split('T')[0];
-    const devHora = document.getElementById('devHora');
-    if(devHora && !devHora.value) {
-      const now = new Date();
-      devHora.value = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-    }
   }
   for (let i = 1; i <= 4; i++) {
     const el = document.getElementById('paso' + i);
@@ -714,22 +668,12 @@ function finalizar() {
   } catch(e){}
 
   // Link liviano: solo datos + firma mini (sin fotos)
-  const encargado = document.getElementById('encargadoRecibe')?.value || _estado.vendedor;
-  const devFechaVal = document.getElementById('devFecha')?.value || '';
-  const devHoraVal  = document.getElementById('devHora')?.value  || '';
-  const devObsVal   = document.getElementById('devObs')?.value   || obs;
-  const devAccVal   = document.getElementById('devAccesorios')?.value || 'completos';
-  const devGarVal   = document.getElementById('devGarantia')?.value   || 'devuelta';
-
   const dataQR = {
     v:3, emp:empId, ctto:contratoId, tipo,
-    chk:_estado.checklist, obs: devObsVal,
+    chk:_estado.checklist, obs,
     gps:_estado.gps,
     vend:_estado.vendedor, vendTel:_estado.vendTel,
     cliNombre:_estado.cliNombre, cliTel:_estado.cliTel,
-    encargado: encargado,
-    devFecha: devFechaVal, devHora: devHoraVal,
-    devAccesorios: devAccVal, devGarantia: devGarVal,
     fecha:new Date().toISOString(),
     firma: firmaMin,
     nFotos: _estado.fotos.length
