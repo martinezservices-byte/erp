@@ -272,14 +272,20 @@ select.fi{appearance:none;}
     </div>
 
     <div class="card">
-      <div class="card-title">Fotos del equipo</div>
+      <div class="card-title">Fotos del equipo <span style="font-size:10px;color:var(--muted);font-weight:400">(máx. 5)</span></div>
       <div class="foto-grid" id="fotoGrid">
-        <div class="foto-slot" onclick="tomarFoto()" id="addFotoBtn">📷</div>
+        <div class="foto-slot" onclick="document.getElementById('inputFotoCamera').click()">📷</div>
       </div>
-      <input type="file" id="inputFoto" accept="image/*" capture="environment" multiple style="display:none" onchange="procesarFotos(this)"/>
-      <button class="btn btn-outline" onclick="document.getElementById('inputFoto').click()">
-        📁 Elegir desde galería
-      </button>
+      <input type="file" id="inputFotoCamera" accept="image/*" capture="environment" multiple style="display:none" onchange="procesarFotos(this)"/>
+      <input type="file" id="inputFotoGaleria" accept="image/*" multiple style="display:none" onchange="procesarFotos(this)"/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+        <button class="btn btn-outline" onclick="document.getElementById('inputFotoCamera').click()">
+          📷 Tomar foto
+        </button>
+        <button class="btn btn-outline" onclick="document.getElementById('inputFotoGaleria').click()">
+          📁 Desde galería
+        </button>
+      </div>
     </div>
 
     <div style="display:flex;gap:8px;margin-top:8px">
@@ -532,9 +538,7 @@ function obtenerGPS() {
 // FOTOS
 // ═══════════════════════════════════════════════
 function tomarFoto() {
-  const input = document.getElementById('inputFoto');
-  input.setAttribute('capture', 'environment');
-  input.click();
+  document.getElementById('inputFotoCamera').click();
 }
 
 function procesarFotos(input) {

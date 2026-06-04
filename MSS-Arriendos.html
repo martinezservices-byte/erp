@@ -1254,6 +1254,28 @@ function emitirContrato(id){
 
         <div style="font-size:10px;margin:8px 0 4px"><strong>Recibe conforme (cliente):</strong> <span class="field-blank" style="min-width:220px">&nbsp;</span></div>
 
+        \${(()=>{
+          try{
+            const ev=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_evidencia_entrega_'+a.id)||'null');
+            if(!ev) return '';
+            const chkMap={optimo:'\u2705 \u00d3ptimo',observaciones:'\u26a0 Con Observaciones',mantencion:'\ud83d\udd27 Requiere Manten\u00f3cion'};
+            const firma=localStorage.getItem('mss_arr'+EMP.id+'_firma_entrega_'+a.id)||null;
+            return '<div style="border:0.5px solid #ccc;border-radius:4px;padding:10px 12px;margin-bottom:10px;background:#fafafa">'
+              +'<div style="font-size:9px;font-weight:700;color:#F59E0B;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">\ud83d\udcf1 Datos registrados desde terreno</div>'
+              +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px">'
+              +'<div><strong>Estado:</strong> '+(chkMap[ev.checklist]||ev.checklist)+'</div>'
+              +'<div><strong>Registrado por:</strong> '+(ev.vendedor||'\u2014')+'</div>'
+              +(ev.gps?'<div><strong>GPS:</strong> '+ev.gps.lat.toFixed(5)+', '+ev.gps.lng.toFixed(5)+'</div><div><strong>Precisi\u00f3n:</strong> \u00b1'+Math.round(ev.gps.acc||0)+'m</div>':'')
+              +(ev.obs?'<div style="grid-column:1/-1"><strong>Observaciones:</strong> '+ev.obs+'</div>':'')
+              +(ev.cliNombre?'<div><strong>Cliente:</strong> '+ev.cliNombre+'</div>':'')
+              +(ev.cliTel?'<div><strong>Tel:</strong> '+ev.cliTel+'</div>':'')
+              +'<div><strong>Fecha:</strong> '+new Date(ev.fecha).toLocaleString('es-CL')+'</div>'
+              +'</div>'
+              +(firma?'<div style="margin-top:8px"><div style="font-size:9px;color:#666;margin-bottom:3px">FIRMA DIGITAL:</div><img src="'+firma+'" style="max-height:55px;border:0.5px solid #ddd;border-radius:4px;background:white"/></div>':'')
+              +'</div>';
+          }catch(e){return '';}
+        })()}
+
         <div class="firmas">
           <div class="firma"><div class="firma-line"><div class="nombre">${emp.nombre}</div><div class="rut">RUT: ${emp.rut||''}</div><div class="rol">Arrendador</div></div></div>
           <div class="firma"><div class="firma-line"><div class="nombre">${(cliente.nombre||'—').toUpperCase()}</div><div class="rut">RUT: ${cliente.rut||'—'}</div><div class="rol">Arrendatario</div></div></div>
@@ -1387,6 +1409,28 @@ function emitirContrato(id){
         </div>
 
         <div style="font-size:10px;margin:8px 0 4px"><strong>Recibe conforme (cliente):</strong> <span class="field-blank" style="min-width:220px">&nbsp;</span></div>
+
+        ${(()=>{
+          try{
+            const ev=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_evidencia_entrega_'+a.id)||'null');
+            if(!ev) return '';
+            const chkMap={optimo:'✅ Óptimo',observaciones:'⚠ Con Observaciones',mantencion:'🔧 Requiere Mantención'};
+            const firma=localStorage.getItem('mss_arr'+EMP.id+'_firma_entrega_'+a.id)||null;
+            return '<div style="border:0.5px solid #ccc;border-radius:4px;padding:10px 12px;margin-bottom:10px;background:#fafafa">'
+              +'<div style="font-size:9px;font-weight:700;color:#F59E0B;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">📱 Datos registrados desde terreno</div>'
+              +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px">'
+              +'<div><strong>Estado:</strong> '+(chkMap[ev.checklist]||ev.checklist)+'</div>'
+              +'<div><strong>Registrado por:</strong> '+(ev.vendedor||'—')+'</div>'
+              +(ev.gps?'<div><strong>GPS:</strong> '+ev.gps.lat.toFixed(5)+', '+ev.gps.lng.toFixed(5)+'</div><div><strong>Precisión:</strong> ±'+Math.round(ev.gps.acc||0)+'m</div>':'')
+              +(ev.obs?'<div style="grid-column:1/-1"><strong>Observaciones:</strong> '+ev.obs+'</div>':'')
+              +(ev.cliNombre?'<div><strong>Cliente:</strong> '+ev.cliNombre+'</div>':'')
+              +(ev.cliTel?'<div><strong>Tel:</strong> '+ev.cliTel+'</div>':'')
+              +'<div><strong>Fecha:</strong> '+new Date(ev.fecha).toLocaleString("es-CL")+'</div>'
+              +'</div>'
+              +(firma?'<div style="margin-top:8px"><div style="font-size:9px;color:#666;margin-bottom:3px">FIRMA DIGITAL:</div><img src="'+firma+'" style="max-height:55px;border:0.5px solid #ddd;border-radius:4px;background:white"/></div>':'')
+              +'</div>';
+          }catch(e){return '';}
+        })()}
 
         <div class="firmas">
           <div class="firma"><div class="firma-line"><div class="nombre">${emp.nombre}</div><div class="rut">RUT: ${emp.rut||''}</div><div class="rol">Arrendador</div></div></div>
@@ -2768,9 +2812,21 @@ rDash();
         // Limpiar URL
         window.history.replaceState({}, '', window.location.pathname);
 
-        const infoExtra = arrMatch ? '\nFotos y firma vinculadas al contrato ✓' : '\n(Abre el ERP en el mismo navegador del celular para ver las fotos)';
-        alert('✅ Datos del celular cargados correctamente al contrato ' + data.ctto + infoExtra);
-        // Ir a tab arriendos
+        // Guardar evidencia completa para usar en el acta PDF
+        const keyEv = 'mss_arr' + empId + '_evidencia_' + data.tipo + '_' + (arrMatch ? arrMatch.id : data.ctto);
+        localStorage.setItem(keyEv, JSON.stringify({
+          checklist: data.chk,
+          obs: data.obs || '',
+          gps: data.gps || null,
+          vendedor: data.vend || '',
+          vendTel: data.vendTel || '',
+          cliNombre: data.cliNombre || '',
+          cliTel: data.cliTel || '',
+          fecha: data.fecha || new Date().toISOString()
+        }));
+
+        const infoExtra = arrMatch ? '\nFotos, firma y datos del terreno vinculados ✓' : '\n(Abre el ERP en el mismo navegador del celular para ver las fotos)';
+        alert('✅ Datos del celular cargados al contrato ' + data.ctto + infoExtra);
         T('arriendos');
         rArriendos();
       }
