@@ -1672,12 +1672,41 @@ function emitirDevolucion(id){
     </div>`;
   }
 
-  const ventana=window.open('','_blank','width=820,height=650');
+  // ── FOTOS ENTREGA Y DEVOLUCIÓN ──
+  let fotosEntrega=[], fotosDevol=[];
+  try{fotosEntrega=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_fotos_entrega_'+id)||'[]');}catch(e){}
+  try{fotosDevol=JSON.parse(localStorage.getItem('mss_arr'+EMP.id+'_fotos_devolucion_'+id)||'[]');}catch(e){}
+
+  const seccionFotos=(fotos,titulo,color)=>{
+    if(!fotos.length) return '';
+    return `<div style="margin-top:16px">
+      <div style="background:${color};color:white;padding:5px 10px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;border-radius:4px 4px 0 0">${titulo}</div>
+      <div style="border:0.5px solid #ccc;border-top:none;padding:10px 12px;border-radius:0 0 4px 4px">
+        <div style="display:grid;grid-template-columns:repeat(${Math.min(fotos.length,3)},1fr);gap:8px">
+          ${fotos.map((src,i)=>`
+            <div style="text-align:center">
+              <img src="${src}" style="width:100%;height:140px;object-fit:cover;border-radius:6px;border:0.5px solid #ddd"/>
+              <div style="font-size:8px;color:#888;margin-top:3px">Foto ${i+1}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  };
+
+  const htmlFotos = seccionFotos(fotosEntrega,'📷 Evidencia Fotográfica — Entrega','#1a1a1a')
+                  + seccionFotos(fotosDevol,'📸 Evidencia Fotográfica — Devolución','#374151');
+
+  // Insertar fotos antes de las firmas
+  const htmlFinal = htmlFotos
+    ? html.replace('<div class="firmas">', htmlFotos+'<div class="firmas">')
+    : html;
+
+  const ventana=window.open('','_blank','width=820,height=700');
   ventana.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/>
   <title>Devolución ${a.num}</title>
   <style>${estilosDoc()}</style></head><body>
   <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
-  ${html}
+  ${htmlFinal}
   <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar como PDF</button>
   </body></html>`);
   ventana.document.close();
