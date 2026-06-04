@@ -1689,13 +1689,9 @@ function emitirDevolucion(id){
         ${garantia>0?`<div class="sec-hdr">3. Liquidación de garantía</div>
         <div class="sec-body">
           <div class="grid2">
-            <div class="cell"><strong>Garantía recibida:</strong> ${clp(garantia)} (EFECTIVO [${chkEfec}] TRANSF. [${chkTran}])</div>
-            <div class="cell"><strong>Forma devolución garantía:</strong><br>
-            ${(()=>{
-              const fg=_evDev&&_evDev.devFormaGar?_evDev.devFormaGar:(a.formaPagoGarantia||'').toLowerCase().includes('efectivo')?'efectivo':'transferencia';
-              return '<span style="font-family:monospace">EFECTIVO ['+(fg==='efectivo'?'X':' ')+'] &nbsp; TRANSFERENCIA ['+(fg==='transferencia'?'X':' ')+']</span>';
-            })()}
-          </div>
+            <div class="cell"><strong>Garantía recibida:</strong> ${clp(garantia)}</div>
+            <div class="cell"><strong>Recibida mediante:</strong> <span style="font-family:monospace">EFECTIVO [${chkEfec}] &nbsp; TRANSF. [${chkTran}]</span></div>
+            <div class="cell" style="grid-column:1/-1"><strong>Garantía devuelta mediante:</strong> <span style="font-family:monospace">${(()=>{const fg=_evDev&&_evDev.devFormaGar?_evDev.devFormaGar:(a.formaPagoGarantia||'').toLowerCase().includes('efectivo')?'efectivo':'transferencia';return 'EFECTIVO ['+(fg==='efectivo'?'X':'&nbsp;')+'] &nbsp;&nbsp; TRANSFERENCIA ['+(fg==='transferencia'?'X':'&nbsp;')+']';})()}</span></div>
             <div class="cell"><strong>Monto devuelto:</strong> $ <span class="field-blank" style="min-width:90px">&nbsp;</span></div>
             <div class="cell"><strong>Monto retenido:</strong> $ <span class="field-blank" style="min-width:90px">&nbsp;</span></div>
           </div>
@@ -1743,13 +1739,9 @@ function emitirDevolucion(id){
         ${garantia>0?`<div class="sec-hdr">3. Liquidación de garantía</div>
         <div class="sec-body">
           <div class="grid2">
-            <div class="cell"><strong>Garantía recibida:</strong> ${clp(garantia)} (EFECTIVO [${chkEfec}] TRANSF. [${chkTran}])</div>
-            <div class="cell"><strong>Forma devolución garantía:</strong><br>
-            ${(()=>{
-              const fg=_evDev&&_evDev.devFormaGar?_evDev.devFormaGar:(a.formaPagoGarantia||'').toLowerCase().includes('efectivo')?'efectivo':'transferencia';
-              return '<span style="font-family:monospace">EFECTIVO ['+(fg==='efectivo'?'X':' ')+'] &nbsp; TRANSFERENCIA ['+(fg==='transferencia'?'X':' ')+']</span>';
-            })()}
-          </div>
+            <div class="cell"><strong>Garantía recibida:</strong> ${clp(garantia)}</div>
+            <div class="cell"><strong>Recibida mediante:</strong> <span style="font-family:monospace">EFECTIVO [${chkEfec}] &nbsp; TRANSF. [${chkTran}]</span></div>
+            <div class="cell" style="grid-column:1/-1"><strong>Garantía devuelta mediante:</strong> <span style="font-family:monospace">${(()=>{const fg=_evDev&&_evDev.devFormaGar?_evDev.devFormaGar:(a.formaPagoGarantia||'').toLowerCase().includes('efectivo')?'efectivo':'transferencia';return 'EFECTIVO ['+(fg==='efectivo'?'X':'&nbsp;')+'] &nbsp;&nbsp; TRANSFERENCIA ['+(fg==='transferencia'?'X':'&nbsp;')+']';})()}</span></div>
             <div class="cell"><strong>Monto devuelto:</strong> $ <span class="field-blank" style="min-width:90px">&nbsp;</span></div>
             <div class="cell"><strong>Monto retenido:</strong> $ <span class="field-blank" style="min-width:90px">&nbsp;</span></div>
           </div>
