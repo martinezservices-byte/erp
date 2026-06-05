@@ -341,64 +341,91 @@ var nextId = 300;
 var charts = {};
 
 // ── 6. STORAGE ──
-function guardar() {
-  try { localStorage.setItem(SK, JSON.stringify({data:DATA, nextId:nextId})); } catch(e) {}
+// ── Firebase ──
+var _db=null,_fbReady=false;
+async function _initFB(){
+  if(_fbReady)return;
+  try{
+    var m1=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    var m2=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    var FB={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
+    var app=m1.getApps().length?m1.getApps()[0]:m1.initializeApp(FB);
+    _db=m2.getFirestore(app);window._fb2=m2;_fbReady=true;
+    console.log('✅ Finanzas Firebase OK');
+  }catch(e){_fbReady=false;console.warn('Firebase no disponible:',e.message);}
 }
-function cargar() {
-  try {
-    var raw = localStorage.getItem(SK);
-    if (raw) {
-      var p = JSON.parse(raw);
-      if (p.data && p.data.length > 0) {
-        DATA = p.data;
-        nextId = p.nextId || 300;
-        return;
-      }
-    }
-    // Sin datos: empezar vacío
-    DATA = [];
-    nextId = 100;
-    guardar();
-  } catch(e) {
-    DATA = [];
+function _epFin(){return 'empresas/'+EMP.id+'/finanzas/data';}
+
+function guardar() {
+  // localStorage respaldo
+  try{localStorage.setItem(SK,JSON.stringify({data:DATA,nextId:nextId}));}catch(e){}
+  // Firebase async (no bloquea)
+  if(_fbReady&&_db){
+    window._fb2.setDoc(window._fb2.doc(_db,_epFin()),{data:DATA,nextId:nextId,updated:new Date().toISOString()})
+      .catch(function(e){console.error('FB guardar:',e);});
   }
 }
 
+async function cargar() {
+  await _initFB();
+  if(_fbReady){
+    try{
+      var snap=await window._fb2.getDoc(window._fb2.doc(_db,_epFin()));
+      if(snap.exists()&&snap.data().data&&snap.data().data.length>0){
+        DATA=snap.data().data;
+        nextId=snap.data().nextId||300;
+        console.log('✅ Finanzas cargadas desde Firebase: '+DATA.length+' registros');
+        return;
+      }
+    }catch(e){console.error('FB cargar:',e);}
+  }
+  // Fallback localStorage
+  try{
+    var raw=localStorage.getItem(SK);
+    if(raw){
+      var p=JSON.parse(raw);
+      if(p.data&&p.data.length>0){DATA=p.data;nextId=p.nextId||300;return;}
+    }
+    DATA=[];nextId=100;guardar();
+  }catch(e){DATA=[];}
+}
+
 // ── 6b. SINCRONIZAR DESDE CONDOMINIO ──
-// MSS-Condominio escribe en 'mss_fin{empId}_movs' al registrar pagos GC.
-// Esta función lee esos movimientos y los fusiona en DATA para mostrarlos en Finanzas.
-function sincronizarDesdeCondominio() {
-  try {
-    var keyCondo = 'mss_fin' + EMP.id + '_movs';
-    var movsCondo = JSON.parse(localStorage.getItem(keyCondo) || '[]');
-    if (!movsCondo.length) return;
-    var cambiado = false;
-    movsCondo.forEach(function(m) {
-      if (!m.ref || !m.monto) return;
-      // Buscar si ya existe por ref (evita duplicados)
-      var existe = DATA.findIndex(function(r){ return r.srcRef === m.ref; });
-      var reg = {
-        id: existe >= 0 ? DATA[existe].id : nextId++,
-        srcRef: m.ref,
-        srcTipo: 'condominio',
-        fecha: m.fecha || new Date().toISOString().split('T')[0],
-        tipo: 'Ingreso',
-        cat: 'Gastos Comunes',
-        desc: m.desc || 'GC Condominio',
-        monto: m.monto,
-        doc: '', numDoc: '',
-        medioPago: m.forma || 'Transferencia',
-        cuenta: 'Condo'
-      };
-      if (existe >= 0) { DATA[existe] = reg; } else { DATA.push(reg); cambiado = true; }
-    });
-    if (cambiado) guardar();
-  } catch(e) { console.error('Sync Condominio→Finanzas:', e); }
+async function sincronizarDesdeCondominio() {
+  var movsCondo = [];
+  // Intentar desde Firebase primero
+  if(_fbReady&&_db){
+    try{
+      var snap=await window._fb2.getDocs(window._fb2.collection(_db,'empresas/'+EMP.id+'/cobros'));
+      snap.forEach(function(d){
+        var c=d.data();
+        if(c.pagado>0){
+          movsCondo.push({ref:'gc_'+c.unidadId+'_'+c.mes,fecha:c.fechaPago||'',desc:'GC '+(c.mes||'')+' — Unidad '+(c.unidadNum||'')+' ('+(c.prop||')'),monto:c.pagado,forma:c.forma||'Transferencia'});
+        }
+      });
+    }catch(e){}
+  }
+  // Fallback localStorage
+  if(!movsCondo.length){
+    try{
+      var keyCondo='mss_fin'+EMP.id+'_movs';
+      movsCondo=JSON.parse(localStorage.getItem(keyCondo)||'[]');
+    }catch(e){}
+  }
+  if(!movsCondo.length)return;
+  var cambiado=false;
+  movsCondo.forEach(function(m){
+    if(!m.ref||!m.monto)return;
+    var existe=DATA.findIndex(function(r){return r.srcRef===m.ref;});
+    var reg={id:existe>=0?DATA[existe].id:nextId++,srcRef:m.ref,srcTipo:'condominio',fecha:m.fecha||new Date().toISOString().split('T')[0],tipo:'Ingreso',cat:'Gastos Comunes',desc:m.desc||'GC Condominio',monto:m.monto,doc:'',numDoc:'',medioPago:m.forma||'Transferencia',cuenta:'Condo'};
+    if(existe>=0){DATA[existe]=reg;}else{DATA.push(reg);cambiado=true;}
+  });
+  if(cambiado)guardar();
 }
 
 // ── 7. SINCRONIZACIÓN CON ARRIENDOS ──
 // Cuando se registra un arriendo/flete en MSS-Arriendos, aparece acá automáticamente
-function sincronizarDesdeArriendos() {
+async function sincronizarDesdeArriendos() {
   try {
     var esMYP = EMP.rut === '78.361.479-0' || EMP.id === 3;
     var arrKey = 'mss_arr' + EMP.id + '_arriendos';
@@ -876,10 +903,12 @@ document.querySelectorAll('.modal-overlay').forEach(function(m){
 });
 
 // ── 15. INIT ──
-cargar();
-sincronizarDesdeArriendos();
-sincronizarDesdeCondominio();
-renderTodo();
+(async function(){
+  await cargar();
+  await sincronizarDesdeArriendos();
+  await sincronizarDesdeCondominio();
+  renderTodo();
+})();
 </script>
 </body>
 </html>
