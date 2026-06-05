@@ -96,6 +96,9 @@ try{var _e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}');if(_e&&_
   <div style="display:flex;gap:8px">
     <button class="bg" style="padding:6px 12px;font-size:11px" onclick="O('moCobro')">+ Cobro GC</button>
     <button class="bgh" style="padding:6px 12px;font-size:11px" onclick="O('moEgreso')">+ Egreso</button>
+    <button onclick="exportarCondCSV()" style="padding:6px 12px;font-size:11px;background:#1d4ed8;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700">📊 CSV</button>
+    <button onclick="exportarCondJSON()" style="padding:6px 12px;font-size:11px;background:#7c3aed;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700">💾 Backup</button>
+    <label style="padding:6px 12px;font-size:11px;background:#065f46;color:white;border-radius:6px;cursor:pointer;font-weight:700">📂 Importar<input type="file" accept=".json" onchange="importarCondJSON(this)" style="display:none"/></label>
   </div>
 </div>
 
@@ -634,7 +637,23 @@ function saveCobro(){
   const obj={mes:document.getElementById('coMes').value,unidadId:uId,unidadNum:u?.num||'?',prop:u?.prop||'?',gcOrd,mora,total,pagado,saldo:Math.max(0,total-pagado),estado:document.getElementById('coEstado').value,fechaPago:document.getElementById('coFecha').value,ref:document.getElementById('coComp').value,forma:document.getElementById('coForma').value,obs:document.getElementById('coObs').value};
   if(id){const i=COBROS.findIndex(c=>c.id==id);if(i>=0)COBROS[i]={...COBROS[i],...obj};}
   else COBROS.push({id:uid(),...obj});
-  save();C('moCobro');rGastos();
+  save();
+  if(pagado>0) sincronizarGCFinanzas({...obj});
+  C('moCobro');rGastos();rDash();
+}
+
+function sincronizarGCFinanzas(cobro){
+  try{
+    const empId=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}').id||2;
+    const keyFin='mss_fin'+empId+'_movs';
+    let movs=[];try{movs=JSON.parse(localStorage.getItem(keyFin)||'[]');}catch(e){}
+    const refKey='gc_'+(cobro.unidadId||'')+'_'+(cobro.mes||'').replace(/ /g,'_');
+    movs=movs.filter(m=>m.ref!==refKey);
+    movs.push({id:'gc_'+Date.now(),fecha:cobro.fechaPago||new Date().toISOString().split('T')[0],
+      desc:'GC '+(cobro.mes||'')+' — Unidad '+(cobro.unidadNum||'')+' ('+cobro.prop+')',
+      monto:cobro.pagado,tipo:'i',cat:'Gastos Comunes',forma:cobro.forma||'Transferencia',ref:refKey,origen:'condominio'});
+    localStorage.setItem(keyFin,JSON.stringify(movs));
+  }catch(e){console.error('Sync finanzas:',e);}
 }
 
 function delCobro(id){if(!confirm('¿Eliminar cobro?'))return;COBROS=COBROS.filter(c=>c.id!==id);save();rGastos();}
@@ -1000,6 +1019,64 @@ load();
 document.getElementById('condNombre').textContent=CFG.nombre||'Condominio Pioneros 2';
 document.getElementById('filtMes').value=MES;
 rDash();
+
+// ═══════════════════════
+// EXPORTAR / IMPORTAR
+// ═══════════════════════
+function exportarCondCSV(){
+  const rows=[['Mes','Unidad','Torre','Propietario','GC Ord','Mora','Total','Pagado','Saldo','Estado','Fecha Pago','Forma','Ref']];
+  COBROS.forEach(c=>{const u=UNIDADES.find(x=>x.id===c.unidadId)||{};
+    rows.push([c.mes,c.unidadNum,u.torre||'',c.prop,c.gcOrd,c.mora,c.total,c.pagado,c.saldo,c.estado,c.fechaPago||'',c.forma||'',c.ref||'']);});
+  const csv=rows.map(r=>r.map(v=>'"'+String(v||'').replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='Cobros_'+(CFG.nombre||'Condo').replace(/ /g,'_')+'_'+HOY+'.csv';a.click();
+}
+
+function exportarCondJSON(){
+  const data={cfg:CFG,unidades:UNIDADES,cobros:COBROS,egresos:EGRESOS,fondo:FONDO,novedades:NOVEDADES,ot:OT,exportado:new Date().toISOString()};
+  const a=document.createElement('a');a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data,null,2));
+  a.download='Backup_Condo_'+HOY+'.json';a.click();
+}
+
+function importarCondJSON(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{try{
+    const data=JSON.parse(e.target.result);
+    if(!confirm('¿Importar backup? Esto reemplazará los datos actuales.'))return;
+    if(data.cfg)CFG={...CFG,...data.cfg};
+    if(data.unidades)UNIDADES=data.unidades;
+    if(data.cobros)COBROS=data.cobros;
+    if(data.egresos)EGRESOS=data.egresos;
+    if(data.fondo)FONDO=data.fondo;
+    if(data.novedades)NOVEDADES=data.novedades;
+    if(data.ot)OT=data.ot;
+    save();rDash();alert('\u2705 Backup importado correctamente');
+  }catch(err){alert('\u26a0 Error: '+err.message);}};
+  reader.readAsText(file);input.value='';
+}
+
+function pdfHistorialResidente(uId){
+  const u=UNIDADES.find(x=>x.id===uId);if(!u){alert('Selecciona una unidad primero');return;}
+  const hist=COBROS.filter(c=>c.unidadId===uId).sort((a,b)=>a.mes.localeCompare(b.mes));
+  const totPag=hist.reduce((s,c)=>s+c.pagado,0),totSaldo=hist.reduce((s,c)=>s+c.saldo,0);
+  const html='<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Historial '+u.num+'</title>'
+    +'<style>body{font-family:Arial,sans-serif;padding:20px;font-size:10px;}table{width:100%;border-collapse:collapse;}th{background:#1a5c3a;color:white;padding:6px 8px;}td{padding:5px 8px;border-bottom:0.5px solid #e5e7eb;}.ok{color:#166534;font-weight:700;}.pend{color:#dc2626;font-weight:700;}@media print{button{display:none!important;}}</style></head><body>'
+    +'<div style="display:flex;justify-content:space-between;border-bottom:2px solid #1a5c3a;padding-bottom:10px;margin-bottom:14px">'
+    +'<div><div style="font-size:15px;font-weight:900;color:#1a5c3a">'+(CFG.nombre||'Condominio')+'</div><div>Admin: '+(CFG.admin||'')+'</div></div>'
+    +'<div style="text-align:right"><div style="font-size:13px;font-weight:900">HISTORIAL DE PAGOS</div><div>'+df(HOY)+'</div></div></div>'
+    +'<div style="background:#f0fff8;padding:10px;border-radius:5px;margin-bottom:14px">'
+    +'<strong>Unidad:</strong> '+u.num+' &middot; <strong>Torre:</strong> '+(u.torre||'&mdash;')+' &middot; <strong>Propietario:</strong> '+u.prop+'<br>'
+    +'<strong>Tel:</strong> '+(u.tel||'&mdash;')+' &middot; <strong>Email:</strong> '+(u.email||'&mdash;')+'</div>'
+    +'<table><thead><tr><th>Per&iacute;odo</th><th>GC</th><th>Mora</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th>Fecha</th><th>Forma</th></tr></thead><tbody>'
+    +hist.map(c=>'<tr><td>'+c.mes+'</td><td>'+clp(c.gcOrd)+'</td><td>'+(c.mora>0?'<span class=pend>'+clp(c.mora)+'</span>':clp(0))+'</td><td><strong>'+clp(c.total)+'</strong></td><td class=ok>'+clp(c.pagado)+'</td><td class='+(c.saldo>0?'pend':'ok')+'>'+clp(c.saldo)+'</td><td>'+c.estado+'</td><td>'+(c.fechaPago?df(c.fechaPago):'&mdash;')+'</td><td>'+(c.forma||'&mdash;')+'</td></tr>').join('')
+    +'</tbody><tfoot><tr style="background:#f0fff8;font-weight:700"><td colspan="3">TOTALES</td><td>&mdash;</td><td class=ok>'+clp(totPag)+'</td><td class='+(totSaldo>0?'pend':'ok')+'>'+clp(totSaldo)+'</td><td colspan="3"></td></tr></tfoot></table>'
+    +'<div style="margin-top:10px;font-size:9px;color:#6b7280">'+(CFG.nombre||'')+' &middot; Ley 21.442</div>'
+    +'<button onclick="window.print()" style="margin-top:12px;padding:10px 24px;background:#1a5c3a;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700">\uD83D\uDDB8 Imprimir PDF</button></body></html>';
+  const v=window.open('','_blank','width=900,height=700');
+  if(!v){alert('\u26a0 Permite ventanas emergentes');return;}
+  v.document.write(html);v.document.close();
+}
 </script>
 </body>
 </html>

@@ -267,18 +267,31 @@ function init(){
 
 function cargarDatos(){
   try{
+    // El ERP usa cid() que genera '_c{empId}' desde mss_empresa_actual
+    // Las claves son: mss_c{empId}_co, mss_c{empId}_u, mss_c{empId}_cfg
     const sfx = '_c'+EMP_ID;
-    const raw = localStorage.getItem('mss_condo'+sfx);
-    if(!raw){ mostrarError(); return; }
-    const data = JSON.parse(raw);
-    COBROS = data.cobros||[];
-    UNIDADES = data.unidades||[];
-    CFG_CONDO = data.cfg||{};
-    document.getElementById('hdrNombre').textContent = CFG_CONDO.nombre||'Condominio';
-    document.getElementById('hdrSub').textContent = 'Gestión en terreno · '+(UNIDADES.length)+' unidades';
+    const keyCo  = 'mss'+sfx+'_co';
+    const keyU   = 'mss'+sfx+'_u';
+    const keyCfg = 'mss'+sfx+'_cfg';
+    
+    const rawCo  = localStorage.getItem(keyCo);
+    const rawU   = localStorage.getItem(keyU);
+    const rawCfg = localStorage.getItem(keyCfg);
+    
+    if(!rawCo && !rawU){ mostrarError(); return; }
+    
+    COBROS   = JSON.parse(rawCo  || '[]');
+    UNIDADES = JSON.parse(rawU   || '[]');
+    CFG_CONDO= JSON.parse(rawCfg || '{}');
+    
+    const nombre = CFG_CONDO.nombre || 'Condominio';
+    document.getElementById('hdrNombre').textContent = nombre;
+    document.getElementById('hdrSub').textContent = 'Gestión en terreno · '+UNIDADES.length+' unidades';
+    if(document.getElementById('cfgNombre')) document.getElementById('cfgNombre').value = nombre;
     renderCobros();
     renderResumen();
   }catch(e){
+    console.error('Error cargarDatos:', e);
     mostrarError();
   }
 }
@@ -468,18 +481,15 @@ function confirmarPago(){
 function guardarCobros(){
   try{
     const sfx = '_c'+EMP_ID;
-    const raw = localStorage.getItem('mss_condo'+sfx);
-    if(!raw) return;
-    const data = JSON.parse(raw);
-    data.cobros = COBROS;
-    localStorage.setItem('mss_condo'+sfx, JSON.stringify(data));
+    // Guardar cobros con clave correcta del ERP
+    localStorage.setItem('mss'+sfx+'_co', JSON.stringify(COBROS));
     toast('✅ Guardado');
   }catch(e){toast('⚠ Error al guardar');}
 }
 
 function sincFinanzas(cobro){
   try{
-    const keyFin = 'mss_fin'+EMP_ID+'_movs';
+    const keyFin = 'mss_fin'+EMP_ID+'_movs'; // misma clave que MSS-Finanzas
     let movs = [];
     try{movs=JSON.parse(localStorage.getItem(keyFin)||'[]');}catch(e){}
     const refKey = 'cond_'+cobro.unidadId+'_'+cobro.mes;
