@@ -98,6 +98,16 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .row-fin{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
 .row-fin:last-child{border:none;}
 
+/* EMPRESA CARDS */
+.emp-card{background:var(--surf2);border:2px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px;}
+.emp-card:active{background:rgba(245,158,11,0.1);}
+.emp-card.activa{border-color:var(--gold);background:rgba(245,158,11,0.07);}
+.emp-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.emp-info{flex:1;}
+.emp-nombre{font-size:14px;font-weight:800;}
+.emp-rut{font-size:11px;color:var(--muted);margin-top:2px;}
+.emp-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(245,158,11,0.15);color:var(--gold);}
+
 /* DIVIDER */
 .divider{height:1px;background:var(--border);margin:12px 0;}
 </style>
@@ -111,7 +121,20 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
     <div class="hdr-title" id="hdrNombre">Condominio</div>
     <div class="hdr-sub" id="hdrSub">Cargando...</div>
   </div>
-  <div class="hdr-emp" onclick="cambiarTab('config',document.querySelectorAll('.tab')[2])" id="hdrEmpBadge">⚙ Config</div>
+  <div class="hdr-emp" onclick="abrirSelectorEmp()" id="hdrEmpBadge">🏢 Empresa</div>
+</div>
+
+<!-- SELECTOR EMPRESA (aparece al inicio o al tocar el badge) -->
+<div class="overlay" id="overlayEmp" style="align-items:flex-start;padding-top:0">
+  <div class="sheet" style="border-radius:0 0 20px 20px;padding-top:24px">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:28px;margin-bottom:6px">🏢</div>
+      <div style="font-size:17px;font-weight:900">Seleccionar Empresa</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">¿Con cuál empresa vas a trabajar?</div>
+    </div>
+    <div id="listaEmpresas"></div>
+    <button class="btn btn-outline" onclick="cerrar('overlayEmp')" style="margin-top:8px">Cancelar</button>
+  </div>
 </div>
 
 <!-- TABS -->
@@ -212,13 +235,10 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 <div class="screen" id="sc-config">
   <div class="card">
     <div class="card-title">🏢 Empresa activa</div>
-    <div class="fg">
-      <label>ID de empresa (Condominio = 2)</label>
-      <input class="fi" id="cfgEmpId" type="number" value="2"/>
-    </div>
-    <div class="fg">
-      <label>Nombre (opcional)</label>
-      <input class="fi" id="cfgNombre" type="text" placeholder="Condominio Pioneros 2"/>
+    <div id="cfgEmpCards"></div>
+    <div style="display:none">
+      <input id="cfgEmpId" type="number" value="2"/>
+      <input id="cfgNombre" type="text"/>
     </div>
     <button class="btn btn-gold" onclick="guardarConfig()" style="margin-bottom:10px">💾 Guardar y recargar datos</button>
     <button class="btn btn-outline btn-sm" onclick="debugLS()" style="width:auto">🔍 Diagnóstico localStorage</button>
@@ -319,18 +339,69 @@ let _waMsg = '';
 let _waTel = '';
 
 // ══════════════════════════════════════════
+// EMPRESAS — definición fija de las 3 empresas
+// ══════════════════════════════════════════
+const EMPRESAS = [
+  {id:1, nombre:'Martinez Services Spa',          rut:'76.782.954-K', icon:'🔧', color:'#10B981'},
+  {id:2, nombre:'Condominio Pioneros 2',           rut:'65.184.252-2', icon:'🏢', color:'#F59E0B'},
+  {id:3, nombre:'Martinez y Pajuelo Arriendos SpA',rut:'78.361.479-0', icon:'🚛', color:'#38BDF8'},
+];
+
+function renderEmpCards(containerId){
+  const lista = document.getElementById(containerId);
+  if(!lista) return;
+  lista.innerHTML = EMPRESAS.map(e=>`
+    <div class="emp-card ${EMP_ID===e.id?'activa':''}" onclick="elegirEmpresa(${e.id})">
+      <div class="emp-icon" style="background:${e.color}22;color:${e.color}">${e.icon}</div>
+      <div class="emp-info">
+        <div class="emp-nombre">${e.nombre}</div>
+        <div class="emp-rut">${e.rut}</div>
+      </div>
+      ${EMP_ID===e.id?'<span class="emp-badge">✓ Activa</span>':''}
+    </div>`).join('');
+}
+
+function abrirSelectorEmp(){
+  renderEmpCards('listaEmpresas');
+  abrir('overlayEmp');
+}
+
+function elegirEmpresa(id){
+  EMP_ID = id;
+  const emp = EMPRESAS.find(e=>e.id===id);
+  const nombre = emp?.nombre||'';
+  localStorage.setItem('mss_condo_movil_cfg', JSON.stringify({empId:EMP_ID, nombre}));
+  document.getElementById('hdrEmpBadge').textContent = emp?.icon+' '+nombre.split(' ').slice(0,2).join(' ');
+  document.getElementById('cfgEmpId').value = EMP_ID;
+  document.getElementById('cfgNombre').value = nombre;
+  renderEmpCards('cfgEmpCards');
+  cerrar('overlayEmp');
+  toast('✅ '+nombre);
+  cargarDatos();
+}
+
+// ══════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════
 function init(){
-  // Cargar config guardada
+  // Leer config guardada
+  let configGuardada = false;
   try{
     const c = JSON.parse(localStorage.getItem('mss_condo_movil_cfg')||'{}');
-    EMP_ID = c.empId || 2;
-    if(c.nombre){ document.getElementById('cfgNombre').value = c.nombre; }
+    if(c.empId){
+      EMP_ID = c.empId;
+      configGuardada = true;
+    }
+    if(c.nombre) document.getElementById('cfgNombre').value = c.nombre;
   }catch(e){}
   document.getElementById('cfgEmpId').value = EMP_ID;
 
-  // Fecha por defecto
+  // Actualizar badge header
+  const emp = EMPRESAS.find(e=>e.id===EMP_ID);
+  document.getElementById('hdrEmpBadge').textContent = (emp?.icon||'🏢')+' '+(emp?.nombre||'Empresa').split(' ').slice(0,2).join(' ');
+  renderEmpCards('cfgEmpCards'); // mostrar tarjetas en pantalla Config
+
+  // Fechas por defecto
   const hoy = new Date();
   const mes = hoy.getFullYear()+'-'+String(hoy.getMonth()+1).padStart(2,'0');
   document.getElementById('filMes').value = mes;
@@ -338,7 +409,12 @@ function init(){
   document.getElementById('regMes').value = mes;
   document.getElementById('regFecha').value = hoy.toISOString().split('T')[0];
 
-  cargarDatos();
+  // Si nunca eligió empresa → mostrar selector automáticamente
+  if(!configGuardada){
+    setTimeout(()=>abrirSelectorEmp(), 400);
+  } else {
+    cargarDatos();
+  }
 }
 
 // ══════════════════════════════════════════
@@ -358,21 +434,23 @@ function cargarDatos(){
     UNIDADES = rawU   ? JSON.parse(rawU)   : [];
     CFG      = rawCfg ? JSON.parse(rawCfg) : {};
 
-    const nombre = CFG.nombre || 'Condominio Pioneros 2';
+    // Nombre: prioridad → config del ERP → config guardada → empresa predefinida
+    const emp = EMPRESAS.find(e=>e.id===EMP_ID);
+    const nombre = CFG.nombre || emp?.nombre || 'Empresa '+EMP_ID;
     document.getElementById('hdrNombre').textContent = nombre;
     document.getElementById('hdrSub').textContent = UNIDADES.length+' unidades · '+COBROS.length+' cobros';
-    document.getElementById('hdrEmpBadge').textContent = 'Emp '+EMP_ID;
+    document.getElementById('hdrEmpBadge').textContent = (emp?.icon||'🏢')+' '+nombre.split(' ').slice(0,2).join(' ');
 
     llenarBlocks();
     renderCobros();
     renderResumen();
 
     if(!rawU && !rawCo){
-      toast('⚠ Sin datos — abre el ERP primero');
+      toast('⚠ Sin datos — genera cobros en el ERP primero');
     }
   }catch(e){
     console.error(e);
-    toast('⚠ Error cargando datos: '+e.message);
+    toast('⚠ Error: '+e.message);
   }
 }
 
@@ -787,7 +865,10 @@ function sincFinanzas(cobro){
 function guardarConfig(){
   EMP_ID = parseInt(document.getElementById('cfgEmpId').value)||2;
   const nombre = document.getElementById('cfgNombre').value.trim();
-  localStorage.setItem('mss_condo_movil_cfg', JSON.stringify({empId:EMP_ID,nombre}));
+  const emp = EMPRESAS.find(e=>e.id===EMP_ID);
+  const nombreFinal = nombre || emp?.nombre || 'Empresa '+EMP_ID;
+  localStorage.setItem('mss_condo_movil_cfg', JSON.stringify({empId:EMP_ID, nombre:nombreFinal}));
+  document.getElementById('hdrEmpBadge').textContent = (emp?.icon||'🏢')+' '+nombreFinal.split(' ').slice(0,2).join(' ');
   toast('✅ Config guardada — recargando...');
   setTimeout(()=>{ cargarDatos(); cambiarTab('cobros',document.querySelectorAll('.tab')[0]); },800);
 }
