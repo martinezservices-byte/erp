@@ -116,6 +116,7 @@ canvas{max-height:240px;}
   <button class="tab" onclick="showTab('control',this)">Control Financiero</button>
   <button class="tab" onclick="showTab('viabilidad',this)">Viabilidad</button>
   <button class="tab" onclick="showTab('datos',this)">⊞ Datos</button>
+  <button onclick="pdfGraficos()" style="margin-left:auto;padding:7px 16px;background:#1d4ed8;color:white;border:none;border-radius:7px;cursor:pointer;font-size:11px;font-weight:700;font-family:monospace">📄 PDF Reporte</button>
 </div>
 
 <div id="content">
@@ -298,6 +299,26 @@ canvas{max-height:240px;}
 </div>
 
 <script>
+// ── MSS AUTH GUARD ──
+(async()=>{
+  try{
+    const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const {getAuth,onAuthStateChanged}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const FB={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
+    const app=getApps().length?getApps()[0]:initializeApp(FB);
+    const auth=getAuth(app);
+    onAuthStateChanged(auth,u=>{
+      if(!u){document.body.style.display='none';window.location.href='MSS-Login.html';}
+      else{
+        window._MSS_SESION={uid:u.uid,email:u.email,nombre:u.displayName||u.email.split('@')[0]};
+        const el=document.getElementById('_usuarioActual');
+        if(el)el.textContent=window._MSS_SESION.nombre;
+      }
+    });
+  }catch(e){console.warn('Auth guard:',e.message);}
+})();
+// ── FIN GUARD ──
+
 // ═══════════════════════════════════════════════════════════════
 // MSS-FINANZAS — Módulo Financiero Profesional v4.0
 // Por empresa · Sincronizado con Arriendos · Sin errores
@@ -551,11 +572,31 @@ function renderTodo() {
 }
 
 function renderKPIs() {
-  var tV = ventas(), tE = egresos(), tC = capital(), tF = fletes(), tA = arriendos(), tR = resultado();
+  var tV = ventas(), tE = egresos(), tC = capital(), tR = resultado();
   var margen = tV > 0 ? ((tR/tV)*100).toFixed(1) : 0;
   var saldo = tC + tV - tE;
   var el = document.getElementById('kpi-flujo');
-  el.innerHTML = 
+
+  // Sub-línea de ventas adaptada según empresa activa
+  var empId = EMP.id || 3;
+  var subVentas = '';
+  if(empId == 2){
+    // Condominio — solo mostrar GC
+    subVentas = '🏢 Gastos Comunes: ' + M(gc_condo());
+  } else if(empId == 1){
+    // Martinez Services — fletes y traslados
+    subVentas = '🚛 Fletes: ' + M(fletes()) + ' · 🔧 Traslados: ' + M(traslados());
+  } else {
+    // M&P Arriendos (id=3) — todo
+    var parts = [];
+    if(fletes()>0)    parts.push('🚛 Fletes: '    + M(fletes()));
+    if(arriendos()>0) parts.push('📋 Arriendos: ' + M(arriendos()));
+    if(traslados()>0) parts.push('🔧 Traslados: ' + M(traslados()));
+    if(gc_condo()>0)  parts.push('🏢 GC Condo: '  + M(gc_condo()));
+    subVentas = parts.length ? parts.join(' · ') : 'Sin ingresos registrados';
+  }
+
+  el.innerHTML =
     '<div class="kpi" style="--kc:rgba(201,168,76,0.12)">' +
       '<div class="kpi-label">Capital Invertido</div>' +
       '<div class="kpi-value" style="color:var(--gold)">' + M(tC) + '</div>' +
@@ -564,7 +605,7 @@ function renderKPIs() {
     '<div class="kpi" style="--kc:rgba(39,174,96,0.1)">' +
       '<div class="kpi-label">Ventas Reales del Negocio</div>' +
       '<div class="kpi-value" style="color:var(--ok)">' + M(tV) + '</div>' +
-      '<div class="kpi-sub">🚛 Fletes: ' + M(fletes()) + ' · 📋 Arriendos: ' + M(arriendos()) + ' · 🔧 Traslados: ' + M(traslados()) + ' · 🏢 GC Condo: ' + M(gc_condo()) + '</div>' +
+      '<div class="kpi-sub">' + subVentas + '</div>' +
     '</div>' +
     '<div class="kpi" style="--kc:rgba(192,57,43,0.1)">' +
       '<div class="kpi-label">Egresos Totales</div>' +
@@ -752,6 +793,94 @@ function buildCharts() {
     {label:'Base',             data:pb, borderColor:'#C9A84C', borderWidth:2.5, pointRadius:3, pointBackgroundColor:'#C9A84C', fill:false},
     {label:'Conservador -20%', data:pc, borderColor:'#D4890A', borderWidth:1.5, borderDash:[5,3], pointRadius:0, fill:false}
   ]}, options:{plugins:{legend:{labels:{font:CF.font,boxWidth:10}}}, scales:{x:{grid:{color:CF.color},ticks:{font:CF.font}}, y:{grid:{color:CF.color},ticks:{font:CF.font,callback:function(v){return '$'+(v/1000).toFixed(0)+'K';}}}}}});
+}
+
+// ── PDF GRÁFICOS ──
+function pdfGraficos(){
+  var tV=ventas(),tE=egresos(),tC=capital(),tR=resultado();
+  var margen=tV>0?((tR/tV)*100).toFixed(1):0;
+  var saldo=tC+tV-tE;
+  var fechaHoy=new Date().toLocaleDateString('es-CL',{year:'numeric',month:'long',day:'numeric'});
+  var empNombre=EMP.nombre||'MSS ERP';
+
+  // Capturar gráficos como imagen base64
+  function imgChart(id){
+    var c=document.getElementById(id);
+    if(!c)return'';
+    try{return c.toDataURL('image/png');}catch(e){return'';}
+  }
+
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Reporte Financiero '+empNombre+'</title>'
+    +'<style>'
+    +'@media print{@page{margin:10mm;size:A4;}button{display:none!important;}}'
+    +'body{font-family:Arial,sans-serif;background:white;color:#1a1a2e;margin:0;padding:20px;font-size:11px;}'
+    +'.hdr{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #C9A84C;padding-bottom:12px;margin-bottom:20px}'
+    +'.hdr-left h1{margin:0;font-size:20px;color:#C9A84C;font-weight:900}'
+    +'.hdr-left p{margin:2px 0;color:#666;font-size:11px}'
+    +'.hdr-right{text-align:right;font-size:11px;color:#666}'
+    +'.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}'
+    +'.kpi{background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:12px;text-align:center}'
+    +'.kpi-lbl{font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}'
+    +'.kpi-val{font-size:16px;font-weight:900}'
+    +'.charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}'
+    +'.chart-box{border:1px solid #e9ecef;border-radius:8px;padding:12px}'
+    +'.chart-box h3{font-size:11px;font-weight:700;margin:0 0 10px;color:#333;text-transform:uppercase;letter-spacing:.5px}'
+    +'.chart-box img{width:100%;height:auto}'
+    +'.chart-full{border:1px solid #e9ecef;border-radius:8px;padding:12px;margin-bottom:14px}'
+    +'.chart-full h3{font-size:11px;font-weight:700;margin:0 0 10px;color:#333;text-transform:uppercase;letter-spacing:.5px}'
+    +'.footer{border-top:1px solid #e9ecef;padding-top:10px;font-size:9px;color:#999;display:flex;justify-content:space-between}'
+    +'</style></head><body>'
+
+    // Header
+    +'<div class="hdr">'
+      +'<div class="hdr-left">'
+        +'<h1>'+empNombre+'</h1>'
+        +'<p>REPORTE FINANCIERO · FLUJO DE CAJA</p>'
+        +'<p>'+EMP.rut||''+'</p>'
+      +'</div>'
+      +'<div class="hdr-right">'
+        +'<div style="font-size:14px;font-weight:900;color:#C9A84C">INFORME FINANCIERO</div>'
+        +'<div>Emitido: '+fechaHoy+'</div>'
+        +'<div>Registros: '+DATA.length+' movimientos</div>'
+      +'</div>'
+    +'</div>'
+
+    // KPIs
+    +'<div class="kpis">'
+      +'<div class="kpi"><div class="kpi-lbl">Capital</div><div class="kpi-val" style="color:#C9A84C">'+M(tC)+'</div></div>'
+      +'<div class="kpi"><div class="kpi-lbl">Ventas Reales</div><div class="kpi-val" style="color:#27AE60">'+M(tV)+'</div></div>'
+      +'<div class="kpi"><div class="kpi-lbl">Egresos</div><div class="kpi-val" style="color:#E74C3C">'+M(tE)+'</div></div>'
+      +'<div class="kpi"><div class="kpi-lbl">Resultado</div><div class="kpi-val" style="color:'+(tR>=0?'#27AE60':'#E74C3C')+'">'+M(tR)+'</div><div style="font-size:9px;color:#999">Margen '+margen+'%</div></div>'
+      +'<div class="kpi"><div class="kpi-lbl">Saldo Estimado</div><div class="kpi-val" style="color:#2980B9">'+M(saldo)+'</div></div>'
+    +'</div>';
+
+  // Gráficos
+  var imgBarras=imgChart('chartBarras');
+  var imgAcum=imgChart('chartAcum');
+  var imgTorta=imgChart('chartTorta');
+  var imgProy=imgChart('chartProyeccion');
+
+  if(imgBarras||imgAcum){
+    html+='<div class="charts">';
+    if(imgBarras) html+='<div class="chart-box"><h3>Ventas vs Egresos por Mes</h3><img src="'+imgBarras+'"/></div>';
+    if(imgAcum)   html+='<div class="chart-box"><h3>Flujo Acumulado Operacional</h3><img src="'+imgAcum+'"/></div>';
+    html+='</div>';
+  }
+  if(imgTorta){
+    html+='<div class="charts">';
+    html+='<div class="chart-box"><h3>Distribución de Egresos</h3><img src="'+imgTorta+'"/></div>';
+    if(imgProy) html+='<div class="chart-box"><h3>Proyección 6 Meses</h3><img src="'+imgProy+'"/></div>';
+    html+='</div>';
+  }
+
+  html+='<div class="footer"><span>'+empNombre+' · Sistema MSS-ERP</span><span>'+fechaHoy+'</span><span>Datos al cierre del período</span></div>'
+    +'<br><button onclick="window.print()" style="padding:10px 28px;background:#C9A84C;color:white;border:none;border-radius:7px;font-weight:700;font-size:13px;cursor:pointer">🖨 Imprimir / Guardar PDF</button>'
+    +'</body></html>';
+
+  var v=window.open('','_blank','width=1100,height=800');
+  if(!v){alert('⚠ Permite ventanas emergentes para exportar PDF');return;}
+  v.document.write(html);
+  v.document.close();
 }
 
 // ── 11. CRUD ──
