@@ -542,7 +542,7 @@ function editU(id){
   document.getElementById('uGC').value=u.gcCustom||0;
   document.getElementById('uEstado').value=u.estado||'Al día';
   document.getElementById('uNotas').value=u.notas||'';
-  O('moUnidad');
+  document.getElementById('moUnidad').classList.add('open'); // NO llamar O() — resetea el id
 }
 
 function saveUnidad(){
@@ -622,7 +622,7 @@ function editCobro(id){
   document.getElementById('coComp').value=c.ref||'';
   document.getElementById('coForma').value=c.forma||'Transferencia';
   document.getElementById('coObs').value=c.obs||'';
-  O('moCobro');
+  document.getElementById('moCobro').classList.add('open'); // NO llamar O() — resetea coId
 }
 
 function abrirCobro(id){
@@ -690,7 +690,7 @@ function editEgreso(id){
   document.getElementById('egMonto').value=e.monto;
   document.getElementById('egDoc').value=e.doc||'';
   document.getElementById('egEstado').value=e.estado||'Pagado';
-  O('moEgreso');
+  document.getElementById('moEgreso').classList.add('open'); // NO llamar O() — resetea egId
 }
 
 function saveEgreso(){
@@ -884,7 +884,7 @@ function editOT(id){
   document.getElementById('otFact').value=o.factura||'';
   document.getElementById('otEstado').value=o.estado;
   document.getElementById('otNotas').value=o.notas||'';
-  O('moOT');
+  document.getElementById('moOT').classList.add('open'); // NO llamar O() — resetea otId
 }
 function delOT(id){if(!confirm('¿Eliminar OT?'))return;OT=OT.filter(o=>o.id!==id);save();rMant();}
 
