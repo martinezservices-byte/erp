@@ -170,6 +170,9 @@ try{var _e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}');if(_e&&_
 
   <!-- MOROSIDAD -->
   <div class="sec" id="sec-morosidad">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+      <button onclick="pdfMorosidad()" style="padding:6px 14px;font-size:11px;background:#dc2626;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-family:monospace">📄 PDF Reporte Morosidad</button>
+    </div>
     <div class="krow" id="kpiMora"></div>
     <div id="listaMora"></div>
   </div>
@@ -249,6 +252,7 @@ try{var _e=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}');if(_e&&_
       </div>
       <button class="bg" onclick="rRendicion()">📊 Ver Rendición</button>
       <button class="bgh" onclick="imprimirRendicion()">🖨 Imprimir</button>
+      <button onclick="pdfRendicion()" style="padding:9px 18px;font-size:12px;background:#1d4ed8;color:white;border:none;border-radius:7px;cursor:pointer;font-weight:700;font-family:monospace">📄 PDF</button>
     </div>
     <div id="rendContent"></div>
   </div>
@@ -710,6 +714,27 @@ function rMorosidad(){
   document.getElementById('listaMora').innerHTML=mora.length===0?'<div class="card" style="text-align:center;padding:24px"><div style="font-size:24px">✅</div><div style="color:var(--ok);margin-top:6px">Sin morosos</div></div>':mora.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2);border-radius:9px;margin-bottom:8px"><div><div style="font-size:12px;font-weight:800">Unidad ${c.unidadNum} — ${c.prop}</div><div style="font-size:10px;color:var(--muted)">${c.mes}</div></div><div style="display:flex;align-items:center;gap:8px"><span style="color:var(--danger);font-weight:700">${clp(c.saldo)}</span><button class="bsm be" onclick="editCobro(${c.id})">💰 Pagar</button><button class="bsm be" onclick="impComp(${c.id})">🖨</button></div></div>`).join('');
 }
 
+function pdfMorosidad(){
+  const mora=COBROS.filter(c=>c.saldo>0).sort((a,b)=>b.saldo-a.saldo);
+  const tot=mora.reduce((s,c)=>s+c.saldo,0);
+  const html='<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Reporte Morosidad</title>'
+    +'<style>body{font-family:Arial,sans-serif;padding:20px;font-size:10px;}table{width:100%;border-collapse:collapse;}th{background:#dc2626;color:white;padding:6px 8px;text-align:left;}td{padding:5px 8px;border-bottom:0.5px solid #fecaca;}.tot{color:#dc2626;font-weight:700;}@media print{button{display:none!important;}}</style></head><body>'
+    +'<div style="display:flex;justify-content:space-between;border-bottom:2px solid #dc2626;padding-bottom:10px;margin-bottom:14px">'
+    +'<div><div style="font-size:15px;font-weight:900;color:#dc2626">'+(CFG.nombre||'Condominio')+'</div><div>Admin: '+(CFG.admin||'')+'&nbsp;&middot;&nbsp;'+(CFG.tel||'')+'</div></div>'
+    +'<div style="text-align:right"><div style="font-size:13px;font-weight:900">REPORTE DE MOROSIDAD</div><div>'+df(HOY)+'</div></div></div>'
+    +'<div style="background:#fff5f5;padding:10px;border-radius:5px;margin-bottom:14px;display:flex;gap:30px">'
+    +'<span><strong>Total morosos:</strong> <span style="color:#dc2626;font-size:14px;font-weight:900">'+mora.length+'</span></span>'
+    +'<span><strong>Deuda total:</strong> <span style="color:#dc2626;font-size:14px;font-weight:900">'+clp(tot)+'</span></span></div>'
+    +'<table><thead><tr><th>Block</th><th>Unidad</th><th>Propietario</th><th>Per&iacute;odo</th><th>GC</th><th>Mora</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Estado</th></tr></thead><tbody>'
+    +mora.map((c,i)=>{const u=UNIDADES.find(x=>x.id===c.unidadId)||{};return'<tr style="background:'+(i%2===0?'#fff5f5':'white')+'"><td>'+(u.torre||'&mdash;')+'</td><td style="font-weight:700">'+c.unidadNum+'</td><td>'+c.prop+'</td><td>'+c.mes+'</td><td>'+clp(c.gcOrd)+'</td><td style="color:#dc2626">'+clp(c.mora)+'</td><td style="font-weight:700">'+clp(c.total)+'</td><td style="color:#166534">'+clp(c.pagado)+'</td><td class="tot">'+clp(c.saldo)+'</td><td>'+c.estado+'</td></tr>';}).join('')
+    +'</tbody><tfoot><tr style="background:#dc2626;color:white;font-weight:900"><td colspan="8" style="padding:7px 8px">TOTAL DEUDA</td><td style="padding:7px 8px">'+clp(tot)+'</td><td></td></tr></tfoot></table>'
+    +'<div style="margin-top:10px;font-size:9px;color:#6b7280">'+(CFG.nombre||'')+'&nbsp;&middot;&nbsp;Ley 21.442&nbsp;&middot;&nbsp;'+df(HOY)+'</div>'
+    +'<button onclick="window.print()" style="margin-top:12px;padding:10px 24px;background:#dc2626;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700">\uD83D\uDDB8 Imprimir PDF</button></body></html>';
+  const v=window.open('','_blank','width=1000,height=700');
+  if(!v){alert('\u26A0 Permite ventanas emergentes en tu navegador');return;}
+  v.document.write(html);v.document.close();
+}
+
 // ═══════════════════════════════════
 // FONDO RESERVA
 // ═══════════════════════════════════
@@ -794,6 +819,10 @@ function buscarResidente(){
         <div style="font-size:12px"><span style="color:var(--muted)">Períodos:</span> ${hist.length} registros</div>
       </div>
     </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <button onclick="pdfHistorialResidente(${u.id})" style="padding:7px 14px;background:#1d4ed8;color:white;border:none;border-radius:7px;cursor:pointer;font-size:11px;font-weight:700;font-family:monospace">📄 PDF Historial</button>
+      ${u.tel?`<button onclick="waResidente(${u.id})" style="padding:7px 14px;background:#25D366;color:white;border:none;border-radius:7px;cursor:pointer;font-size:11px;font-weight:700;font-family:monospace">📱 WhatsApp Resumen</button>`:''}
+    </div>
     <div class="card">
       <div class="ct">Historial de Pagos</div>
       <div class="tw"><table>
@@ -807,7 +836,11 @@ function buscarResidente(){
           <td>${badge(c.estado,EC[c.estado]||'#5A7090')}</td>
           <td style="color:var(--gold)">${c.ref||'—'}</td>
           <td style="color:var(--muted)">${c.fechaPago?df(c.fechaPago):'—'}</td>
-          <td><button class="bsm be" onclick="editCobro(${c.id})">✎</button></td>
+          <td><div style="display:flex;gap:3px">
+            <button class="bsm be" onclick="editCobro(${c.id})">✎</button>
+            ${c.pagado>0?`<button class="bsm be" onclick="impComp(${c.id})">🖨</button>`:''}
+            ${c.pagado>0&&u.tel?`<button class="bsm be" style="background:rgba(37,211,102,0.1);border-color:rgba(37,211,102,0.3);color:#25D366" onclick="waComprobante(${c.id})">📱</button>`:''}
+          </div></td>
         </tr>`).join('')}</tbody>
       </table></div>
     </div>`;
@@ -927,6 +960,19 @@ function imprimirRendicion(){
   if(!d)return alert('Genera primero la rendición');
   const cl=d.cloneNode(true);cl.id='rdPrint';cl.style.cssText='position:fixed;top:0;left:0;width:100%;z-index:99999;background:white;';
   document.body.appendChild(cl);window.print();document.body.removeChild(cl);
+}
+
+function pdfRendicion(){
+  const d=document.getElementById('rendDoc');
+  if(!d)return alert('Genera primero la rendición con el botón "Ver Rendición"');
+  const html='<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Rendici\u00F3n</title>'
+    +'<style>body{margin:0;padding:0;background:white;}@media print{@page{margin:8mm;}button{display:none!important;}}</style>'
+    +'</head><body>'+d.outerHTML
+    +'<br><button onclick="window.print()" style="margin:16px;padding:10px 24px;background:#1a5c3a;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:13px">\uD83D\uDDB8 Imprimir / Guardar PDF</button>'
+    +'</body></html>';
+  const v=window.open('','_blank','width=1100,height=800');
+  if(!v){alert('\u26A0 Permite ventanas emergentes');return;}
+  v.document.write(html);v.document.close();
 }
 
 // ═══════════════════════════════════
@@ -1054,6 +1100,49 @@ function importarCondJSON(input){
     save();rDash();alert('\u2705 Backup importado correctamente');
   }catch(err){alert('\u26a0 Error: '+err.message);}};
   reader.readAsText(file);input.value='';
+}
+
+function waResidente(uId){
+  const u=UNIDADES.find(x=>x.id===uId);if(!u||!u.tel)return alert('Sin teléfono registrado');
+  const hist=COBROS.filter(c=>c.unidadId===uId).sort((a,b)=>b.mes.localeCompare(a.mes));
+  const deuda=hist.reduce((s,c)=>s+c.saldo,0);
+  const totPag=hist.reduce((s,c)=>s+c.pagado,0);
+  const ultimo=hist.find(c=>c.pagado>0);
+  const tel=(u.tel||'').replace(/[^0-9]/g,'');
+  const num='56'+tel.replace(/^0+/,'').replace(/^56/,'');
+  const msg=encodeURIComponent(
+    '🏢 *'+( CFG.nombre||'Condominio')+'*\n'
+    +'Estimado/a *'+u.prop+'*\n\n'
+    +'🏠 Unidad: '+u.torre+' Depto '+u.num+'\n'
+    +'💰 Cuota mensual: $'+Math.round(gc(u)).toLocaleString('es-CL')+'\n'
+    +'✅ Total pagado: $'+Math.round(totPag).toLocaleString('es-CL')+'\n'
+    +(deuda>0?'⚠ Saldo pendiente: $'+Math.round(deuda).toLocaleString('es-CL')+'\n':'✅ Al día en sus pagos\n')
+    +(ultimo?'📅 Último pago: '+( ultimo.mes)+'\n':'')
+    +'\nCualquier consulta contacte a su administración.\n'
+    +'_'+CFG.admin+' · '+CFG.tel+'_'
+  );
+  window.open('https://wa.me/'+num+'?text='+msg,'_blank');
+}
+
+function waComprobante(coId){
+  const c=COBROS.find(x=>x.id===coId);if(!c)return;
+  const u=UNIDADES.find(x=>x.id===c.unidadId);
+  if(!u||!u.tel){alert('Sin teléfono registrado para esta unidad');return;}
+  const tel=(u.tel||'').replace(/[^0-9]/g,'');
+  const num='56'+tel.replace(/^0+/,'').replace(/^56/,'');
+  const msg=encodeURIComponent(
+    '✅ *Comprobante de Pago GC*\n'
+    +'*'+(CFG.nombre||'Condominio')+'*\n\n'
+    +'🏠 Unidad: '+c.unidadNum+(u.torre?' — '+u.torre:'')+'\n'
+    +'👤 '+c.prop+'\n'
+    +'📅 Período: '+c.mes+'\n'
+    +'💰 Monto pagado: $'+Math.round(c.pagado).toLocaleString('es-CL')+'\n'
+    +(c.ref?'🔖 Comprobante: '+c.ref+'\n':'')
+    +(c.forma?'💳 Forma: '+c.forma+'\n':'')
+    +(c.saldo>0?'⚠ Saldo pendiente: $'+Math.round(c.saldo).toLocaleString('es-CL')+'\n':'✅ Pagado en su totalidad\n')
+    +'\nGracias por su pago.\n_'+CFG.admin+' · '+CFG.tel+'_'
+  );
+  window.open('https://wa.me/'+num+'?text='+msg,'_blank');
 }
 
 function pdfHistorialResidente(uId){
