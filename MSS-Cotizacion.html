@@ -852,20 +852,21 @@ function imprimirDoc(){
   document.getElementById('emisorNombre').value   = empActual.nombre||'';
   document.getElementById('emisorRut').value      = empActual.rut||'';
   document.getElementById('emisorDireccion').value= empActual.direccion||'';
-  document.getElementById('emisorTel').value      = empActual.tel||'';
-  document.getElementById('emisorEmail').value    = empActual.email||'';
-  document.getElementById('emisorBanco').value    = empActual.banco||'';
-  document.getElementById('emisorCuenta').value   = empActual.cuenta||'';
-  document.getElementById('emisorGiro').value     = empActual.rubro||'';
-  document.getElementById('docRepLegal').value    = empActual.contacto||'Gaudy Martínez';
+  const _s = id => document.getElementById(id);
+  if(_s('emisorTel'))    _s('emisorTel').value      = empActual.tel||'';
+  if(_s('emisorEmail'))  _s('emisorEmail').value    = empActual.email||'';
+  if(_s('emisorBanco'))  _s('emisorBanco').value    = empActual.banco||'';
+  if(_s('emisorCuenta')) _s('emisorCuenta').value   = empActual.cuenta||'';
+  if(_s('emisorGiro'))   _s('emisorGiro').value     = empActual.rubro||'';
+  if(_s('docRepLegal'))  _s('docRepLegal').value    = empActual.contacto||'Gaudy Martínez';
   const hoy=new Date().toISOString().split('T')[0];
-  document.getElementById('docFecha').value=hoy;
+  if(_s('docFecha'))  _s('docFecha').value=hoy;
   const v=new Date();v.setDate(v.getDate()+30);
-  document.getElementById('docVence').value=v.toISOString().split('T')[0];
-  document.getElementById('docNum').value=DOCS.length+1;
+  if(_s('docVence'))  _s('docVence').value=v.toISOString().split('T')[0];
+  if(_s('docNum'))    _s('docNum').value=DOCS.length+1;
   populateClienteSelect();renderItems();calcTotales();
   renderKPIs();renderLista();
-  document.getElementById('footerInfo').textContent=DOCS.length+' documentos · '+CLIENTES_COT.length+' clientes';
+  if(_s('footerInfo')) _s('footerInfo').textContent=DOCS.length+' documentos · '+CLIENTES_COT.length+' clientes';
 })();
 </script>
 </body>
