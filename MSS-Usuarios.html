@@ -6,216 +6,507 @@
 <title>MSS ERP — Gestión de Usuarios</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:#0A0F1C;color:#F9FAFB;font-family:'Segoe UI',system-ui,sans-serif;padding:20px;}
-.hdr{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.08);}
-.hdr-logo{width:40px;height:40px;background:linear-gradient(135deg,#C9A84C,#F59E0B);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#0A0F1C;font-size:18px;}
-.hdr-title{font-size:18px;font-weight:800;}
-.hdr-sub{font-size:11px;color:#6B7280;}
-.btn-back{margin-left:auto;padding:8px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#9CA3AF;font-size:12px;cursor:pointer;text-decoration:none;}
-.card{background:#111827;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:20px;margin-bottom:16px;}
-.card-title{font-size:12px;font-weight:700;color:#C9A84C;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;}
+body{background:#0A0F1C;color:#F9FAFB;font-family:'Segoe UI',system-ui,sans-serif;padding:20px;min-height:100vh;}
+.hdr{display:flex;align-items:center;gap:12px;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.hdr-logo{width:42px;height:42px;background:linear-gradient(135deg,#C9A84C,#F59E0B);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#0A0F1C;font-size:18px;}
+.hdr-title{font-size:19px;font-weight:800;}
+.hdr-sub{font-size:11px;color:#6B7280;margin-top:2px;}
+.btn-back{margin-left:auto;padding:8px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#9CA3AF;font-size:12px;cursor:pointer;text-decoration:none;font-family:inherit;}
+
+/* TABS */
+.tabs{display:flex;gap:4px;margin-bottom:24px;background:rgba(255,255,255,0.03);padding:4px;border-radius:10px;width:fit-content;}
+.tab{padding:8px 18px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:none;color:#6B7280;font-family:inherit;transition:all .2s;}
+.tab.on{background:#1F2937;color:#F9FAFB;}
+
+.card{background:#111827;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:22px;margin-bottom:16px;}
+.card-title{font-size:11px;font-weight:700;color:#C9A84C;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
 .fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
-.fg label{font-size:11px;color:#9CA3AF;font-weight:600;text-transform:uppercase;}
-.fi{background:#1F2937;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 12px;color:#F9FAFB;font-size:13px;width:100%;outline:none;font-family:inherit;}
+.fg label{font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
+.fi{background:#1F2937;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 12px;color:#F9FAFB;font-size:13px;width:100%;outline:none;font-family:inherit;transition:border .2s;}
 .fi:focus{border-color:#C9A84C;}
-.btn{padding:10px 20px;border-radius:8px;border:none;font-weight:700;cursor:pointer;font-size:13px;font-family:inherit;}
-.btn-gold{background:linear-gradient(135deg,#C9A84C,#F59E0B);color:#0A0F1C;}
-.btn-danger{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#EF4444;}
-.btn-outline{background:none;border:1px solid rgba(255,255,255,0.1);color:#9CA3AF;}
-.user-row{display:flex;align-items:center;gap:12px;padding:12px;background:#1F2937;border-radius:10px;margin-bottom:8px;}
-.user-avatar{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#C9A84C,#F59E0B);display:flex;align-items:center;justify-content:center;font-weight:900;color:#0A0F1C;font-size:14px;flex-shrink:0;}
-.user-info{flex:1;}
-.user-name{font-size:13px;font-weight:700;}
-.user-email{font-size:11px;color:#6B7280;}
-.user-role{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700;}
-.role-admin{background:rgba(201,168,76,0.2);color:#C9A84C;}
-.role-user{background:rgba(56,189,248,0.15);color:#38BDF8;}
-.msg{padding:10px 14px;border-radius:8px;font-size:12px;margin-bottom:12px;display:none;}
-.msg.ok{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:#10B981;}
-.msg.err{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#EF4444;}
-.msg.show{display:block;}
-select.fi{appearance:none;}
+select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239CA3AF' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-@media(max-width:600px){.grid2{grid-template-columns:1fr;}}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+@media(max-width:640px){.grid2,.grid3{grid-template-columns:1fr;}}
+
+/* BOTONES */
+.btn{padding:10px 20px;border-radius:8px;border:none;font-weight:700;cursor:pointer;font-size:13px;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
+.btn-gold{background:linear-gradient(135deg,#C9A84C,#F59E0B);color:#0A0F1C;}
+.btn-gold:hover{opacity:.9;}
+.btn-danger{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);color:#EF4444;}
+.btn-outline{background:none;border:1px solid rgba(255,255,255,0.1);color:#9CA3AF;}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:6px;}
+.btn-info{background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.2);color:#38BDF8;}
+
+/* MENSAJES */
+.msg{padding:10px 14px;border-radius:8px;font-size:12px;margin-bottom:14px;display:none;line-height:1.6;}
+.msg.ok{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:#10B981;display:block;}
+.msg.err{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#EF4444;display:block;}
+.msg.warn{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);color:#F59E0B;display:block;}
+
+/* USUARIOS LISTA */
+.user-card{background:#1F2937;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:16px;margin-bottom:10px;transition:border .2s;}
+.user-card:hover{border-color:rgba(201,168,76,0.2);}
+.user-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;}
+.user-avatar{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;flex-shrink:0;}
+.user-info{flex:1;}
+.user-name{font-size:14px;font-weight:800;}
+.user-email{font-size:11px;color:#6B7280;margin-top:2px;}
+.user-meta{font-size:10px;color:#4B5563;margin-top:3px;}
+.role-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;}
+.role-superadmin{background:rgba(201,168,76,0.2);color:#C9A84C;border:1px solid rgba(201,168,76,0.3);}
+.role-admin{background:rgba(139,92,246,0.15);color:#A78BFA;border:1px solid rgba(139,92,246,0.2);}
+.role-operador{background:rgba(56,189,248,0.12);color:#38BDF8;border:1px solid rgba(56,189,248,0.2);}
+.role-lectura{background:rgba(156,163,175,0.12);color:#9CA3AF;border:1px solid rgba(156,163,175,0.2);}
+
+/* PERMISOS GRID */
+.perms-section{margin-top:10px;}
+.perms-title{font-size:10px;color:#6B7280;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
+.emp-perms{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+.emp-tag{background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);color:#C9A84C;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;}
+.mod-tag{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#9CA3AF;padding:2px 7px;border-radius:4px;font-size:10px;}
+.mod-tag.ok{background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.2);color:#10B981;}
+
+/* CHECKBOXES */
+.check-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:8px;}
+.check-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#1F2937;border:1px solid rgba(255,255,255,0.06);border-radius:7px;cursor:pointer;transition:all .2s;}
+.check-item:hover{border-color:rgba(201,168,76,0.3);}
+.check-item input{accent-color:#C9A84C;width:14px;height:14px;cursor:pointer;}
+.check-item label{font-size:11px;color:#9CA3AF;cursor:pointer;}
+.check-item:has(input:checked){background:rgba(201,168,76,0.07);border-color:rgba(201,168,76,0.25);}
+.check-item:has(input:checked) label{color:#F9FAFB;}
+
+/* SEPARADOR */
+.sep{height:1px;background:rgba(255,255,255,0.06);margin:16px 0;}
+
+/* STATS */
+.stat-row{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+.stat{background:#111827;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:14px 18px;flex:1;min-width:100px;}
+.stat-val{font-size:22px;font-weight:900;color:#C9A84C;}
+.stat-lbl{font-size:10px;color:#6B7280;margin-top:2px;text-transform:uppercase;letter-spacing:0.5px;}
+
+/* SCREEN */
+.screen{display:none;}
+.screen.on{display:block;}
+
+/* EDIT MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
+.overlay.on{display:flex;}
+.modal{background:#111827;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;}
+.modal-title{font-size:16px;font-weight:800;margin-bottom:4px;}
+.modal-sub{font-size:12px;color:#6B7280;margin-bottom:20px;}
 </style>
 </head>
 <body>
 
 <div class="hdr">
-  <div class="hdr-logo">M</div>
+  <div class="hdr-logo">👥</div>
   <div>
-    <div class="hdr-title">Gestión de Usuarios</div>
-    <div class="hdr-sub">Administra accesos al ERP</div>
+    <div class="hdr-title">Gestión de Usuarios y Permisos</div>
+    <div class="hdr-sub">Control de acceso profesional · Solo Super Administrador</div>
   </div>
   <a href="index.html" class="btn-back">← Volver al ERP</a>
 </div>
 
-<!-- CREAR USUARIO -->
-<div class="card">
-  <div class="card-title">➕ Crear Nuevo Usuario</div>
-  <div id="msgCrear" class="msg"></div>
-  <div class="grid2">
-    <div class="fg">
-      <label>Nombre completo</label>
-      <input class="fi" id="newNombre" type="text" placeholder="Ej: Ana González"/>
-    </div>
-    <div class="fg">
-      <label>Correo electrónico</label>
-      <input class="fi" id="newEmail" type="email" placeholder="ana@ejemplo.com"/>
-    </div>
-  </div>
-  <div class="grid2">
-    <div class="fg">
-      <label>Contraseña temporal</label>
-      <input class="fi" id="newPass" type="password" placeholder="Mínimo 6 caracteres"/>
-    </div>
-    <div class="fg">
-      <label>Rol</label>
-      <select class="fi" id="newRol">
-        <option value="admin">👑 Administrador — acceso total</option>
-        <option value="user">👤 Usuario — acceso estándar</option>
-        <option value="condo">🏢 Solo Condominio</option>
-        <option value="terreno">📍 Solo Terreno/App móvil</option>
-      </select>
-    </div>
-  </div>
-  <button class="btn btn-gold" onclick="crearUsuario()">➕ Crear Usuario</button>
+<!-- STATS -->
+<div class="stat-row" id="statsRow">
+  <div class="stat"><div class="stat-val" id="statTotal">—</div><div class="stat-lbl">Usuarios totales</div></div>
+  <div class="stat"><div class="stat-val" id="statActivos">—</div><div class="stat-lbl">Activos</div></div>
+  <div class="stat"><div class="stat-val" id="statAdmins">—</div><div class="stat-lbl">Administradores</div></div>
+  <div class="stat"><div class="stat-val" id="statOps">—</div><div class="stat-lbl">Operadores</div></div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on" onclick="showTab('lista',this)">👥 Usuarios</button>
+  <button class="tab" onclick="showTab('crear',this)">➕ Crear Usuario</button>
+  <button class="tab" onclick="showTab('mipass',this)">🔑 Mi Contraseña</button>
 </div>
 
 <!-- LISTA USUARIOS -->
-<div class="card">
-  <div class="card-title">👥 Usuarios Activos</div>
-  <div id="listaUsuarios">
-    <div style="color:#6B7280;font-size:12px;padding:10px 0">Cargando usuarios...</div>
+<div class="screen on" id="sc-lista">
+  <div id="listaUsuarios"><div style="color:#6B7280;font-size:12px;padding:20px;text-align:center">⏳ Cargando usuarios...</div></div>
+</div>
+
+<!-- CREAR USUARIO -->
+<div class="screen" id="sc-crear">
+  <div class="card">
+    <div class="card-title">➕ Nuevo Usuario</div>
+    <div id="msgCrear"></div>
+
+    <div class="grid2">
+      <div class="fg">
+        <label>Nombre completo</label>
+        <input class="fi" id="newNombre" type="text" placeholder="Ej: Ana González"/>
+      </div>
+      <div class="fg">
+        <label>Correo electrónico</label>
+        <input class="fi" id="newEmail" type="email" placeholder="ana@correo.com"/>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="fg">
+        <label>Contraseña temporal</label>
+        <input class="fi" id="newPass" type="password" placeholder="Mínimo 6 caracteres"/>
+      </div>
+      <div class="fg">
+        <label>Cargo / Descripción</label>
+        <input class="fi" id="newCargo" type="text" placeholder="Ej: Asistente Administrativa"/>
+      </div>
+    </div>
+
+    <div class="sep"></div>
+    <div class="fg">
+      <label>Rol del usuario</label>
+      <select class="fi" id="newRol" onchange="togglePermisos()">
+        <option value="superadmin">👑 Super Administrador — acceso total a todo</option>
+        <option value="admin">🏢 Administrador de empresa — acceso total a empresas asignadas</option>
+        <option value="operador" selected>📋 Operador — solo módulos asignados</option>
+        <option value="lectura">👁 Solo lectura — ve pero no modifica</option>
+      </select>
+    </div>
+
+    <div id="bloquePermisos">
+      <div class="sep"></div>
+      <div class="fg">
+        <label>Empresas a las que puede acceder</label>
+        <div class="check-grid" id="checkEmpresas"></div>
+      </div>
+
+      <div class="fg" id="bloqueModulos">
+        <label>Módulos que puede ver</label>
+        <div class="check-grid" id="checkModulos"></div>
+      </div>
+
+      <div class="fg">
+        <label>Puede editar / guardar datos</label>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+          <input type="checkbox" id="puedeEditar" style="accent-color:#C9A84C;width:16px;height:16px"/>
+          <label for="puedeEditar" style="font-size:12px;color:#9CA3AF">Permitir editar, agregar y eliminar registros</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="sep"></div>
+    <button class="btn btn-gold" onclick="crearUsuario()">➕ Crear Usuario</button>
   </div>
 </div>
 
-<!-- CAMBIAR CONTRASEÑA PROPIA -->
-<div class="card">
-  <div class="card-title">🔑 Cambiar Mi Contraseña</div>
-  <div id="msgPass" class="msg"></div>
-  <div class="grid2">
-    <div class="fg">
-      <label>Nueva contraseña</label>
-      <input class="fi" id="newPassPropia" type="password" placeholder="Mínimo 6 caracteres"/>
+<!-- MI CONTRASEÑA -->
+<div class="screen" id="sc-mipass">
+  <div class="card">
+    <div class="card-title">🔑 Cambiar Mi Contraseña</div>
+    <div id="msgPass"></div>
+    <div class="grid2">
+      <div class="fg">
+        <label>Nueva contraseña</label>
+        <input class="fi" id="p1" type="password" placeholder="Mínimo 6 caracteres"/>
+      </div>
+      <div class="fg">
+        <label>Confirmar contraseña</label>
+        <input class="fi" id="p2" type="password" placeholder="Repite la contraseña"/>
+      </div>
     </div>
-    <div class="fg">
-      <label>Confirmar contraseña</label>
-      <input class="fi" id="newPassConfirm" type="password" placeholder="Repite la contraseña"/>
+    <button class="btn btn-gold" onclick="cambiarPass()">🔑 Actualizar Contraseña</button>
+  </div>
+</div>
+
+<!-- MODAL EDITAR PERMISOS -->
+<div class="overlay" id="overlayEdit">
+  <div class="modal">
+    <div class="modal-title" id="editTitle">Editar permisos</div>
+    <div class="modal-sub" id="editSub">—</div>
+    <div id="editContent"></div>
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button class="btn btn-gold" onclick="guardarPermisos()">💾 Guardar Cambios</button>
+      <button class="btn btn-outline" onclick="cerrarModal()">Cancelar</button>
     </div>
   </div>
-  <button class="btn btn-gold" onclick="cambiarPass()">🔑 Actualizar Contraseña</button>
 </div>
 
 <script type="module">
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getAuth, onAuthStateChanged, updatePassword, createUserWithEmailAndPassword, updateProfile }
+import { getAuth, onAuthStateChanged, updatePassword, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { getFirestore, doc, setDoc, getDocs, collection, deleteDoc, getDoc }
+import { getFirestore, doc, setDoc, getDocs, collection, deleteDoc, getDoc, updateDoc }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-const FB = {apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
-const app  = getApps().length?getApps()[0]:initializeApp(FB);
-const auth = getAuth(app);
-const db   = getFirestore(app);
+const FB={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
+const app=getApps().length?getApps()[0]:initializeApp(FB);
+const auth=getAuth(app);
+const db=getFirestore(app);
 
-let _user = null;
+const EMPRESAS=[
+  {id:1,nombre:'Martinez Services Spa',icon:'🔧',color:'#10B981'},
+  {id:2,nombre:'Condominio Pioneros 2',icon:'🏢',color:'#F59E0B'},
+  {id:3,nombre:'M&P Arriendos SpA',icon:'🚛',color:'#38BDF8'},
+];
+const MODULOS=[
+  {id:'finanzas',nombre:'Finanzas',icon:'💰'},
+  {id:'arriendos',nombre:'Arriendos',icon:'🚛'},
+  {id:'condominio',nombre:'Condominio',icon:'🏢'},
+  {id:'remuneraciones',nombre:'Remuneraciones',icon:'👥'},
+  {id:'cotizacion',nombre:'Cotización',icon:'📋'},
+  {id:'facturacion',nombre:'Facturación',icon:'🧾'},
+  {id:'contabilidad',nombre:'Contabilidad',icon:'📗'},
+  {id:'tesoreria',nombre:'Tesorería',icon:'🏦'},
+  {id:'contratos',nombre:'Contratos',icon:'📄'},
+  {id:'proyectos',nombre:'Proyectos',icon:'◈'},
+  {id:'rrhh',nombre:'RRHH',icon:'◉'},
+  {id:'ventas',nombre:'Ventas CRM',icon:'📈'},
+  {id:'estrategia',nombre:'Estrategia',icon:'🎯'},
+  {id:'terreno',nombre:'Terreno',icon:'📍'},
+];
 
-// Verificar sesión
-onAuthStateChanged(auth, async u => {
-  if(!u){ window.location.href='MSS-Login.html'; return; }
-  _user = u;
-  // Verificar si es admin
-  const snap = await getDoc(doc(db,'usuarios/'+u.uid));
-  if(snap.exists() && snap.data().rol !== 'admin'){
-    alert('Solo administradores pueden gestionar usuarios.');
-    window.location.href='index.html'; return;
+const ROLES={
+  superadmin:{label:'Super Administrador',icon:'👑',clase:'role-superadmin'},
+  admin:{label:'Administrador',icon:'🏢',clase:'role-admin'},
+  operador:{label:'Operador',icon:'📋',clase:'role-operador'},
+  lectura:{label:'Solo Lectura',icon:'👁',clase:'role-lectura'},
+};
+
+let _user=null, _editUid=null, _adminPass=null;
+
+// Verificar sesión y rol
+onAuthStateChanged(auth,async u=>{
+  if(!u){window.location.href='MSS-Login.html';return;}
+  _user=u;
+  const snap=await getDoc(doc(db,'usuarios/'+u.uid));
+  if(!snap.exists()||snap.data().rol!=='superadmin'){
+    alert('⚠ Solo el Super Administrador puede gestionar usuarios.');
+    window.location.href='index.html';return;
   }
+  iniciarUI();
   cargarUsuarios();
 });
 
-async function cargarUsuarios(){
-  const snap = await getDocs(collection(db,'usuarios'));
-  const lista = document.getElementById('listaUsuarios');
-  if(snap.empty){ lista.innerHTML='<div style="color:#6B7280;font-size:12px">Sin usuarios registrados aún</div>'; return; }
-  const roles = {admin:'👑 Admin',user:'👤 Usuario',condo:'🏢 Condominio',terreno:'📍 Terreno'};
-  lista.innerHTML = '';
-  snap.forEach(d=>{
-    const u = d.data();
-    const div = document.createElement('div');
-    div.className = 'user-row';
-    div.innerHTML = `
-      <div class="user-avatar">${(u.nombre||u.email||'?')[0].toUpperCase()}</div>
-      <div class="user-info">
-        <div class="user-name">${u.nombre||'—'}</div>
-        <div class="user-email">${u.email}</div>
-      </div>
-      <span class="user-role ${u.rol==='admin'?'role-admin':'role-user'}">${roles[u.rol]||u.rol}</span>
-      ${u.uid!==_user.uid?`<button class="btn btn-danger" style="padding:5px 10px;font-size:11px" onclick="eliminarUsuario('${d.id}','${u.email}')">✕</button>`:'<span style="font-size:10px;color:#6B7280">Tú</span>'}`;
-    lista.appendChild(div);
-  });
+function iniciarUI(){
+  // Llenar checkboxes de empresas y módulos
+  document.getElementById('checkEmpresas').innerHTML=EMPRESAS.map(e=>`
+    <div class="check-item">
+      <input type="checkbox" id="emp_${e.id}" value="${e.id}" checked/>
+      <label for="emp_${e.id}">${e.icon} ${e.nombre.split(' ').slice(0,2).join(' ')}</label>
+    </div>`).join('');
+  document.getElementById('checkModulos').innerHTML=MODULOS.map(m=>`
+    <div class="check-item">
+      <input type="checkbox" id="mod_${m.id}" value="${m.id}" checked/>
+      <label for="mod_${m.id}">${m.icon} ${m.nombre}</label>
+    </div>`).join('');
 }
 
-window.crearUsuario = async function(){
-  const nombre = document.getElementById('newNombre').value.trim();
-  const email  = document.getElementById('newEmail').value.trim();
-  const pass   = document.getElementById('newPass').value;
-  const rol    = document.getElementById('newRol').value;
-  const msg    = document.getElementById('msgCrear');
-  msg.className='msg';
+async function cargarUsuarios(){
+  const snap=await getDocs(collection(db,'usuarios'));
+  const usuarios=[];
+  snap.forEach(d=>usuarios.push({...d.data(),_docId:d.id}));
+  
+  // Stats
+  document.getElementById('statTotal').textContent=usuarios.length;
+  document.getElementById('statActivos').textContent=usuarios.filter(u=>u.activo!==false).length;
+  document.getElementById('statAdmins').textContent=usuarios.filter(u=>['superadmin','admin'].includes(u.rol)).length;
+  document.getElementById('statOps').textContent=usuarios.filter(u=>u.rol==='operador').length;
 
-  if(!nombre||!email||!pass){ msg.textContent='Completa todos los campos.'; msg.className='msg err show'; return; }
-  if(pass.length<6){ msg.textContent='La contraseña debe tener al menos 6 caracteres.'; msg.className='msg err show'; return; }
+  if(!usuarios.length){
+    document.getElementById('listaUsuarios').innerHTML='<div style="color:#6B7280;font-size:12px;padding:20px;text-align:center">Sin usuarios registrados</div>';
+    return;
+  }
+
+  document.getElementById('listaUsuarios').innerHTML=usuarios.map(u=>{
+    const rol=ROLES[u.rol]||ROLES.operador;
+    const emps=(u.empresas||[1,2,3]).map(id=>{const e=EMPRESAS.find(x=>x.id==id);return e?`<span class="emp-tag">${e.icon} ${e.nombre.split(' ')[0]}</span>`:''}).join('');
+    const mods=u.rol==='superadmin'?'<span class="mod-tag ok">Todos los módulos</span>':
+      (u.modulos||[]).map(id=>{const m=MODULOS.find(x=>x.id===id);return m?`<span class="mod-tag ok">${m.icon} ${m.nombre}</span>`:''}).join('')||'<span style="color:#6B7280;font-size:10px">Sin módulos asignados</span>';
+    const esYo=u.uid===_user?.uid;
+    return `<div class="user-card">
+      <div class="user-top">
+        <div class="user-avatar" style="background:linear-gradient(135deg,${getRolColor(u.rol)},${getRolColor(u.rol)}88)">${(u.nombre||u.email||'?')[0].toUpperCase()}</div>
+        <div class="user-info">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span class="user-name">${u.nombre||'—'}</span>
+            <span class="role-badge ${rol.clase}">${rol.icon} ${rol.label}</span>
+            ${esYo?'<span style="font-size:10px;background:rgba(201,168,76,0.1);color:#C9A84C;padding:2px 8px;border-radius:10px;border:1px solid rgba(201,168,76,0.2)">Tú</span>':''}
+          </div>
+          <div class="user-email">${u.email}</div>
+          <div class="user-meta">${u.cargo||''} ${u.creado?'· Creado: '+new Date(u.creado).toLocaleDateString('es-CL'):''}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          ${!esYo?`<button class="btn btn-info btn-sm" onclick="editarPermisos('${u._docId}')">✏ Editar</button>`:''}
+          ${!esYo?`<button class="btn btn-danger btn-sm" onclick="eliminarUsuario('${u._docId}','${u.email}')">✕</button>`:''}
+        </div>
+      </div>
+      <div class="perms-section">
+        <div class="perms-title">Empresas con acceso</div>
+        <div class="emp-perms">${emps||'<span style="color:#6B7280;font-size:10px">Sin empresas</span>'}</div>
+        <div class="perms-title">Módulos asignados ${u.puedeEditar?'<span style="color:#10B981;font-size:9px">· Puede editar</span>':'<span style="color:#6B7280;font-size:9px">· Solo lectura</span>'}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">${mods}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function getRolColor(rol){
+  return {superadmin:'#C9A84C',admin:'#A78BFA',operador:'#38BDF8',lectura:'#9CA3AF'}[rol]||'#6B7280';
+}
+
+window.togglePermisos=function(){
+  const rol=document.getElementById('newRol').value;
+  const bloque=document.getElementById('bloquePermisos');
+  const mods=document.getElementById('bloqueModulos');
+  bloque.style.display=rol==='superadmin'?'none':'block';
+  mods.style.display=rol==='admin'?'none':'block';
+};
+
+window.crearUsuario=async function(){
+  const nombre=document.getElementById('newNombre').value.trim();
+  const email=document.getElementById('newEmail').value.trim();
+  const pass=document.getElementById('newPass').value;
+  const cargo=document.getElementById('newCargo').value.trim();
+  const rol=document.getElementById('newRol').value;
+  const msgEl=document.getElementById('msgCrear');
+  msgEl.className='msg';msgEl.textContent='';
+
+  if(!nombre||!email||!pass){msgEl.className='msg err';msgEl.textContent='⚠ Completa nombre, correo y contraseña.';return;}
+  if(pass.length<6){msgEl.className='msg err';msgEl.textContent='⚠ La contraseña debe tener al menos 6 caracteres.';return;}
+
+  // Permisos según rol
+  let empresas=[1,2,3],modulos=MODULOS.map(m=>m.id),puedeEditar=true;
+  if(rol!=='superadmin'){
+    empresas=Array.from(document.querySelectorAll('#checkEmpresas input:checked')).map(x=>parseInt(x.value));
+    if(rol!=='admin') modulos=Array.from(document.querySelectorAll('#checkModulos input:checked')).map(x=>x.value);
+    puedeEditar=document.getElementById('puedeEditar').checked;
+  }
 
   try{
-    // Crear en Firebase Auth — usa la API Admin vía función secundaria
-    // Como estamos en cliente, creamos el usuario y lo guardamos en Firestore
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    await updateProfile(cred.user, {displayName: nombre});
+    // Guardar credenciales del admin actual para re-autenticar después
+    const adminEmail=_user.email;
+    const adminPass=prompt('Por seguridad, ingresa TU contraseña actual para crear el usuario:');
+    if(!adminPass){msgEl.className='msg warn';msgEl.textContent='Operación cancelada.';return;}
+
+    // Crear usuario en Firebase Auth
+    const cred=await createUserWithEmailAndPassword(auth,email,pass);
+    await updateProfile(cred.user,{displayName:nombre});
+    
+    // Guardar en Firestore
     await setDoc(doc(db,'usuarios/'+cred.user.uid),{
-      uid:cred.user.uid, nombre, email, rol,
-      creadoPor:_user.email, creado:new Date().toISOString()
+      uid:cred.user.uid,nombre,email,cargo,rol,
+      empresas,modulos,puedeEditar,
+      activo:true,
+      creadoPor:_user.email,
+      creado:new Date().toISOString()
     });
-    // Nota: al crear vía cliente, Firebase hace login automático — volvemos a loguear al admin
-    msg.textContent='✓ Usuario '+nombre+' creado correctamente. La contraseña temporal es: '+pass;
-    msg.className='msg ok show';
+
+    // Re-autenticar como admin
+    await signInWithEmailAndPassword(auth,adminEmail,adminPass);
+
+    msgEl.className='msg ok';
+    msgEl.textContent='✅ Usuario '+nombre+' creado. Contraseña temporal: '+pass+' — Pídele que la cambie al entrar.';
     document.getElementById('newNombre').value='';
     document.getElementById('newEmail').value='';
     document.getElementById('newPass').value='';
+    document.getElementById('newCargo').value='';
+    showTab('lista',document.querySelector('.tab'));
+    document.querySelector('.tab').classList.add('on');
     cargarUsuarios();
   }catch(e){
-    const msgs={'auth/email-already-in-use':'Este correo ya está registrado.','auth/invalid-email':'Correo no válido.'};
-    msg.textContent = msgs[e.code]||'Error: '+e.message;
-    msg.className='msg err show';
+    const msgs={'auth/email-already-in-use':'Este correo ya tiene una cuenta.','auth/invalid-email':'Correo no válido.'};
+    msgEl.className='msg err';msgEl.textContent='⚠ '+(msgs[e.code]||e.message);
   }
 };
 
-window.eliminarUsuario = async function(uid, email){
-  if(!confirm('¿Eliminar acceso de '+email+'?\nEl usuario no podrá volver a ingresar al ERP.'))return;
-  try{
-    await deleteDoc(doc(db,'usuarios/'+uid));
-    cargarUsuarios();
-  }catch(e){ alert('Error: '+e.message); }
+window.editarPermisos=async function(uid){
+  _editUid=uid;
+  const snap=await getDoc(doc(db,'usuarios/'+uid));
+  if(!snap.exists())return;
+  const u=snap.data();
+  const rol=ROLES[u.rol]||ROLES.operador;
+  
+  document.getElementById('editTitle').textContent='Editar: '+u.nombre;
+  document.getElementById('editSub').textContent=u.email+' · '+rol.label;
+
+  const empsCheck=EMPRESAS.map(e=>`
+    <div class="check-item">
+      <input type="checkbox" id="edit_emp_${e.id}" value="${e.id}" ${(u.empresas||[1,2,3]).includes(e.id)?'checked':''}/>
+      <label for="edit_emp_${e.id}">${e.icon} ${e.nombre.split(' ').slice(0,2).join(' ')}</label>
+    </div>`).join('');
+
+  const modsCheck=MODULOS.map(m=>`
+    <div class="check-item">
+      <input type="checkbox" id="edit_mod_${m.id}" value="${m.id}" ${(u.modulos||[]).includes(m.id)||(u.rol==='superadmin')?'checked':''}/>
+      <label for="edit_mod_${m.id}">${m.icon} ${m.nombre}</label>
+    </div>`).join('');
+
+  document.getElementById('editContent').innerHTML=`
+    <div class="fg">
+      <label>Rol</label>
+      <select class="fi" id="editRol">
+        ${Object.entries(ROLES).map(([k,v])=>`<option value="${k}" ${u.rol===k?'selected':''}>${v.icon} ${v.label}</option>`).join('')}
+      </select>
+    </div>
+    <div class="fg">
+      <label>Empresas con acceso</label>
+      <div class="check-grid">${empsCheck}</div>
+    </div>
+    <div class="fg">
+      <label>Módulos asignados</label>
+      <div class="check-grid">${modsCheck}</div>
+    </div>
+    <div class="fg">
+      <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+        <input type="checkbox" id="editPuedeEditar" style="accent-color:#C9A84C;width:16px;height:16px" ${u.puedeEditar?'checked':''}/>
+        <label for="editPuedeEditar" style="font-size:12px;color:#9CA3AF">Puede editar, agregar y eliminar registros</label>
+      </div>
+    </div>`;
+
+  document.getElementById('overlayEdit').classList.add('on');
 };
 
-window.cambiarPass = async function(){
-  const p1  = document.getElementById('newPassPropia').value;
-  const p2  = document.getElementById('newPassConfirm').value;
-  const msg = document.getElementById('msgPass');
-  msg.className='msg';
-  if(!p1||!p2){ msg.textContent='Completa ambos campos.'; msg.className='msg err show'; return; }
-  if(p1!==p2) { msg.textContent='Las contraseñas no coinciden.'; msg.className='msg err show'; return; }
-  if(p1.length<6){ msg.textContent='Mínimo 6 caracteres.'; msg.className='msg err show'; return; }
+window.guardarPermisos=async function(){
+  if(!_editUid)return;
+  const rol=document.getElementById('editRol').value;
+  const empresas=Array.from(document.querySelectorAll('[id^="edit_emp_"]:checked')).map(x=>parseInt(x.value));
+  const modulos=Array.from(document.querySelectorAll('[id^="edit_mod_"]:checked')).map(x=>x.value);
+  const puedeEditar=document.getElementById('editPuedeEditar').checked;
   try{
-    await updatePassword(_user, p1);
-    msg.textContent='✓ Contraseña actualizada correctamente.';
-    msg.className='msg ok show';
-    document.getElementById('newPassPropia').value='';
-    document.getElementById('newPassConfirm').value='';
+    await updateDoc(doc(db,'usuarios/'+_editUid),{rol,empresas,modulos,puedeEditar,actualizado:new Date().toISOString()});
+    cerrarModal();
+    cargarUsuarios();
+  }catch(e){alert('Error: '+e.message);}
+};
+
+window.eliminarUsuario=async function(uid,email){
+  if(!confirm('¿Revocar acceso de '+email+'?\nEl usuario no podrá ingresar al ERP.'))return;
+  try{
+    await updateDoc(doc(db,'usuarios/'+uid),{activo:false,desactivado:new Date().toISOString()});
+    cargarUsuarios();
+  }catch(e){alert('Error: '+e.message);}
+};
+
+window.cambiarPass=async function(){
+  const p1=document.getElementById('p1').value;
+  const p2=document.getElementById('p2').value;
+  const msgEl=document.getElementById('msgPass');
+  msgEl.className='msg';msgEl.textContent='';
+  if(!p1||!p2){msgEl.className='msg err';msgEl.textContent='Completa ambos campos.';return;}
+  if(p1!==p2){msgEl.className='msg err';msgEl.textContent='Las contraseñas no coinciden.';return;}
+  if(p1.length<6){msgEl.className='msg err';msgEl.textContent='Mínimo 6 caracteres.';return;}
+  try{
+    await updatePassword(_user,p1);
+    msgEl.className='msg ok';msgEl.textContent='✅ Contraseña actualizada correctamente.';
+    document.getElementById('p1').value='';document.getElementById('p2').value='';
   }catch(e){
-    msg.textContent = e.code==='auth/requires-recent-login'?'Por seguridad, cierra sesión y vuelve a ingresar antes de cambiar la contraseña.':'Error: '+e.message;
-    msg.className='msg err show';
+    msgEl.className='msg err';
+    msgEl.textContent=e.code==='auth/requires-recent-login'?'Por seguridad cierra sesión, vuelve a entrar y prueba de nuevo.':'Error: '+e.message;
   }
+};
+
+window.cerrarModal=()=>document.getElementById('overlayEdit').classList.remove('on');
+document.getElementById('overlayEdit').addEventListener('click',e=>{if(e.target===document.getElementById('overlayEdit'))cerrarModal();});
+
+window.showTab=function(id,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('sc-'+id).classList.add('on');
+  if(id==='lista')cargarUsuarios();
 };
 </script>
 </body>

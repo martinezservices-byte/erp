@@ -119,25 +119,49 @@ canvas{max-height:220px;}
 <div id="nav-emp" style="margin-left:auto;padding:3px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;font-size:9px;color:#C9A84C;font-family:monospace;white-space:nowrap;flex-shrink:0;display:none"></div>
 </div>
 <script>
-// ── MSS AUTH GUARD ──
+// ── MSS AUTH GUARD v2 ──
 (async()=>{
   try{
     const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
     const {getAuth,onAuthStateChanged}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const {getFirestore,doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const FB={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
     const app=getApps().length?getApps()[0]:initializeApp(FB);
     const auth=getAuth(app);
-    onAuthStateChanged(auth,u=>{
-      if(!u){document.body.style.display='none';window.location.href='MSS-Login.html';}
-      else{
-        window._MSS_SESION={uid:u.uid,email:u.email,nombre:u.displayName||u.email.split('@')[0]};
-        const el=document.getElementById('_usuarioActual');
-        if(el)el.textContent=window._MSS_SESION.nombre;
+    const db=getFirestore(app);
+    const MOD_ID='rrhh';
+    onAuthStateChanged(auth,async u=>{
+      if(!u){document.body.style.display='none';window.location.href='MSS-Login.html';return;}
+      // Cargar perfil de usuario
+      const snap=await getDoc(doc(db,'usuarios/'+u.uid));
+      const perfil=snap.exists()?snap.data():null;
+      // Super admin tiene acceso total
+      if(perfil&&perfil.rol==='superadmin'){
+        window._MSS_SESION={uid:u.uid,email:u.email,nombre:u.displayName||u.email.split('@')[0],rol:'superadmin',puedeEditar:true,empresas:[1,2,3]};
+        const el=document.getElementById('_usuarioActual');if(el)el.textContent=window._MSS_SESION.nombre;
+        return;
+      }
+      // Verificar acceso al módulo
+      if(perfil&&MOD_ID&&!['superadmin','admin'].includes(perfil.rol)){
+        const tieneAcceso=(perfil.modulos||[]).includes(MOD_ID);
+        if(!tieneAcceso){
+          document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0A0F1C;color:#F9FAFB;font-family:system-ui;flex-direction:column;gap:16px"><div style="font-size:48px">🔒</div><div style="font-size:18px;font-weight:700">Acceso restringido</div><div style="font-size:13px;color:#6B7280">No tienes permiso para ver este módulo</div><a href="index.html" style="padding:10px 24px;background:#C9A84C;color:#0A0F1C;border-radius:8px;text-decoration:none;font-weight:700;margin-top:8px">← Volver al inicio</a></div>';
+          return;
+        }
+      }
+      window._MSS_SESION={uid:u.uid,email:u.email,nombre:u.displayName||u.email.split('@')[0],rol:perfil?.rol||'operador',puedeEditar:perfil?.puedeEditar||false,empresas:perfil?.empresas||[],modulos:perfil?.modulos||[]};
+      const el=document.getElementById('_usuarioActual');if(el)el.textContent=window._MSS_SESION.nombre;
+      // Ocultar botones de editar si no puede editar
+      if(!window._MSS_SESION.puedeEditar){
+        document.addEventListener('DOMContentLoaded',()=>{
+          document.querySelectorAll('.btn-editar,.btn-eliminar,.btn-guardar,[data-accion="editar"],[data-accion="eliminar"]').forEach(b=>b.style.display='none');
+        });
       }
     });
   }catch(e){console.warn('Auth guard:',e.message);}
 })();
 // ── FIN GUARD ──
+
 
 // ── FIREBASE ──
 let _db=null,_fbReady=false;
