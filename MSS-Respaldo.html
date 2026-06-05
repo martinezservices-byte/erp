@@ -237,37 +237,43 @@ try{
 // MÓDULOS Y SUS STORAGE KEYS
 // ════════════════════════════════════════
 const MODULOS = [
-  {nombre:'Empresas Hub',     key:'mss_hub_v3',               icon:'🏢', color:'#C9A84C'},
-  {nombre:'Finanzas',         key:'mss_finanzas_v1',           icon:'₲',  color:'#C9A84C'},
-  {nombre:'Trabajadores',     key:'mss_rem_trabajadores_v1',   icon:'👥', color:'#22C55E'},
-  {nombre:'Liquidaciones',    key:'mss_rem_liquidaciones_v1',  icon:'📄', color:'#22C55E'},
-  {nombre:'Vacaciones',       key:'mss_rem_vacaciones_v1',     icon:'🏖', color:'#22C55E'},
-  {nombre:'Finiquitos',       key:'mss_rem_finiquitos_v1',     icon:'📋', color:'#22C55E'},
-  {nombre:'Parámetros Rem.',  key:'mss_rem_params_v1',         icon:'⚙',  color:'#22C55E'},
+  {nombre:'Empresas Hub',     key:'mss_hub_v4',                icon:'🏢', color:'#C9A84C'},
+  {nombre:'Finanzas Emp.1',   key:'mss_finanzas2_v1_1',        icon:'₲',  color:'#C9A84C'},
+  {nombre:'Finanzas Emp.2',   key:'mss_finanzas2_v1_2',        icon:'₲',  color:'#C9A84C'},
+  {nombre:'Finanzas Emp.3',   key:'mss_finanzas2_v1_3',        icon:'₲',  color:'#C9A84C'},
+  {nombre:'Trabajadores',     key:'mss_rem_trabajadores_v1_1', icon:'👥', color:'#22C55E'},
+  {nombre:'Trabajadores E2',  key:'mss_rem_trabajadores_v1_2', icon:'👥', color:'#22C55E'},
+  {nombre:'Trabajadores E3',  key:'mss_rem_trabajadores_v1_3', icon:'👥', color:'#22C55E'},
+  {nombre:'Liquidaciones',    key:'mss_rem_liquidaciones_v1_1',icon:'📄', color:'#22C55E'},
+  {nombre:'Liquidaciones E3', key:'mss_rem_liquidaciones_v1_3',icon:'📄', color:'#22C55E'},
+  {nombre:'Vacaciones',       key:'mss_rem_vacaciones_v1_1',   icon:'🏖', color:'#22C55E'},
+  {nombre:'Finiquitos',       key:'mss_rem_finiquitos_v1_1',   icon:'📋', color:'#22C55E'},
+  {nombre:'Parámetros Rem.',  key:'mss_rem_params_v1_1',       icon:'⚙',  color:'#22C55E'},
+  {nombre:'Arriendos',        key:'mss_arr3_ar',               icon:'🚛', color:'#F59E0B'},
+  {nombre:'Fletes',           key:'mss_arr3_fl',               icon:'🚛', color:'#F59E0B'},
+  {nombre:'Activos',          key:'mss_arr3_a',                icon:'🚛', color:'#F59E0B'},
+  {nombre:'Clientes Arr.',    key:'mss_arr3_cli',              icon:'🚛', color:'#F59E0B'},
+  {nombre:'Unidades Condo',   key:'mss_c2_u',                  icon:'🏢', color:'#10B981'},
+  {nombre:'Cobros Condo',     key:'mss_c2_co',                 icon:'🏢', color:'#10B981'},
+  {nombre:'Egresos Condo',    key:'mss_c2_eg',                 icon:'🏢', color:'#10B981'},
+  {nombre:'Config Condo',     key:'mss_c2_cfg',                icon:'🏢', color:'#10B981'},
   {nombre:'Asientos Cont.',   key:'mss_cont_asientos_v1',      icon:'📗', color:'#10B981'},
-  {nombre:'Plan Cuentas',     key:'mss_cont_cuentas_v1',       icon:'📗', color:'#10B981'},
   {nombre:'Facturación Docs', key:'mss_fact_docs_v1',          icon:'🧾', color:'#38BDF8'},
   {nombre:'Clientes Fact.',   key:'mss_fact_clis_v1',          icon:'🏢', color:'#38BDF8'},
-  {nombre:'Productos',        key:'mss_fact_prods_v1',         icon:'📦', color:'#38BDF8'},
+  {nombre:'Cotizaciones',     key:'mss_cot_docs_v1',           icon:'📋', color:'#38BDF8'},
+  {nombre:'Clientes Cot.',    key:'mss_cot_clis_v1',           icon:'📋', color:'#38BDF8'},
   {nombre:'Cuentas Banco',    key:'mss_tes_cuentas_v1',        icon:'🏦', color:'#FBBF24'},
-  {nombre:'Movimientos',      key:'mss_tes_movs_v1',           icon:'💳', color:'#FBBF24'},
-  {nombre:'Presupuesto Tes.', key:'mss_tes_presup_v1',         icon:'📋', color:'#FBBF24'},
   {nombre:'Contratos',        key:'mss_contratos_v1',          icon:'📄', color:'#A78BFA'},
-  {nombre:'Anexos',           key:'mss_anexos_v1',             icon:'📎', color:'#A78BFA'},
   {nombre:'Proyectos',        key:'mss_proyectos_v1',          icon:'◈',  color:'#38BDF8'},
-  {nombre:'Tareas',           key:'mss_tareas_v1',             icon:'✅', color:'#38BDF8'},
   {nombre:'Clientes CRM',     key:'mss_clientes_v1',           icon:'◎',  color:'#FB923C'},
-  {nombre:'Ventas Plan',      key:'mss_ventas_v1',             icon:'📈', color:'#FB923C'},
   {nombre:'Personas RRHH',    key:'mss_personas_v1',           icon:'◉',  color:'#A78BFA'},
-  {nombre:'Clima Org.',       key:'mss_clima_v1',              icon:'🌡', color:'#A78BFA'},
-  {nombre:'Formaciones',      key:'mss_formacion_v1',          icon:'📚', color:'#A78BFA'},
   {nombre:'KPIs',             key:'mss_kpis_v1',               icon:'◆',  color:'#10B981'},
   {nombre:'SMART',            key:'mss_smart_v1',              icon:'🎯', color:'#10B981'},
   {nombre:'FODA',             key:'mss_foda_v1',               icon:'⬡',  color:'#10B981'},
   {nombre:'PESTEL',           key:'mss_pestel_v1',             icon:'🌐', color:'#10B981'},
   {nombre:'Plan Estrat.',     key:'mss_plan_v1',               icon:'🗺', color:'#10B981'},
-  {nombre:'ERP Multi-Emp.',   key:'mss_erp3_empresas',         icon:'🏗', color:'#C9A84C'},
-  {nombre:'ERP Data',         key:'mss_erp3_data',             icon:'💾', color:'#C9A84C'},
+  {nombre:'Logos',            key:'mss_logos_v1',              icon:'🖼', color:'#C9A84C'},
+  {nombre:'ERP Empresas',     key:'mss_hub_v4',                icon:'🏗', color:'#C9A84C'},
 ];
 
 let pendingRestore = null;
@@ -370,17 +376,22 @@ async function _initFB(){
 }
 
 function exportarTodo(){
-  const backup={version:'4.0',fecha:new Date().toISOString(),empresa:'Martinez Services Spa',modulos:{}};
+  const backup={version:'4.0',fecha:new Date().toISOString(),empresa:'Martinez Services',modulos:{}};
   let count=0;
   document.getElementById('exportLog').innerHTML='';
-  MODULOS.forEach(m=>{
-    const val=localStorage.getItem(m.key);
-    if(val){
-      backup.modulos[m.key]=JSON.parse(val);
-      count++;
-      log('exportLog',`${m.icon} ${m.nombre} — ${formatSize(getSize(m.key))}`,'ok');
+  // Exportar TODAS las claves de localStorage que empiecen con 'mss_'
+  for(let i=0;i<localStorage.length;i++){
+    const key=localStorage.key(i);
+    if(key&&key.startsWith('mss_')){
+      try{
+        backup.modulos[key]=JSON.parse(localStorage.getItem(key));
+        count++;
+      }catch(e){
+        backup.modulos[key]=localStorage.getItem(key);
+        count++;
+      }
     }
-  });
+  }
   const json=JSON.stringify(backup,null,2);
   const filename=`MSS_Respaldo_Completo_${dateStr()}.json`;
   download(json,filename);
