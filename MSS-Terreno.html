@@ -442,6 +442,43 @@ select.fi{appearance:none;}
 <div class="toast" id="toast"></div>
 
 <script>
+// ── FIREBASE ──
+let _db=null,_fbReady=false;
+async function _initFB(){
+  if(_fbReady)return;
+  try{
+    const m1=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const m2=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const FB={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
+    const app=m1.getApps().length?m1.getApps()[0]:m1.initializeApp(FB);
+    _db=m2.getFirestore(app);window._fbM=m2;_fbReady=true;
+    console.log('✅ Terreno Firebase OK');
+  }catch(e){_fbReady=false;}
+}
+function _ep(){return 'empresas/'+(_EMP_ID||_empId||window._MSS_EMPID||2);}
+async function _fbGetAll(col){
+  const snap=await window._fbM.getDocs(window._fbM.collection(_db,_ep()+'/'+col));
+  const arr=[];snap.forEach(d=>arr.push({id:d.id,...d.data()}));return arr;
+}
+async function _fbSet(col,id,data){
+  await window._fbM.setDoc(window._fbM.doc(_db,_ep()+'/'+col+'/'+String(id)),{...data});
+}
+async function _fbBatch(col,arr){
+  if(!arr||!arr.length)return;
+  for(let i=0;i<arr.length;i+=400){
+    const b=window._fbM.writeBatch(_db);
+    arr.slice(i,i+400).forEach(item=>b.set(window._fbM.doc(_db,_ep()+'/'+col+'/'+String(item.id||Date.now())),{...item}));
+    await b.commit();
+  }
+}
+async function _fbDoc(path,data){
+  await window._fbM.setDoc(window._fbM.doc(_db,path),{...data});
+}
+async function _fbGetDoc(path){
+  const s=await window._fbM.getDoc(window._fbM.doc(_db,path));
+  return s.exists()?s.data():null;
+}
+
 // ═══════════════════════════════════════════════
 // ESTADO GLOBAL
 // ═══════════════════════════════════════════════
@@ -863,13 +900,16 @@ function guardarReserva() {
   reservas.push(nueva);
   try {
     localStorage.setItem(key, JSON.stringify(reservas));
+    // También guardar en Firebase
+    if(_fbReady&&_db){
+      _fbDoc('empresas/'+empId+'/reservas/'+String(nueva.id), nueva).catch(e=>console.warn('FB reserva:',e));
+    }
     document.getElementById('reservaOKTxt').textContent = cliente + ' · ' + equipo + ' · ' + ini + ' al ' + fin;
     document.getElementById('reservaOK').style.display = 'block';
-    // Limpiar form
     ['resEquipo','resCliente','resTel','resFechaIni','resFechaFin','resTarifa','resLugar','resObs'].forEach(id => {
       document.getElementById(id).value = '';
     });
-    toast('✅ Reserva guardada en el ERP');
+    toast('✅ Reserva guardada en la nube');
   } catch(e) { toast('⚠ Error al guardar'); }
 }
 
