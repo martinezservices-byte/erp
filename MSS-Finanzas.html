@@ -348,13 +348,26 @@ var _db=null,_fbReady=false;
 async function _initFB(){
   if(_fbReady)return;
   try{
-    var m1=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-    var m2=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    var FB={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
-    var app=m1.getApps().length?m1.getApps()[0]:m1.initializeApp(FB);
-    _db=m2.getFirestore(app);window._fb2=m2;_fbReady=true;
+    const m1=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const m2=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const m3=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const FB={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
+    const app=m1.getApps().length?m1.getApps()[0]:m1.initializeApp(FB);
+    const auth=m3.getAuth(app);
+    // Esperar usuario autenticado
+    await new Promise((resolve)=>{
+      const unsub=m3.onAuthStateChanged(auth,user=>{
+        unsub();
+        if(!user){window.location.href='MSS-Login.html';}
+        else{
+          window._MSS_USER=user;
+          _db=m2.getFirestore(app);window._fbM=m2;_fbReady=true;
+          resolve();
+        }
+      });
+    });
     console.log('✅ Finanzas Firebase OK');
-  }catch(e){_fbReady=false;console.warn('Firebase no disponible:',e.message);}
+  }catch(e){_fbReady=false;console.warn('Firebase:',e.message);}
 }
 function _epFin(){return 'empresas/'+EMP.id+'/finanzas/data';}
 
