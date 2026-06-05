@@ -97,8 +97,11 @@ tfoot td{border-top:2px solid rgba(56,189,248,0.2);font-weight:800;}
   body{background:white!important;margin:0!important;padding:0!important;}
   #previewContainer{display:block!important;position:fixed;top:0;left:0;width:100%;background:white;}
   .doc{box-shadow:none!important;margin:0!important;border-radius:0!important;max-width:100%!important;}
-  /* FORZAR COLORES DE FONDO EN IMPRESIÓN */
-  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}
+  .doc-head{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .doc-table th{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .doc-tot-final{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .doc-banco{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .doc-info-left{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   /* Ocultar URL y fecha del navegador */
   @page{margin:10mm;size:A4;}
 }
@@ -126,7 +129,6 @@ tfoot td{border-top:2px solid rgba(56,189,248,0.2);font-weight:800;}
 <div id="nav-emp" style="margin-left:auto;padding:3px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;font-size:9px;color:#C9A84C;font-family:monospace;white-space:nowrap;flex-shrink:0;display:none"></div>
 </div>
 <script>
-// ── MSS AUTH GUARD v2 — ver script type=module al final ──
 
 // ── FIREBASE ──
 let _db=null,_fbReady=false;
@@ -670,7 +672,8 @@ function renderPreviewFromDoc(d){
 
   const html=`
   <div style="margin-top:20px">
-    <div style="font-size:12px;color:var(--acc);font-family:monospace;margin-bottom:10px;display:flex;justify-content:flex-end;align-items:center" class="no-print">
+    <div style="font-size:12px;color:var(--acc);font-family:monospace;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+      <span>DOCUMENTO GENERADO — ${d.tipo.toUpperCase()} Nº${d.num} · ${emp.nombre}</span>
       <button class="btn-ghost no-print" style="padding:6px 14px;font-size:11px" onclick="imprimirDoc()">🖨 Imprimir / PDF</button>
     </div>
     <div class="doc">
