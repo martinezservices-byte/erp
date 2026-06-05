@@ -75,20 +75,6 @@ textarea.restore-input:focus{border-color:var(--gold);}
 <div id="nav-emp" style="margin-left:auto;padding:3px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;font-size:9px;color:#C9A84C;font-family:monospace;white-space:nowrap;flex-shrink:0;display:none"></div>
 </div>
 <script>
-
-// ═══ EMPRESA DINÁMICA ═══
-var _er = localStorage.getItem('mss_empresa_actual');
-var _EMP = _er ? JSON.parse(_er) : {id:1, nombre:'Mi Empresa', rut:''};
-window._MSS_EMP = _EMP;
-var _nd = document.getElementById('nav-emp');
-if(_nd){_nd.textContent='🏢 '+_EMP.nombre; _nd.style.display='block';}
-var _cur = window.location.pathname.split('/').pop();
-document.querySelectorAll('#nav-bar a').forEach(function(a){
-  if(a.getAttribute('href')===_cur){
-    a.style.background='rgba(201,168,76,0.25)';
-    a.style.color='#E8C97A';
-  }
-});
 const _empRaw = localStorage.getItem('mss_empresa_actual');
 const _empObj = _empRaw ? JSON.parse(_empRaw) : {id:1, nombre:'Mi Empresa'};
 const _EMP_ID = _empObj.id || 1;
@@ -150,6 +136,19 @@ try{
       <button class="btn-outline" onclick="exportarCSVTodo()">📊 Exportar CSV por módulo</button>
     </div>
     <div id="exportLog" class="log" style="display:none"></div>
+  </div>
+
+  <!-- FIREBASE NUBE -->
+  <div class="card" style="border-color:rgba(56,189,248,0.3)">
+    <div class="card-title" style="color:#38BDF8">☁ Backup en la Nube (Firebase)</div>
+    <div class="card-sub">Guarda o restaura todos tus datos directamente desde Firebase — accesible desde cualquier dispositivo</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <span id="fbStatus" style="font-size:11px;font-family:monospace;color:var(--muted)">⏳ Verificando conexión...</span>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+      <button class="btn-gold" onclick="backupFirebase()" style="background:#38BDF8;color:#0A0F1C">☁ Guardar en Nube</button>
+      <button class="btn-outline" onclick="restaurarDesdeFirebase()" style="border-color:rgba(56,189,248,0.4);color:#38BDF8">⬇ Restaurar desde Nube</button>
+    </div>
   </div>
 
   <!-- EXPORTAR POR MÓDULO -->
@@ -225,33 +224,33 @@ try{
 const MODULOS = [
   {nombre:'Empresas Hub',     key:'mss_hub_v3',               icon:'🏢', color:'#C9A84C'},
   {nombre:'Finanzas',         key:'mss_finanzas_v1',           icon:'₲',  color:'#C9A84C'},
-  {nombre:'Trabajadores',     key:'mss_rem_trabajadores_v1_'+(_EMP.id||1),   icon:'👥', color:'#22C55E'},
-  {nombre:'Liquidaciones',    key:'mss_rem_liquidaciones_v1_'+(_EMP.id||1),  icon:'📄', color:'#22C55E'},
-  {nombre:'Vacaciones',       key:'mss_rem_vacaciones_v1_'+(_EMP.id||1),     icon:'🏖', color:'#22C55E'},
-  {nombre:'Finiquitos',       key:'mss_rem_finiquitos_v1_'+(_EMP.id||1),     icon:'📋', color:'#22C55E'},
-  {nombre:'Parámetros Rem.',  key:'mss_rem_params_v1_'+(_EMP.id||1),         icon:'⚙',  color:'#22C55E'},
-  {nombre:'Asientos Cont.',   key:'mss_cont_asientos_v1_'+(_EMP.id||1),      icon:'📗', color:'#10B981'},
-  {nombre:'Plan Cuentas',     key:'mss_cont_cuentas_v1_'+(_EMP.id||1),       icon:'📗', color:'#10B981'},
-  {nombre:'Facturación Docs', key:'mss_fact_docs_v1_'+(_EMP.id||1),          icon:'🧾', color:'#38BDF8'},
-  {nombre:'Clientes Fact.',   key:'mss_fact_clis_v1_'+(_EMP.id||1),          icon:'🏢', color:'#38BDF8'},
-  {nombre:'Productos',        key:'mss_fact_prods_v1_'+(_EMP.id||1),         icon:'📦', color:'#38BDF8'},
-  {nombre:'Cuentas Banco',    key:'mss_tes_cuentas_v1_'+(_EMP.id||1),        icon:'🏦', color:'#FBBF24'},
-  {nombre:'Movimientos',      key:'mss_tes_movs_v1_'+(_EMP.id||1),           icon:'💳', color:'#FBBF24'},
-  {nombre:'Presupuesto Tes.', key:'mss_tes_presup_v1_'+(_EMP.id||1),         icon:'📋', color:'#FBBF24'},
-  {nombre:'Contratos',        key:'mss_contratos_v1_'+(_EMP.id||1),          icon:'📄', color:'#A78BFA'},
-  {nombre:'Anexos',           key:'mss_anexos_v1_'+(_EMP.id||1),             icon:'📎', color:'#A78BFA'},
-  {nombre:'Proyectos',        key:'mss_proyectos_v1_'+(_EMP.id||1),          icon:'◈',  color:'#38BDF8'},
-  {nombre:'Tareas',           key:'mss_tareas_v1_'+(_EMP.id||1),             icon:'✅', color:'#38BDF8'},
-  {nombre:'Clientes CRM',     key:'mss_clientes_v1_'+(_EMP.id||1),           icon:'◎',  color:'#FB923C'},
-  {nombre:'Ventas Plan',      key:'mss_ventas_v1_'+(_EMP.id||1),             icon:'📈', color:'#FB923C'},
-  {nombre:'Personas RRHH',    key:'mss_personas_v1_'+(_EMP.id||1),           icon:'◉',  color:'#A78BFA'},
-  {nombre:'Clima Org.',       key:'mss_clima_v1_'+(_EMP.id||1),              icon:'🌡', color:'#A78BFA'},
-  {nombre:'Formaciones',      key:'mss_formacion_v1_'+(_EMP.id||1),          icon:'📚', color:'#A78BFA'},
-  {nombre:'KPIs',             key:'mss_kpis_v1_'+(_EMP.id||1),               icon:'◆',  color:'#10B981'},
-  {nombre:'SMART',            key:'mss_smart_v1_'+(_EMP.id||1),              icon:'🎯', color:'#10B981'},
-  {nombre:'FODA',             key:'mss_foda_v1_'+(_EMP.id||1),               icon:'⬡',  color:'#10B981'},
-  {nombre:'PESTEL',           key:'mss_pestel_v1_'+(_EMP.id||1),             icon:'🌐', color:'#10B981'},
-  {nombre:'Plan Estrat.',     key:'mss_plan_v1_'+(_EMP.id||1),               icon:'🗺', color:'#10B981'},
+  {nombre:'Trabajadores',     key:'mss_rem_trabajadores_v1',   icon:'👥', color:'#22C55E'},
+  {nombre:'Liquidaciones',    key:'mss_rem_liquidaciones_v1',  icon:'📄', color:'#22C55E'},
+  {nombre:'Vacaciones',       key:'mss_rem_vacaciones_v1',     icon:'🏖', color:'#22C55E'},
+  {nombre:'Finiquitos',       key:'mss_rem_finiquitos_v1',     icon:'📋', color:'#22C55E'},
+  {nombre:'Parámetros Rem.',  key:'mss_rem_params_v1',         icon:'⚙',  color:'#22C55E'},
+  {nombre:'Asientos Cont.',   key:'mss_cont_asientos_v1',      icon:'📗', color:'#10B981'},
+  {nombre:'Plan Cuentas',     key:'mss_cont_cuentas_v1',       icon:'📗', color:'#10B981'},
+  {nombre:'Facturación Docs', key:'mss_fact_docs_v1',          icon:'🧾', color:'#38BDF8'},
+  {nombre:'Clientes Fact.',   key:'mss_fact_clis_v1',          icon:'🏢', color:'#38BDF8'},
+  {nombre:'Productos',        key:'mss_fact_prods_v1',         icon:'📦', color:'#38BDF8'},
+  {nombre:'Cuentas Banco',    key:'mss_tes_cuentas_v1',        icon:'🏦', color:'#FBBF24'},
+  {nombre:'Movimientos',      key:'mss_tes_movs_v1',           icon:'💳', color:'#FBBF24'},
+  {nombre:'Presupuesto Tes.', key:'mss_tes_presup_v1',         icon:'📋', color:'#FBBF24'},
+  {nombre:'Contratos',        key:'mss_contratos_v1',          icon:'📄', color:'#A78BFA'},
+  {nombre:'Anexos',           key:'mss_anexos_v1',             icon:'📎', color:'#A78BFA'},
+  {nombre:'Proyectos',        key:'mss_proyectos_v1',          icon:'◈',  color:'#38BDF8'},
+  {nombre:'Tareas',           key:'mss_tareas_v1',             icon:'✅', color:'#38BDF8'},
+  {nombre:'Clientes CRM',     key:'mss_clientes_v1',           icon:'◎',  color:'#FB923C'},
+  {nombre:'Ventas Plan',      key:'mss_ventas_v1',             icon:'📈', color:'#FB923C'},
+  {nombre:'Personas RRHH',    key:'mss_personas_v1',           icon:'◉',  color:'#A78BFA'},
+  {nombre:'Clima Org.',       key:'mss_clima_v1',              icon:'🌡', color:'#A78BFA'},
+  {nombre:'Formaciones',      key:'mss_formacion_v1',          icon:'📚', color:'#A78BFA'},
+  {nombre:'KPIs',             key:'mss_kpis_v1',               icon:'◆',  color:'#10B981'},
+  {nombre:'SMART',            key:'mss_smart_v1',              icon:'🎯', color:'#10B981'},
+  {nombre:'FODA',             key:'mss_foda_v1',               icon:'⬡',  color:'#10B981'},
+  {nombre:'PESTEL',           key:'mss_pestel_v1',             icon:'🌐', color:'#10B981'},
+  {nombre:'Plan Estrat.',     key:'mss_plan_v1',               icon:'🗺', color:'#10B981'},
   {nombre:'ERP Multi-Emp.',   key:'mss_erp3_empresas',         icon:'🏗', color:'#C9A84C'},
   {nombre:'ERP Data',         key:'mss_erp3_data',             icon:'💾', color:'#C9A84C'},
 ];
@@ -328,13 +327,26 @@ function refreshStatus(){
 // ════════════════════════════════════════
 // EXPORTAR TODO (JSON)
 // ════════════════════════════════════════
+// ── FIREBASE ──
+let _db=null,_fbReady=false;
+async function _initFB(){
+  if(_fbReady)return;
+  try{
+    const m1=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const m2=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const FB={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
+    const app=m1.getApps().length?m1.getApps()[0]:m1.initializeApp(FB);
+    _db=m2.getFirestore(app);window._fbR=m2;_fbReady=true;
+    document.getElementById('fbStatus').textContent='🟢 Firebase conectado';
+    document.getElementById('fbStatus').style.color='#22C55E';
+  }catch(e){
+    _fbReady=false;
+    document.getElementById('fbStatus').textContent='🔴 Sin conexión Firebase';
+  }
+}
+
 function exportarTodo(){
-  const backup = {
-    version: '3.0',
-    fecha: new Date().toISOString(),
-    empresa: 'Martinez Services Spa',
-    modulos: {}
-  };
+  const backup={version:'4.0',fecha:new Date().toISOString(),empresa:'Martinez Services Spa',modulos:{}};
   let count=0;
   document.getElementById('exportLog').innerHTML='';
   MODULOS.forEach(m=>{
@@ -348,8 +360,93 @@ function exportarTodo(){
   const json=JSON.stringify(backup,null,2);
   const filename=`MSS_Respaldo_Completo_${dateStr()}.json`;
   download(json,filename);
-  log('exportLog',`✅ Respaldo completo exportado: ${filename} (${count} módulos, ${formatSize(new Blob([json]).size)})`,'ok');
+  log('exportLog',`✅ Respaldo exportado: ${filename} (${count} módulos, ${formatSize(new Blob([json]).size)})`,'ok');
 }
+
+// ════════════════════════════════════════
+// BACKUP FIREBASE — guarda todo en la nube
+// ════════════════════════════════════════
+async function backupFirebase(){
+  document.getElementById('exportLog').innerHTML='';
+  log('exportLog','⏳ Conectando a Firebase...','info');
+  await _initFB();
+  if(!_fbReady){log('exportLog','❌ Sin conexión Firebase','err');return;}
+  let count=0;
+  const empId=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}').id||3;
+  for(const m of MODULOS){
+    const val=localStorage.getItem(m.key);
+    if(val){
+      try{
+        await window._fbR.setDoc(window._fbR.doc(_db,'respaldos/'+empId+'/modulos/'+m.key.replace(/\//g,'_')),{key:m.key,nombre:m.nombre,data:JSON.parse(val),updated:new Date().toISOString()});
+        log('exportLog',`${m.icon} ${m.nombre} — guardado en nube`,'ok');
+        count++;
+      }catch(e){log('exportLog',`⚠ Error ${m.nombre}: ${e.message}`,'err');}
+    }
+  }
+  log('exportLog',`✅ Backup Firebase completo: ${count} módulos guardados en la nube`,'ok');
+}
+
+// ════════════════════════════════════════
+// RESTAURAR DESDE FIREBASE
+// ════════════════════════════════════════
+async function restaurarDesdeFirebase(){
+  document.getElementById('restoreLog').innerHTML='';
+  log('restoreLog','⏳ Conectando a Firebase...','info');
+  await _initFB();
+  if(!_fbReady){log('restoreLog','❌ Sin conexión Firebase','err');return;}
+  if(!confirm('¿Restaurar todos los datos desde Firebase? Esto reemplazará los datos locales actuales.'))return;
+  let count=0;
+  const empId=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}').id||3;
+  try{
+    const snap=await window._fbR.getDocs(window._fbR.collection(_db,'respaldos/'+empId+'/modulos'));
+    snap.forEach(d=>{
+      try{
+        const item=d.data();
+        if(item.key&&item.data){
+          localStorage.setItem(item.key,JSON.stringify(item.data));
+          const m=MODULOS.find(x=>x.key===item.key);
+          log('restoreLog',`${m?m.icon:'📦'} ${m?m.nombre:item.key} restaurado`,'ok');
+          count++;
+        }
+      }catch(e){log('restoreLog','Error: '+e.message,'err');}
+    });
+    log('restoreLog',`✅ Restauración Firebase completa: ${count} módulos restaurados`,'ok');
+    setTimeout(()=>{refreshStatus();renderBtnsMods();},500);
+  }catch(e){log('restoreLog','❌ Error: '+e.message,'err');}
+}
+
+function restaurarTodo(){
+  if(!pendingRestore){alert('Sin datos para restaurar');return;}
+  document.getElementById('restoreLog').innerHTML='';
+  if(pendingRestore.modulos){
+    let count=0;
+    Object.entries(pendingRestore.modulos).forEach(([key,val])=>{
+      try{
+        localStorage.setItem(key,JSON.stringify(val));
+        const m=MODULOS.find(x=>x.key===key);
+        log('restoreLog',`${m?m.icon:'📦'} ${m?m.nombre:key} restaurado`,'ok');
+        count++;
+      }catch(err){log('restoreLog',`Error restaurando ${key}`,'err');}
+    });
+    log('restoreLog',`✅ Restauración completa: ${count} módulos restaurados`,'ok');
+  }else{
+    try{
+      localStorage.setItem(pendingRestore.key,JSON.stringify(pendingRestore.data));
+      log('restoreLog',`✅ ${pendingRestore.modulo} restaurado correctamente`,'ok');
+    }catch(err){log('restoreLog','Error al restaurar','err');}
+  }
+  document.getElementById('previewRestore').style.display='none';
+  pendingRestore=null;
+  setTimeout(()=>{refreshStatus();renderBtnsMods();},500);
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+document.getElementById('hFecha').textContent=new Date().toLocaleString('es-CL');
+refreshStatus();
+renderBtnsMods();
+_initFB();
 
 // ════════════════════════════════════════
 // EXPORTAR CSV POR MÓDULO
@@ -371,7 +468,7 @@ function exportarCSVTodo(){
     }catch(e){log('exportLog','Error Finanzas','err');}
   }
   // Trabajadores
-  const trabs=localStorage.getItem('mss_rem_trabajadores_v1_'+(_EMP.id||1));
+  const trabs=localStorage.getItem('mss_rem_trabajadores_v1');
   if(trabs){
     try{
       const data=JSON.parse(trabs);
@@ -384,7 +481,7 @@ function exportarCSVTodo(){
     }catch(e){log('exportLog','Error Trabajadores','err');}
   }
   // Liquidaciones
-  const liqs=localStorage.getItem('mss_rem_liquidaciones_v1_'+(_EMP.id||1));
+  const liqs=localStorage.getItem('mss_rem_liquidaciones_v1');
   if(liqs){
     try{
       const data=JSON.parse(liqs);
@@ -397,7 +494,7 @@ function exportarCSVTodo(){
     }catch(e){log('exportLog','Error Liquidaciones','err');}
   }
   // Contratos
-  const ctrs=localStorage.getItem('mss_contratos_v1_'+(_EMP.id||1));
+  const ctrs=localStorage.getItem('mss_contratos_v1');
   if(ctrs){
     try{
       const data=JSON.parse(ctrs);
@@ -410,7 +507,7 @@ function exportarCSVTodo(){
     }catch(e){log('exportLog','Error Contratos','err');}
   }
   // Facturación
-  const docs=localStorage.getItem('mss_fact_docs_v1_'+(_EMP.id||1));
+  const docs=localStorage.getItem('mss_fact_docs_v1');
   if(docs){
     try{
       const data=JSON.parse(docs);
@@ -423,7 +520,7 @@ function exportarCSVTodo(){
     }catch(e){log('exportLog','Error Facturación','err');}
   }
   // Movimientos tesorería
-  const movs=localStorage.getItem('mss_tes_movs_v1_'+(_EMP.id||1));
+  const movs=localStorage.getItem('mss_tes_movs_v1');
   if(movs){
     try{
       const data=JSON.parse(movs);
