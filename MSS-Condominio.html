@@ -427,24 +427,81 @@ let _id=50000; const uid=()=>++_id;
 const HOY=new Date().toISOString().split('T')[0];
 const MES=HOY.substring(0,7);
 
-function load(){
+// ═══════════════════════════════════
+// FIREBASE — nube en tiempo real
+// ═══════════════════════════════════
+let _db=null,_fbReady=false,_unsubs=[];
+
+async function initFirebase(){
+  if(_fbReady)return;
   try{
-    const cfg=localStorage.getItem(SK.cfg);
-    CFG=cfg?JSON.parse(cfg):{...CFG};
-    const u=localStorage.getItem(SK.u);
-    // Si no hay unidades guardadas → usar las 160 precargadas
-    UNIDADES=u?JSON.parse(u):[...U160];
-    if(!u){localStorage.setItem(SK.u,JSON.stringify(UNIDADES));}
+    const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const fb=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const FB={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
+    const app=getApps().length?getApps()[0]:initializeApp(FB);
+    _db=fb.getFirestore(app);
+    window._fb=fb;_fbReady=true;
+    console.log('✅ Firebase OK');
+  }catch(e){console.warn('Firebase no disponible:',e.message);_fbReady=false;}
+}
+
+function ep(){return 'empresas/'+_EMP_ID;}
+
+async function fbGetAll(col){
+  const snap=await window._fb.getDocs(window._fb.collection(_db,ep()+'/'+col));
+  const arr=[];snap.forEach(d=>arr.push({id:d.id,...d.data()}));return arr;
+}
+async function fbSet(col,id,data){
+  await window._fb.setDoc(window._fb.doc(_db,ep()+'/'+col+'/'+String(id)),{...data});
+}
+async function fbBatch(col,arr){
+  if(!arr.length)return;
+  // Firestore batch max 500 docs
+  for(let i=0;i<arr.length;i+=400){
+    const batch=window._fb.writeBatch(_db);
+    arr.slice(i,i+400).forEach(item=>batch.set(window._fb.doc(_db,ep()+'/'+col+'/'+String(item.id)),{...item}));
+    await batch.commit();
+  }
+}
+
+async function load(){
+  await initFirebase();
+  if(_fbReady){
+    try{
+      const cfgSnap=await window._fb.getDoc(window._fb.doc(_db,ep()+'/config/main'));
+      if(cfgSnap.exists())CFG={...CFG,...cfgSnap.data()};
+      const uArr=await fbGetAll('unidades');
+      UNIDADES=uArr.length?uArr:[...U160];
+      if(!uArr.length)await fbBatch('unidades',UNIDADES);
+      COBROS=await fbGetAll('cobros');
+      EGRESOS=await fbGetAll('egresos');
+      const foArr=await fbGetAll('fondo');
+      FONDO=foArr.sort((a,b)=>String(a.id).localeCompare(String(b.id)));
+      NOVEDADES=await fbGetAll('novedades');
+      OT=await fbGetAll('ot');
+      TORRES=[...new Set(UNIDADES.map(u=>u.torre).filter(Boolean))].sort((a,b)=>(parseInt(a.replace(/\D/g,''))||0)-(parseInt(b.replace(/\D/g,''))||0));
+      console.log('✅ Cargado: '+UNIDADES.length+' unidades, '+COBROS.length+' cobros');
+      suscribirRT();
+    }catch(e){console.error('Firebase load error:',e);_loadLS();}
+  }else{_loadLS();}
+}
+
+function _loadLS(){
+  try{
+    const cfg=localStorage.getItem(SK.cfg);CFG=cfg?JSON.parse(cfg):{...CFG};
+    const u=localStorage.getItem(SK.u);UNIDADES=u?JSON.parse(u):[...U160];
+    if(!u)localStorage.setItem(SK.u,JSON.stringify(UNIDADES));
     COBROS=JSON.parse(localStorage.getItem(SK.co)||'[]');
     EGRESOS=JSON.parse(localStorage.getItem(SK.eg)||'[]');
     FONDO=JSON.parse(localStorage.getItem(SK.fo)||'[]');
     NOVEDADES=JSON.parse(localStorage.getItem(SK.no)||'[]');
     OT=JSON.parse(localStorage.getItem(SK.ot)||'[]');
-    // Torres desde unidades
     TORRES=[...new Set(UNIDADES.map(u=>u.torre).filter(Boolean))].sort((a,b)=>(parseInt(a.replace(/\D/g,''))||0)-(parseInt(b.replace(/\D/g,''))||0));
   }catch(e){UNIDADES=[...U160];COBROS=[];EGRESOS=[];FONDO=[];NOVEDADES=[];OT=[];TORRES=['Block 1','Block 2','Block 3','Block 4','Block 5','Block 6','Block 7','Block 8'];}
 }
-function save(){
+
+async function save(){
+  // Siempre localStorage como respaldo
   try{
     localStorage.setItem(SK.cfg,JSON.stringify(CFG));
     localStorage.setItem(SK.u,JSON.stringify(UNIDADES));
@@ -455,6 +512,36 @@ function save(){
     localStorage.setItem(SK.ot,JSON.stringify(OT));
     TORRES=[...new Set(UNIDADES.map(u=>u.torre).filter(Boolean))].sort((a,b)=>(parseInt(a.replace(/\D/g,''))||0)-(parseInt(b.replace(/\D/g,''))||0));
   }catch(e){}
+  // Firebase (no bloquea el UI — async en segundo plano)
+  if(_fbReady&&_db){
+    try{
+      await window._fb.setDoc(window._fb.doc(_db,ep()+'/config/main'),CFG);
+      await fbBatch('unidades',UNIDADES);
+      await fbBatch('cobros',COBROS);
+      await fbBatch('egresos',EGRESOS);
+      await fbBatch('fondo',FONDO);
+      await fbBatch('novedades',NOVEDADES);
+      await fbBatch('ot',OT);
+    }catch(e){console.error('Firebase save error:',e);}
+  }
+}
+
+function suscribirRT(){
+  _unsubs.forEach(u=>u());_unsubs=[];
+  try{
+    const {collection,onSnapshot}=window._fb;
+    _unsubs.push(onSnapshot(collection(_db,ep()+'/cobros'),snap=>{
+      COBROS=[];snap.forEach(d=>COBROS.push({id:d.id,...d.data()}));
+      if(document.getElementById('sec-gastos')?.classList.contains('on'))rGastos();
+      if(document.getElementById('sec-dashboard')?.classList.contains('on'))rDash();
+      if(document.getElementById('sec-morosidad')?.classList.contains('on'))rMorosidad();
+    }));
+    _unsubs.push(onSnapshot(collection(_db,ep()+'/unidades'),snap=>{
+      UNIDADES=[];snap.forEach(d=>UNIDADES.push({id:d.id,...d.data()}));
+      TORRES=[...new Set(UNIDADES.map(u=>u.torre).filter(Boolean))].sort((a,b)=>(parseInt(a.replace(/\D/g,''))||0)-(parseInt(b.replace(/\D/g,''))||0));
+    }));
+    console.log('✅ Tiempo real activo');
+  }catch(e){console.error('RT error:',e);}
 }
 
 // ═══════════════════════════════════
@@ -1061,10 +1148,12 @@ function nuevoBlock(){
 // ═══════════════════════════════════
 // INIT
 // ═══════════════════════════════════
-load();
-document.getElementById('condNombre').textContent=CFG.nombre||'Condominio Pioneros 2';
 document.getElementById('filtMes').value=MES;
-rDash();
+(async()=>{
+  await load();
+  document.getElementById('condNombre').textContent=CFG.nombre||'Condominio Pioneros 2';
+  rDash();
+})();
 
 // ═══════════════════════
 // EXPORTAR / IMPORTAR
