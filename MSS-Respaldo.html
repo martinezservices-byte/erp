@@ -405,17 +405,27 @@ async function backupFirebase(){
   document.getElementById('exportLog').innerHTML='';
   log('exportLog','⏳ Conectando a Firebase...','info');
   await _initFB();
-  if(!_fbReady){log('exportLog','❌ Sin conexión Firebase','err');return;}
+  if(!_fbReady||!_db){log('exportLog','❌ Sin conexión Firebase','err');return;}
   let count=0;
   const empId=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}').id||3;
-  for(const m of MODULOS){
-    const val=localStorage.getItem(m.key);
+  const {setDoc,doc}=window._fbM;
+  // Exportar TODAS las claves mss_ del localStorage
+  const keys=[];
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k&&k.startsWith('mss_'))keys.push(k);
+  }
+  for(const key of keys){
+    const val=localStorage.getItem(key);
     if(val){
       try{
-        await window._fbR.setDoc(window._fbR.doc(_db,'respaldos/'+empId+'/modulos/'+m.key.replace(/\//g,'_')),{key:m.key,nombre:m.nombre,data:JSON.parse(val),updated:new Date().toISOString()});
-        log('exportLog',`${m.icon} ${m.nombre} — guardado en nube`,'ok');
+        let data;
+        try{data=JSON.parse(val);}catch(e){data=val;}
+        await setDoc(doc(_db,'respaldos/global/modulos/'+key.replace(/[\/\.#\[\]\*]/g,'_')),{key,data,updated:new Date().toISOString()});
+        const m=MODULOS.find(x=>x.key===key);
+        log('exportLog',`${m?m.icon:'📦'} ${m?m.nombre:key} — guardado`,'ok');
         count++;
-      }catch(e){log('exportLog',`⚠ Error ${m.nombre}: ${e.message}`,'err');}
+      }catch(e){log('exportLog',`⚠ Error ${key}: ${e.message}`,'err');}
     }
   }
   log('exportLog',`✅ Backup Firebase completo: ${count} módulos guardados en la nube`,'ok');
@@ -428,16 +438,16 @@ async function restaurarDesdeFirebase(){
   document.getElementById('restoreLog').innerHTML='';
   log('restoreLog','⏳ Conectando a Firebase...','info');
   await _initFB();
-  if(!_fbReady){log('restoreLog','❌ Sin conexión Firebase','err');return;}
+  if(!_fbReady||!_db){log('restoreLog','❌ Sin conexión Firebase','err');return;}
   if(!confirm('¿Restaurar todos los datos desde Firebase? Esto reemplazará los datos locales actuales.'))return;
   let count=0;
-  const empId=JSON.parse(localStorage.getItem('mss_empresa_actual')||'{}').id||3;
   try{
-    const snap=await window._fbR.getDocs(window._fbR.collection(_db,'respaldos/'+empId+'/modulos'));
+    const {getDocs,collection}=window._fbM;
+    const snap=await getDocs(collection(_db,'respaldos/global/modulos'));
     snap.forEach(d=>{
       try{
         const item=d.data();
-        if(item.key&&item.data){
+        if(item.key&&item.data!==undefined){
           localStorage.setItem(item.key,JSON.stringify(item.data));
           const m=MODULOS.find(x=>x.key===item.key);
           log('restoreLog',`${m?m.icon:'📦'} ${m?m.nombre:item.key} restaurado`,'ok');
@@ -445,7 +455,7 @@ async function restaurarDesdeFirebase(){
         }
       }catch(e){log('restoreLog','Error: '+e.message,'err');}
     });
-    log('restoreLog',`✅ Restauración Firebase completa: ${count} módulos restaurados`,'ok');
+    log('restoreLog',`✅ Restauración completa: ${count} módulos restaurados`,'ok');
     setTimeout(()=>{refreshStatus();renderBtnsMods();},500);
   }catch(e){log('restoreLog','❌ Error: '+e.message,'err');}
 }
