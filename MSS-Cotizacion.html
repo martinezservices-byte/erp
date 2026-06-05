@@ -649,33 +649,36 @@ function limpiarForm(){
 }
 
 function emitirDocumento(){
-  const tipo=document.getElementById('docTipo').value;
-  const clienteId=parseInt(document.getElementById('docCliente').value)||null;
+  const tipo=document.getElementById('docTipo')?.value||'Cotización';
+  const clienteId=parseInt(document.getElementById('docCliente')?.value)||null;
   const cliente=CLIENTES_COT.find(c=>c.id===clienteId);
   const neto=ITEMS.reduce((s,it)=>s+it.total,0);
   if(!neto){alert('Agrega al menos un ítem con precio');return;}
-  if(!document.getElementById('docClienteRut').value){alert('Selecciona o ingresa los datos del cliente');return;}
+  const clienteRut=document.getElementById('docClienteRut')?.value||'';
+  if(!clienteRut){alert('Selecciona o ingresa los datos del cliente');return;}
   const iva=Math.round(neto*0.19);
+  const docNum=parseInt(document.getElementById('docNum')?.value)||DOCS.length+1;
   const doc={
     id:uid(), tipo,
-    num:parseInt(document.getElementById('docNum').value)||DOCS.length+1,
-    fecha:document.getElementById('docFecha').value,
-    vence:document.getElementById('docVence').value,
-    clienteId, clienteNombre:cliente?.nombre||document.getElementById('docCliente').options[document.getElementById('docCliente').selectedIndex]?.text||'Cliente',
-    clienteRut:document.getElementById('docClienteRut').value,
-    clienteGiro:document.getElementById('docClienteGiro').value,
-    clienteDir:document.getElementById('docClienteDir').value,
-    contacto:document.getElementById('docContacto').value,
-    condPago:document.getElementById('docCondPago').value,
-    comentarios:document.getElementById('docComentarios').value,
-    repLegal:document.getElementById('docRepLegal').value,
+    num:docNum,
+    fecha:document.getElementById('docFecha')?.value||new Date().toISOString().split('T')[0],
+    vence:document.getElementById('docVence')?.value||'',
+    clienteId,
+    clienteNombre:cliente?.nombre||document.getElementById('docCliente')?.options[document.getElementById('docCliente')?.selectedIndex]?.text||'Cliente',
+    clienteRut,
+    clienteGiro:document.getElementById('docClienteGiro')?.value||'',
+    clienteDir:document.getElementById('docClienteDir')?.value||'',
+    contacto:document.getElementById('docContacto')?.value||'',
+    condPago:document.getElementById('docCondPago')?.value||'Contado',
+    comentarios:document.getElementById('docComentarios')?.value||'',
+    repLegal:document.getElementById('docRepLegal')?.value||'Gaudy Martínez',
     items:ITEMS.filter(it=>it.total>0).map(it=>({...it})),
     neto,iva,total:neto+iva,estado:'Borrador',
   };
   DOCS.push(doc);save();
   alert('✓ '+tipo+' Nº'+doc.num+' generada correctamente');
   renderPreviewFromDoc(doc);
-  document.getElementById('docNum').value=parseInt(document.getElementById('docNum').value)+1;
+  if(document.getElementById('docNum')) document.getElementById('docNum').value=docNum+1;
 }
 
 function previewDoc(){
