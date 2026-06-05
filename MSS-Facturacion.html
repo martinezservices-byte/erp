@@ -578,7 +578,7 @@ function previewDocumento(docData){
 
   document.getElementById('previewContainer').innerHTML=`
   <div style="margin-top:20px">
-    <div style="font-size:12px;color:var(--acc);font-family:var(--mono);margin-bottom:10px">VISTA PREVIA DEL DOCUMENTO</div>
+    <div class="no-print" style="display:flex;justify-content:flex-end;margin-bottom:8px">
     <div class="factura-preview">
       ${(()=>{
         // Leer empresa actual del Hub

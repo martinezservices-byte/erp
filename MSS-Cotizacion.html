@@ -625,28 +625,31 @@ function emitirDocumento(){
 }
 
 function previewDoc(){
-  const tipo=document.getElementById('docTipo').value;
-  const clienteId=parseInt(document.getElementById('docCliente').value)||null;
+  const tipo=document.getElementById('docTipo')?.value||'Cotización';
+  const clienteId=parseInt(document.getElementById('docCliente')?.value)||null;
   const cliente=CLIENTES_COT.find(c=>c.id===clienteId);
   const itemsValidos=ITEMS.filter(it=>it.total>0);
-  // Permite vista previa aunque no haya items — muestra con datos vacíos
   const neto=ITEMS.reduce((s,it)=>s+it.total,0);
   const doc={
     tipo,
-    num:document.getElementById('docNum').value||1,
-    fecha:document.getElementById('docFecha').value||new Date().toISOString().split('T')[0],
-    vence:document.getElementById('docVence').value||'',
-    clienteNombre:cliente?.nombre||document.getElementById('docClienteRut').value||'[Nombre del Cliente]',
-    clienteRut:document.getElementById('docClienteRut').value||'[RUT]',
-    clienteGiro:document.getElementById('docClienteGiro').value||'[Giro]',
-    clienteDir:document.getElementById('docClienteDir').value||'[Dirección]',
-    contacto:document.getElementById('docContacto').value||'[Contacto]',
-    condPago:document.getElementById('docCondPago').value,
-    comentarios:document.getElementById('docComentarios').value,
-    repLegal:document.getElementById('docRepLegal').value||'Gaudy Martínez',
+    num:document.getElementById('docNum')?.value||1,
+    fecha:document.getElementById('docFecha')?.value||new Date().toISOString().split('T')[0],
+    vence:document.getElementById('docVence')?.value||'',
+    clienteNombre:cliente?.nombre||document.getElementById('docClienteRut')?.value||'[Nombre del Cliente]',
+    clienteRut:document.getElementById('docClienteRut')?.value||'[RUT]',
+    clienteGiro:document.getElementById('docClienteGiro')?.value||'[Giro]',
+    clienteDir:document.getElementById('docClienteDir')?.value||'[Dirección]',
+    contacto:document.getElementById('docContacto')?.value||'[Contacto]',
+    condPago:document.getElementById('docCondPago')?.value||'Contado',
+    comentarios:document.getElementById('docComentarios')?.value||'',
+    repLegal:document.getElementById('docRepLegal')?.value||'Gaudy Martínez',
     items:itemsValidos.length>0?itemsValidos:[{desc:'[Descripción del servicio]',qty:1,precio:0,total:0}],
     neto,iva:Math.round(neto*0.19),total:neto+Math.round(neto*0.19),
   };
+  // Asegurar que la pestaña de emisión esté visible para mostrar el preview
+  const tabEmitir = document.querySelector('[onclick*="showTab"][onclick*="emitir"]') ||
+                    document.querySelector('.tab[onclick*="emitir"]');
+  if(tabEmitir) tabEmitir.click();
   renderPreviewFromDoc(doc);
 }
 
@@ -673,7 +676,6 @@ function renderPreviewFromDoc(d){
   const html=`
   <div style="margin-top:20px">
     <div style="font-size:12px;color:var(--acc);font-family:monospace;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
-      <span>DOCUMENTO GENERADO — ${d.tipo.toUpperCase()} Nº${d.num} · ${emp.nombre}</span>
       <button class="btn-ghost no-print" style="padding:6px 14px;font-size:11px" onclick="imprimirDoc()">🖨 Imprimir / PDF</button>
     </div>
     <div class="doc">

@@ -342,7 +342,7 @@ function generarDocumento(){
   } else {
     html='<div class="doc-preview"><p style="text-align:center;padding:20px;color:#666">Selecciona un tipo de documento y completa el formulario</p></div>';
   }
-  document.getElementById('docPreview').innerHTML='<div style="margin-top:16px"><div style="font-size:11px;color:var(--acc);font-family:monospace;margin-bottom:10px">DOCUMENTO GENERADO</div>'+html+'<div style="margin-top:10px;display:flex;gap:8px" class="no-print"><button class="btn-ghost" onclick="imprimirDoc()">🖨 Imprimir</button><button class="btn-acc" onclick="guardarComoCtrRapido()">💾 Guardar Contrato</button></div></div>';
+  document.getElementById('docPreview').innerHTML='<div style="margin-top:16px">'+html+'<div style="margin-top:10px;display:flex;gap:8px" class="no-print"><button class="btn-ghost" onclick="imprimirDoc()">🖨 Imprimir</button><button class="btn-acc" onclick="guardarComoCtrRapido()">💾 Guardar Contrato</button></div></div>';
 }
 function guardarComoCtrRapido(){
   const tipo=document.getElementById('genTipo').value;
