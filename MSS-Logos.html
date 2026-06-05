@@ -271,7 +271,14 @@ const DEF_EMPRESAS = [
   {id:'3', nombre:'Martinez y Pajuelo Arriendos y Servicios SpA',   rut:'78.361.479-0'},
 ]
 
-function loadLogos(){try{LOGOS=JSON.parse(localStorage.getItem(SK_LOGOS)||'{}');}catch(e){LOGOS={};}}
+function loadLogos(){
+  try{LOGOS=JSON.parse(localStorage.getItem(SK_LOGOS)||'{}');}catch(e){LOGOS={};}
+  if(window._MSS_USER&&_fbReady&&_db){
+    window._fbM.getDoc(window._fbM.doc(_db,'empresas/logos/data/main'))
+      .then(snap=>{if(snap.exists()&&snap.data().logos){LOGOS={...LOGOS,...snap.data().logos};if(typeof renderLogos==='function')renderLogos();}})
+      .catch(()=>{});
+  }
+}
 function saveLogos(){try{localStorage.setItem(SK_LOGOS,JSON.stringify(LOGOS));}catch(e){alert('Error guardando — imagen muy grande, intenta con una más pequeña');}}
 
 function showTab(id,btn){

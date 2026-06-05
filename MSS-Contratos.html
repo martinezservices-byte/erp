@@ -113,6 +113,43 @@ async function _initFB(){
     console.log('✅ Contratos Firebase OK');
   }catch(e){_fbReady=false;console.warn('Firebase:',e.message);}
 }
+
+// ── FIREBASE SYNC ──
+async function _fbSyncSave(col, arr){
+  if(!window._MSS_USER||!_fbReady||!_db)return;
+  try{
+    const {writeBatch,doc,collection,setDoc}=window._fbM;
+    const ep='empresas/'+(window._MSS_EMP_ID||_EMP_ID||1)+'/'+col;
+    if(Array.isArray(arr)){
+      for(let i=0;i<arr.length;i+=400){
+        const b=writeBatch(_db);
+        arr.slice(i,i+400).forEach(item=>{
+          const id=String(item.id||item.uid||Date.now());
+          b.set(doc(_db,ep+'/'+id),{...item});
+        });
+        await b.commit();
+      }
+    } else {
+      await setDoc(doc(_db,ep+'/main'),{...arr,_updated:new Date().toISOString()});
+    }
+  }catch(e){console.warn('fbSyncSave:',e.message);}
+}
+async function _fbSyncLoad(col){
+  if(!window._MSS_USER||!_fbReady||!_db)return null;
+  try{
+    const {getDocs,collection,getDoc,doc}=window._fbM;
+    const ep='empresas/'+(window._MSS_EMP_ID||_EMP_ID||1)+'/'+col;
+    const snap=await getDocs(collection(_db,ep));
+    if(snap.empty)return null;
+    const arr=[];
+    snap.forEach(d=>arr.push({id:d.id,...d.data()}));
+    // Remove _updated meta from main doc
+    return arr.filter(x=>!x._updated||Object.keys(x).length>2).length===1&&arr[0].id==='main'
+      ? arr[0] : arr;
+  }catch(e){console.warn('fbSyncLoad:',e.message);return null;}
+}
+// ── FIN FIREBASE SYNC ──
+
 function _ep(){return 'empresas/'+(_EMP_ID||_empId||window._MSS_EMPID||2);}
 async function _fbGetAll(col){
   const snap=await window._fbM.getDocs(window._fbM.collection(_db,_ep()+'/'+col));
