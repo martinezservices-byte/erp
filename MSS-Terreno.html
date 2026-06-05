@@ -442,6 +442,26 @@ select.fi{appearance:none;}
 <div class="toast" id="toast"></div>
 
 <script>
+// ── MSS AUTH GUARD ──
+(async()=>{
+  try{
+    const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const {getAuth,onAuthStateChanged}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const FB={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
+    const app=getApps().length?getApps()[0]:initializeApp(FB);
+    const auth=getAuth(app);
+    onAuthStateChanged(auth,u=>{
+      if(!u){document.body.style.display='none';window.location.href='MSS-Login.html';}
+      else{
+        window._MSS_SESION={uid:u.uid,email:u.email,nombre:u.displayName||u.email.split('@')[0]};
+        const el=document.getElementById('_usuarioActual');
+        if(el)el.textContent=window._MSS_SESION.nombre;
+      }
+    });
+  }catch(e){console.warn('Auth guard:',e.message);}
+})();
+// ── FIN GUARD ──
+
 // ── FIREBASE ──
 let _db=null,_fbReady=false;
 async function _initFB(){

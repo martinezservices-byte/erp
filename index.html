@@ -127,7 +127,9 @@ body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;m
   <div class="header-right">
     <div class="header-clock" id="headerClock">--:--:--</div>
     <div class="header-ver">v3.0 Multi-Empresa</div>
-    <div style="width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--goldHi));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--bg);font-family:'JetBrains Mono',monospace;">GM</div>
+    <div id="userBadge" style="font-size:11px;color:var(--mutedHi);font-family:'JetBrains Mono',monospace;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+    <button id="btnLogout" onclick="cerrarSesion()" style="padding:6px 12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#FCA5A5;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'JetBrains Mono',monospace;display:none">⏻ Salir</button>
+    <div style="width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--goldHi));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--bg);font-family:'JetBrains Mono',monospace;" id="userAvatar">GM</div>
   </div>
 </div>
 
@@ -217,6 +219,26 @@ body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;m
 </div>
 
 <script>
+// ── MSS AUTH GUARD ──
+(async()=>{
+  try{
+    const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const {getAuth,onAuthStateChanged}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const FB={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
+    const app=getApps().length?getApps()[0]:initializeApp(FB);
+    const auth=getAuth(app);
+    onAuthStateChanged(auth,u=>{
+      if(!u){document.body.style.display='none';window.location.href='MSS-Login.html';}
+      else{
+        window._MSS_SESION={uid:u.uid,email:u.email,nombre:u.displayName||u.email.split('@')[0]};
+        const el=document.getElementById('_usuarioActual');
+        if(el)el.textContent=window._MSS_SESION.nombre;
+      }
+    });
+  }catch(e){console.warn('Auth guard:',e.message);}
+})();
+// ── FIN GUARD ──
+
 // ════════════════════════════════════════════════════════════
 //  MSS HUB — Motor Unificado v4.0
 //  Lee datos reales de cada módulo · 3 empresas fijas + CRUD
@@ -804,6 +826,55 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('clic
 // ════════════════════════════════════════
 load();
 render();
+</script>
+
+<!-- AUTH GUARD — protege el ERP con login -->
+<script type="module">
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+const FB = {
+  apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",
+  authDomain:"mss-erp.firebaseapp.com",
+  projectId:"mss-erp",
+  storageBucket:"mss-erp.firebasestorage.app",
+  messagingSenderId:"546891085564",
+  appId:"1:546891085564:web:82a24fb40941e6a54a0979"
+};
+
+const app  = getApps().length ? getApps()[0] : initializeApp(FB);
+const auth = getAuth(app);
+
+const ADMIN_EMAIL = 'aybserviciosg@gmail.com';
+
+onAuthStateChanged(auth, user => {
+  if(!user){
+    // No hay sesión → redirigir al login
+    window.location.href = 'login.html';
+    return;
+  }
+  // Sesión activa — mostrar info del usuario
+  const email = user.email || '';
+  const iniciales = email.substring(0,2).toUpperCase();
+  document.getElementById('userAvatar').textContent = iniciales;
+  document.getElementById('userBadge').textContent = email;
+  document.getElementById('btnLogout').style.display = 'block';
+
+  // Si es admin, mostrar botón crear usuarios
+  if(email === ADMIN_EMAIL){
+    const adminBtn = document.createElement('button');
+    adminBtn.textContent = '+ Usuario';
+    adminBtn.style.cssText = 'padding:6px 12px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);color:#C9A84C;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:JetBrains Mono,monospace';
+    adminBtn.onclick = () => window.location.href = 'admin-usuarios.html';
+    document.getElementById('btnLogout').before(adminBtn);
+  }
+});
+
+window.cerrarSesion = async function(){
+  if(!confirm('¿Cerrar sesión?')) return;
+  await signOut(auth);
+  window.location.href = 'login.html';
+};
 </script>
 </body>
 </html>
