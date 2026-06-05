@@ -628,54 +628,94 @@ const ICONOS={'Camioneta':'🚛','Vehículo':'🚗','Moto':'🏍','Maquinaria':'
 // Normaliza IDs a número — fix bug string vs number en localStorage
 function normIds(arr){ return arr.map(function(o){var c=Object.assign({},o);c.id=parseInt(o.id)||o.id;return c;}); }
 
-function load(){
+// ── FIREBASE ──
+let _db=null,_fbReady=false;
+async function _initFB(){
+  if(_fbReady)return;
   try{
-    if(_ES_MYP){
-      // M&P: intentar leer datos guardados por el usuario
-      // Si el usuario guardó datos (editó/agregó), usarlos
-      // Si no hay nada guardado, usar los datos reales base
-      const a    = JSON.parse(localStorage.getItem(SK.a)   ||'[]');
-      const ar   = JSON.parse(localStorage.getItem(SK.ar)  ||'[]');
-      const fl   = JSON.parse(localStorage.getItem(SK.fl)  ||'[]');
-      const cli  = JSON.parse(localStorage.getItem(SK.cli) ||'[]');
-      const mant = JSON.parse(localStorage.getItem(SK.mant)||'[]');
-      // Solo usar localStorage si tiene datos VÁLIDOS (más de 0 registros)
-      // Y si el primer registro tiene las propiedades correctas
-      if(a.length  && a[0].nombre)    ACTIVOS    = normIds(a);
-      if(ar.length && ar[0].num)      ARRIENDOS  = normIds(ar);
-      if(fl.length && fl[0].num)      FLETES     = normIds(fl);
-      if(cli.length&& cli[0].nombre)  CLIENTES   = normIds(cli);
-      if(mant.length&&mant[0].tipo)   MANTENCION = normIds(mant);
-    } else {
-      // Otras empresas: leer solo de localStorage
-      const a    = JSON.parse(localStorage.getItem(SK.a)   ||'[]');
-      const ar   = JSON.parse(localStorage.getItem(SK.ar)  ||'[]');
-      const fl   = JSON.parse(localStorage.getItem(SK.fl)  ||'[]');
-      const cli  = JSON.parse(localStorage.getItem(SK.cli) ||'[]');
-      const mant = JSON.parse(localStorage.getItem(SK.mant)||'[]');
-      ACTIVOS    = normIds(a);
-      ARRIENDOS  = normIds(ar);
-      FLETES     = normIds(fl);
-      CLIENTES   = normIds(cli);
-      MANTENCION = normIds(mant);
-    }
-    const c = localStorage.getItem(SK.cfg);
-    if(c) CFG = JSON.parse(c);
-  }catch(e){
-    console.warn('load() error:', e);
+    const m1=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const m2=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const FB={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
+    const app=m1.getApps().length?m1.getApps()[0]:m1.initializeApp(FB);
+    _db=m2.getFirestore(app);window._fbA=m2;_fbReady=true;
+    console.log('✅ Arriendos Firebase OK');
+  }catch(e){_fbReady=false;console.warn('Firebase no disponible:',e.message);}
+}
+function _ep(){return 'empresas/'+EMP.id;}
+async function _fbGetAll(col){
+  const snap=await window._fbA.getDocs(window._fbA.collection(_db,_ep()+'/'+col));
+  const arr=[];snap.forEach(d=>arr.push({id:d.id,...d.data()}));return arr;
+}
+async function _fbBatch(col,arr){
+  if(!arr.length){
+    // Si el array está vacío, no hacemos nada (evita borrar datos accidentalmente)
+    return;
   }
-  // Guardar estado actual (para persistir cambios futuros)
-  save();
-  // Sincronizar con Finanzas si es M&P
-  if(_ES_MYP){
-    try{
-      // Siempre resincronizar Finanzas al cargar para mantener consistencia
-      ARRIENDOS.forEach(a=>syncFinanzas('arriendo',a,'save'));
-      FLETES.forEach(f=>syncFinanzas('flete',f,'save'));
-    }catch(e){}
+  for(let i=0;i<arr.length;i+=400){
+    const batch=window._fbA.writeBatch(_db);
+    arr.slice(i,i+400).forEach(item=>{
+      const id=String(item.id||Date.now());
+      batch.set(window._fbA.doc(_db,_ep()+'/'+col+'/'+id),{...item});
+    });
+    await batch.commit();
   }
 }
-function save(){
+
+async function load(){
+  await _initFB();
+  if(_fbReady){
+    try{
+      const [aArr,arArr,flArr,cliArr,mantArr,cfgSnap]=await Promise.all([
+        _fbGetAll('activos'),
+        _fbGetAll('arr_arriendos'),
+        _fbGetAll('arr_fletes'),
+        _fbGetAll('arr_clientes'),
+        _fbGetAll('arr_mantencion'),
+        window._fbA.getDoc(window._fbA.doc(_db,_ep()+'/arr_config/main'))
+      ]);
+      // Solo usar Firebase si tiene datos válidos
+      if(aArr.length   && aArr[0].nombre)   ACTIVOS    = normIds(aArr);
+      if(arArr.length  && arArr[0].num)     ARRIENDOS  = normIds(arArr);
+      if(flArr.length  && flArr[0].num)     FLETES     = normIds(flArr);
+      if(cliArr.length && cliArr[0].nombre) CLIENTES   = normIds(cliArr);
+      if(mantArr.length&& mantArr[0].tipo)  MANTENCION = normIds(mantArr);
+      if(cfgSnap.exists()) CFG={...CFG,...cfgSnap.data()};
+      console.log('✅ Arriendos cargados desde Firebase: '+ACTIVOS.length+' activos, '+ARRIENDOS.length+' arriendos, '+FLETES.length+' fletes');
+      // Si Firebase no tenía datos, intentar localStorage
+      if(!ACTIVOS.length&&!ARRIENDOS.length) _loadLS();
+      suscribirRT();
+      return;
+    }catch(e){console.error('Firebase load error:',e);}
+  }
+  _loadLS();
+}
+
+function _loadLS(){
+  try{
+    if(_ES_MYP){
+      const a=JSON.parse(localStorage.getItem(SK.a)||'[]');
+      const ar=JSON.parse(localStorage.getItem(SK.ar)||'[]');
+      const fl=JSON.parse(localStorage.getItem(SK.fl)||'[]');
+      const cli=JSON.parse(localStorage.getItem(SK.cli)||'[]');
+      const mant=JSON.parse(localStorage.getItem(SK.mant)||'[]');
+      if(a.length   &&a[0].nombre)    ACTIVOS    = normIds(a);
+      if(ar.length  &&ar[0].num)      ARRIENDOS  = normIds(ar);
+      if(fl.length  &&fl[0].num)      FLETES     = normIds(fl);
+      if(cli.length &&cli[0].nombre)  CLIENTES   = normIds(cli);
+      if(mant.length&&mant[0].tipo)   MANTENCION = normIds(mant);
+    }else{
+      ACTIVOS    = normIds(JSON.parse(localStorage.getItem(SK.a)||'[]'));
+      ARRIENDOS  = normIds(JSON.parse(localStorage.getItem(SK.ar)||'[]'));
+      FLETES     = normIds(JSON.parse(localStorage.getItem(SK.fl)||'[]'));
+      CLIENTES   = normIds(JSON.parse(localStorage.getItem(SK.cli)||'[]'));
+      MANTENCION = normIds(JSON.parse(localStorage.getItem(SK.mant)||'[]'));
+    }
+    const c=localStorage.getItem(SK.cfg);if(c)CFG=JSON.parse(c);
+  }catch(e){console.warn('_loadLS error:',e);}
+}
+
+async function save(){
+  // localStorage respaldo siempre
   try{
     localStorage.setItem(SK.a,    JSON.stringify(ACTIVOS));
     localStorage.setItem(SK.ar,   JSON.stringify(ARRIENDOS));
@@ -684,6 +724,35 @@ function save(){
     localStorage.setItem(SK.mant, JSON.stringify(MANTENCION));
     localStorage.setItem(SK.cfg,  JSON.stringify(CFG));
   }catch(e){}
+  // Firebase en segundo plano
+  if(_fbReady&&_db){
+    try{
+      await Promise.all([
+        _fbBatch('activos',       ACTIVOS),
+        _fbBatch('arr_arriendos', ARRIENDOS),
+        _fbBatch('arr_fletes',    FLETES),
+        _fbBatch('arr_clientes',  CLIENTES),
+        _fbBatch('arr_mantencion',MANTENCION),
+        window._fbA.setDoc(window._fbA.doc(_db,_ep()+'/arr_config/main'),CFG)
+      ]);
+    }catch(e){console.error('Firebase save error:',e);}
+  }
+}
+
+function suscribirRT(){
+  try{
+    const {collection,onSnapshot}=window._fbA;
+    // Escuchar cambios en arriendos y fletes en tiempo real
+    onSnapshot(collection(_db,_ep()+'/arr_arriendos'),snap=>{
+      ARRIENDOS=[];snap.forEach(d=>ARRIENDOS.push({id:d.id,...d.data()}));
+      if(document.getElementById('sec-arriendos')?.classList.contains('on')) rArriendos?.();
+    });
+    onSnapshot(collection(_db,_ep()+'/arr_fletes'),snap=>{
+      FLETES=[];snap.forEach(d=>FLETES.push({id:d.id,...d.data()}));
+      if(document.getElementById('sec-fletes')?.classList.contains('on')) rFletes?.();
+    });
+    console.log('✅ Arriendos tiempo real activo');
+  }catch(e){console.error('RT error:',e);}
 }
 
 // ── SINCRONIZACIÓN CON FINANZAS ──
@@ -751,6 +820,13 @@ function syncFinanzas(tipo, obj, accion){
     }
 
     localStorage.setItem(finKey, JSON.stringify(fin));
+    // También sincronizar con Firebase Finanzas
+    if(_fbReady&&_db){
+      try{
+        const ep2='empresas/'+EMP.id+'/finanzas/data';
+        window._fbA.setDoc(window._fbA.doc(_db,ep2),fin).catch(e=>console.warn('syncFin Firebase:',e));
+      }catch(e){}
+    }
   }catch(e){ console.warn('syncFinanzas error:', e); }
 }
 function getEmpresa(){ return EMP; }
@@ -2952,8 +3028,16 @@ function generarDevolucionERP(id) {
 }
 
 // INIT
-load();
-rDash();
+(async()=>{
+  await load();
+  if(_ES_MYP){
+    try{
+      ARRIENDOS.forEach(a=>syncFinanzas('arriendo',a,'save'));
+      FLETES.forEach(f=>syncFinanzas('flete',f,'save'));
+    }catch(e){}
+  }
+  rDash();
+})();
 
 // ── RECEPTOR DE DATOS DESDE MSS-FotoMovil (QR) ──
 (function(){
