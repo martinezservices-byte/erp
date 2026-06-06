@@ -83,7 +83,8 @@ tfoot td{border-top:2px solid rgba(56,189,248,0.25);font-weight:800;}
   #sec-documentos,#sec-nuevo,#sec-clientes,#sec-productos,#sec-resumen{display:none!important;}
   body{background:white!important;margin:0!important;padding:0!important;}
   #content{display:block!important;background:white!important;padding:0!important;margin:0!important;}
-  #previewContainer{display:block!important;width:100%!important;}
+  #previewContainer{display:block!important;}
+  #printOnly{display:block!important;}
   .factura-preview,.doc-preview,.liq-box{box-shadow:none!important;margin:0!important;border-radius:0!important;max-width:100%!important;width:100%!important;}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}
   @page{margin:10mm;size:A4;}
@@ -330,10 +331,8 @@ try{
         <button class="btn-ghost" onclick="limpiarForm()">🗑 Limpiar</button>
       </div>
     </div>
+    <div id="previewContainer"></div>
   </div>
-
-  <!-- PREVIEW IMPRESION - fuera de todas las secciones -->
-  <div id="previewContainer"></div>
 
   <!-- CLIENTES/PROVEEDORES -->
   <div id="sec-clientes" class="section">
@@ -880,7 +879,16 @@ document.getElementById('hInfo').textContent=`${DOCUMENTOS.length} documentos`;
 function imprimirDoc(){
   var prev=document.getElementById('previewContainer');
   if(!prev||!prev.innerHTML.trim()){alert('Primero genera una vista previa del documento.');return;}
-  window.print();
+  var estilos='';
+  document.querySelectorAll('style').forEach(function(s){estilos+=s.innerHTML;});
+  var win=window.open('','_blank','width=900,height=700');
+  win.document.write('<html><head><meta charset="UTF-8"><style>'+
+    'body{background:white;margin:0;padding:16px;font-family:Arial,sans-serif;}'+
+    estilos+
+    '@media print{body{padding:0;}@page{margin:10mm;size:A4;}}'+
+    '</style></head><body>'+prev.innerHTML+'</body></html>');
+  win.document.close();
+  win.onload=function(){win.focus();win.print();};
 }
 
 try{var _l=document.getElementById('_empNombreLogo');if(_l&&window._MSS_EMP)_l.textContent=window._MSS_EMP.nombre||_empObj.nombre||'Mi Empresa';}catch(e){}
