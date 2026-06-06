@@ -598,9 +598,123 @@ function irModuloCondo(archivo, condoId){
 }
 
 function openCondoModal(id){
-  // Por ahora usar el mismo modal de empresa adaptado
-  alert('Funcionalidad de nuevo condominio: próximamente disponible en Fase 2.');
+  const condo = id ? CONDOMINIOS.find(c=>String(c.id)===String(id)) : null;
+  // Crear modal dinámico
+  let mo = document.getElementById('_moCondoEdit');
+  if(!mo){
+    mo = document.createElement('div');
+    mo.id = '_moCondoEdit';
+    mo.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+    mo.innerHTML=`
+    <div style="background:#111827;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto">
+      <div style="font-size:16px;font-weight:800;color:#F9FAFB;margin-bottom:18px" id="_moCondoTitle">Nuevo Condominio</div>
+      <input type="hidden" id="_cId"/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="display:flex;flex-direction:column;gap:5px;grid-column:1/-1">
+          <label style="font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase">Nombre del Condominio *</label>
+          <input id="_cNombre" style="background:#1F2937;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;color:#F9FAFB;font-size:13px;font-family:inherit;outline:none" placeholder="Ej: Condominio Pioneros 2"/>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase">RUT Comunidad</label>
+          <input id="_cRut" style="background:#1F2937;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;color:#F9FAFB;font-size:13px;font-family:inherit;outline:none" placeholder="65.000.000-0"/>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase">Administrador</label>
+          <input id="_cAdmin" style="background:#1F2937;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;color:#F9FAFB;font-size:13px;font-family:inherit;outline:none" placeholder="Nombre del administrador"/>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase">Email</label>
+          <input id="_cEmail" type="email" style="background:#1F2937;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;color:#F9FAFB;font-size:13px;font-family:inherit;outline:none" placeholder="admin@condominio.cl"/>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;grid-column:1/-1">
+          <label style="font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase">Dirección</label>
+          <input id="_cDir" style="background:#1F2937;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;color:#F9FAFB;font-size:13px;font-family:inherit;outline:none" placeholder="Calle y número, ciudad"/>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase">N° Departamentos</label>
+          <input id="_cDeptos" type="number" style="background:#1F2937;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;color:#F9FAFB;font-size:13px;font-family:inherit;outline:none" placeholder="Ej: 160"/>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase">Modalidad Cobro GC *</label>
+          <select id="_cModalidad" style="background:#1F2937;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;color:#F9FAFB;font-size:13px;font-family:inherit;outline:none;appearance:none">
+            <option value="fija">💰 Cuota Fija — monto igual para todas las unidades</option>
+            <option value="prorrateo">📐 Prorrateo Variable — coeficiente de copropiedad (%)</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase">GC Base ($)</label>
+          <input id="_cGC" type="number" style="background:#1F2937;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;color:#F9FAFB;font-size:13px;font-family:inherit;outline:none" placeholder="40000"/>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase">Color</label>
+          <input id="_cColor" type="color" value="#10B981" style="background:#1F2937;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px;height:42px;width:100%;cursor:pointer"/>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button onclick="saveCondoModal()" style="flex:1;padding:12px;background:linear-gradient(135deg,#10B981,#059669);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit">💾 Guardar Condominio</button>
+        <button onclick="document.getElementById('_moCondoEdit').style.display='none'" style="padding:12px 18px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#9CA3AF;border-radius:10px;cursor:pointer;font-family:inherit">Cancelar</button>
+      </div>
+    </div>`;
+    document.body.appendChild(mo);
+    mo.addEventListener('click', e=>{ if(e.target===mo) mo.style.display='none'; });
+  }
+  // Poblar con datos existentes o limpiar
+  document.getElementById('_moCondoTitle').textContent = condo ? 'Editar Condominio' : 'Nuevo Condominio';
+  document.getElementById('_cId').value       = condo ? condo.id : '';
+  document.getElementById('_cNombre').value   = condo?.nombre  || '';
+  document.getElementById('_cRut').value      = condo?.rut     || '';
+  document.getElementById('_cAdmin').value    = condo?.contacto|| '';
+  document.getElementById('_cEmail').value    = condo?.email   || '';
+  document.getElementById('_cDir').value      = condo?.direccion||'';
+  document.getElementById('_cDeptos').value   = condo?.deptos  || '';
+  document.getElementById('_cModalidad').value= condo?.modalidad||'fija';
+  document.getElementById('_cGC').value       = condo?.gc      || 40000;
+  document.getElementById('_cColor').value    = condo?.color   || '#10B981';
+  mo.style.display='flex';
 }
+
+function saveCondoModal(){
+  const id    = document.getElementById('_cId').value;
+  const nombre= document.getElementById('_cNombre').value.trim();
+  if(!nombre){ alert('El nombre del condominio es obligatorio'); return; }
+  const obj = {
+    nombre,
+    rut:       document.getElementById('_cRut').value.trim(),
+    contacto:  document.getElementById('_cAdmin').value.trim(),
+    email:     document.getElementById('_cEmail').value.trim(),
+    direccion: document.getElementById('_cDir').value.trim(),
+    deptos:    parseInt(document.getElementById('_cDeptos').value)||0,
+    modalidad: document.getElementById('_cModalidad').value,
+    gc:        parseFloat(document.getElementById('_cGC').value)||40000,
+    color:     document.getElementById('_cColor').value,
+    tipo:      'condominio',
+    rubro:     'Administración Condominio',
+  };
+  if(id){
+    // Editar existente
+    const i = CONDOMINIOS.findIndex(c=>String(c.id)===String(id));
+    if(i>=0) CONDOMINIOS[i]={...CONDOMINIOS[i],...obj};
+  } else {
+    // Nuevo
+    obj.id = 'condo_'+Date.now();
+    CONDOMINIOS.push(obj);
+  }
+  // Guardar
+  try{localStorage.setItem('mss_condominios_v1', JSON.stringify(CONDOMINIOS));}catch(e){}
+  // Firebase
+  if(typeof db !== 'undefined' && db){
+    try{
+      import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js').then(({doc,setDoc,getFirestore})=>{
+        const d=getFirestore();
+        setDoc(doc(d,'condominios/'+(id||obj.id)), obj, {merge:true}).catch(e=>console.warn(e));
+      });
+    }catch(e){}
+  }
+  document.getElementById('_moCondoEdit').style.display='none';
+  renderCondominios();
+  alert('✅ Condominio guardado correctamente');
+}
+
 function editCondominio(id){ openCondoModal(id); }
 
 // ── NAVEGACIÓN ──

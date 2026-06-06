@@ -213,11 +213,10 @@ body::before{
   <div class="brand">
     <div class="brand-logo">M</div>
     <div class="brand-name">Martinez Services</div>
-    <div class="brand-sub">Sistema ERP Empresarial</div>
+    <div class="brand-sub">Plataforma ERP Profesional</div>
     <div class="emps">
-      <span class="emp-badge">🔧 Martinez Services Spa</span>
-      <span class="emp-badge">🏢 Condominio Pioneros 2</span>
-      <span class="emp-badge">🚛 M&P Arriendos SpA</span>
+      <span class="emp-badge" style="background:rgba(201,168,76,0.12);border-color:rgba(201,168,76,0.25);color:#C9A84C">🏭 ERP Multiempresas Comerciales</span>
+      <span class="emp-badge" style="background:rgba(16,185,129,0.12);border-color:rgba(16,185,129,0.25);color:#10B981">🏢 ERP Gestión de Condominios</span>
     </div>
   </div>
 
@@ -268,6 +267,24 @@ body::before{
       <button class="btn-login" id="btnRecover" onclick="doRecover()">
         Enviar enlace de recuperación
       </button>
+    </div>
+  </div>
+
+  <!-- BIENVENIDA ADMIN -->
+  <div id="screenBienvenida" style="display:none">
+    <div class="card">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:22px;font-weight:900;color:#F9FAFB">¡Bienvenida, <span id="bvNombre">Admin</span>!</div>
+        <div style="font-size:12px;color:#6B7280;margin-top:6px">¿A qué módulo deseas acceder?</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <button onclick="window.location.href='index.html'" style="width:100%;padding:16px;background:linear-gradient(135deg,#C9A84C,#F59E0B);color:#0A0F1C;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px">
+          🏭 Entrar al ERP Comercial
+        </button>
+        <button onclick="window.location.href='MSS-Condominio.html'" style="width:100%;padding:16px;background:linear-gradient(135deg,#10B981,#059669);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px">
+          🏢 Entrar al ERP de Condominios
+        </button>
+      </div>
     </div>
   </div>
 
@@ -330,7 +347,24 @@ window.doLogin = async function(){
       nombre: cred.user.displayName || cred.user.email.split('@')[0]
     }));
     btn.innerHTML = '✓ Acceso concedido';
-    setTimeout(()=> window.location.href = 'index.html', 500);
+    // Leer rol desde Firestore para mostrar menú correcto
+    setTimeout(async ()=>{
+      let rol = 'user';
+      try{
+        const {getFirestore,doc,getDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+        const db2 = getFirestore(app);
+        const snap = await getDoc(doc(db2,'usuarios/'+cred.user.uid));
+        if(snap.exists()) rol = snap.data().rol || 'user';
+      }catch(e){}
+      if(rol==='superadmin'||rol==='admin'){
+        // Mostrar menú de bienvenida con dos botones
+        document.getElementById('screenLogin').style.display='none';
+        document.getElementById('screenBienvenida').style.display='block';
+        document.getElementById('bvNombre').textContent = cred.user.displayName||cred.user.email.split('@')[0];
+      } else {
+        window.location.href = 'index.html';
+      }
+    }, 400);
   }catch(e){
     btn.disabled = false;
     btn.innerHTML = 'Ingresar al Sistema';

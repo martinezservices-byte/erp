@@ -284,6 +284,7 @@ try{var _e=_condoObj;if(_e&&_e.nombre){var _nd=document.getElementById('nav-emp'
         <div class="fl"><label>Banco</label><input id="cfgBanco" type="text"/></div>
         <div class="fl"><label>N° Cuenta</label><input id="cfgCuenta" type="text"/></div>
         <div class="fl"><label>GC Mensual ($)</label><input id="cfgGC" type="number"/></div>
+        <div class="fl" style="grid-column:1/-1"><label>Modalidad de Cobro GC</label><select id="cfgModalidad" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none"><option value="fija">💰 Cuota Fija — mismo monto para todas las unidades</option><option value="prorrateo">📐 Prorrateo Variable — coeficiente de copropiedad (%)</option></select></div>
         <div class="fl"><label>Tasa Mora (%)</label><input id="cfgMora" type="number" step="0.1"/></div>
       </div>
       <button class="bg" onclick="saveConfig()">💾 Guardar</button>
@@ -320,6 +321,8 @@ try{var _e=_condoObj;if(_e&&_e.nombre){var _nd=document.getElementById('nav-emp'
     <div class="fl"><label>GC Personalizado ($) — 0=usa general</label><input id="uGC" type="number" value="0"/></div>
     <div class="fl"><label>Estado</label><select id="uEstado" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none"><option>Al día</option><option>Moroso</option><option>Inactivo</option></select></div>
     <div class="fl f"><label>Notas</label><input id="uNotas" type="text"/></div>
+    <div class="fl"><label>N° Estacionamiento</label><input id="uEst" type="text" placeholder="Ej: E-39 (Subterráneo -1)"/></div>
+    <div class="fl"><label>N° Bodega (vacío si no aplica)</label><input id="uBodega" type="text" placeholder="Ej: B-12"/></div>
   </div>
   <div style="display:flex;gap:8px;margin-top:12px">
     <button class="bg" style="flex:1" onclick="saveUnidad()">Guardar</button>
@@ -330,7 +333,13 @@ try{var _e=_condoObj;if(_e&&_e.nombre){var _nd=document.getElementById('nav-emp'
 <div class="mo" id="moCobro"><div class="mb">
   <h3 id="tCobro">Registrar Pago</h3><input type="hidden" id="coId"/>
   <div class="fg">
-    <div class="fl"><label>Período</label><input id="coMes" type="month"/></div>
+    <div class="fl"><label>Período</label>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input id="coMes" type="month" style="flex:1"/>
+        <button type="button" onclick="setMesSinIdentificar()" title="Mes por Identificar" style="padding:6px 8px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);border-radius:6px;color:#F59E0B;cursor:pointer;font-size:10px;font-weight:700;white-space:nowrap">? Sin Mes</button>
+      </div>
+      <div id="_mesIdLabel" style="display:none;font-size:10px;color:#F59E0B;font-weight:700;margin-top:3px">⚠ MES POR IDENTIFICAR — Saldo Histórico</div>
+    </div>
     <div class="fl"><label>Unidad</label><select id="coUnidad" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none"></select></div>
     <div class="fl"><label>Estado</label><select id="coEstado" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none"><option>Pagado</option><option>Abono</option><option>Pendiente</option><option>Moroso</option></select></div>
     <div class="fl"><label>GC Ordinario ($)</label><input id="coGC" type="number"/></div>
@@ -583,7 +592,16 @@ const clp=n=>new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maxi
 const df=d=>{try{return new Date(d+'T12:00:00').toLocaleDateString('es-CL');}catch{return d||'—';}};
 const badge=(l,c)=>`<span class="badge" style="background:${c}20;color:${c};border:1px solid ${c}40">${l}</span>`;
 const EC={Pagado:'#22C55E',Abono:'#F59E0B',Pendiente:'#38BDF8',Moroso:'#EF4444','Al día':'#22C55E',Inactivo:'#5A7090',Abierta:'#38BDF8','En Proceso':'#F59E0B',Cerrada:'#22C55E',Completado:'#22C55E',Programado:'#38BDF8'};
-const gc=u=>u.gcCustom>0?u.gcCustom:(CFG.gc||40000);
+const gc=u=>{
+  if(u.gcCustom>0) return u.gcCustom;
+  if((CFG.modalidad||'fija')==='prorrateo'&&u.prorrateo>0){
+    // Prorrateo: coeficiente % sobre total egresos del mes
+    const totEgr=EGRESOS.filter(e=>e.fecha&&e.fecha.startsWith(MES)).reduce((s,eg)=>s+eg.monto,0);
+    const base=totEgr>0?totEgr:(CFG.gc||40000)*UNIDADES.length;
+    return Math.round(base*(u.prorrateo/100));
+  }
+  return CFG.gc||40000;
+};
 
 // ═══════════════════════════════════
 // TABS
@@ -658,6 +676,8 @@ function editU(id){
   document.getElementById('uRut').value=u.rut||'';
   document.getElementById('uTel').value=u.tel||'';
   document.getElementById('uEmail').value=u.email||'';
+  if(document.getElementById('uEst'))document.getElementById('uEst').value=u.estacionamiento||'';
+  if(document.getElementById('uBodega'))document.getElementById('uBodega').value=u.bodega||'';
   document.getElementById('uGC').value=u.gcCustom||0;
   document.getElementById('uEstado').value=u.estado||'Al día';
   document.getElementById('uNotas').value=u.notas||'';
@@ -666,7 +686,7 @@ function editU(id){
 
 function saveUnidad(){
   const id=document.getElementById('uId').value;
-  const obj={torre:document.getElementById('uTorre').value,piso:document.getElementById('uPiso').value,num:document.getElementById('uNum').value.trim(),tipo:document.getElementById('uTipo').value,prop:document.getElementById('uProp').value.trim(),rut:document.getElementById('uRut').value.trim(),tel:document.getElementById('uTel').value.trim(),email:document.getElementById('uEmail').value.trim(),gcCustom:parseFloat(document.getElementById('uGC').value)||0,estado:document.getElementById('uEstado').value,notas:document.getElementById('uNotas').value.trim()};
+  const obj={torre:document.getElementById('uTorre').value,piso:document.getElementById('uPiso').value,num:document.getElementById('uNum').value.trim(),tipo:document.getElementById('uTipo').value,prop:document.getElementById('uProp').value.trim(),rut:document.getElementById('uRut').value.trim(),tel:document.getElementById('uTel').value.trim(),email:document.getElementById('uEmail').value.trim(),gcCustom:parseFloat(document.getElementById('uGC').value)||0,estado:document.getElementById('uEstado').value,notas:document.getElementById('uNotas').value.trim(),estacionamiento:document.getElementById('uEst')?.value.trim()||'',bodega:document.getElementById('uBodega')?.value.trim()||''};
   if(!obj.num)return alert('Ingresa el número de unidad');
   if(id){const i=UNIDADES.findIndex(u=>u.id==id);if(i>=0)UNIDADES[i]={...UNIDADES[i],...obj};}
   else UNIDADES.push({id:uid(),...obj});
@@ -749,6 +769,11 @@ function abrirCobro(id){
   editCobro(id);
 }
 
+function setMesSinIdentificar(){
+  document.getElementById('coMes').value='';
+  document.getElementById('coMes').dataset.sinMes='1';
+  document.getElementById('_mesIdLabel').style.display='block';
+}
 function saveCobro(){
   const id=document.getElementById('coId').value;
   const uId=parseInt(document.getElementById('coUnidad').value)||0;
@@ -757,7 +782,9 @@ function saveCobro(){
   const mora=parseFloat(document.getElementById('coMora').value)||0;
   const pagado=parseFloat(document.getElementById('coPagado').value)||0;
   const total=gcOrd+mora;
-  const obj={mes:document.getElementById('coMes').value,unidadId:uId,unidadNum:u?.num||'?',prop:u?.prop||'?',gcOrd,mora,total,pagado,saldo:Math.max(0,total-pagado),estado:document.getElementById('coEstado').value,fechaPago:document.getElementById('coFecha').value,ref:document.getElementById('coComp').value,forma:document.getElementById('coForma').value,obs:document.getElementById('coObs').value};
+  const mesSinId=document.getElementById('coMes').dataset.sinMes==='1'&&!document.getElementById('coMes').value;
+  const mesVal=mesSinId?'MES POR IDENTIFICAR':document.getElementById('coMes').value;
+  const obj={mes:mesVal,mesSinIdentificar:mesSinId,unidadId:uId,unidadNum:u?.num||'?',prop:u?.prop||'?',gcOrd,mora,total,pagado,saldo:Math.max(0,total-pagado),estado:document.getElementById('coEstado').value,fechaPago:document.getElementById('coFecha').value,ref:document.getElementById('coComp').value,forma:document.getElementById('coForma').value,obs:document.getElementById('coObs').value};
   if(id){const i=COBROS.findIndex(c=>c.id==id);if(i>=0)COBROS[i]={...COBROS[i],...obj};}
   else COBROS.push({id:uid(),...obj});
   save();
@@ -1108,11 +1135,12 @@ function rConfig(){
   document.getElementById('cfgBanco').value=CFG.banco||'';
   document.getElementById('cfgCuenta').value=CFG.cuenta||'';
   document.getElementById('cfgGC').value=CFG.gc||40000;
+  if(document.getElementById('cfgModalidad'))document.getElementById('cfgModalidad').value=CFG.modalidad||'fija';
   document.getElementById('cfgMora').value=CFG.mora||1.5;
 }
 
 function saveConfig(){
-  CFG={nombre:document.getElementById('cfgNombre').value,dir:document.getElementById('cfgDir').value,rut:document.getElementById('cfgRut').value,admin:document.getElementById('cfgAdmin').value,tel:document.getElementById('cfgTel').value,email:document.getElementById('cfgEmail').value,banco:document.getElementById('cfgBanco').value,cuenta:document.getElementById('cfgCuenta').value,gc:parseFloat(document.getElementById('cfgGC').value)||40000,mora:parseFloat(document.getElementById('cfgMora').value)||1.5};
+  CFG={nombre:document.getElementById('cfgNombre').value,dir:document.getElementById('cfgDir').value,rut:document.getElementById('cfgRut').value,admin:document.getElementById('cfgAdmin').value,tel:document.getElementById('cfgTel').value,email:document.getElementById('cfgEmail').value,banco:document.getElementById('cfgBanco').value,cuenta:document.getElementById('cfgCuenta').value,gc:parseFloat(document.getElementById('cfgGC').value)||40000,mora:parseFloat(document.getElementById('cfgMora').value)||1.5,modalidad:document.getElementById('cfgModalidad')?.value||'fija'};
   save();document.getElementById('condNombre').textContent=CFG.nombre||'Condominio';alert('✓ Guardado');
 }
 
@@ -1129,18 +1157,95 @@ function limpiarTodo(){
 function impComp(id){
   const c=COBROS.find(x=>x.id===id);if(!c)return;
   const u=UNIDADES.find(x=>x.id===c.unidadId);
-  const html=`<div class="comp"><div class="ch"><div><div style="font-size:15px;font-weight:900">${CFG.nombre||'Condominio'}</div><div style="font-size:10px;opacity:.8">${CFG.dir||''}</div><div style="font-size:10px;opacity:.8">Admin: ${CFG.admin} · ${CFG.tel}</div></div><div style="text-align:right"><div style="font-size:10px;opacity:.9">COMPROBANTE DE PAGO</div><div style="font-size:18px;font-weight:900">Nº ${String(c.id).slice(-4)}</div><div style="font-size:10px;opacity:.8">${df(c.fechaPago||HOY)}</div></div></div><div class="cb"><div style="background:#f0fff8;padding:10px;border-radius:5px;margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:#1a5c3a;margin-bottom:5px">DATOS DEL PROPIETARIO</div><div style="font-size:11px;margin-bottom:2px"><strong>Unidad:</strong> ${c.unidadNum}${u?.torre?' — '+u.torre:''}</div><div style="font-size:11px;margin-bottom:2px"><strong>Propietario:</strong> ${c.prop}</div><div style="font-size:11px"><strong>Período:</strong> ${c.mes}</div></div><div class="cr"><span>Gastos Comunes</span><span>${clp(c.gcOrd)}</span></div>${c.mora>0?`<div class="cr" style="color:#dc2626"><span>Mora</span><span>${clp(c.mora)}</span></div>`:''}<div class="cr"><span>Total</span><span style="font-weight:700">${clp(c.total)}</span></div><div class="cr" style="color:#166534"><span>Pagado</span><span style="font-weight:700">${clp(c.pagado)}</span></div>${c.saldo>0?`<div class="cr" style="color:#dc2626"><span>Saldo</span><span style="font-weight:700">${clp(c.saldo)}</span></div>`:''}</div><div class="ct2"><span>${c.saldo===0?'✓ PAGADO':'SALDO PENDIENTE'}</span><span>${clp(c.saldo===0?c.pagado:c.saldo)}</span></div><div class="cf"><div style="display:flex;justify-content:space-between"><span>${CFG.nombre} · ${CFG.dir}</span><span>Ley 21.442</span></div></div></div>`;
-  document.getElementById('printArea').innerHTML=html;
-  document.getElementById('printArea').style.display='block';
-  window.print();
-  document.getElementById('printArea').style.display='none';
+  // Calcular historial de deuda de la unidad
+  const histUnidad=COBROS.filter(x=>x.unidadId===c.unidadId&&x.id!==c.id);
+  const deudaHist=histUnidad.filter(x=>x.saldo>0).reduce((s,x)=>s+x.saldo,0);
+  const gcMesActual=COBROS.filter(x=>x.mes===MES&&x.unidadId===c.unidadId&&x.id!==c.id).reduce((s,x)=>s+x.total,0)||0;
+  const fondoRes=Math.round(c.gcOrd*(CFG.reserva||5)/100);
+  const modalidadLabel=(CFG.modalidad||'fija')==='prorrateo'?'Prorrateo Dinámico':'Cuota Fija';
+  const mesSinId=c.mesSinIdentificar||c.mes==='MES POR IDENTIFICAR';
+  const periodoLabel=mesSinId?'<span style="color:#dc2626;font-weight:900;font-size:13px;text-transform:uppercase">MES POR IDENTIFICAR</span>':c.mes;
+  const numComp='N° '+String(c.id).slice(-5).padStart(5,'0')+' - '+Math.floor(Math.random()*90000+10000);
+  const html=`
+<div style="font-family:Arial,sans-serif;color:#1a1a1a;max-width:680px;margin:0 auto;padding:24px;font-size:12px">
+  <!-- ENCABEZADO -->
+  <div style="background:linear-gradient(135deg,#0f2027,#1a3a4a);color:white;padding:16px 20px;border-radius:10px 10px 0 0;display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <div style="font-size:13px;font-weight:700;letter-spacing:1px;opacity:.8">MARTINEZ SERVICES</div>
+      <div style="font-size:10px;opacity:.7;margin-top:2px">PLATAFORMA ERP GESTIÓN DE CONDOMINIOS</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:11px;font-weight:700;opacity:.8">COMPROBANTE DE PAGO</div>
+      <div style="font-size:15px;font-weight:900">${numComp}</div>
+    </div>
+  </div>
+  <!-- SECCIÓN 1: IDENTIFICACIÓN -->
+  <div style="border:1px solid #ddd;border-top:none;padding:14px 16px">
+    <div style="font-size:10px;font-weight:700;color:#1a5c3a;letter-spacing:1px;margin-bottom:10px;border-bottom:1px solid #e5f5ec;padding-bottom:5px">1. IDENTIFICACIÓN DE LA UNIDAD Y RESIDENTE</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><span style="color:#6b7280">Condominio:</span> <strong>${CFG.nombre||'Condominio'} (${modalidadLabel})</strong></div>
+      <div><span style="color:#6b7280">Fecha Emisión:</span> <strong>${df(HOY)}</strong></div>
+      <div><span style="color:#6b7280">Unidad / Depto:</span> <strong>${c.unidadNum||'?'}${u?.torre?' – '+u.torre:''}</strong></div>
+      <div><span style="color:#6b7280">Fecha de Pago:</span> <strong>${df(c.fechaPago)||'—'}</strong></div>
+      <div><span style="color:#6b7280">Copropietario:</span> <strong>${c.prop||'—'}</strong></div>
+      <div><span style="color:#6b7280">Medio de Pago:</span> <strong>${c.forma||'—'}</strong></div>
+      ${u?.estacionamiento?`<div><span style="color:#6b7280">Estacionamiento:</span> <strong>${u.estacionamiento}</strong></div>`:'<div></div>'}
+      <div><span style="color:#6b7280">N° Operación:</span> <strong>${c.ref||'—'}</strong></div>
+      ${u?.bodega?`<div><span style="color:#6b7280">Bodega:</span> <strong>${u.bodega}</strong></div>`:'<div></div>'}
+      <div><span style="color:#6b7280">Período Pagado:</span> <strong>${periodoLabel}</strong></div>
+    </div>
+  </div>
+  <!-- SECCIÓN 2: DESGLOSE -->
+  <div style="border:1px solid #ddd;border-top:none;padding:14px 16px">
+    <div style="font-size:10px;font-weight:700;color:#1a5c3a;letter-spacing:1px;margin-bottom:10px;border-bottom:1px solid #e5f5ec;padding-bottom:5px">2. DESGLOSE DEL PAGO RECEPCIONADO</div>
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
+      <thead><tr style="background:#f0f9f4"><th style="text-align:left;padding:6px 8px;border:1px solid #ddd">Ítem</th><th style="text-align:left;padding:6px 8px;border:1px solid #ddd">Descripción</th><th style="text-align:right;padding:6px 8px;border:1px solid #ddd">Monto</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:6px 8px;border:1px solid #ddd">1</td><td style="padding:6px 8px;border:1px solid #ddd">Abono Gasto Común Base (Modalidad: ${modalidadLabel})</td><td style="text-align:right;padding:6px 8px;border:1px solid #ddd">${clp(c.gcOrd)}</td></tr>
+        ${fondoRes>0?`<tr><td style="padding:6px 8px;border:1px solid #ddd">2</td><td style="padding:6px 8px;border:1px solid #ddd">Aporte Obligatorio Fondo de Reserva (${CFG.reserva||5}%)</td><td style="text-align:right;padding:6px 8px;border:1px solid #ddd">${clp(fondoRes)}</td></tr>`:''}
+        ${c.mora>0?`<tr><td style="padding:6px 8px;border:1px solid #ddd">3</td><td style="padding:6px 8px;border:1px solid #ddd">Interés / Multa Período Anterior</td><td style="text-align:right;padding:6px 8px;border:1px solid #ddd;color:#dc2626">${clp(c.mora)}</td></tr>`:''}
+      </tbody>
+      <tfoot>
+        <tr><td colspan="2" style="padding:6px 8px;border:1px solid #ddd;text-align:right;font-weight:700">Sub-Total:</td><td style="text-align:right;padding:6px 8px;border:1px solid #ddd;font-weight:700">${clp(c.gcOrd+fondoRes+c.mora)}</td></tr>
+        <tr style="background:#f0f9f4"><td colspan="2" style="padding:8px;border:1px solid #ddd;text-align:right;font-weight:900;font-size:13px">TOTAL PAGADO:</td><td style="text-align:right;padding:8px;border:1px solid #ddd;font-weight:900;font-size:13px;color:#166534">${clp(c.pagado)}</td></tr>
+      </tfoot>
+    </table>
+    ${mesSinId?`<div style="margin-top:10px;padding:10px;background:#fff8e5;border:1px solid #f59e0b;border-radius:6px;font-size:10px;color:#92400e">⚠ <strong>Nota:</strong> Cuando el Período figura "MES POR IDENTIFICAR", el abono queda resguardado en la cuenta de la unidad a la espera de la conciliación del historial contable anterior.</div>`:''}
+  </div>
+  <!-- SECCIÓN 3: ESTADO DE CUENTA -->
+  <div style="border:1px solid #ddd;border-top:none;padding:14px 16px">
+    <div style="font-size:10px;font-weight:700;color:#1a5c3a;letter-spacing:1px;margin-bottom:10px;border-bottom:1px solid #e5f5ec;padding-bottom:5px">3. ESTADO DE CUENTA CONSOLIDADO (HISTORIAL A LA FECHA)</div>
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
+      <thead><tr style="background:#f0f9f4"><th style="text-align:left;padding:6px 8px;border:1px solid #ddd">Detalle</th><th style="text-align:left;padding:6px 8px;border:1px solid #ddd">Período</th><th style="text-align:right;padding:6px 8px;border:1px solid #ddd">Saldo Actual</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:6px 8px;border:1px solid #ddd">Gasto Común Facturado (Mes en Curso)</td><td style="padding:6px 8px;border:1px solid #ddd">${df(HOY)}</td><td style="text-align:right;padding:6px 8px;border:1px solid #ddd">${clp(c.saldo)}</td></tr>
+        <tr><td style="padding:6px 8px;border:1px solid #ddd">Deuda Histórica / Capital Atrasado</td><td style="padding:6px 8px;border:1px solid #ddd">Historial Anterior</td><td style="text-align:right;padding:6px 8px;border:1px solid #ddd${deudaHist>0?';color:#dc2626':''}">${clp(deudaHist)}</td></tr>
+      </tbody>
+      <tfoot>
+        <tr style="background:#f0f9f4"><td colspan="2" style="padding:8px;border:1px solid #ddd;font-weight:900">Saldo Total Acumulado en la Unidad:</td><td style="text-align:right;padding:8px;border:1px solid #ddd;font-weight:900;color:${c.saldo+deudaHist>0?'#dc2626':'#166534'}">${clp(c.saldo+deudaHist)}</td></tr>
+      </tfoot>
+    </table>
+  </div>
+  <!-- PIE -->
+  <div style="border:1px solid #ddd;border-top:none;padding:10px 16px;background:#f9fafb;border-radius:0 0 10px 10px;font-size:9px;color:#6b7280;text-align:center">
+    Comprobante emitido automáticamente por la plataforma ERP Martinez Services de acuerdo con la Ley N° 21.442 de Copropiedad Inmobiliaria.
+  </div>
+</div>`;
+  // Usar iframe para imprimir (no popup bloqueado)
+  let iframe=document.getElementById('_printFrame');
+  if(!iframe){iframe=document.createElement('iframe');iframe.id='_printFrame';iframe.style.cssText='position:fixed;top:-9999px;left:-9999px;width:210mm;height:297mm;border:none;';document.body.appendChild(iframe);}
+  const doc2=iframe.contentDocument||iframe.contentWindow.document;
+  doc2.open();
+  doc2.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:0;padding:0;}@media print{@page{margin:8mm;size:A4;}}</style></head><body>'+html+'</body></html>');
+  doc2.close();
+  iframe.onload=function(){try{iframe.contentWindow.focus();iframe.contentWindow.print();}catch(e){window.print();}};
 }
 
 // ═══════════════════════════════════
 // MODALES
 // ═══════════════════════════════════
 function O(id){
-  if(id==='moCobro'){poblarUnidades();document.getElementById('coMes').value=MES;document.getElementById('coFecha').value=HOY;document.getElementById('coId').value='';document.getElementById('tCobro').textContent='Registrar Pago';}
+  if(id==='moCobro'){poblarUnidades();document.getElementById('coMes').value=MES;document.getElementById('coMes').dataset.sinMes='';document.getElementById('_mesIdLabel').style.display='none';document.getElementById('coFecha').value=HOY;document.getElementById('coId').value='';document.getElementById('tCobro').textContent='Registrar Pago';}
   if(id==='moEgreso'){document.getElementById('egFecha').value=HOY;document.getElementById('egId').value='';document.getElementById('tEgreso').textContent='Nuevo Egreso';}
   if(id==='moFondo'){document.getElementById('fFecha').value=HOY;}
   if(id==='moNovedad'){document.getElementById('nFecha').value=HOY;document.getElementById('nResp').value=CFG.admin||'Gaudy Martínez';}

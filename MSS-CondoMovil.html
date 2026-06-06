@@ -121,7 +121,7 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
     <div class="hdr-title" id="hdrNombre">Condominio</div>
     <div class="hdr-sub" id="hdrSub">Cargando...</div>
   </div>
-  <div class="hdr-emp" onclick="abrirSelectorEmp()" id="hdrEmpBadge">🏢 Empresa</div>
+  <div class="hdr-emp" onclick="abrirSelectorEmp()" id="hdrEmpBadge">🏢 Condominio</div>
 </div>
 
 <!-- SELECTOR EMPRESA (aparece al inicio o al tocar el badge) -->
@@ -129,8 +129,8 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
   <div class="sheet" style="border-radius:0 0 20px 20px;padding-top:24px">
     <div style="text-align:center;margin-bottom:20px">
       <div style="font-size:28px;margin-bottom:6px">🏢</div>
-      <div style="font-size:17px;font-weight:900">Seleccionar Empresa</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:4px">¿Con cuál empresa vas a trabajar?</div>
+      <div style="font-size:17px;font-weight:900">Seleccionar Condominio</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">¿En cuál condominio vas a trabajar?</div>
     </div>
     <div id="listaEmpresas"></div>
     <button class="btn btn-outline" onclick="cerrar('overlayEmp')" style="margin-top:8px">Cancelar</button>
@@ -346,13 +346,21 @@ let _waMsg = '';
 let _waTel = '';
 
 // ══════════════════════════════════════════
-// EMPRESAS — definición fija de las 3 empresas
+// CONDOMINIOS — solo el mundo de condominios
+// Se leen desde localStorage (guardados por index.html)
 // ══════════════════════════════════════════
-const EMPRESAS = [
-  {id:1, nombre:'Martinez Services Spa',          rut:'76.782.954-K', icon:'🔧', color:'#10B981'},
-  {id:2, nombre:'Condominio Pioneros 2',           rut:'65.184.252-2', icon:'🏢', color:'#F59E0B'},
-  {id:3, nombre:'Martinez y Pajuelo Arriendos SpA',rut:'78.361.479-0', icon:'🚛', color:'#38BDF8'},
-];
+function cargarCondominiosDisp(){
+  try{
+    const raw = localStorage.getItem('mss_condominios_v1');
+    if(raw){
+      const arr = JSON.parse(raw);
+      if(arr.length) return arr;
+    }
+  }catch(e){}
+  // Default: Pioneros 2
+  return [{id:'condo_1', nombre:'Condominio Pioneros 2', rut:'65.184.252-2', icon:'🏢', color:'#10B981', tipo:'condominio'}];
+}
+const EMPRESAS = cargarCondominiosDisp();
 
 function renderEmpCards(containerId){
   const lista = document.getElementById(containerId);
