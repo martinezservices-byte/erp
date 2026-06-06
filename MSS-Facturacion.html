@@ -875,14 +875,12 @@ document.getElementById('hInfo').textContent=`${DOCUMENTOS.length} documentos`;
 
 function imprimirDoc(){
   var prev=document.getElementById('previewContainer')||document.getElementById('docPreview');
-  if(!prev){window.print();return;}
+  if(!prev||!prev.innerHTML.trim()){alert('Primero genera una vista previa del documento.');return;}
   var clone=prev.cloneNode(true);
   clone.id='printOnly';
-  // Sin position:fixed para evitar PDF en blanco — el @media print oculta todo y muestra solo #printOnly
-  clone.style.cssText='display:none;width:100%;background:white;';
+  clone.style.cssText='';
   clone.querySelectorAll('.no-print').forEach(function(el){el.remove();});
   document.body.appendChild(clone);
-  // Forzar repaint antes de imprimir
   clone.offsetHeight;
   window.print();
   document.body.removeChild(clone);
