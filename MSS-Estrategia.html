@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Martinez Services Spa — Estrategia</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#060E18;--surf:#0C1A28;--surf2:#102030;
+  --border:rgba(16,185,129,0.14);--acc:#10B981;--accHi:#6EE7B7;
+  --white:#EEF4F0;--muted:#4D6B5A;--ok:#22C55E;--danger:#EF4444;
+  --warn:#F59E0B;--info:#38BDF8;--purple:#A78BFA;
+}
+body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;min-height:100vh;}
+#header{background:var(--surf);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:14px;}
+.logo-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--acc),var(--accHi));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--bg);}
+.logo-name{font-size:15px;font-weight:800;}
+.logo-mod{font-size:10px;color:var(--acc);font-weight:700;letter-spacing:2px;font-family:monospace;}
+.hright{display:flex;gap:10px;align-items:center;}
+.hinfo{font-size:11px;color:var(--muted);font-family:monospace;}
+#tabbar{display:flex;gap:3px;background:var(--bg);padding:4px;border-radius:10px;width:fit-content;margin:22px 24px 0;flex-wrap:wrap;}
+.tab{padding:7px 15px;border-radius:7px;border:none;cursor:pointer;font-size:11px;font-weight:700;transition:all .18s;background:transparent;color:var(--muted);font-family:monospace;}
+.tab.active{background:var(--acc);color:var(--bg);}
+#content{max-width:1280px;margin:0 auto;padding:20px 24px 40px;}
+.section{display:none;}.section.active{display:block;}
+.kpi-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
+.kpi{flex:1;min-width:145px;background:var(--surf);border-radius:12px;padding:16px 18px;border:1px solid var(--border);position:relative;overflow:hidden;}
+.kpi::before{content:'';position:absolute;top:0;right:0;width:55px;height:55px;background:radial-gradient(circle at top right,var(--kc,rgba(16,185,129,0.1)),transparent 70%);}
+.kpi-label{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;font-family:monospace;}
+.kpi-value{font-size:22px;font-weight:900;}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;}
+.card{background:var(--surf);border-radius:12px;padding:18px;border:1px solid var(--border);}
+.card-title{font-size:13px;font-weight:700;margin-bottom:14px;}
+.badge{display:inline-flex;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;font-family:monospace;white-space:nowrap;}
+.progress-wrap{background:rgba(255,255,255,0.07);border-radius:4px;height:6px;width:100%;}
+.progress-bar{border-radius:4px;transition:width .8s ease;}
+/* TABLE */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:11px;font-family:monospace;}
+th{padding:9px 11px;text-align:left;color:var(--acc);font-weight:700;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:8px 11px;border-bottom:1px solid rgba(16,185,129,0.05);}
+tr:nth-child(even) td{background:rgba(255,255,255,0.012);}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:999;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surf);border-radius:16px;padding:28px;border:1px solid rgba(16,185,129,0.35);width:500px;max-height:90vh;overflow-y:auto;font-family:monospace;}
+.modal h3{font-size:16px;font-weight:800;margin-bottom:20px;font-family:'Segoe UI',sans-serif;}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.fgrid .full{grid-column:1/3;}
+.field label{font-size:10px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;}
+.field input,.field select,.field textarea{width:100%;padding:8px 11px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--white);font-size:12px;font-family:monospace;outline:none;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--acc);}
+.btn{padding:9px 20px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:13px;font-family:monospace;}
+.btn-acc{background:var(--acc);color:var(--bg);}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted);}
+.btn-sm{padding:3px 9px;border-radius:5px;font-size:10px;}
+.btn-edit{background:transparent;border:1px solid rgba(16,185,129,0.35);color:var(--acc);}
+.btn-del{background:transparent;border:1px solid rgba(239,68,68,0.35);color:var(--danger);}
+/* KPI CARDS GRID */
+.kpi-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:20px;}
+.kpi-sel-card{background:var(--surf);border-radius:10px;padding:14px 16px;border:1px solid var(--border);cursor:pointer;transition:all .2s;}
+.kpi-sel-card.active{box-shadow:0 0 16px rgba(16,185,129,0.2);}
+/* SMART CARD */
+.smart-card{background:var(--surf);border-radius:12px;padding:18px 20px;border:1px solid var(--border);border-left:4px solid var(--acc);margin-bottom:14px;}
+.smart-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+.smart-dims{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:12px;}
+.smart-dim{background:var(--bg);border-radius:8px;padding:10px 12px;border:1px solid var(--border);}
+.smart-dim-label{font-size:9px;color:var(--acc);font-weight:700;font-family:monospace;letter-spacing:.5px;margin-bottom:4px;}
+.smart-dim-val{font-size:11px;line-height:1.5;}
+/* FODA */
+.foda-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+.foda-quad{background:var(--surf);border-radius:12px;border:1px solid var(--border);overflow:hidden;}
+.foda-quad-header{padding:11px 16px;display:flex;justify-content:space-between;align-items:center;}
+.foda-quad-title{font-size:12px;font-weight:800;font-family:monospace;letter-spacing:1px;}
+.foda-items{padding:10px;display:flex;flex-direction:column;gap:7px;min-height:140px;}
+.foda-item{background:var(--bg);border-radius:8px;padding:10px 12px;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.foda-item-text{font-size:11px;line-height:1.5;flex:1;}
+/* PESTEL */
+.pestel-add{background:var(--surf);border-radius:12px;padding:18px;border:1px solid rgba(16,185,129,0.3);margin-bottom:16px;}
+/* IND ROW */
+.ind-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(16,185,129,0.06);}
+/* PLAN */
+.plan-item{background:var(--surf);border-radius:12px;padding:16px 20px;border:1px solid var(--border);border-left:4px solid var(--acc);margin-bottom:10px;}
+#footer{border-top:1px solid var(--border);padding:13px 28px;display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-family:monospace;}
+canvas{max-height:230px;}
+@media(max-width:700px){.grid-2,.foda-grid{grid-template-columns:1fr;}.fgrid{grid-template-columns:1fr;}.fgrid .full{grid-column:1;}}
+@media print{
+  #nav-bar,#header,#tabbar,.no-print,
+  .tabs{display:none!important;}
+  body{background:white!important;}
+}
+</style>
+</head>
+<body>
+<div id="nav-bar" style="background:#030609;border-bottom:1px solid rgba(201,168,76,0.1);padding:0 16px;display:flex;align-items:center;gap:4px;overflow-x:auto;flex-shrink:0;height:42px;position:sticky;top:0;z-index:200;">
+<a href="index.html" style="display:flex;align-items:center;padding:5px 10px;border-radius:6px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">&#127968; Hub</a>
+<div style="width:1px;height:20px;background:rgba(201,168,76,0.15);margin:0 2px;flex-shrink:0"></div>
+<a href="MSS-Finanzas.html" style="padding:5px 9px;border-radius:6px;color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Finanzas</a>
+<a href="MSS-Remuneraciones.html" style="padding:5px 9px;border-radius:6px;color:#22C55E;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Remuner.</a>
+<a href="MSS-Contabilidad.html" style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Contab.</a>
+<a href="MSS-Facturacion.html" style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Factur.</a>
+<a href="MSS-Cotizacion.html" style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Cotiz.</a>
+<a href="MSS-Tesoreria.html" style="padding:5px 9px;border-radius:6px;color:#FBBF24;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Tesor.</a>
+<a href="MSS-Contratos.html" style="padding:5px 9px;border-radius:6px;color:#A78BFA;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Contratos</a>
+<a href="MSS-Proyectos.html" style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Proyectos</a>
+<a href="MSS-Ventas-CRM.html" style="padding:5px 9px;border-radius:6px;color:#FB923C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Ventas</a>
+<a href="MSS-RRHH.html" style="padding:5px 9px;border-radius:6px;color:#A78BFA;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">RRHH</a>
+<a href="MSS-Estrategia.html" style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Estrategia</a>
+<a href="MSS-Logos.html" style="padding:5px 9px;border-radius:6px;color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Logos</a>
+<a href="MSS-Respaldo.html" style="padding:5px 9px;border-radius:6px;color:#64748B;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Respaldo</a><a href="MSS-Arriendos.html" style="padding:5px 9px;border-radius:6px;color:#F59E0B;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">🚛 Arriendos</a><a href="MSS-Condominio.html" style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;border:1px solid rgba(16,185,129,0.3);">🏢 Condominio</a>
+<div id="nav-emp" style="margin-left:auto;padding:3px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;font-size:9px;color:#C9A84C;font-family:monospace;white-space:nowrap;flex-shrink:0;display:none"></div>
+</div>
+<script>
+
+// ── FIREBASE ──
+let _db=null,_fbReady=false;
+async function _initFB(){
+  if(_fbReady)return;
+  try{
+    const m1=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const m2=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const m3=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const FB={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
+    const app=m1.getApps().length?m1.getApps()[0]:m1.initializeApp(FB);
+    const auth=m3.getAuth(app);
+    // Esperar usuario autenticado
+    await new Promise((resolve)=>{
+      const unsub=m3.onAuthStateChanged(auth,user=>{
+        unsub();
+        if(!user){window.location.href='MSS-Login.html';}
+        else{
+          window._MSS_USER=user;
+          _db=m2.getFirestore(app);window._fbM=m2;_fbReady=true;
+          resolve();
+        }
+      });
+    });
+    console.log('✅ Estrategia Firebase OK');
+  }catch(e){_fbReady=false;console.warn('Firebase:',e.message);}
+}
+function _ep(){return 'empresas/'+(_EMP_ID||1);}
+async function _fbGetAll(col){
+  const snap=await window._fbM.getDocs(window._fbM.collection(_db,_ep()+'/'+col));
+  const arr=[];snap.forEach(d=>arr.push({id:d.id,...d.data()}));return arr;
+}
+async function _fbSet(col,id,data){
+  await window._fbM.setDoc(window._fbM.doc(_db,_ep()+'/'+col+'/'+String(id)),{...data});
+}
+async function _fbBatch(col,arr){
+  if(!arr||!arr.length)return;
+  for(let i=0;i<arr.length;i+=400){
+    const b=window._fbM.writeBatch(_db);
+    arr.slice(i,i+400).forEach(item=>b.set(window._fbM.doc(_db,_ep()+'/'+col+'/'+String(item.id||Date.now())),{...item}));
+    await b.commit();
+  }
+}
+async function _fbDoc(path,data){
+  await window._fbM.setDoc(window._fbM.doc(_db,path),{...data});
+}
+async function _fbGetDoc(path){
+  const s=await window._fbM.getDoc(window._fbM.doc(_db,path));
+  return s.exists()?s.data():null;
+}
+
+// ── EMPRESA COMERCIAL — lee mss_empresa_actual, rechaza condominios ──
+const _empRaw = localStorage.getItem('mss_empresa_actual');
+const _empObj = (()=>{
+  try{
+    const o = _empRaw ? JSON.parse(_empRaw) : null;
+    // SEGURIDAD: si es condominio, no cargar datos aquí
+    if(o && o.tipo === 'condominio') return {id:1, nombre:'Mi Empresa'};
+    return o || {id:1, nombre:'Mi Empresa'};
+  }catch(e){ return {id:1, nombre:'Mi Empresa'}; }
+})();
+window._MSS_EMP = _empObj;
+const _EMP_ID   = _empObj.id || 1;
+const _EMP_NOMBRE = _empObj.nombre || 'Mi Empresa';
+(function(){
+try{
+  var emp=_empObj;
+  if(emp&&emp.nombre){
+    var nd=document.getElementById("nav-emp");
+    if(nd){nd.textContent="Empresa: "+emp.nombre;nd.style.display="block";}
+    var cur=window.location.pathname.split("/").pop();
+    document.querySelectorAll("#nav-bar a").forEach(function(a){
+      if(a.getAttribute("href")===cur){
+        a.style.background="rgba(201,168,76,0.25)";
+        a.style.border="1px solid rgba(201,168,76,0.5)";
+        a.style.color="#E8C97A";
+      }
+    });
+  }
+}catch(ex){}
+})();
+</script>
+
+
+<div id="header">
+  <div class="logo">
+    <div class="logo-icon">M</div>
+    <div><div class="logo-name"><span id="_empNombreLogo">Mi Empresa</span></div><div class="logo-mod">MÓDULO ESTRATEGIA</div></div>
+  </div>
+  <div class="hright">
+    <span class="hinfo" id="hInfo">Cargando...</span>
+  </div>
+</div>
+
+<div id="tabbar">
+  <button class="tab active" onclick="showTab('kpi',this)">📊 Panel KPI</button>
+  <button class="tab" onclick="showTab('smart',this)">🎯 Objetivos SMART</button>
+  <button class="tab" onclick="showTab('foda',this)">⬡ Análisis FODA</button>
+  <button class="tab" onclick="showTab('pestel',this)">🌐 Análisis PESTEL</button>
+  <button class="tab" onclick="showTab('plan',this)">🗺 Plan Estratégico</button>
+</div>
+
+<div id="content">
+
+  <!-- KPI -->
+  <div id="sec-kpi" class="section active">
+    <div class="kpi-row" id="kpiSummary"></div>
+    <div class="kpi-cards-grid" id="kpiCardsGrid"></div>
+    <div class="grid-2" id="kpiCharts">
+      <div class="card"><div class="card-title" id="kpiChartTitle">Selecciona un KPI</div><canvas id="chartKPILine"></canvas></div>
+      <div class="card"><div class="card-title">% Cumplimiento por Período</div><canvas id="chartKPIBar"></canvas></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+      <button class="btn btn-acc btn-sm" onclick="openKPIModal(null)">+ Nuevo KPI</button>
+    </div>
+  </div>
+
+  <!-- SMART -->
+  <div id="sec-smart" class="section">
+    <div class="kpi-row" id="kpiSmart"></div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+      <button class="btn btn-acc btn-sm" onclick="openSmartModal(null)">+ Nuevo Objetivo SMART</button>
+    </div>
+    <div id="smartList"></div>
+  </div>
+
+  <!-- FODA -->
+  <div id="sec-foda" class="section">
+    <div class="kpi-row" id="kpiFoda"></div>
+    <div class="foda-grid" id="fodaGrid"></div>
+  </div>
+
+  <!-- PESTEL -->
+  <div id="sec-pestel" class="section">
+    <div class="grid-2" style="margin-bottom:16px">
+      <div class="card"><div class="card-title">Factores por Categoría</div><div id="pestelSummary"></div></div>
+      <div class="card"><div class="card-title">Radar de Riesgo</div><canvas id="chartRadar" style="max-height:200px"></canvas></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+      <button class="btn btn-acc btn-sm" onclick="showPestelForm()">+ Nuevo Factor</button>
+    </div>
+    <div id="pestelForm" style="display:none" class="pestel-add">
+      <div class="fgrid" style="margin-bottom:12px">
+        <div class="field full"><label>Factor / Descripción</label><input id="pfItem" type="text"/></div>
+        <div class="field full"><label>Plan de Acción</label><input id="pfAccion" type="text"/></div>
+        <div class="field"><label>Factor</label><select id="pfFactor"><option>Político</option><option>Económico</option><option>Social</option><option>Tecnológico</option><option>Ecológico</option><option>Legal</option></select></div>
+        <div class="field"><label>Impacto</label><select id="pfImpacto"><option>Alto</option><option>Medio</option><option>Bajo</option></select></div>
+        <div class="field"><label>Probabilidad %</label><input id="pfProb" type="number" min="0" max="100" value="50"/></div>
+        <div class="field"><label>Tendencia</label><select id="pfTend"><option>Positiva</option><option>Negativa</option><option>Neutral</option></select></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-acc btn-sm" onclick="savePestel()">Guardar Factor</button>
+        <button class="btn btn-outline btn-sm" onclick="hidePestelForm()">Cancelar</button>
+      </div>
+    </div>
+    <div class="card tbl-wrap">
+      <table id="tblPestel">
+        <thead><tr><th>Factor</th><th>Descripción</th><th>Impacto</th><th>Prob.</th><th>Tendencia</th><th>Plan de Acción</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PLAN -->
+  <div id="sec-plan" class="section">
+    <div class="kpi-row" id="kpiPlan"></div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+      <button class="btn btn-acc btn-sm" onclick="openPlanModal(null)">+ Nueva Iniciativa</button>
+    </div>
+    <div id="planList"></div>
+  </div>
+
+</div>
+
+<div id="footer">
+  <span>Martinez Services Spa · Módulo Estrategia v1.0 · 2025</span>
+  <span>KPI · SMART · FODA · PESTEL · Plan Estratégico · Datos guardados automáticamente</span>
+</div>
+
+<!-- MODAL KPI -->
+<div class="modal-overlay" id="modalKPI">
+  <div class="modal">
+    <h3 id="kpiModalTitle">Nuevo KPI</h3>
+    <input type="hidden" id="kId"/>
+    <div class="fgrid">
+      <div class="field full"><label>Nombre del KPI</label><input id="kNombre" type="text" placeholder="Ej: Ingresos Mensuales"/></div>
+      <div class="field"><label>Unidad (%, $CLP, Ud.)</label><input id="kUnidad" type="text" value="%"/></div>
+      <div class="field"><label>Meta</label><input id="kMeta" type="number"/></div>
+      <div class="field"><label>Área</label><input id="kArea" type="text"/></div>
+      <div class="field"><label>Frecuencia</label><input id="kFrec" type="text" value="Mensual"/></div>
+      <div class="field"><label>Tendencia Esperada</label>
+        <select id="kTend"><option>Subida</option><option>Bajada</option><option>Estable</option></select>
+      </div>
+      <div class="field full"><label>Valores históricos (separados por coma)</label><input id="kValores" type="text" placeholder="82,75,91,88,94,97"/></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn btn-acc" style="flex:1" onclick="saveKPI()">Guardar</button>
+      <button class="btn btn-outline" onclick="closeModal('modalKPI')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SMART -->
+<div class="modal-overlay" id="modalSmart">
+  <div class="modal">
+    <h3 id="smartModalTitle">Objetivo SMART</h3>
+    <input type="hidden" id="sId"/>
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <div class="field"><label>Objetivo General</label><textarea id="sObjetivo" rows="2"></textarea></div>
+      <div class="field"><label style="color:var(--acc)">S — Específico (¿Qué exactamente?)</label><textarea id="sEspecifico" rows="2"></textarea></div>
+      <div class="field"><label style="color:var(--acc)">M — Medible (¿Cómo se mide?)</label><input id="sMedible" type="text"/></div>
+      <div class="field"><label style="color:var(--acc)">A — Alcanzable (¿Por qué es viable?)</label><input id="sAlcanzable" type="text"/></div>
+      <div class="field"><label style="color:var(--acc)">R — Relevante (¿Por qué importa?)</label><input id="sRelevante" type="text"/></div>
+      <div class="fgrid">
+        <div class="field"><label style="color:var(--acc)">T — Fecha Límite</label><input id="sTiempo" type="date"/></div>
+        <div class="field"><label>Área</label><input id="sArea" type="text"/></div>
+        <div class="field"><label>Avance %</label><input id="sAvance" type="number" min="0" max="100" value="0"/></div>
+        <div class="field"><label>Estado</label>
+          <select id="sEstado"><option>Planificado</option><option>En Proceso</option><option>Completado</option><option>Atrasado</option></select>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn btn-acc" style="flex:1" onclick="saveSmart()">Guardar</button>
+      <button class="btn btn-outline" onclick="closeModal('modalSmart')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PLAN -->
+<div class="modal-overlay" id="modalPlan">
+  <div class="modal">
+    <h3 id="planModalTitle">Iniciativa Estratégica</h3>
+    <input type="hidden" id="plId"/>
+    <div class="fgrid">
+      <div class="field full"><label>Iniciativa Estratégica</label><input id="plNombre" type="text"/></div>
+      <div class="field full"><label>Objetivo Vinculado</label><input id="plObjetivo" type="text"/></div>
+      <div class="field"><label>Área</label><input id="plArea" type="text"/></div>
+      <div class="field"><label>Responsable</label><input id="plResp" type="text"/></div>
+      <div class="field"><label>Fecha Inicio</label><input id="plInicio" type="date"/></div>
+      <div class="field"><label>Fecha Fin</label><input id="plFin" type="date"/></div>
+      <div class="field"><label>Presupuesto ($)</label><input id="plPres" type="number"/></div>
+      <div class="field"><label>Avance %</label><input id="plAvance" type="number" min="0" max="100" value="0"/></div>
+      <div class="field"><label>Prioridad</label><select id="plPrio"><option>Alta</option><option>Media</option><option>Baja</option></select></div>
+      <div class="field"><label>Estado</label><select id="plEstado"><option>Planificado</option><option>En Proceso</option><option>Completado</option><option>Atrasado</option></select></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn btn-acc" style="flex:1" onclick="savePlan()">Guardar</button>
+      <button class="btn btn-outline" onclick="closeModal('modalPlan')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════
+//  STORAGE KEYS
+// ════════════════════════════
+const SK = {
+  kpi:'mss_kpis_v1_'+_EMP_ID, smart:'mss_smart_v1_'+_EMP_ID,
+  foda:'mss_foda_v1_'+_EMP_ID, pestel:'mss_pestel_v1_'+_EMP_ID, plan:'mss_plan_v1_'+_EMP_ID
+};
+
+// ════════════════════════════
+//  DEFAULT DATA
+// ════════════════════════════
+const MESES = ['Ene','Feb','Mar','Abr','May','Jun'];
+let _id = 500;
+const uid = () => ++_id;
+
+const DEF_KPI = []
+
+const DEF_SMART = []
+
+const DEF_FODA = {
+  fortalezas:[
+    {id:uid(),texto:"Equipo de alta especialización en Control de Gestión",impacto:"Alto"},
+    {id:uid(),texto:"Metodología propia de auditoría y diagnóstico empresarial",impacto:"Alto"},
+    {id:uid(),texto:"Herramientas tecnológicas propias (Suite ERP)",impacto:"Medio"},
+    {id:uid(),texto:"Red de contactos en sector industrial y financiero",impacto:"Alto"},
+  ],
+  oportunidades:[
+    {id:uid(),texto:"Creciente demanda de consultoría post-pandemia en PyMEs",impacto:"Alto"},
+    {id:uid(),texto:"Digitalización obligatoria en sector público y privado",impacto:"Alto"},
+    {id:uid(),texto:"Escasez de profesionales certificados en la región",impacto:"Medio"},
+  ],
+  debilidades:[
+    {id:uid(),texto:"Capacidad operativa limitada (equipo reducido)",impacto:"Alto"},
+    {id:uid(),texto:"Dependencia de clientes recurrentes",impacto:"Alto"},
+    {id:uid(),texto:"Bajo posicionamiento de marca en redes digitales",impacto:"Medio"},
+  ],
+  amenazas:[
+    {id:uid(),texto:"Competencia de grandes consultoras internacionales",impacto:"Alto"},
+    {id:uid(),texto:"Volatilidad económica afecta presupuestos de clientes",impacto:"Alto"},
+    {id:uid(),texto:"Cambios regulatorios tributarios frecuentes",impacto:"Medio"},
+  ],
+};
+
+const DEF_PESTEL = []
+
+const DEF_PLAN = []
+
+// ════════════════════════════
+//  STATE
+// ════════════════════════════
+let KPIS=[], SMARTS=[], FODA={}, PESTEL=[], PLAN=[];
+let selectedKPI = null;
+let charts = {};
+
+async function save(){
+  try{
+    localStorage.setItem(SK.kpi, JSON.stringify(KPIS));
+    localStorage.setItem(SK.smart, JSON.stringify(SMARTS));
+    localStorage.setItem(SK.foda, JSON.stringify(FODA));
+    localStorage.setItem(SK.pestel, JSON.stringify(PESTEL));
+    localStorage.setItem(SK.plan, JSON.stringify(PLAN));
+  }catch(e){}
+  if(_fbReady&&_db){try{await Promise.all([_fbBatch('est_kpis',KPIS),_fbBatch('est_smarts',SMARTS),_fbBatch('est_pestel',PESTEL),_fbBatch('est_plan',PLAN),_fbDoc(_ep()+'/est_foda/main',FODA)]);}catch(e){}}
+}
+
+async function load(){
+  await _initFB();
+  if(_fbReady){
+    try{
+      const [kArr,sArr,peArr,plArr,fodaData]=await Promise.all([_fbGetAll('est_kpis'),_fbGetAll('est_smarts'),_fbGetAll('est_pestel'),_fbGetAll('est_plan'),_fbGetDoc(_ep()+'/est_foda/main')]);
+      KPIS   = kArr.length  ? kArr   : DEF_KPI.map(x=>({...x}));
+      SMARTS = sArr.length  ? sArr   : DEF_SMART.map(x=>({...x}));
+      PESTEL = peArr.length ? peArr  : DEF_PESTEL.map(x=>({...x}));
+      PLAN   = plArr.length ? plArr  : DEF_PLAN.map(x=>({...x}));
+      FODA   = fodaData||JSON.parse(JSON.stringify(DEF_FODA));
+      if(!FODA.fortalezas)FODA=JSON.parse(JSON.stringify(DEF_FODA));
+      return;
+    }catch(e){}
+  }
+  try{
+    KPIS   = JSON.parse(localStorage.getItem(SK.kpi))  || DEF_KPI.map(x=>({...x}));
+    SMARTS = JSON.parse(localStorage.getItem(SK.smart)) || DEF_SMART.map(x=>({...x}));
+    FODA   = JSON.parse(localStorage.getItem(SK.foda)) || JSON.parse(JSON.stringify(DEF_FODA));
+    PESTEL = JSON.parse(localStorage.getItem(SK.pestel))|| DEF_PESTEL.map(x=>({...x}));
+    PLAN   = JSON.parse(localStorage.getItem(SK.plan)) || DEF_PLAN.map(x=>({...x}));
+    if(!FODA.fortalezas)FODA=JSON.parse(JSON.stringify(DEF_FODA));
+  }catch(e){
+    KPIS=DEF_KPI.map(x=>({...x})); SMARTS=DEF_SMART.map(x=>({...x}));
+    FODA=JSON.parse(JSON.stringify(DEF_FODA)); PESTEL=DEF_PESTEL.map(x=>({...x}));
+    PLAN=DEF_PLAN.map(x=>({...x}));
+  }
+}
+
+// ════════════════════════════
+//  HELPERS
+// ════════════════════════════
+const clp = n => new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(n);
+const M   = n => '$'+(n/1e6).toFixed(2)+'M';
+const dateF = d => {try{return new Date(d+'T12:00:00').toLocaleDateString('es-CL');}catch{return d;}};
+
+const ESTADO_COLOR = {'En Proceso':'#10B981','Completado':'#22C55E','Planificado':'#38BDF8','Atrasado':'#EF4444'};
+const IMPACTO_COLOR = {'Alto':'#EF4444','Medio':'#F59E0B','Bajo':'#22C55E'};
+const TEND_COLOR    = {'Positiva':'#22C55E','Negativa':'#EF4444','Neutral':'#F59E0B'};
+const PRIO_COLOR    = {'Alta':'#EF4444','Media':'#F59E0B','Baja':'#22C55E'};
+const FACTOR_COLOR  = {'Político':'#EF4444','Económico':'#F59E0B','Social':'#22C55E','Tecnológico':'#38BDF8','Ecológico':'#10B981','Legal':'#A78BFA'};
+
+function badge(label,color){return `<span class="badge" style="background:${color}20;color:${color};border:1px solid ${color}40">${label}</span>`;}
+
+function cumpl(kpi){
+  const last = kpi.valores[kpi.valores.length-1]??0;
+  return kpi.tendencia==='Bajada'
+    ? Math.min(150,Math.round((kpi.meta/Math.max(last,.01))*100))
+    : Math.min(150,Math.round((last/Math.max(kpi.meta,.01))*100));
+}
+function fmtV(v,u){return u==='$CLP'?M(v):`${v}${u}`;}
+
+// ════════════════════════════
+//  TABS
+// ════════════════════════════
+function showTab(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  btn.classList.add('active');
+  renderAll();
+}
+
+function renderAll(){
+  updateHeader();
+  renderKPITab();
+  renderSmartTab();
+  renderFodaTab();
+  renderPestelTab();
+  renderPlanTab();
+}
+
+function updateHeader(){
+  document.getElementById('hInfo').textContent =
+    `${KPIS.length} KPIs · ${SMARTS.length} Objetivos · ${PESTEL.length} Factores PESTEL`;
+}
+
+// ════════════════════════════
+//  KPI TAB
+// ════════════════════════════
+function renderKPITab(){
+  const enMeta = KPIS.filter(k=>cumpl(k)>=90).length;
+  const promCumpl = KPIS.length ? Math.round(KPIS.reduce((s,k)=>s+cumpl(k),0)/KPIS.length) : 0;
+  document.getElementById('kpiSummary').innerHTML = `
+    <div class="kpi" style="--kc:rgba(16,185,129,0.1)"><div class="kpi-label">KPIs Activos</div><div class="kpi-value" style="color:var(--acc)">${KPIS.length}</div></div>
+    <div class="kpi" style="--kc:rgba(34,197,94,0.1)"><div class="kpi-label">En Meta ≥90%</div><div class="kpi-value" style="color:var(--ok)">${enMeta}</div></div>
+    <div class="kpi" style="--kc:rgba(239,68,68,0.1)"><div class="kpi-label">Bajo Meta</div><div class="kpi-value" style="color:var(--danger)">${KPIS.length-enMeta}</div></div>
+    <div class="kpi" style="--kc:rgba(245,158,11,0.1)"><div class="kpi-label">Cumpl. Promedio</div><div class="kpi-value" style="color:${promCumpl>=90?'var(--ok)':'var(--warn)'}">${promCumpl}%</div></div>
+  `;
+
+  // KPI selector cards
+  if(!selectedKPI && KPIS.length) selectedKPI = KPIS[0].id;
+  document.getElementById('kpiCardsGrid').innerHTML = KPIS.map(k=>{
+    const last = k.valores[k.valores.length-1]??0;
+    const cp = cumpl(k);
+    const c = cp>=90?'var(--ok)':cp>=70?'var(--warn)':'var(--danger)';
+    const isA = selectedKPI===k.id;
+    return `<div class="kpi-sel-card ${isA?'active':''}" onclick="selectKPI(${k.id})" style="border-color:${isA?c:'var(--border)'}">
+      <div style="font-size:11px;font-weight:700;color:var(--white);margin-bottom:6px;font-family:monospace">${k.nombre}</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px">
+        <div><div style="font-size:18px;font-weight:900;color:${c}">${fmtV(last,k.unidad)}</div><div style="font-size:9px;color:var(--muted)">Meta: ${fmtV(k.meta,k.unidad)}</div></div>
+        <div style="font-size:15px;font-weight:900;color:${c}">${cp}%</div>
+      </div>
+      <div class="progress-wrap" style="height:4px"><div class="progress-bar" style="width:${Math.min(100,cp)}%;background:${c};height:4px"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px">
+        ${badge(k.area,'#38BDF8')}
+        ${badge(cp>=90?'✓ Meta':'⚠ Bajo',cp>=90?'#22C55E':'#F59E0B')}
+      </div>
+    </div>`;
+  }).join('') + `<div onclick="openKPIModal(null)" style="background:transparent;border-radius:10px;padding:14px;border:1px dashed rgba(16,185,129,0.35);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--acc)">+</div>`;
+
+  buildKPICharts();
+}
+
+function selectKPI(id){
+  selectedKPI = id;
+  renderKPITab();
+}
+
+function buildKPICharts(){
+  const kpi = KPIS.find(k=>k.id===selectedKPI);
+  if(!kpi) return;
+  const labels = MESES.slice(0,kpi.valores.length);
+  const cp = labels.map((m,i)=>Math.min(150,Math.round(kpi.tendencia==='Bajada'?(kpi.meta/Math.max(kpi.valores[i],.01))*100:(kpi.valores[i]/Math.max(kpi.meta,.01))*100)));
+  const last = kpi.valores[kpi.valores.length-1]??0;
+  const cpLast = cumpl(kpi);
+  const c = cpLast>=90?'#22C55E':cpLast>=70?'#F59E0B':'#EF4444';
+  const cf = {color:'rgba(255,255,255,0.04)',font:{family:'monospace',size:10}};
+
+  document.getElementById('kpiChartTitle').textContent = kpi.nombre + ' — Real vs Meta';
+  const build=(id,cfg)=>{if(charts[id])charts[id].destroy();const el=document.getElementById(id);if(el)charts[id]=new Chart(el,cfg);};
+
+  build('chartKPILine',{type:'line',data:{labels,datasets:[
+    {label:'Real',data:kpi.valores,borderColor:c,backgroundColor:c+'20',fill:true,tension:.4,borderWidth:3,pointRadius:5,pointBackgroundColor:c},
+    {label:'Meta',data:labels.map(()=>kpi.meta),borderColor:'#5A7090',borderWidth:2,borderDash:[6,3],pointRadius:0,fill:false},
+  ]},options:{plugins:{legend:{labels:{font:cf.font,boxWidth:10}}},scales:{x:{grid:{color:cf.color},ticks:{font:cf.font}},y:{grid:{color:cf.color},ticks:{font:cf.font}}}}});
+
+  build('chartKPIBar',{type:'bar',data:{labels,datasets:[{label:'Cumplimiento %',data:cp,backgroundColor:cp.map(v=>v>=90?'rgba(34,197,94,0.7)':v>=70?'rgba(245,158,11,0.7)':'rgba(239,68,68,0.7)'),borderRadius:4}]},options:{plugins:{legend:{display:false}},scales:{x:{grid:{color:cf.color},ticks:{font:cf.font}},y:{grid:{color:cf.color},ticks:{font:cf.font,callback:v=>v+'%'}}}}});
+}
+
+// ════════════════════════════
+//  SMART TAB
+// ════════════════════════════
+function renderSmartTab(){
+  const avg = SMARTS.length ? Math.round(SMARTS.reduce((s,o)=>s+o.avance,0)/SMARTS.length) : 0;
+  document.getElementById('kpiSmart').innerHTML = `
+    <div class="kpi"><div class="kpi-label">Total Objetivos</div><div class="kpi-value" style="color:var(--acc)">${SMARTS.length}</div></div>
+    <div class="kpi" style="--kc:rgba(34,197,94,0.1)"><div class="kpi-label">Completados</div><div class="kpi-value" style="color:var(--ok)">${SMARTS.filter(s=>s.estado==='Completado').length}</div></div>
+    <div class="kpi" style="--kc:rgba(16,185,129,0.1)"><div class="kpi-label">En Proceso</div><div class="kpi-value" style="color:var(--acc)">${SMARTS.filter(s=>s.estado==='En Proceso').length}</div></div>
+    <div class="kpi"><div class="kpi-label">Avance Promedio</div><div class="kpi-value" style="color:var(--warn)">${avg}%</div></div>
+  `;
+  document.getElementById('smartList').innerHTML = SMARTS.map(obj=>{
+    const c = ESTADO_COLOR[obj.estado]||'var(--acc)';
+    return `<div class="smart-card" style="border-left-color:${c}">
+      <div class="smart-header">
+        <div style="flex:1;margin-right:16px">
+          <div style="font-size:14px;font-weight:800;margin-bottom:6px">${obj.objetivo}</div>
+          <div style="display:flex;gap:7px;flex-wrap:wrap">
+            ${badge(obj.estado,c)}${badge(obj.area,'#38BDF8')}${badge('⏰ '+dateF(obj.tiempo),'#5A7090')}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+          <div style="text-align:right"><div style="font-size:24px;font-weight:900;color:${c}">${obj.avance}%</div></div>
+          <button class="btn btn-sm btn-edit" onclick="openSmartModal(${obj.id})">✎</button>
+          <button class="btn btn-sm btn-del" onclick="delSmart(${obj.id})">✕</button>
+        </div>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar" style="width:${obj.avance}%;background:${c}"></div></div>
+      <div class="smart-dims">
+        <div class="smart-dim"><div class="smart-dim-label">S — Específico</div><div class="smart-dim-val">${obj.especifico||'—'}</div></div>
+        <div class="smart-dim"><div class="smart-dim-label">M — Medible</div><div class="smart-dim-val">${obj.medible||'—'}</div></div>
+        <div class="smart-dim"><div class="smart-dim-label">A — Alcanzable</div><div class="smart-dim-val">${obj.alcanzable||'—'}</div></div>
+        <div class="smart-dim"><div class="smart-dim-label">R — Relevante</div><div class="smart-dim-val">${obj.relevante||'—'}</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════
+//  FODA TAB
+// ════════════════════════════
+function renderFodaTab(){
+  const quads = [
+    {key:'fortalezas',label:'FORTALEZAS',color:'#22C55E',icon:'💪',desc:'Capacidades internas ventajosas'},
+    {key:'oportunidades',label:'OPORTUNIDADES',color:'#10B981',icon:'🎯',desc:'Factores externos favorables'},
+    {key:'debilidades',label:'DEBILIDADES',color:'#F59E0B',icon:'⚠️',desc:'Limitaciones internas a mejorar'},
+    {key:'amenazas',label:'AMENAZAS',color:'#EF4444',icon:'🛡',desc:'Factores externos de riesgo'},
+  ];
+
+  document.getElementById('kpiFoda').innerHTML = quads.map(q=>`
+    <div class="kpi" style="--kc:${q.color}18">
+      <div class="kpi-label">${q.label}</div>
+      <div class="kpi-value" style="color:${q.color}">${(FODA[q.key]||[]).length}</div>
+      <div class="kpi-sub">${(FODA[q.key]||[]).filter(i=>i.impacto==='Alto').length} alto impacto</div>
+    </div>`).join('');
+
+  document.getElementById('fodaGrid').innerHTML = quads.map(q=>`
+    <div class="foda-quad" style="border-color:${q.color}33">
+      <div class="foda-quad-header" style="background:${q.color}10;border-bottom:1px solid ${q.color}33">
+        <div>
+          <div class="foda-quad-title" style="color:${q.color}">${q.icon} ${q.label}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">${q.desc}</div>
+        </div>
+        <button class="btn btn-sm" style="background:transparent;border:1px solid ${q.color};color:${q.color};cursor:pointer" onclick="addFodaItem('${q.key}','${q.color}')">+ Agregar</button>
+      </div>
+      <div class="foda-items" id="foda-${q.key}">
+        ${(FODA[q.key]||[]).map(item=>`
+          <div class="foda-item">
+            <div class="foda-item-text">
+              <div style="margin-bottom:5px">${item.texto}</div>
+              ${badge('Impacto '+item.impacto,IMPACTO_COLOR[item.impacto]||'#5A7090')}
+            </div>
+            <button onclick="delFodaItem('${q.key}',${item.id})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;margin-top:2px;flex-shrink:0">✕</button>
+          </div>`).join('')}
+        ${!(FODA[q.key]||[]).length?`<div style="text-align:center;padding:20px 0;color:var(--muted);font-size:11px;font-family:monospace">Sin elementos. Agrega uno →</div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function addFodaItem(key,color){
+  const texto = prompt(`Nuevo elemento — ${key.toUpperCase()}\n\nDescripción:`);
+  if(!texto) return;
+  const impacto = prompt('Impacto (Alto / Medio / Bajo):','Medio');
+  if(!FODA[key]) FODA[key]=[];
+  FODA[key].push({id:uid(),texto:texto.trim(),impacto:impacto||'Medio'});
+  save(); renderFodaTab();
+}
+
+function delFodaItem(key,id){
+  if(!confirm('¿Eliminar este elemento?')) return;
+  FODA[key]=(FODA[key]||[]).filter(i=>i.id!==id);
+  save(); renderFodaTab();
+}
+
+// ════════════════════════════
+//  PESTEL TAB
+// ════════════════════════════
+const FACTORES = ['Político','Económico','Social','Tecnológico','Ecológico','Legal'];
+
+function renderPestelTab(){
+  // Summary by factor
+  document.getElementById('pestelSummary').innerHTML = FACTORES.map(f=>{
+    const items = PESTEL.filter(p=>p.factor===f);
+    const altos = items.filter(p=>p.impacto==='Alto').length;
+    const c = FACTOR_COLOR[f]||'#5A7090';
+    return `<div class="ind-row">
+      <div style="display:flex;align-items:center;gap:8px">
+        ${badge(f.substring(0,3).toUpperCase(),c)}
+        <span style="font-size:12px;font-family:monospace">${f}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:14px;font-weight:800;font-family:monospace">${items.length}</span>
+        ${altos?badge(altos+' alto riesgo','#EF4444'):''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Radar chart
+  const radarData = FACTORES.map(f=>{
+    const items = PESTEL.filter(p=>p.factor===f);
+    const avg = items.length ? Math.round(items.reduce((s,p)=>{
+      const imp = p.impacto==='Alto'?3:p.impacto==='Medio'?2:1;
+      return s + imp*(p.prob/100)*33;
+    },0)/items.length) : 0;
+    return avg;
+  });
+  const cf = {color:'rgba(255,255,255,0.06)',font:{family:'monospace',size:9}};
+  if(charts.radar) charts.radar.destroy();
+  const el = document.getElementById('chartRadar');
+  if(el) charts.radar = new Chart(el,{type:'radar',data:{
+    labels:FACTORES.map(f=>f.substring(0,4)),
+    datasets:[{label:'Riesgo',data:radarData,borderColor:'#10B981',backgroundColor:'rgba(16,185,129,0.2)',borderWidth:2,pointBackgroundColor:'#10B981'}]
+  },options:{scales:{r:{grid:{color:cf.color},ticks:{backdropColor:'transparent',font:cf.font},pointLabels:{font:cf.font}}},plugins:{legend:{display:false}}}});
+
+  // Table
+  const tbody = document.querySelector('#tblPestel tbody');
+  tbody.innerHTML = PESTEL.map(p=>`<tr>
+    <td>${badge(p.factor,FACTOR_COLOR[p.factor]||'#5A7090')}</td>
+    <td style="color:var(--white);max-width:220px;overflow:hidden;text-overflow:ellipsis">${p.item}</td>
+    <td>${badge(p.impacto,IMPACTO_COLOR[p.impacto])}</td>
+    <td style="text-align:center;font-family:monospace">${p.prob}%</td>
+    <td>${badge(p.tendencia,TEND_COLOR[p.tendencia])}</td>
+    <td style="color:var(--muted);max-width:200px;overflow:hidden;text-overflow:ellipsis">${p.accion}</td>
+    <td><button class="btn btn-sm btn-del" onclick="delPestel(${p.id})">✕</button></td>
+  </tr>`).join('');
+}
+
+function showPestelForm(){document.getElementById('pestelForm').style.display='block';}
+function hidePestelForm(){document.getElementById('pestelForm').style.display='none';}
+
+function savePestel(){
+  const item = document.getElementById('pfItem').value.trim();
+  if(!item){alert('Ingresa la descripción del factor');return;}
+  PESTEL.push({
+    id:uid(),
+    factor:document.getElementById('pfFactor').value,
+    item,
+    impacto:document.getElementById('pfImpacto').value,
+    prob:parseFloat(document.getElementById('pfProb').value)||50,
+    tendencia:document.getElementById('pfTend').value,
+    accion:document.getElementById('pfAccion').value.trim(),
+  });
+  save(); hidePestelForm(); renderPestelTab();
+}
+
+function delPestel(id){if(!confirm('¿Eliminar este factor?'))return;PESTEL=PESTEL.filter(p=>p.id!==id);save();renderPestelTab();}
+
+// ════════════════════════════
+//  PLAN TAB
+// ════════════════════════════
+function renderPlanTab(){
+  const totPres = PLAN.reduce((s,p)=>s+p.presupuesto,0);
+  const avgAv   = PLAN.length ? Math.round(PLAN.reduce((s,p)=>s+p.avance,0)/PLAN.length) : 0;
+  document.getElementById('kpiPlan').innerHTML = `
+    <div class="kpi"><div class="kpi-label">Iniciativas</div><div class="kpi-value" style="color:var(--acc)">${PLAN.length}</div></div>
+    <div class="kpi" style="--kc:rgba(245,158,11,0.1)"><div class="kpi-label">Presupuesto Total</div><div class="kpi-value" style="color:var(--warn)">${M(totPres)}</div></div>
+    <div class="kpi" style="--kc:rgba(34,197,94,0.1)"><div class="kpi-label">Avance Promedio</div><div class="kpi-value" style="color:var(--ok)">${avgAv}%</div></div>
+    <div class="kpi"><div class="kpi-label">Completadas</div><div class="kpi-value" style="color:var(--ok)">${PLAN.filter(p=>p.estado==='Completado').length}</div></div>
+  `;
+  document.getElementById('planList').innerHTML = PLAN.map(p=>{
+    const c = ESTADO_COLOR[p.estado]||'var(--acc)';
+    const pc = PRIO_COLOR[p.prioridad]||'var(--warn)';
+    return `<div class="plan-item" style="border-left-color:${c}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:800;margin-bottom:4px">${p.nombre}</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">🎯 ${p.objetivo}</div>
+          <div style="display:flex;gap:7px;flex-wrap:wrap">
+            ${badge(p.estado,c)}${badge(p.area,'#38BDF8')}${badge(p.prioridad,pc)}${badge('👤 '+p.responsable,'#5A7090')}${badge(clp(p.presupuesto),'#F59E0B')}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:16px">
+          <div style="font-size:24px;font-weight:900;color:${c}">${p.avance}%</div>
+          <button class="btn btn-sm btn-edit" onclick="openPlanModal(${p.id})">✎</button>
+          <button class="btn btn-sm btn-del" onclick="delPlan(${p.id})">✕</button>
+        </div>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar" style="width:${p.avance}%;background:${c}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════
+//  MODALS
+// ════════════════════════════
+function openKPIModal(id){
+  if(id){
+    const k=KPIS.find(x=>x.id===id);if(!k)return;
+    document.getElementById('kpiModalTitle').textContent='Editar KPI';
+    document.getElementById('kId').value=id;
+    document.getElementById('kNombre').value=k.nombre;
+    document.getElementById('kUnidad').value=k.unidad;
+    document.getElementById('kMeta').value=k.meta;
+    document.getElementById('kArea').value=k.area;
+    document.getElementById('kFrec').value=k.frecuencia;
+    document.getElementById('kTend').value=k.tendencia;
+    document.getElementById('kValores').value=k.valores.join(',');
+  } else {
+    document.getElementById('kpiModalTitle').textContent='Nuevo KPI';
+    document.getElementById('kId').value='';
+    ['kNombre','kMeta','kArea','kValores'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('kUnidad').value='%';
+    document.getElementById('kFrec').value='Mensual';
+  }
+  document.getElementById('modalKPI').classList.add('open');
+}
+
+function saveKPI(){
+  const id=document.getElementById('kId').value;
+  const obj={
+    nombre:document.getElementById('kNombre').value.trim(),
+    unidad:document.getElementById('kUnidad').value.trim(),
+    meta:parseFloat(document.getElementById('kMeta').value)||0,
+    area:document.getElementById('kArea').value.trim(),
+    frecuencia:document.getElementById('kFrec').value.trim(),
+    tendencia:document.getElementById('kTend').value,
+    valores:document.getElementById('kValores').value.split(',').map(v=>parseFloat(v.trim())).filter(v=>!isNaN(v)),
+  };
+  if(!obj.nombre){alert('Ingresa el nombre del KPI');return;}
+  if(id){const idx=KPIS.findIndex(k=>k.id==id);if(idx>=0)KPIS[idx]={...KPIS[idx],...obj};}
+  else{KPIS.push({id:uid(),...obj});}
+  save(); closeModal('modalKPI'); renderKPITab();
+}
+
+function openSmartModal(id){
+  if(id){
+    const s=SMARTS.find(x=>x.id===id);if(!s)return;
+    document.getElementById('smartModalTitle').textContent='Editar Objetivo';
+    document.getElementById('sId').value=id;
+    document.getElementById('sObjetivo').value=s.objetivo;
+    document.getElementById('sEspecifico').value=s.especifico;
+    document.getElementById('sMedible').value=s.medible;
+    document.getElementById('sAlcanzable').value=s.alcanzable;
+    document.getElementById('sRelevante').value=s.relevante;
+    document.getElementById('sTiempo').value=s.tiempo;
+    document.getElementById('sArea').value=s.area;
+    document.getElementById('sAvance').value=s.avance;
+    document.getElementById('sEstado').value=s.estado;
+  } else {
+    document.getElementById('smartModalTitle').textContent='Nuevo Objetivo SMART';
+    document.getElementById('sId').value='';
+    ['sObjetivo','sEspecifico','sMedible','sAlcanzable','sRelevante','sTiempo','sArea'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('sAvance').value='0';
+  }
+  document.getElementById('modalSmart').classList.add('open');
+}
+
+function saveSmart(){
+  const id=document.getElementById('sId').value;
+  const obj={
+    objetivo:document.getElementById('sObjetivo').value.trim(),
+    especifico:document.getElementById('sEspecifico').value.trim(),
+    medible:document.getElementById('sMedible').value.trim(),
+    alcanzable:document.getElementById('sAlcanzable').value.trim(),
+    relevante:document.getElementById('sRelevante').value.trim(),
+    tiempo:document.getElementById('sTiempo').value,
+    area:document.getElementById('sArea').value.trim(),
+    avance:Math.min(100,Math.max(0,parseFloat(document.getElementById('sAvance').value)||0)),
+    estado:document.getElementById('sEstado').value,
+  };
+  if(!obj.objetivo){alert('Ingresa el objetivo');return;}
+  if(id){const idx=SMARTS.findIndex(s=>s.id==id);if(idx>=0)SMARTS[idx]={...SMARTS[idx],...obj};}
+  else{SMARTS.push({id:uid(),...obj});}
+  save(); closeModal('modalSmart'); renderSmartTab();
+}
+
+function delSmart(id){if(!confirm('¿Eliminar este objetivo?'))return;SMARTS=SMARTS.filter(s=>s.id!==id);save();renderSmartTab();}
+
+function openPlanModal(id){
+  if(id){
+    const p=PLAN.find(x=>x.id===id);if(!p)return;
+    document.getElementById('planModalTitle').textContent='Editar Iniciativa';
+    document.getElementById('plId').value=id;
+    document.getElementById('plNombre').value=p.nombre;
+    document.getElementById('plObjetivo').value=p.objetivo;
+    document.getElementById('plArea').value=p.area;
+    document.getElementById('plResp').value=p.responsable;
+    document.getElementById('plInicio').value=p.fechaInicio;
+    document.getElementById('plFin').value=p.fechaFin;
+    document.getElementById('plPres').value=p.presupuesto;
+    document.getElementById('plAvance').value=p.avance;
+    document.getElementById('plPrio').value=p.prioridad;
+    document.getElementById('plEstado').value=p.estado;
+  } else {
+    document.getElementById('planModalTitle').textContent='Nueva Iniciativa';
+    document.getElementById('plId').value='';
+    ['plNombre','plObjetivo','plArea','plResp','plInicio','plFin','plPres'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('plAvance').value='0';
+  }
+  document.getElementById('modalPlan').classList.add('open');
+}
+
+function savePlan(){
+  const id=document.getElementById('plId').value;
+  const obj={
+    nombre:document.getElementById('plNombre').value.trim(),
+    objetivo:document.getElementById('plObjetivo').value.trim(),
+    area:document.getElementById('plArea').value.trim(),
+    responsable:document.getElementById('plResp').value.trim(),
+    fechaInicio:document.getElementById('plInicio').value,
+    fechaFin:document.getElementById('plFin').value,
+    presupuesto:parseFloat(document.getElementById('plPres').value)||0,
+    avance:Math.min(100,Math.max(0,parseFloat(document.getElementById('plAvance').value)||0)),
+    prioridad:document.getElementById('plPrio').value,
+    estado:document.getElementById('plEstado').value,
+  };
+  if(!obj.nombre){alert('Ingresa el nombre de la iniciativa');return;}
+  if(id){const idx=PLAN.findIndex(p=>p.id==id);if(idx>=0)PLAN[idx]={...PLAN[idx],...obj};}
+  else{PLAN.push({id:uid(),...obj});}
+  save(); closeModal('modalPlan'); renderPlanTab();
+}
+
+function delPlan(id){if(!confirm('¿Eliminar esta iniciativa?'))return;PLAN=PLAN.filter(p=>p.id!==id);save();renderPlanTab();}
+
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});
+});
+
+// ════════════════════════════
+//  INIT
+// ════════════════════════════
+(async()=>{
+  await load();
+  renderAll();
+  try{var _l=document.getElementById('_empNombreLogo');if(_l&&window._MSS_EMP)_l.textContent=window._MSS_EMP.nombre||_empObj.nombre||'Mi Empresa';}catch(e){}
+})();
+</script>
+</body>
+</html>
