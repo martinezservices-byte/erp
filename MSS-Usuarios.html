@@ -127,8 +127,21 @@ onAuthStateChanged(auth, async u => {
   _user = u;
   // Verificar si es admin
   const snap = await getDoc(doc(db,'usuarios/'+u.uid));
-  if(snap.exists() && snap.data().rol !== 'admin'){
-    alert('Solo administradores pueden gestionar usuarios.');
+  if(!snap.exists()){
+    // Primera vez: crear documento admin automáticamente
+    await setDoc(doc(db,'usuarios/'+u.uid),{
+      uid: u.uid,
+      nombre: u.displayName || u.email.split('@')[0],
+      email: u.email,
+      rol: 'admin',
+      creado: new Date().toISOString()
+    });
+    cargarUsuarios();
+    return;
+  }
+  const rolActual = snap.data().rol;
+  if(rolActual !== 'admin'){
+    alert('Solo administradores pueden gestionar usuarios.\nTu rol actual es: ' + rolActual + '\nContacta al administrador del sistema.');
     window.location.href='index.html'; return;
   }
   cargarUsuarios();
