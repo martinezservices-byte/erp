@@ -725,9 +725,10 @@ function rGastos(){
       <td style="text-align:right;color:var(--ok)">${clp(c.pagado)}</td>
       <td style="text-align:right;color:${c.saldo>0?'var(--danger)':'var(--ok)'};font-weight:700">${clp(c.saldo)}</td>
       <td>${badge(c.estado,EC[c.estado]||'#5A7090')}</td>
-      <td style="color:var(--gold);font-family:monospace">${c.ref||'—'}</td>
+      <td style="color:var(--gold);font-family:monospace">${c.numComp?'#'+c.numComp:c.ref||'—'}</td>
       <td style="color:var(--muted)">${c.fechaPago?df(c.fechaPago):'—'}</td>
       <td><div style="display:flex;gap:3px">
+        ${c.mesSinIdentificar||c.mes==='MES POR IDENTIFICAR'?`<button class="bsm" style="background:rgba(245,158,11,0.2);color:#F59E0B;border:1px solid rgba(245,158,11,0.3)" onclick="asignarMes(${c.id})" title="Asignar mes correspondiente">📅</button>`:''}
         <button class="bsm be" onclick="editCobro(${c.id})">✎</button>
         <button class="bsm be" onclick="impComp(${c.id})">🖨</button>
         <button class="bsm bd" onclick="delCobro(${c.id})">✕</button>
@@ -785,6 +786,12 @@ function saveCobro(){
   const mesSinId=document.getElementById('coMes').dataset.sinMes==='1'&&!document.getElementById('coMes').value;
   const mesVal=mesSinId?'MES POR IDENTIFICAR':document.getElementById('coMes').value;
   const obj={mes:mesVal,mesSinIdentificar:mesSinId,unidadId:uId,unidadNum:u?.num||'?',prop:u?.prop||'?',gcOrd,mora,total,pagado,saldo:Math.max(0,total-pagado),estado:document.getElementById('coEstado').value,fechaPago:document.getElementById('coFecha').value,ref:document.getElementById('coComp').value,forma:document.getElementById('coForma').value,obs:document.getElementById('coObs').value};
+  // Asignar número correlativo de comprobante si hay pago
+  if(pagado>0&&!obj.numComp){
+    CFG.nextComp=(CFG.nextComp||0)+1;
+    obj.numComp=CFG.nextComp;
+    save(); // guardar nextComp en CFG también
+  }
   if(id){const i=COBROS.findIndex(c=>c.id==id);if(i>=0)COBROS[i]={...COBROS[i],...obj};}
   else COBROS.push({id:uid(),...obj});
   save();
@@ -807,6 +814,19 @@ function sincronizarGCFinanzas(cobro){
   }catch(e){console.error('Sync finanzas:',e);}
 }
 
+function asignarMes(id){
+  const c=COBROS.find(x=>x.id===id);if(!c)return;
+  const mes=prompt('Ingresa el mes correspondiente a este pago (formato AAAA-MM):\nEjemplo: 2026-05\n\nPropietario: '+c.prop+'\nPagado: $'+Math.round(c.pagado||0).toLocaleString('es-CL'));
+  if(!mes)return;
+  if(!/^\d{4}-\d{2}$/.test(mes)){alert('Formato incorrecto. Usa AAAA-MM (ej: 2026-05)');return;}
+  const i=COBROS.findIndex(x=>x.id===id);
+  if(i>=0){
+    COBROS[i].mes=mes;
+    COBROS[i].mesSinIdentificar=false;
+    save();rGastos();
+    alert('✅ Mes asignado: '+mes);
+  }
+}
 function delCobro(id){if(!confirm('¿Eliminar cobro?'))return;COBROS=COBROS.filter(c=>c.id!==id);save();rGastos();}
 
 // ═══════════════════════════════════
@@ -1165,7 +1185,9 @@ function impComp(id){
   const modalidadLabel=(CFG.modalidad||'fija')==='prorrateo'?'Prorrateo Dinámico':'Cuota Fija';
   const mesSinId=c.mesSinIdentificar||c.mes==='MES POR IDENTIFICAR';
   const periodoLabel=mesSinId?'<span style="color:#dc2626;font-weight:900;font-size:13px;text-transform:uppercase">MES POR IDENTIFICAR</span>':c.mes;
-  const numComp='N° '+String(c.id).slice(-5).padStart(5,'0')+' - '+Math.floor(Math.random()*90000+10000);
+  // Número correlativo real guardado en el cobro
+  const numBase=c.numComp?String(c.numComp).padStart(5,'0'):'00001';
+  const numComp='N° '+numBase+' - '+String(Math.abs(c.id)).toString().slice(-5).padStart(5,'0');
   const fechaLarga=(d)=>{if(!d)return df(HOY);const ms=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];const p=(d||HOY).split('-');return p[2]+' de '+ms[parseInt(p[1])-1]+', '+p[0];};
   const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"/>
 <style>
@@ -1248,7 +1270,7 @@ function impComp(id){
   <table>
     <thead><tr><th>Ítem</th><th>Descripción del Concepto / Fondo</th><th>Monto Abonado</th></tr></thead>
     <tbody>
-      <tr><td>1</td><td>Abono Gasto Común Base (Modalidad: ${modalidadLabel})</td><td>${clp(c.gcOrd)}</td></tr>
+      <tr><td>1</td><td>${mesSinId?'Abono Gasto Común (Período por Identificar)':'Gasto Común '+c.mes+' — '+CFG.nombre} <span style='color:#4a7c59;font-size:10px'>(Modalidad: ${modalidadLabel})</span></td><td>${clp(c.gcOrd)}</td></tr>
       ${fondoRes>0?`<tr><td>2</td><td>Aporte Obligatorio Fondo de Reserva (${CFG.reserva||5}%)</td><td>${clp(fondoRes)}</td></tr>`:''}
       ${c.mora>0?`<tr><td>${fondoRes>0?3:2}</td><td class="mora">Interés por Pago Fuera de Plazo / Multa Período Anterior</td><td class="mora">${clp(c.mora)}</td></tr>`:''}
     </tbody>
