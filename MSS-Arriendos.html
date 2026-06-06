@@ -664,18 +664,30 @@ async function _fbGetAll(col){
   const arr=[];snap.forEach(d=>arr.push({id:d.id,...d.data()}));return arr;
 }
 async function _fbBatch(col,arr){
-  if(!arr.length){
-    // Si el array está vacío, no hacemos nada (evita borrar datos accidentalmente)
-    return;
-  }
-  for(let i=0;i<arr.length;i+=400){
-    const batch=window._fbM.writeBatch(_db);
-    arr.slice(i,i+400).forEach(item=>{
-      const id=String(item.id||Date.now());
-      batch.set(window._fbM.doc(_db,_ep()+'/'+col+'/'+id),{...item});
-    });
-    await batch.commit();
-  }
+  if(!_db)return;
+  try{
+    // Obtener IDs existentes y eliminar los que ya no están en el array
+    const snap=await window._fbM.getDocs(window._fbM.collection(_db,_ep()+'/'+col));
+    const existingIds=new Set();snap.forEach(d=>existingIds.add(d.id));
+    const currentIds=new Set((arr||[]).map(item=>String(item.id||'')).filter(Boolean));
+    const toDelete=[...existingIds].filter(id=>!currentIds.has(id));
+    if(toDelete.length>0){
+      for(let i=0;i<toDelete.length;i+=400){
+        const bDel=window._fbM.writeBatch(_db);
+        toDelete.slice(i,i+400).forEach(id=>bDel.delete(window._fbM.doc(_db,_ep()+'/'+col+'/'+id)));
+        await bDel.commit();
+      }
+    }
+    if(!arr||!arr.length)return;
+    for(let i=0;i<arr.length;i+=400){
+      const batch=window._fbM.writeBatch(_db);
+      arr.slice(i,i+400).forEach(item=>{
+        const id=String(item.id||Date.now());
+        batch.set(window._fbM.doc(_db,_ep()+'/'+col+'/'+id),{...item});
+      });
+      await batch.commit();
+    }
+  }catch(e){console.warn('_fbBatch error:',e.message);}
 }
 
 async function load(){

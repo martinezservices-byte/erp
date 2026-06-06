@@ -186,12 +186,31 @@ async function _fbSet(col,id,data){
   await window._fbM.setDoc(window._fbM.doc(_db,_ep()+'/'+col+'/'+String(id)),{...data});
 }
 async function _fbBatch(col,arr){
-  if(!arr||!arr.length)return;
-  for(let i=0;i<arr.length;i+=400){
-    const b=window._fbM.writeBatch(_db);
-    arr.slice(i,i+400).forEach(item=>b.set(window._fbM.doc(_db,_ep()+'/'+col+'/'+String(item.id||Date.now())),{...item}));
-    await b.commit();
-  }
+  if(!_fbReady||!_db)return;
+  try{
+    // 1. Obtener IDs actuales en Firebase para esa colección
+    const snap=await window._fbM.getDocs(window._fbM.collection(_db,_ep()+'/'+col));
+    const existingIds=new Set();
+    snap.forEach(d=>existingIds.add(d.id));
+    // 2. IDs que deben existir (los del array actual)
+    const currentIds=new Set((arr||[]).map(item=>String(item.id||'')).filter(Boolean));
+    // 3. Eliminar los que ya no están en el array (fueron borrados)
+    const toDelete=[...existingIds].filter(id=>!currentIds.has(id));
+    if(toDelete.length>0){
+      for(let i=0;i<toDelete.length;i+=400){
+        const bDel=window._fbM.writeBatch(_db);
+        toDelete.slice(i,i+400).forEach(id=>bDel.delete(window._fbM.doc(_db,_ep()+'/'+col+'/'+id)));
+        await bDel.commit();
+      }
+    }
+    // 4. Guardar/actualizar los que sí existen
+    if(!arr||!arr.length)return;
+    for(let i=0;i<arr.length;i+=400){
+      const b=window._fbM.writeBatch(_db);
+      arr.slice(i,i+400).forEach(item=>b.set(window._fbM.doc(_db,_ep()+'/'+col+'/'+String(item.id||Date.now())),{...item}));
+      await b.commit();
+    }
+  }catch(e){console.warn('_fbBatch error:',e.message);}
 }
 async function _fbDoc(path,data){
   await window._fbM.setDoc(window._fbM.doc(_db,path),{...data});
