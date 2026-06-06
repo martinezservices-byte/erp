@@ -1196,8 +1196,8 @@ function impComp(id){
   const mesSinId=c.mesSinIdentificar||c.mes==='MES POR IDENTIFICAR';
   const periodoLabel=mesSinId?'<span style="color:#dc2626;font-weight:900;font-size:13px;text-transform:uppercase">MES POR IDENTIFICAR</span>':c.mes;
   // Número correlativo real guardado en el cobro
-  const numBase=c.numComp?String(c.numComp).padStart(5,'0'):'00001';
-  const numComp='N° '+numBase+' - '+String(Math.abs(c.id)).toString().slice(-5).padStart(5,'0');
+  // Número correlativo limpio: solo el consecutivo del condominio
+  const numComp='N° '+String(c.numComp||'1').padStart(5,'0');
   const fechaLarga=(d)=>{if(!d)return df(HOY);const ms=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];const p=(d||HOY).split('-');return p[2]+' de '+ms[parseInt(p[1])-1]+', '+p[0];};
   const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"/>
 <style>
