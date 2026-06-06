@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>MSS ERP — Auditoría</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#030609;--bg2:#0A0F1C;--bg3:#111827;--bg4:#1F2937;
+  --gold:#C9A84C;--ok:#22C55E;--danger:#EF4444;--info:#38BDF8;
+  --purple:#A78BFA;--teal:#10B981;--orange:#F59E0B;
+  --white:#F9FAFB;--muted:#6B7280;--mutedHi:#9CA3AF;
+  --border:rgba(255,255,255,0.07);
+}
+body{background:var(--bg);color:var(--white);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
+#nav-bar{background:var(--bg);border-bottom:1px solid rgba(201,168,76,0.1);padding:0 16px;display:flex;align-items:center;gap:4px;overflow-x:auto;flex-shrink:0;height:42px;position:sticky;top:0;z-index:200;}
+#nav-bar a{padding:4px 10px;border-radius:6px;color:var(--mutedHi);font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;transition:all .2s;}
+#nav-bar a:hover{background:rgba(201,168,76,0.1);color:var(--gold);}
+#nav-emp{margin-left:auto;padding:3px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;font-size:9px;color:var(--gold);font-family:monospace;white-space:nowrap;flex-shrink:0;display:none}
+#header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:42px;z-index:90;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--gold),#F59E0B);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#0A0F1C;font-size:14px;}
+.logo-name{font-size:14px;font-weight:800;color:var(--white);}
+.logo-mod{font-size:9px;color:var(--gold);font-weight:700;letter-spacing:2px;font-family:monospace;}
+#tabbar{background:var(--bg2);padding:0 20px;display:flex;gap:4px;border-bottom:1px solid var(--border);position:sticky;top:98px;z-index:89;overflow-x:auto;}
+.tab{padding:10px 14px;background:none;border:none;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+.tab.active,.tab:hover{color:var(--gold);border-bottom-color:var(--gold);}
+#content{max-width:1200px;margin:0 auto;padding:20px;}
+.section{display:none;}.section.active{display:block;}
+
+/* SELECTOR MODO */
+.modo-selector{display:flex;gap:8px;margin-bottom:20px;}
+.modo-btn{padding:10px 20px;border-radius:10px;border:2px solid var(--border);background:var(--bg3);color:var(--mutedHi);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;}
+.modo-btn.active-com{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,0.1);}
+.modo-btn.active-con{border-color:var(--teal);color:var(--teal);background:rgba(16,185,129,0.1);}
+
+/* KPI ROW */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px;}
+.kpi{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.kpi-label{font-size:10px;color:var(--muted);font-family:monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.kpi-value{font-size:22px;font-weight:900;}
+.kpi-sub{font-size:9px;color:var(--muted);margin-top:3px;}
+
+/* CARDS */
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;}
+.card-title{font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+@media(max-width:700px){.grid2,.grid3{grid-template-columns:1fr;}}
+
+/* TABLA */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:11px;}
+th{background:var(--bg4);padding:8px 10px;text-align:left;font-size:9px;color:var(--muted);font-family:monospace;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;}
+td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:hover td{background:rgba(255,255,255,0.02);}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;}
+
+/* CHART */
+.chart-wrap{position:relative;height:220px;width:100%;}
+canvas{max-height:220px;}
+
+/* FILTROS */
+.filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.filtros select,.filtros input{background:var(--bg4);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--white);font-size:11px;font-family:inherit;outline:none;}
+.filtros select:focus,.filtros input:focus{border-color:var(--gold);}
+.btn-export{padding:7px 14px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);color:var(--gold);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;}
+.btn-export:hover{background:rgba(201,168,76,0.2);}
+
+/* ESTADO */
+.estado-ok{color:var(--ok);}
+.estado-warn{color:var(--orange);}
+.estado-danger{color:var(--danger);}
+
+/* SELECTOR EMPRESA */
+.emp-selector{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+.emp-selector select{flex:1;background:var(--bg4);border:1px solid var(--border);border-radius:7px;padding:8px 12px;color:var(--white);font-size:12px;font-family:inherit;outline:none;}
+.emp-selector select:focus{border-color:var(--gold);}
+.badge-tipo{padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;}
+.badge-com{background:rgba(201,168,76,0.15);color:var(--gold);}
+.badge-cond{background:rgba(16,185,129,0.15);color:var(--teal);}
+
+/* LOADING */
+.loading{text-align:center;padding:40px;color:var(--muted);font-size:12px;}
+.spinner-sm{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ALERT */
+.alert{padding:10px 14px;border-radius:8px;font-size:11px;margin-bottom:12px;}
+.alert-warn{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);color:var(--orange);}
+.alert-ok{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:var(--ok);}
+.alert-info{background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.3);color:var(--info);}
+
+@media print{
+  #nav-bar,#header,#tabbar,.modo-selector,.filtros,.btn-export,.emp-selector{display:none!important;}
+  body{background:white!important;color:#1a1a1a!important;}
+  .kpi,.card{border:1px solid #ddd!important;background:white!important;}
+  .kpi-value,.card-title{color:#1a1a1a!important;}
+}
+</style>
+</head>
+<body>
+
+<div id="nav-bar">
+  <a href="index.html">🏠 Hub</a>
+  <a href="MSS-Finanzas.html">Finanzas</a>
+  <a href="MSS-Tesoreria.html">Tesorería</a>
+  <a href="MSS-Facturacion.html">Facturación</a>
+  <a href="MSS-Contabilidad.html">Contabilidad</a>
+  <a href="MSS-Condominio.html">Condominio</a>
+  <div id="nav-emp"></div>
+</div>
+
+<div id="header">
+  <div class="logo">
+    <div class="logo-icon">📊</div>
+    <div>
+      <div class="logo-name" id="_audNombre">Auditoría</div>
+      <div class="logo-mod" id="_audModo">PANEL DE AUDITORÍA</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn-export" onclick="exportarPDF()">🖨 Exportar PDF</button>
+    <button class="btn-export" onclick="exportarCSV()">📥 Exportar CSV</button>
+  </div>
+</div>
+
+<div id="tabbar">
+  <button class="tab active" onclick="showTab('resumen',this)">📊 Resumen Ejecutivo</button>
+  <button class="tab" onclick="showTab('financiero',this)">💰 Análisis Financiero</button>
+  <button class="tab" onclick="showTab('operacional',this)">⚙ Operacional</button>
+  <button class="tab" onclick="showTab('comparativo',this)">📈 Comparativo</button>
+  <button class="tab" onclick="showTab('alertas',this)">🚨 Alertas</button>
+</div>
+
+<div id="content">
+
+  <!-- SELECTOR DE ENTIDAD -->
+  <div class="emp-selector">
+    <div style="font-size:11px;color:var(--muted);font-weight:700;white-space:nowrap">Entidad a auditar:</div>
+    <select id="selEntidad" onchange="cambiarEntidad()">
+      <optgroup label="🏭 Empresas Comerciales" id="grpEmpresas"></optgroup>
+      <optgroup label="🏢 Condominios" id="grpCondos"></optgroup>
+    </select>
+    <span class="badge-tipo badge-com" id="badgeTipo">Comercial</span>
+    <div style="font-size:10px;color:var(--muted)" id="lblPeriodo">Cargando...</div>
+  </div>
+
+  <!-- TAB: RESUMEN EJECUTIVO -->
+  <div id="sec-resumen" class="section active">
+    <div class="kpi-row" id="kpiResumen">
+      <div class="kpi"><div class="kpi-label">Cargando</div><div class="kpi-value" style="color:var(--gold)">—</div></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">📈 Ingresos vs Egresos — Últimos 6 meses</div>
+        <div class="chart-wrap"><canvas id="chartIngEgr"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🥧 Distribución por Categoría</div>
+        <div class="chart-wrap"><canvas id="chartCats"></canvas></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 Últimos Movimientos</div>
+      <div class="tbl-wrap"><table id="tblUltMov">
+        <thead><tr><th>Fecha</th><th>Descripción</th><th>Tipo</th><th>Categoría</th><th style="text-align:right">Monto</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- TAB: ANÁLISIS FINANCIERO -->
+  <div id="sec-financiero" class="section">
+    <div class="filtros">
+      <select id="filtAnio" onchange="renderFinanciero()">
+        <option value="">Todos los años</option>
+      </select>
+      <select id="filtMes" onchange="renderFinanciero()">
+        <option value="">Todos los meses</option>
+        <option value="01">Enero</option><option value="02">Febrero</option>
+        <option value="03">Marzo</option><option value="04">Abril</option>
+        <option value="05">Mayo</option><option value="06">Junio</option>
+        <option value="07">Julio</option><option value="08">Agosto</option>
+        <option value="09">Septiembre</option><option value="10">Octubre</option>
+        <option value="11">Noviembre</option><option value="12">Diciembre</option>
+      </select>
+      <button class="btn-export" onclick="renderFinanciero()">🔄 Actualizar</button>
+    </div>
+    <div class="kpi-row" id="kpiFinanciero"></div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">📊 Flujo Mensual</div>
+        <div class="chart-wrap"><canvas id="chartFlujo"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📉 Saldo Acumulado</div>
+        <div class="chart-wrap"><canvas id="chartSaldo"></canvas></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🗂 Detalle de Movimientos</div>
+      <div class="tbl-wrap"><table id="tblMovFin">
+        <thead><tr><th>Fecha</th><th>Tipo</th><th>Categoría</th><th>Descripción</th><th style="text-align:right">Monto</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- TAB: OPERACIONAL -->
+  <div id="sec-operacional" class="section">
+    <div id="opComercial" style="display:none">
+      <div class="kpi-row" id="kpiOp"></div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">👥 Personal Activo</div>
+          <div id="opPersonal"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📄 Contratos Vigentes</div>
+          <div id="opContratos"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🏷 Ventas / CRM</div>
+        <div id="opVentas"></div>
+      </div>
+    </div>
+    <div id="opCondo" style="display:none">
+      <div class="kpi-row" id="kpiOpCondo"></div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">🏠 Estado de Unidades</div>
+          <div id="opUnidades"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">⚠ Morosos</div>
+          <div id="opMorosos"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔧 Órdenes de Trabajo</div>
+        <div id="opOT"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: COMPARATIVO -->
+  <div id="sec-comparativo" class="section">
+    <div class="alert alert-info">Los gráficos comparativos muestran el desempeño mes a mes del año en curso vs año anterior.</div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">📊 Ingresos Mes a Mes</div>
+        <div class="chart-wrap"><canvas id="chartCompIng"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📉 Egresos Mes a Mes</div>
+        <div class="chart-wrap"><canvas id="chartCompEgr"></canvas></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 Resumen Anual por Mes</div>
+      <div class="tbl-wrap"><table id="tblAnual">
+        <thead><tr><th>Mes</th><th style="text-align:right">Ingresos</th><th style="text-align:right">Egresos</th><th style="text-align:right">Resultado</th><th>Estado</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- TAB: ALERTAS -->
+  <div id="sec-alertas" class="section">
+    <div id="alertasContainer"></div>
+  </div>
+
+</div><!-- /content -->
+
+<script type="module">
+import {initializeApp,getApps} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import {getAuth,onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import {getFirestore,collection,getDocs,doc,getDoc,onSnapshot} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const FB={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
+const app=getApps().length?getApps()[0]:initializeApp(FB);
+const auth=getAuth(app);
+const db=getFirestore(app);
+
+// ── ESTADO GLOBAL ──
+let _user=null, _modo='comercial', _entidadId=null, _entidadNombre='';
+let _movimientos=[], _cobros=[], _egresos=[], _unidades=[], _personal=[], _contratos=[], _ventas=[];
+let _charts={}, _unsubs=[];
+
+// ── CATÁLOGO DE ENTIDADES ──
+const EMPRESAS=[
+  {id:1,nombre:'Martinez Services Spa',tipo:'comercial'},
+  {id:3,nombre:'M&P Arriendos y Servicios SpA',tipo:'comercial'},
+];
+const CONDOMINIOS=[
+  {id:'condo_1',nombre:'Condominio Pioneros 2',tipo:'condominio'},
+];
+
+const clp=n=>new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Math.round(n||0));
+const M=n=>'$'+(n/1e6).toFixed(2)+'M';
+const df=d=>{try{if(!d)return'—';if(typeof d==='object'&&d.seconds)return new Date(d.seconds*1000).toLocaleDateString('es-CL');const s=String(d);return new Date(s.includes('T')?s:s+'T12:00:00').toLocaleDateString('es-CL');}catch(e){return String(d)||'—';}};
+
+// ── AUTH GUARD ──
+onAuthStateChanged(auth,async u=>{
+  if(!u){window.location.href='MSS-Login.html';return;}
+  _user=u;
+  poblarSelector();
+  // Leer entidad desde sessionStorage/localStorage
+  const condoActual=(()=>{try{const r=localStorage.getItem('mss_condominio_actual');return r?JSON.parse(r):null;}catch(e){return null;}})();
+  const empActual=(()=>{try{const r=localStorage.getItem('mss_empresa_actual');return r?JSON.parse(r):null;}catch(e){return null;}})();
+  if(condoActual&&condoActual.id&&String(condoActual.id).startsWith('condo')){
+    _modo='condominio';_entidadId=condoActual.id;
+  } else if(empActual&&empActual.id&&empActual.tipo!=='condominio'){
+    _modo='comercial';_entidadId=empActual.id;
+  } else {
+    _modo='comercial';_entidadId=1;
+  }
+  document.getElementById('selEntidad').value=String(_entidadId);
+  await cargarDatos();
+});
+
+function poblarSelector(){
+  const grpE=document.getElementById('grpEmpresas');
+  const grpC=document.getElementById('grpCondos');
+  EMPRESAS.forEach(e=>{const o=document.createElement('option');o.value=String(e.id);o.textContent=e.nombre;grpE.appendChild(o);});
+  CONDOMINIOS.forEach(c=>{const o=document.createElement('option');o.value=String(c.id);o.textContent=c.nombre;grpC.appendChild(o);});
+}
+
+window.cambiarEntidad=async function(){
+  const val=document.getElementById('selEntidad').value;
+  const condo=CONDOMINIOS.find(c=>String(c.id)===val);
+  const emp=EMPRESAS.find(e=>String(e.id)===val);
+  if(condo){_modo='condominio';_entidadId=condo.id;_entidadNombre=condo.nombre;}
+  else if(emp){_modo='comercial';_entidadId=emp.id;_entidadNombre=emp.nombre;}
+  actualizarHeader();
+  _unsubs.forEach(u=>u());_unsubs=[];
+  await cargarDatos();
+};
+
+function actualizarHeader(){
+  const ent=CONDOMINIOS.find(c=>String(c.id)===String(_entidadId))||EMPRESAS.find(e=>String(e.id)===String(_entidadId));
+  _entidadNombre=ent?.nombre||'Entidad';
+  document.getElementById('_audNombre').textContent=_entidadNombre;
+  document.getElementById('_audModo').textContent=_modo==='condominio'?'AUDITORÍA CONDOMINIO':'AUDITORÍA EMPRESARIAL';
+  const badge=document.getElementById('badgeTipo');
+  badge.textContent=_modo==='condominio'?'Condominio':'Comercial';
+  badge.className='badge-tipo '+(_modo==='condominio'?'badge-cond':'badge-com');
+  const navEmp=document.getElementById('nav-emp');
+  navEmp.textContent=(_modo==='condominio'?'🏢 ':'🏭 ')+_entidadNombre;
+  navEmp.style.display='block';
+  document.getElementById('opComercial').style.display=_modo==='comercial'?'block':'none';
+  document.getElementById('opCondo').style.display=_modo==='condominio'?'block':'none';
+}
+
+// ── CARGA DE DATOS FIREBASE ──
+async function cargarDatos(){
+  actualizarHeader();
+  document.getElementById('kpiResumen').innerHTML='<div class="loading"><span class="spinner-sm"></span>Cargando datos de Firebase...</div>';
+  const ep=_modo==='condominio'?'condominios/'+_entidadId:'empresas/'+_entidadId;
+
+  if(_modo==='comercial'){
+    await cargarComercial(ep);
+  } else {
+    await cargarCondominio(ep);
+  }
+  renderResumen();
+  renderFinanciero();
+  renderOperacional();
+  renderComparativo();
+  renderAlertas();
+  // Tiempo real
+  suscribirRT(ep);
+}
+
+async function cargarComercial(ep){
+  _movimientos=[];_personal=[];_contratos=[];_ventas=[];
+  try{
+    // Finanzas: doc único
+    const finSnap=await getDoc(doc(db,ep+'/finanzas/data'));
+    if(finSnap.exists()){const d=finSnap.data();_movimientos=d.data||[];}
+    // Tesorería
+    const tesSnap=await getDocs(collection(db,ep+'/tes_movimientos'));
+    tesSnap.forEach(d=>{const r=d.data();_movimientos.push({fecha:r.fecha,tipo:r.tipo==='Ingreso'?'Ingreso':'Egreso',cat:r.cat||'Tesorería',desc:r.desc||'',monto:r.monto||0,src:'tes'});});
+    // Facturación
+    const facSnap=await getDocs(collection(db,ep+'/fac_documentos'));
+    facSnap.forEach(d=>{const r=d.data();if(r.total>0)_movimientos.push({fecha:r.fecha,tipo:'Ingreso',cat:'Facturación',desc:(r.tipo||'Doc')+' N°'+(r.folio||''),monto:r.total||0,src:'fac'});});
+    // RRHH
+    const peSnap=await getDocs(collection(db,ep+'/rrhh_personas'));
+    peSnap.forEach(d=>_personal.push(d.data()));
+    // Contratos
+    const ctSnap=await getDocs(collection(db,ep+'/ctr_contratos'));
+    ctSnap.forEach(d=>_contratos.push(d.data()));
+    // Ventas
+    const vtSnap=await getDocs(collection(db,ep+'/crm_ventas'));
+    vtSnap.forEach(d=>_ventas.push(d.data()));
+  }catch(e){console.warn('cargarComercial:',e.message);}
+  // Fallback localStorage
+  if(!_movimientos.length){
+    try{
+      const sk='mss_finanzas2_v1_'+_entidadId;
+      const raw=localStorage.getItem(sk);
+      if(raw){const p=JSON.parse(raw);_movimientos=p.data||[];}
+    }catch(e){}
+  }
+}
+
+async function cargarCondominio(ep){
+  _cobros=[];_egresos=[];_unidades=[];
+  try{
+    const coSnap=await getDocs(collection(db,ep+'/cobros'));
+    coSnap.forEach(d=>_cobros.push({id:d.id,...d.data()}));
+    const egSnap=await getDocs(collection(db,ep+'/egresos'));
+    egSnap.forEach(d=>_egresos.push({id:d.id,...d.data()}));
+    const unSnap=await getDocs(collection(db,ep+'/unidades'));
+    unSnap.forEach(d=>_unidades.push({id:d.id,...d.data()}));
+  }catch(e){console.warn('cargarCondominio:',e.message);}
+  // Fallback localStorage
+  if(!_cobros.length){
+    try{
+      const cid='_c'+_entidadId;
+      const co=localStorage.getItem('mss'+cid+'_co');
+      const eg=localStorage.getItem('mss'+cid+'_eg');
+      const un=localStorage.getItem('mss'+cid+'_u');
+      if(co)_cobros=JSON.parse(co);
+      if(eg)_egresos=JSON.parse(eg);
+      if(un)_unidades=JSON.parse(un);
+    }catch(e){}
+    // También probar con condo_1
+    if(!_cobros.length){
+      try{
+        const co=localStorage.getItem('mss_ccondo_1_co');
+        const eg=localStorage.getItem('mss_ccondo_1_eg');
+        const un=localStorage.getItem('mss_ccondo_1_u');
+        if(co)_cobros=JSON.parse(co);
+        if(eg)_egresos=JSON.parse(eg);
+        if(un)_unidades=JSON.parse(un);
+      }catch(e){}
+    }
+  }
+  // Convertir cobros/egresos a movimientos para gráficos unificados
+  _movimientos=[];
+  _cobros.filter(c=>c.pagado>0).forEach(c=>_movimientos.push({fecha:c.fechaPago||c.mes+'-01',tipo:'Ingreso',cat:'Gastos Comunes',desc:'GC '+c.mes+' — Unidad '+(c.unidadNum||''),monto:c.pagado,src:'cobros'}));
+  _egresos.forEach(e=>_movimientos.push({fecha:e.fecha,tipo:'Egreso',cat:e.cat||'Egreso',desc:e.desc||'',monto:e.monto||0,src:'egresos'}));
+}
+
+function suscribirRT(ep){
+  try{
+    const colCobros=_modo==='condominio'?'cobros':'tes_movimientos';
+    const unsub=onSnapshot(collection(db,ep+'/'+colCobros),()=>{
+      cargarDatos();
+    });
+    _unsubs.push(unsub);
+  }catch(e){}
+}
+
+// ── RENDER RESUMEN ──
+function renderResumen(){
+  const ing=_movimientos.filter(m=>m.tipo==='Ingreso').reduce((s,m)=>s+m.monto,0);
+  const egr=_movimientos.filter(m=>m.tipo==='Egreso').reduce((s,m)=>s+m.monto,0);
+  const res=ing-egr;
+  const hoy=new Date().toISOString().split('T')[0];
+  const mes=hoy.substring(0,7);
+  const ingMes=_movimientos.filter(m=>m.tipo==='Ingreso'&&String(m.fecha||'').startsWith(mes)).reduce((s,m)=>s+m.monto,0);
+  const egrMes=_movimientos.filter(m=>m.tipo==='Egreso'&&String(m.fecha||'').startsWith(mes)).reduce((s,m)=>s+m.monto,0);
+
+  let kpiExtra='';
+  if(_modo==='condominio'){
+    const morosos=_cobros.filter(c=>c.saldo>0).length;
+    const pagados=_cobros.filter(c=>c.mes===mes&&c.estado==='Pagado').length;
+    const pct=_unidades.length>0?Math.round(pagados/_unidades.length*100):0;
+    kpiExtra=`<div class="kpi"><div class="kpi-label">Morosos</div><div class="kpi-value" style="color:${morosos>0?'var(--danger)':'var(--ok)'}">${morosos}</div><div class="kpi-sub">unidades</div></div>
+    <div class="kpi"><div class="kpi-label">Recaudación</div><div class="kpi-value" style="color:var(--teal)">${pct}%</div><div class="kpi-sub">este mes</div></div>`;
+  } else {
+    kpiExtra=`<div class="kpi"><div class="kpi-label">Personal</div><div class="kpi-value" style="color:var(--purple)">${_personal.length}</div><div class="kpi-sub">activos</div></div>
+    <div class="kpi"><div class="kpi-label">Contratos</div><div class="kpi-value" style="color:var(--info)">${_contratos.length}</div><div class="kpi-sub">vigentes</div></div>`;
+  }
+
+  document.getElementById('kpiResumen').innerHTML=`
+    <div class="kpi"><div class="kpi-label">Ingresos Totales</div><div class="kpi-value" style="color:var(--ok)">${M(ing)}</div><div class="kpi-sub">acumulado</div></div>
+    <div class="kpi"><div class="kpi-label">Egresos Totales</div><div class="kpi-value" style="color:var(--danger)">${M(egr)}</div><div class="kpi-sub">acumulado</div></div>
+    <div class="kpi"><div class="kpi-label">Resultado</div><div class="kpi-value" style="color:${res>=0?'var(--ok)':'var(--danger)'}">${M(res)}</div><div class="kpi-sub">${res>=0?'superávit':'déficit'}</div></div>
+    <div class="kpi"><div class="kpi-label">Ingresos Mes</div><div class="kpi-value" style="color:var(--gold)">${clp(ingMes)}</div><div class="kpi-sub">${mes}</div></div>
+    ${kpiExtra}`;
+
+  // Tabla últimos movimientos
+  const ultimos=[..._movimientos].sort((a,b)=>String(b.fecha||'').localeCompare(String(a.fecha||''))).slice(0,15);
+  const tbody=document.querySelector('#tblUltMov tbody');
+  tbody.innerHTML=ultimos.map(m=>`<tr>
+    <td>${df(m.fecha)}</td>
+    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.desc||'—'}</td>
+    <td><span class="badge" style="background:${m.tipo==='Ingreso'?'rgba(34,197,94,0.15)':'rgba(239,68,68,0.15)'};color:${m.tipo==='Ingreso'?'var(--ok)':'var(--danger)'}">${m.tipo}</span></td>
+    <td style="color:var(--mutedHi);font-size:10px">${m.cat||'—'}</td>
+    <td style="text-align:right;font-weight:700;color:${m.tipo==='Ingreso'?'var(--ok)':'var(--danger)'}">${clp(m.monto)}</td>
+  </tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Sin movimientos registrados</td></tr>';
+
+  // Gráficos
+  renderChartIngEgr();
+  renderChartCats();
+  document.getElementById('lblPeriodo').textContent=`${_movimientos.length} movimientos registrados`;
+}
+
+function getUltimos6Meses(){
+  const meses=[];
+  for(let i=5;i>=0;i--){
+    const d=new Date();d.setMonth(d.getMonth()-i);
+    meses.push(d.toISOString().substring(0,7));
+  }
+  return meses;
+}
+
+function renderChartIngEgr(){
+  const meses=getUltimos6Meses();
+  const ings=meses.map(m=>_movimientos.filter(x=>x.tipo==='Ingreso'&&String(x.fecha||'').startsWith(m)).reduce((s,x)=>s+x.monto,0));
+  const egrs=meses.map(m=>_movimientos.filter(x=>x.tipo==='Egreso'&&String(x.fecha||'').startsWith(m)).reduce((s,x)=>s+x.monto,0));
+  drawBarChart('chartIngEgr',meses.map(m=>m.substring(5)),
+    [{label:'Ingresos',data:ings,color:'rgba(34,197,94,0.8)'},{label:'Egresos',data:egrs,color:'rgba(239,68,68,0.8)'}]);
+}
+
+function renderChartCats(){
+  const cats={};
+  _movimientos.filter(m=>m.tipo==='Egreso').forEach(m=>{if(!cats[m.cat])cats[m.cat]=0;cats[m.cat]+=m.monto;});
+  const top=Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const COLORS=['#C9A84C','#EF4444','#38BDF8','#A78BFA','#F59E0B','#10B981'];
+  drawDoughnut('chartCats',top.map(x=>x[0]),top.map(x=>x[1]),COLORS);
+}
+
+// ── RENDER FINANCIERO ──
+window.renderFinanciero=function(){
+  const anio=document.getElementById('filtAnio').value;
+  const mes=document.getElementById('filtMes').value;
+  let movs=_movimientos.filter(m=>m.fecha);
+  if(anio)movs=movs.filter(m=>String(m.fecha).startsWith(anio));
+  if(mes)movs=movs.filter(m=>String(m.fecha).substring(5,7)===mes);
+  const ing=movs.filter(m=>m.tipo==='Ingreso').reduce((s,m)=>s+m.monto,0);
+  const egr=movs.filter(m=>m.tipo==='Egreso').reduce((s,m)=>s+m.monto,0);
+  const res=ing-egr;
+  document.getElementById('kpiFinanciero').innerHTML=`
+    <div class="kpi"><div class="kpi-label">Ingresos Período</div><div class="kpi-value" style="color:var(--ok)">${clp(ing)}</div></div>
+    <div class="kpi"><div class="kpi-label">Egresos Período</div><div class="kpi-value" style="color:var(--danger)">${clp(egr)}</div></div>
+    <div class="kpi"><div class="kpi-label">Resultado</div><div class="kpi-value" style="color:${res>=0?'var(--ok)':'var(--danger)'}">${clp(res)}</div></div>
+    <div class="kpi"><div class="kpi-label">N° Movimientos</div><div class="kpi-value" style="color:var(--gold)">${movs.length}</div></div>`;
+  // Tabla detalle
+  const tbody=document.querySelector('#tblMovFin tbody');
+  const sorted=[...movs].sort((a,b)=>String(b.fecha||'').localeCompare(String(a.fecha||'')));
+  tbody.innerHTML=sorted.map(m=>`<tr>
+    <td>${df(m.fecha)}</td>
+    <td><span class="badge" style="background:${m.tipo==='Ingreso'?'rgba(34,197,94,0.15)':'rgba(239,68,68,0.15)'};color:${m.tipo==='Ingreso'?'var(--ok)':'var(--danger)'}">${m.tipo}</span></td>
+    <td style="color:var(--mutedHi);font-size:10px">${m.cat||'—'}</td>
+    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">${m.desc||'—'}</td>
+    <td style="text-align:right;font-weight:700;color:${m.tipo==='Ingreso'?'var(--ok)':'var(--danger)'}">${clp(m.monto)}</td>
+  </tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Sin movimientos en el período</td></tr>';
+  // Flujo mensual
+  const meses=getUltimos6Meses();
+  const ings=meses.map(m=>_movimientos.filter(x=>x.tipo==='Ingreso'&&String(x.fecha||'').startsWith(m)).reduce((s,x)=>s+x.monto,0));
+  const egrs=meses.map(m=>_movimientos.filter(x=>x.tipo==='Egreso'&&String(x.fecha||'').startsWith(m)).reduce((s,x)=>s+x.monto,0));
+  drawBarChart('chartFlujo',meses.map(m=>m.substring(5)),
+    [{label:'Ingresos',data:ings,color:'rgba(34,197,94,0.7)'},{label:'Egresos',data:egrs,color:'rgba(239,68,68,0.7)'}]);
+  // Saldo acumulado
+  let saldo=0;
+  const saldos=meses.map(m=>{
+    const i=_movimientos.filter(x=>x.tipo==='Ingreso'&&String(x.fecha||'').startsWith(m)).reduce((s,x)=>s+x.monto,0);
+    const e=_movimientos.filter(x=>x.tipo==='Egreso'&&String(x.fecha||'').startsWith(m)).reduce((s,x)=>s+x.monto,0);
+    saldo+=i-e;return saldo;
+  });
+  drawLineChart('chartSaldo',meses.map(m=>m.substring(5)),saldos,'Saldo Acumulado','rgba(56,189,248,0.8)');
+  // Poblar filtro año
+  const anios=[...new Set(_movimientos.map(m=>String(m.fecha||'').substring(0,4)).filter(Boolean))].sort().reverse();
+  const sel=document.getElementById('filtAnio');
+  if(sel.options.length<2){anios.forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=a;sel.appendChild(o);});}
+}
+
+// ── RENDER OPERACIONAL ──
+function renderOperacional(){
+  if(_modo==='comercial'){
+    document.getElementById('kpiOp').innerHTML=`
+      <div class="kpi"><div class="kpi-label">Personal</div><div class="kpi-value" style="color:var(--purple)">${_personal.length}</div></div>
+      <div class="kpi"><div class="kpi-label">Contratos</div><div class="kpi-value" style="color:var(--info)">${_contratos.length}</div></div>
+      <div class="kpi"><div class="kpi-label">Ventas</div><div class="kpi-value" style="color:var(--ok)">${_ventas.length}</div></div>`;
+    document.getElementById('opPersonal').innerHTML=_personal.length
+      ?_personal.slice(0,8).map(p=>`<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid var(--border);font-size:11px"><span>${p.nombre||'—'}</span><span style="color:var(--mutedHi)">${p.cargo||p.area||'—'}</span></div>`).join('')
+      :'<div style="color:var(--muted);font-size:12px;padding:12px">Sin personal registrado</div>';
+    document.getElementById('opContratos').innerHTML=_contratos.length
+      ?_contratos.slice(0,8).map(c=>`<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid var(--border);font-size:11px"><span>${c.trabajador||c.nombre||'—'}</span><span class="badge" style="background:rgba(56,189,248,0.15);color:var(--info)">${c.tipo||'—'}</span></div>`).join('')
+      :'<div style="color:var(--muted);font-size:12px;padding:12px">Sin contratos registrados</div>';
+    const totVentas=_ventas.reduce((s,v)=>s+(v.monto||v.valor||0),0);
+    document.getElementById('opVentas').innerHTML=`<div style="padding:12px;font-size:13px;font-weight:700;color:var(--ok)">Total ventas: ${clp(totVentas)}</div>`;
+  } else {
+    const morosos=_cobros.filter(c=>c.saldo>0);
+    const alDia=_unidades.filter(u=>u.estado==='Al día').length;
+    const mesActual=new Date().toISOString().substring(0,7);
+    const pagMes=_cobros.filter(c=>c.mes===mesActual&&c.estado==='Pagado').length;
+    document.getElementById('kpiOpCondo').innerHTML=`
+      <div class="kpi"><div class="kpi-label">Unidades</div><div class="kpi-value" style="color:var(--teal)">${_unidades.length}</div></div>
+      <div class="kpi"><div class="kpi-label">Al día</div><div class="kpi-value" style="color:var(--ok)">${alDia}</div></div>
+      <div class="kpi"><div class="kpi-label">Morosos</div><div class="kpi-value" style="color:${morosos.length>0?'var(--danger)':'var(--ok)'}">${morosos.length}</div></div>
+      <div class="kpi"><div class="kpi-label">Pagaron este mes</div><div class="kpi-value" style="color:var(--gold)">${pagMes}</div></div>`;
+    document.getElementById('opUnidades').innerHTML=`<div style="padding:12px;color:var(--mutedHi);font-size:12px">${_unidades.length} unidades registradas · ${alDia} al día</div>`;
+    document.getElementById('opMorosos').innerHTML=morosos.length
+      ?morosos.slice(0,8).map(c=>`<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid var(--border);font-size:11px"><div><div>Unidad ${c.unidadNum||'—'} — ${c.prop||'—'}</div><div style="font-size:9px;color:var(--muted)">${c.mes||'—'}</div></div><span style="color:var(--danger);font-weight:700">${clp(c.saldo)}</span></div>`).join('')
+      :'<div style="color:var(--ok);font-size:12px;padding:12px">✓ Sin morosos</div>';
+    document.getElementById('opOT').innerHTML='<div style="color:var(--mutedHi);font-size:12px;padding:12px">Órdenes de trabajo disponibles en MSS-Condominio</div>';
+  }
+}
+
+// ── RENDER COMPARATIVO ──
+function renderComparativo(){
+  const anioActual=new Date().getFullYear();
+  const MESES=['01','02','03','04','05','06','07','08','09','10','11','12'];
+  const LABELS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const ingsAct=MESES.map(m=>_movimientos.filter(x=>x.tipo==='Ingreso'&&String(x.fecha||'').startsWith(anioActual+'-'+m)).reduce((s,x)=>s+x.monto,0));
+  const egrsAct=MESES.map(m=>_movimientos.filter(x=>x.tipo==='Egreso'&&String(x.fecha||'').startsWith(anioActual+'-'+m)).reduce((s,x)=>s+x.monto,0));
+  drawBarChart('chartCompIng',LABELS,[{label:anioActual,data:ingsAct,color:'rgba(34,197,94,0.8)'}]);
+  drawBarChart('chartCompEgr',LABELS,[{label:anioActual,data:egrsAct,color:'rgba(239,68,68,0.8)'}]);
+  // Tabla anual
+  const tbody=document.querySelector('#tblAnual tbody');
+  tbody.innerHTML=MESES.map((m,i)=>{
+    const ing=ingsAct[i],egr=egrsAct[i],res=ing-egr;
+    if(ing===0&&egr===0)return'';
+    return`<tr>
+      <td>${LABELS[i]} ${anioActual}</td>
+      <td style="text-align:right;color:var(--ok)">${clp(ing)}</td>
+      <td style="text-align:right;color:var(--danger)">${clp(egr)}</td>
+      <td style="text-align:right;color:${res>=0?'var(--ok)':'var(--danger)'};font-weight:700">${clp(res)}</td>
+      <td><span class="badge" style="background:${res>=0?'rgba(34,197,94,0.15)':'rgba(239,68,68,0.15)'};color:${res>=0?'var(--ok)':'var(--danger)'}">${res>=0?'Superávit':'Déficit'}</span></td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Sin datos del año en curso</td></tr>';
+}
+
+// ── RENDER ALERTAS ──
+function renderAlertas(){
+  const alertas=[];
+  const ing=_movimientos.filter(m=>m.tipo==='Ingreso').reduce((s,m)=>s+m.monto,0);
+  const egr=_movimientos.filter(m=>m.tipo==='Egreso').reduce((s,m)=>s+m.monto,0);
+  if(egr>ing)alertas.push({tipo:'danger',icono:'🚨',titulo:'Déficit acumulado',desc:`Los egresos (${clp(egr)}) superan los ingresos (${clp(ing)}). Diferencia: ${clp(egr-ing)}`});
+  const mes=new Date().toISOString().substring(0,7);
+  const ingMes=_movimientos.filter(m=>m.tipo==='Ingreso'&&String(m.fecha||'').startsWith(mes)).reduce((s,m)=>s+m.monto,0);
+  const egrMes=_movimientos.filter(m=>m.tipo==='Egreso'&&String(m.fecha||'').startsWith(mes)).reduce((s,m)=>s+m.monto,0);
+  if(egrMes>ingMes&&(ingMes>0||egrMes>0))alertas.push({tipo:'warn',icono:'⚠',titulo:'Déficit este mes',desc:`Este mes los egresos (${clp(egrMes)}) superan los ingresos (${clp(ingMes)})`});
+  if(_modo==='condominio'){
+    const morosos=_cobros.filter(c=>c.saldo>0);
+    if(morosos.length>0)alertas.push({tipo:'warn',icono:'🏠',titulo:`${morosos.length} unidades morosas`,desc:'Deuda total: '+clp(morosos.reduce((s,c)=>s+c.saldo,0))});
+    const pct=_unidades.length>0?_cobros.filter(c=>c.mes===mes&&c.estado==='Pagado').length/_unidades.length*100:0;
+    if(pct<50&&_unidades.length>0)alertas.push({tipo:'warn',icono:'📉',titulo:'Baja recaudación',desc:`Solo ${Math.round(pct)}% de recaudación este mes`});
+  } else {
+    if(_personal.length===0)alertas.push({tipo:'info',icono:'👥',titulo:'Sin personal registrado',desc:'No hay trabajadores en RRHH para esta empresa'});
+  }
+  if(alertas.length===0)alertas.push({tipo:'ok',icono:'✅',titulo:'Todo en orden',desc:'No se detectaron alertas para esta entidad'});
+  document.getElementById('alertasContainer').innerHTML=alertas.map(a=>`
+    <div class="card" style="border-left:3px solid ${a.tipo==='danger'?'var(--danger)':a.tipo==='warn'?'var(--orange)':a.tipo==='ok'?'var(--ok)':'var(--info)'}">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">${a.icono}</span>
+        <div>
+          <div style="font-size:13px;font-weight:800;color:${a.tipo==='danger'?'var(--danger)':a.tipo==='warn'?'var(--orange)':a.tipo==='ok'?'var(--ok)':'var(--info)'}">${a.titulo}</div>
+          <div style="font-size:11px;color:var(--mutedHi);margin-top:3px">${a.desc}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── CHARTS (Canvas nativo — sin librerías externas) ──
+function drawBarChart(id,labels,datasets){
+  const canvas=document.getElementById(id);if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||canvas.parentElement.offsetWidth||400;
+  const H=220;canvas.width=W;canvas.height=H;
+  ctx.clearRect(0,0,W,H);
+  const pad={l:55,r:20,t:20,b:35};
+  const chartW=W-pad.l-pad.r,chartH=H-pad.t-pad.b;
+  const allVals=datasets.flatMap(d=>d.data);
+  const maxVal=Math.max(...allVals,1);
+  const barW=chartW/labels.length/(datasets.length+0.5);
+  // Grid lines
+  ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pad.t+chartH*(1-i/4);
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+chartW,y);ctx.stroke();
+    ctx.fillStyle='rgba(156,163,175,0.6)';ctx.font='9px monospace';ctx.textAlign='right';
+    ctx.fillText(M(maxVal*i/4),pad.l-5,y+3);
+  }
+  // Bars
+  labels.forEach((lbl,li)=>{
+    datasets.forEach((ds,di)=>{
+      const x=pad.l+li*chartW/labels.length+di*barW+barW*0.2;
+      const h=(ds.data[li]/maxVal)*chartH;
+      const y=pad.t+chartH-h;
+      ctx.fillStyle=ds.color;
+      ctx.beginPath();ctx.roundRect(x,y,barW*0.9,h,2);ctx.fill();
+    });
+    ctx.fillStyle='rgba(156,163,175,0.7)';ctx.font='9px monospace';ctx.textAlign='center';
+    ctx.fillText(lbl,pad.l+(li+0.5)*chartW/labels.length,H-10);
+  });
+  // Legend
+  datasets.forEach((ds,i)=>{
+    ctx.fillStyle=ds.color;ctx.fillRect(pad.l+i*90,5,10,8);
+    ctx.fillStyle='rgba(156,163,175,0.8)';ctx.font='9px monospace';ctx.textAlign='left';
+    ctx.fillText(ds.label,pad.l+i*90+14,13);
+  });
+}
+
+function drawLineChart(id,labels,data,label,color){
+  const canvas=document.getElementById(id);if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||400,H=220;canvas.width=W;canvas.height=H;
+  ctx.clearRect(0,0,W,H);
+  const pad={l:60,r:20,t:20,b:35};
+  const chartW=W-pad.l-pad.r,chartH=H-pad.t-pad.b;
+  const minVal=Math.min(...data),maxVal=Math.max(...data,1);
+  const range=maxVal-minVal||1;
+  ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pad.t+chartH*(1-i/4);
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+chartW,y);ctx.stroke();
+    ctx.fillStyle='rgba(156,163,175,0.6)';ctx.font='9px monospace';ctx.textAlign='right';
+    ctx.fillText(M(minVal+range*i/4),pad.l-5,y+3);
+  }
+  const pts=data.map((v,i)=>({x:pad.l+i*chartW/(data.length-1||1),y:pad.t+chartH*(1-(v-minVal)/range)}));
+  // Gradient fill
+  const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+chartH);
+  grad.addColorStop(0,color.replace('0.8','0.3'));grad.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.beginPath();ctx.moveTo(pts[0].x,pad.t+chartH);pts.forEach(p=>ctx.lineTo(p.x,p.y));ctx.lineTo(pts[pts.length-1].x,pad.t+chartH);ctx.closePath();
+  ctx.fillStyle=grad;ctx.fill();
+  // Line
+  ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=2;
+  pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.stroke();
+  // Points
+  pts.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();});
+  // Labels
+  labels.forEach((lbl,i)=>{ctx.fillStyle='rgba(156,163,175,0.7)';ctx.font='9px monospace';ctx.textAlign='center';ctx.fillText(lbl,pts[i].x,H-10);});
+}
+
+function drawDoughnut(id,labels,data,colors){
+  const canvas=document.getElementById(id);if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||400,H=220;canvas.width=W;canvas.height=H;
+  ctx.clearRect(0,0,W,H);
+  const total=data.reduce((s,v)=>s+v,0)||1;
+  const cx=W/2-60,cy=H/2,r=Math.min(cx,cy)-20,ir=r*0.55;
+  let angle=-Math.PI/2;
+  data.forEach((v,i)=>{
+    const slice=v/total*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,angle,angle+slice);ctx.closePath();
+    ctx.fillStyle=colors[i%colors.length];ctx.fill();
+    ctx.beginPath();ctx.arc(cx,cy,ir,0,Math.PI*2);ctx.fillStyle='#0A0F1C';ctx.fill();
+    angle+=slice;
+  });
+  ctx.fillStyle='var(--white)';ctx.font='bold 11px monospace';ctx.textAlign='center';
+  ctx.fillText(labels.length+'',cx,cy-6);ctx.font='9px monospace';ctx.fillStyle='rgba(156,163,175,0.8)';
+  ctx.fillText('categorías',cx,cy+8);
+  // Legend
+  labels.slice(0,6).forEach((lbl,i)=>{
+    const lx=W-110,ly=20+i*28;
+    ctx.fillStyle=colors[i%colors.length];ctx.fillRect(lx,ly,10,10);
+    ctx.fillStyle='rgba(156,163,175,0.8)';ctx.font='9px monospace';ctx.textAlign='left';
+    const pct=Math.round(data[i]/total*100);
+    ctx.fillText(lbl.substring(0,14)+(lbl.length>14?'…':''),lx+14,ly+9);
+    ctx.fillStyle='rgba(201,168,76,0.8)';ctx.fillText(pct+'%',lx+14,ly+19);
+  });
+}
+
+// ── UI HELPERS ──
+window.showTab=function(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  btn.classList.add('active');
+};
+
+window.exportarPDF=function(){
+  window.print();
+};
+
+window.exportarCSV=function(){
+  const rows=[['Fecha','Tipo','Categoria','Descripcion','Monto']];
+  _movimientos.forEach(m=>rows.push([m.fecha||'',m.tipo||'',m.cat||'',m.desc||'',m.monto||0]));
+  const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='auditoria_'+_entidadNombre.replace(/\s/g,'_')+'_'+new Date().toISOString().split('T')[0]+'.csv';a.click();
+};
+</script>
+</body>
+</html>
