@@ -438,7 +438,7 @@ async function initFirebase(){
       const unsub=fa.onAuthStateChanged(auth,user=>{
         unsub();
         if(!user){window.location.href='MSS-Login.html';}
-        else{window._MSS_USER=user;_db=fb.getFirestore(app);window._fb=fb;_fbReady=true;resolve();}
+        else{window._MSS_USER=user;_db=fb.getFirestore(app);window._fbM=fb;_fbReady=true;resolve();}
       });
     });
   }catch(e){_fbReady=false;}
@@ -450,7 +450,7 @@ async function cargarDatos(){
     const ep='empresas/'+EMP_ID;
     let cobros=[],unidades=[],cfg={};
     if(_fbReady){
-      const {getDocs,collection,getDoc,doc,onSnapshot}=window._fb;
+      const {getDocs,collection,getDoc,doc,onSnapshot}=window._fbM;
       const uSnap=await getDocs(collection(_db,ep+'/unidades'));
       uSnap.forEach(d=>unidades.push({id:d.id,...d.data()}));
       const coSnap=await getDocs(collection(_db,ep+'/cobros'));
@@ -872,7 +872,7 @@ async function guardarCobros(){
     localStorage.setItem('mss_c'+EMP_ID+'_co', JSON.stringify(COBROS));
     // Firebase
     if(_fbReady&&_db){
-      const {writeBatch,doc}=window._fb;
+      const {writeBatch,doc}=window._fbM;
       const batch=writeBatch(_db);
       COBROS.forEach(c=>batch.set(doc(_db,'empresas/'+EMP_ID+'/cobros/'+String(c.id)),{...c}));
       await batch.commit();

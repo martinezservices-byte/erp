@@ -472,8 +472,8 @@ function loadState(){
 // ════════════════════════════
 const clp  = n => new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(n);
 const M    = n => '$'+(n/1e6).toFixed(2)+'M';
-const dateF= d => {try{return new Date(d+'T00:00:00').toLocaleDateString('es-CL');}catch{return d;}};
-const tenure=d=>{const diff=(new Date()-new Date(d+'T00:00:00'))/(1000*60*60*24*365);return diff>=1?`${Math.floor(diff)} año${Math.floor(diff)>1?'s':''}`:`${Math.floor(diff*12)} meses`;};
+const dateF= d => {try{return new Date(d+'T12:00:00').toLocaleDateString('es-CL');}catch{return d;}};
+const tenure=d=>{const diff=(new Date()-new Date(d+'T12:00:00'))/(1000*60*60*24*365);return diff>=1?`${Math.floor(diff)} año${Math.floor(diff)>1?'s':''}`:`${Math.floor(diff*12)} meses`;};
 const perfColor=v=>v>=90?'#22C55E':v>=75?'#F59E0B':'#EF4444';
 const discDom=disc=>Object.entries(disc).sort((a,b)=>b[1]-a[1])[0][0];
 function badge(label,color){return `<span class="badge" style="background:${color}20;color:${color};border:1px solid ${color}40">${label}</span>`;}

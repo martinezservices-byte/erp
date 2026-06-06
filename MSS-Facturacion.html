@@ -877,18 +877,28 @@ populateClientesSelect();renderItems();updateTotales();
 document.getElementById('hInfo').textContent=`${DOCUMENTOS.length} documentos`;
 
 function imprimirDoc(){
-  var prev=document.getElementById('previewContainer');
+  var prev=document.getElementById('previewContainer')||document.getElementById('docPreview')||document.getElementById('liqResult');
   if(!prev||!prev.innerHTML.trim()){alert('Primero genera una vista previa del documento.');return;}
   var estilos='';
   document.querySelectorAll('style').forEach(function(s){estilos+=s.innerHTML;});
-  var win=window.open('','_blank','width=900,height=700');
-  win.document.write('<html><head><meta charset="UTF-8"><style>'+
-    'body{background:white;margin:0;padding:16px;font-family:Arial,sans-serif;}'+
+  var iframe=document.getElementById('_printFrame');
+  if(!iframe){
+    iframe=document.createElement('iframe');
+    iframe.id='_printFrame';
+    iframe.style.cssText='position:fixed;top:-9999px;left:-9999px;width:210mm;height:297mm;border:none;';
+    document.body.appendChild(iframe);
+  }
+  var doc=iframe.contentDocument||iframe.contentWindow.document;
+  doc.open();
+  doc.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>'+
+    'body{background:white;margin:0;padding:12px;font-family:Arial,sans-serif;color:#1a1a1a;}'+
     estilos+
-    '@media print{body{padding:0;}@page{margin:10mm;size:A4;}}'+
+    '@page{margin:10mm;size:A4;}'+
     '</style></head><body>'+prev.innerHTML+'</body></html>');
-  win.document.close();
-  win.onload=function(){win.focus();win.print();};
+  doc.close();
+  iframe.onload=function(){
+    try{iframe.contentWindow.focus();iframe.contentWindow.print();}catch(e){window.print();}
+  };
 }
 
 try{var _l=document.getElementById('_empNombreLogo');if(_l&&window._MSS_EMP)_l.textContent=window._MSS_EMP.nombre||_empObj.nombre||'Mi Empresa';}catch(e){}

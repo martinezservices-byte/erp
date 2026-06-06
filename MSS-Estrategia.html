@@ -459,7 +459,7 @@ async function load(){
 // ════════════════════════════
 const clp = n => new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(n);
 const M   = n => '$'+(n/1e6).toFixed(2)+'M';
-const dateF = d => {try{return new Date(d+'T00:00:00').toLocaleDateString('es-CL');}catch{return d;}};
+const dateF = d => {try{return new Date(d+'T12:00:00').toLocaleDateString('es-CL');}catch{return d;}};
 
 const ESTADO_COLOR = {'En Proceso':'#10B981','Completado':'#22C55E','Planificado':'#38BDF8','Atrasado':'#EF4444'};
 const IMPACTO_COLOR = {'Alto':'#EF4444','Medio':'#F59E0B','Bajo':'#22C55E'};

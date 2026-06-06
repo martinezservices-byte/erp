@@ -781,7 +781,7 @@ async function loadAll(){
 //  HELPERS
 // ════════════════════════════════════════
 const clp  = n => new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Math.round(n));
-const dateF= d => {try{return new Date(d+'T00:00:00').toLocaleDateString('es-CL');}catch{return d||'—';}};
+const dateF= d => {try{return new Date(d+'T12:00:00').toLocaleDateString('es-CL');}catch{return d||'—';}};
 function badge(label,color){return `<span class="badge" style="background:${color}20;color:${color};border:1px solid ${color}40">${label}</span>`;}
 
 function diasHabiles(inicio, fin){
@@ -1579,15 +1579,28 @@ function actualizarInfoGratif(val){
 })();
 
 function imprimirDoc(){
-  var prev=document.getElementById('previewContainer')||document.getElementById('docPreview');
-  if(!prev){window.print();return;}
-  var clone=prev.cloneNode(true);
-  clone.id='printOnly';
-  clone.style.cssText='display:block;position:fixed;top:0;left:0;width:100%;z-index:99999;background:white;';
-  clone.querySelectorAll('.no-print').forEach(function(el){el.remove();});
-  document.body.appendChild(clone);
-  window.print();
-  document.body.removeChild(clone);
+  var prev=document.getElementById('previewContainer')||document.getElementById('docPreview')||document.getElementById('liqResult');
+  if(!prev||!prev.innerHTML.trim()){alert('Primero genera una vista previa del documento.');return;}
+  var estilos='';
+  document.querySelectorAll('style').forEach(function(s){estilos+=s.innerHTML;});
+  var iframe=document.getElementById('_printFrame');
+  if(!iframe){
+    iframe=document.createElement('iframe');
+    iframe.id='_printFrame';
+    iframe.style.cssText='position:fixed;top:-9999px;left:-9999px;width:210mm;height:297mm;border:none;';
+    document.body.appendChild(iframe);
+  }
+  var doc=iframe.contentDocument||iframe.contentWindow.document;
+  doc.open();
+  doc.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>'+
+    'body{background:white;margin:0;padding:12px;font-family:Arial,sans-serif;color:#1a1a1a;}'+
+    estilos+
+    '@page{margin:10mm;size:A4;}'+
+    '</style></head><body>'+prev.innerHTML+'</body></html>');
+  doc.close();
+  iframe.onload=function(){
+    try{iframe.contentWindow.focus();iframe.contentWindow.print();}catch(e){window.print();}
+  };
 }
 
 try{var _l=document.getElementById('_empNombreLogo');if(_l&&window._MSS_EMP)_l.textContent=window._MSS_EMP.nombre||_empObj.nombre||'Mi Empresa';}catch(e){}

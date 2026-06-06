@@ -418,7 +418,7 @@ function loadState(){
 // ════════════════════════════
 const clp = n => new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(n);
 const M   = n => '$'+(n/1e6).toFixed(2)+'M';
-const dateF = d => {try{return new Date(d+'T00:00:00').toLocaleDateString('es-CL');}catch{return d;}};
+const dateF = d => {try{return new Date(d+'T12:00:00').toLocaleDateString('es-CL');}catch{return d;}};
 function badge(label,color){return `<span class="badge" style="background:${color}20;color:${color};border:1px solid ${color}40">${label}</span>`;}
 const pipelineActivos = () => CLIENTES.filter(c=>!['Cerrado Won','Cerrado Lost'].includes(c.etapa));
 const pipeline = () => pipelineActivos().reduce((s,c)=>s+c.valor*(c.prob/100),0);

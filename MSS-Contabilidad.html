@@ -466,12 +466,21 @@ const DEF_ASIENTOS = []
 let ASIENTOS=[], CUENTAS=[];
 
 function saveAll(){
-  try{
-    localStorage.setItem(SK_ASIENTOS,JSON.stringify(ASIENTOS));
-    localStorage.setItem(SK_CUENTAS,JSON.stringify(CUENTAS));
-  }catch(e){}
+  try{localStorage.setItem(SK_ASIENTOS,JSON.stringify(ASIENTOS));localStorage.setItem(SK_CUENTAS,JSON.stringify(CUENTAS));}catch(e){}
+  if(_fbReady&&_db){
+    Promise.all([_fbBatch('cont_asientos',ASIENTOS),_fbBatch('cont_cuentas',CUENTAS)]).catch(function(e){console.warn('FB saveAll:',e.message);});
+  }
 }
-function loadAll(){
+async function loadAll(){
+  await _initFB();
+  if(_fbReady&&_db){
+    try{
+      const [aArr,cArr]=await Promise.all([_fbGetAll('cont_asientos'),_fbGetAll('cont_cuentas')]);
+      ASIENTOS=aArr.length?aArr:(JSON.parse(localStorage.getItem(SK_ASIENTOS))||DEF_ASIENTOS.map(x=>({...x})));
+      CUENTAS =cArr.length?cArr:(JSON.parse(localStorage.getItem(SK_CUENTAS)) ||PLAN_BASE.map(x=>({...x})));
+      return;
+    }catch(e){console.warn('FB loadAll:',e.message);}
+  }
   try{
     ASIENTOS=JSON.parse(localStorage.getItem(SK_ASIENTOS))||DEF_ASIENTOS.map(x=>({...x}));
     CUENTAS =JSON.parse(localStorage.getItem(SK_CUENTAS)) ||PLAN_BASE.map(x=>({...x}));
@@ -482,7 +491,7 @@ function loadAll(){
 //  HELPERS
 // ════════════════════════════════════════
 const clp  = n => new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Math.round(n||0));
-const dateF= d => {try{return new Date(d+'T00:00:00').toLocaleDateString('es-CL');}catch{return d||'—';}};
+const dateF= d => {try{return new Date(d+'T12:00:00').toLocaleDateString('es-CL');}catch{return d||'—';}};
 function badge(label,color){return `<span class="badge" style="background:${color}20;color:${color};border:1px solid ${color}40">${label}</span>`;}
 function cuentaNombre(id){const c=CUENTAS.find(x=>x.id===id);return c?`${c.codigo} — ${c.nombre}`:'—';}
 function cuentaById(id){return CUENTAS.find(x=>x.id===id);}

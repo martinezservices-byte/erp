@@ -895,16 +895,28 @@ function saveCliente(){
 function delCliente(id){if(!confirm('¿Eliminar?'))return;CLIENTES_COT=CLIENTES_COT.filter(c=>c.id!==id);save();renderClientes();}
 
 function imprimirDoc(){
-  // Mover el preview al body temporalmente para imprimir solo él
-  const prev = document.getElementById('previewContainer');
-  const clone = prev.cloneNode(true);
-  clone.id = 'printOnly';
-  clone.style.cssText = 'display:block;position:fixed;top:0;left:0;width:100%;z-index:99999;background:white;';
-  // Quitar botones del clon
-  clone.querySelectorAll('.no-print').forEach(el => el.remove());
-  document.body.appendChild(clone);
-  window.print();
-  document.body.removeChild(clone);
+  var prev=document.getElementById('previewContainer')||document.getElementById('docPreview')||document.getElementById('liqResult');
+  if(!prev||!prev.innerHTML.trim()){alert('Primero genera una vista previa del documento.');return;}
+  var estilos='';
+  document.querySelectorAll('style').forEach(function(s){estilos+=s.innerHTML;});
+  var iframe=document.getElementById('_printFrame');
+  if(!iframe){
+    iframe=document.createElement('iframe');
+    iframe.id='_printFrame';
+    iframe.style.cssText='position:fixed;top:-9999px;left:-9999px;width:210mm;height:297mm;border:none;';
+    document.body.appendChild(iframe);
+  }
+  var doc=iframe.contentDocument||iframe.contentWindow.document;
+  doc.open();
+  doc.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>'+
+    'body{background:white;margin:0;padding:12px;font-family:Arial,sans-serif;color:#1a1a1a;}'+
+    estilos+
+    '@page{margin:10mm;size:A4;}'+
+    '</style></head><body>'+prev.innerHTML+'</body></html>');
+  doc.close();
+  iframe.onload=function(){
+    try{iframe.contentWindow.focus();iframe.contentWindow.print();}catch(e){window.print();}
+  };
 }
 
 // ════════════════════

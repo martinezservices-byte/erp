@@ -446,7 +446,7 @@ async function initFirebase(){
       const unsub=fa.onAuthStateChanged(auth,user=>{
         unsub();
         if(!user){window.location.href='MSS-Login.html';}
-        else{window._MSS_USER=user;_db=fb.getFirestore(app);window._fb=fb;_fbReady=true;resolve();}
+        else{window._MSS_USER=user;_db=fb.getFirestore(app);window._fbM=fb;_fbReady=true;resolve();}
       });
     });
     console.log('✅ Firebase OK');
@@ -456,18 +456,18 @@ async function initFirebase(){
 function ep(){return 'empresas/'+_EMP_ID;}
 
 async function fbGetAll(col){
-  const snap=await window._fb.getDocs(window._fb.collection(_db,ep()+'/'+col));
+  const snap=await window._fbM.getDocs(window._fbM.collection(_db,ep()+'/'+col));
   const arr=[];snap.forEach(d=>arr.push({id:d.id,...d.data()}));return arr;
 }
 async function fbSet(col,id,data){
-  await window._fb.setDoc(window._fb.doc(_db,ep()+'/'+col+'/'+String(id)),{...data});
+  await window._fbM.setDoc(window._fbM.doc(_db,ep()+'/'+col+'/'+String(id)),{...data});
 }
 async function fbBatch(col,arr){
   if(!arr.length)return;
   // Firestore batch max 500 docs
   for(let i=0;i<arr.length;i+=400){
-    const batch=window._fb.writeBatch(_db);
-    arr.slice(i,i+400).forEach(item=>batch.set(window._fb.doc(_db,ep()+'/'+col+'/'+String(item.id)),{...item}));
+    const batch=window._fbM.writeBatch(_db);
+    arr.slice(i,i+400).forEach(item=>batch.set(window._fbM.doc(_db,ep()+'/'+col+'/'+String(item.id)),{...item}));
     await batch.commit();
   }
 }
@@ -476,7 +476,7 @@ async function load(){
   await initFirebase();
   if(_fbReady){
     try{
-      const cfgSnap=await window._fb.getDoc(window._fb.doc(_db,ep()+'/config/main'));
+      const cfgSnap=await window._fbM.getDoc(window._fbM.doc(_db,ep()+'/config/main'));
       if(cfgSnap.exists())CFG={...CFG,...cfgSnap.data()};
       const uArr=await fbGetAll('unidades');
       UNIDADES=uArr.length?uArr:[...U160];
@@ -523,7 +523,7 @@ async function save(){
   // Firebase (no bloquea el UI — async en segundo plano)
   if(_fbReady&&_db){
     try{
-      await window._fb.setDoc(window._fb.doc(_db,ep()+'/config/main'),CFG);
+      await window._fbM.setDoc(window._fbM.doc(_db,ep()+'/config/main'),CFG);
       await fbBatch('unidades',UNIDADES);
       await fbBatch('cobros',COBROS);
       await fbBatch('egresos',EGRESOS);
@@ -537,7 +537,7 @@ async function save(){
 function suscribirRT(){
   _unsubs.forEach(u=>u());_unsubs=[];
   try{
-    const {collection,onSnapshot}=window._fb;
+    const {collection,onSnapshot}=window._fbM;
     _unsubs.push(onSnapshot(collection(_db,ep()+'/cobros'),snap=>{
       COBROS=[];snap.forEach(d=>COBROS.push({id:d.id,...d.data()}));
       if(document.getElementById('sec-gastos')?.classList.contains('on'))rGastos();
