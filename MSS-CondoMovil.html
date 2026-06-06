@@ -366,7 +366,7 @@ function renderEmpCards(containerId){
   const lista = document.getElementById(containerId);
   if(!lista) return;
   lista.innerHTML = EMPRESAS.map(e=>`
-    <div class="emp-card ${EMP_ID===e.id?'activa':''}" onclick="elegirEmpresa(${e.id})">
+    <div class="emp-card ${String(EMP_ID)===String(e.id)?'activa':''}" onclick="elegirEmpresa('${e.id}')">
       <div class="emp-icon" style="background:${e.color}22;color:${e.color}">${e.icon}</div>
       <div class="emp-info">
         <div class="emp-nombre">${e.nombre}</div>
@@ -920,7 +920,7 @@ function sincFinanzas(cobro){
 // CONFIG
 // ══════════════════════════════════════════
 function guardarConfig(){
-  EMP_ID = parseInt(document.getElementById('cfgEmpId').value)||2;
+  EMP_ID = document.getElementById('cfgEmpId').value||'condo_1';
   const nombre = document.getElementById('cfgNombre').value.trim();
   const emp = EMPRESAS.find(e=>e.id===EMP_ID);
   const nombreFinal = nombre || emp?.nombre || 'Empresa '+EMP_ID;
