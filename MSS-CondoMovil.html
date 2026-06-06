@@ -137,12 +137,51 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
   </div>
 </div>
 
+<!-- PANTALLA BIENVENIDA / SELECTOR ROL -->
+<div id="sc-bienvenida" style="display:none;padding:24px 16px">
+  <div style="text-align:center;margin-bottom:28px">
+    <div style="font-size:36px;margin-bottom:8px">🏢</div>
+    <div style="font-size:20px;font-weight:900;color:var(--white)" id="bvCondoNombre">Condominio</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:4px">Selecciona tu tipo de acceso</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <button onclick="entrarComoAdmin()" style="width:100%;padding:18px;background:linear-gradient(135deg,#1a5c3a,#166534);color:white;border:none;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left">
+      <span style="font-size:28px">👩‍💼</span>
+      <div>
+        <div>Acceso Administrador</div>
+        <div style="font-size:11px;font-weight:400;opacity:.8;margin-top:2px">Gestión completa: cobros, egresos, resumen</div>
+      </div>
+    </button>
+    <button onclick="entrarComoResidente()" style="width:100%;padding:18px;background:linear-gradient(135deg,#1e3a5f,#1d4ed8);color:white;border:none;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left">
+      <span style="font-size:28px">🏠</span>
+      <div>
+        <div>Acceso Residente</div>
+        <div style="font-size:11px;font-weight:400;opacity:.8;margin-top:2px">Consulta tu estado de cuenta y pagos</div>
+      </div>
+    </button>
+  </div>
+</div>
+
 <!-- TABS -->
-<div class="tabs">
+<div class="tabs" id="mainTabs" style="display:none">
   <div class="tab on"  onclick="cambiarTab('cobros',this)">💰 Cobros</div>
   <div class="tab"     onclick="cambiarTab('resumen',this)">📊 Resumen</div>
   <div class="tab"     onclick="cambiarTab('registrar',this)">➕ Registrar</div>
   <div class="tab"     onclick="cambiarTab('config',this)">⚙ Config</div>
+</div>
+
+<!-- PANTALLA RESIDENTE -->
+<div id="sc-residente" class="screen" style="display:none;padding:16px">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+    <button onclick="volverBienvenida()" style="padding:6px 12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:var(--muted);border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit">← Volver</button>
+    <div style="font-size:14px;font-weight:800;color:var(--white)">Mi Cuenta</div>
+  </div>
+  <div style="margin-bottom:14px">
+    <select id="resBuscaUnidad" class="fi" style="width:100%" onchange="cargarCuentaResidente()">
+      <option value="">— Selecciona tu unidad —</option>
+    </select>
+  </div>
+  <div id="residentePanel"></div>
 </div>
 
 <!-- ═══════ COBROS ═══════ -->
@@ -393,12 +432,89 @@ function elegirEmpresa(id){
   renderEmpCards('cfgEmpCards');
   cerrar('overlayEmp');
   toast('✅ '+nombre);
-  cargarDatos();
+  cargarDatos().then(()=>{
+    document.getElementById('sc-bienvenida').style.display='block';
+    document.getElementById('bvCondoNombre').textContent=CFG.nombre||nombre;
+  });
 }
 
 // ══════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════
+function entrarComoAdmin(){
+  document.getElementById('sc-bienvenida').style.display='none';
+  document.getElementById('mainTabs').style.display='flex';
+  // Mostrar primera pantalla activa
+  document.querySelectorAll('.screen').forEach(s=>s.style.display='none');
+  const sc=document.getElementById('sc-cobros');
+  if(sc){sc.style.display='block';sc.classList.add('on');}
+}
+
+function entrarComoResidente(){
+  document.getElementById('sc-bienvenida').style.display='none';
+  document.getElementById('mainTabs').style.display='none';
+  document.querySelectorAll('.screen').forEach(s=>{s.style.display='none';s.classList.remove('on');});
+  document.getElementById('sc-residente').style.display='block';
+  // Poblar selector de unidades
+  const sel=document.getElementById('resBuscaUnidad');
+  sel.innerHTML='<option value="">— Selecciona tu unidad —</option>';
+  UNIDADES.filter(u=>u.tipo==='Departamento'||!u.tipo).forEach(u=>{
+    const opt=document.createElement('option');
+    opt.value=u.id;
+    opt.textContent=(u.torre?u.torre+' · ':'')+u.num+(u.prop&&u.prop!=='(Por completar)'?' — '+u.prop:'');
+    sel.appendChild(opt);
+  });
+}
+
+function volverBienvenida(){
+  document.querySelectorAll('.screen').forEach(s=>{s.style.display='none';s.classList.remove('on');});
+  document.getElementById('sc-residente').style.display='none';
+  document.getElementById('mainTabs').style.display='none';
+  document.getElementById('sc-bienvenida').style.display='block';
+}
+
+function cargarCuentaResidente(){
+  const uId=document.getElementById('resBuscaUnidad').value;
+  const panel=document.getElementById('residentePanel');
+  if(!uId){panel.innerHTML='';return;}
+  const u=UNIDADES.find(x=>String(x.id)===String(uId));
+  const historial=COBROS.filter(x=>String(x.unidadId)===String(uId)).sort((a,b)=>String(b.mes).localeCompare(String(a.mes)));
+  const deuda=historial.filter(x=>x.saldo>0).reduce((s,x)=>s+x.saldo,0);
+  panel.innerHTML=`
+    <div style="background:rgba(26,92,58,0.15);border:1px solid rgba(26,92,58,0.3);border-radius:12px;padding:14px;margin-bottom:14px">
+      <div style="font-size:13px;font-weight:800;color:var(--acc)">Unidad ${u?.num||'?'}${u?.torre?' — '+u.torre:''}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:3px">${u?.prop||'—'}</div>
+      ${u?.estacionamiento?`<div style="font-size:11px;color:var(--muted)">Estacionamiento: ${u.estacionamiento}</div>`:''}
+      ${u?.bodega?`<div style="font-size:11px;color:var(--muted)">Bodega: ${u.bodega}</div>`:''}
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <div style="flex:1;text-align:center;padding:10px;background:rgba(255,255,255,0.05);border-radius:8px">
+          <div style="font-size:18px;font-weight:900;color:${deuda>0?'var(--danger)':'var(--ok)'}">${clp(deuda)}</div>
+          <div style="font-size:10px;color:var(--muted)">Saldo Total</div>
+        </div>
+        <div style="flex:1;text-align:center;padding:10px;background:rgba(255,255,255,0.05);border-radius:8px">
+          <div style="font-size:18px;font-weight:900;color:var(--acc)">${historial.length}</div>
+          <div style="font-size:10px;color:var(--muted)">Registros</div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Historial de Pagos</div>
+    ${historial.length?historial.map(x=>`
+      <div style="padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:${x.mes==='MES POR IDENTIFICAR'?'var(--warn)':'var(--white)'}">${x.mes==='MES POR IDENTIFICAR'?'⚠ '+x.mes:x.mes}</div>
+            <div style="font-size:10px;color:var(--muted)">${x.estado} · ${x.forma||'—'} · ${x.fechaPago?df(x.fechaPago):'Sin fecha'}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:13px;font-weight:700;color:var(--ok)">${clp(x.pagado)}</div>
+            ${x.saldo>0?`<div style="font-size:10px;color:var(--danger)">Debe: ${clp(x.saldo)}</div>`:''}
+          </div>
+        </div>
+      </div>`).join('')
+    :'<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">Sin registros de pago para esta unidad</div>'}
+  `;
+}
+
 function init(){
   // Leer config guardada
   let configGuardada = false;
@@ -429,7 +545,11 @@ function init(){
   if(!configGuardada){
     setTimeout(()=>abrirSelectorEmp(), 400);
   } else {
-    cargarDatos();
+    cargarDatos().then(()=>{
+      // Mostrar pantalla de bienvenida
+      document.getElementById('sc-bienvenida').style.display='block';
+      document.getElementById('bvCondoNombre').textContent=CFG.nombre||EMPRESAS.find(e=>String(e.id)===String(EMP_ID))?.nombre||'Condominio';
+    });
   }
 }
 
