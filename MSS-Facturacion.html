@@ -83,8 +83,7 @@ tfoot td{border-top:2px solid rgba(56,189,248,0.25);font-weight:800;}
   #sec-documentos,#sec-nuevo,#sec-clientes,#sec-productos,#sec-resumen{display:none!important;}
   body{background:white!important;margin:0!important;padding:0!important;}
   #content{display:block!important;background:white!important;padding:0!important;margin:0!important;}
-  #previewContainer{display:block!important;}
-  #printOnly{display:block!important;}
+  #previewContainer{display:block!important;width:100%!important;}
   .factura-preview,.doc-preview,.liq-box{box-shadow:none!important;margin:0!important;border-radius:0!important;max-width:100%!important;width:100%!important;}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}
   @page{margin:10mm;size:A4;}
@@ -331,8 +330,10 @@ try{
         <button class="btn-ghost" onclick="limpiarForm()">🗑 Limpiar</button>
       </div>
     </div>
-    <div id="previewContainer"></div>
   </div>
+
+  <!-- PREVIEW IMPRESION - fuera de todas las secciones -->
+  <div id="previewContainer"></div>
 
   <!-- CLIENTES/PROVEEDORES -->
   <div id="sec-clientes" class="section">
@@ -879,16 +880,7 @@ document.getElementById('hInfo').textContent=`${DOCUMENTOS.length} documentos`;
 function imprimirDoc(){
   var prev=document.getElementById('previewContainer');
   if(!prev||!prev.innerHTML.trim()){alert('Primero genera una vista previa del documento.');return;}
-  // Ocultar secciones que no son el preview antes de imprimir
-  var secs=['sec-documentos','sec-nuevo','sec-clientes','sec-productos','sec-resumen'];
-  var hidden=[];
-  secs.forEach(function(id){
-    var el=document.getElementById(id);
-    if(el&&el.style.display!=='none'){el._prevDisplay=el.style.display;el.style.display='none';hidden.push(el);}
-  });
   window.print();
-  // Restaurar
-  hidden.forEach(function(el){el.style.display=el._prevDisplay||'';});
 }
 
 try{var _l=document.getElementById('_empNombreLogo');if(_l&&window._MSS_EMP)_l.textContent=window._MSS_EMP.nombre||_empObj.nombre||'Mi Empresa';}catch(e){}
