@@ -559,6 +559,7 @@ render();
 <script type="module">
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const FB = {
   apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",
@@ -574,26 +575,63 @@ const auth = getAuth(app);
 
 const ADMIN_EMAIL = 'aybserviciosg@gmail.com';
 
-onAuthStateChanged(auth, user => {
+const db = getFirestore(app);
+
+onAuthStateChanged(auth, async user => {
   if(!user){
-    // No hay sesión → redirigir al login
     window.location.href = 'MSS-Login.html';
     return;
   }
-  // Sesión activa — mostrar info del usuario
+
+  // Leer rol desde Firestore
+  let rol = 'user';
+  try{
+    const snap = await getDoc(doc(db,'usuarios/'+user.uid));
+    if(snap.exists()) rol = snap.data().rol || 'user';
+  }catch(e){ console.warn('No se pudo leer rol:', e.message); }
+
+  // Guardar rol en sessionStorage para uso en otros módulos
+  sessionStorage.setItem('mss_rol', rol);
+  sessionStorage.setItem('mss_uid', user.uid);
+  sessionStorage.setItem('mss_email', user.email);
+
+  // Mostrar info usuario
   const email = user.email || '';
   const iniciales = email.substring(0,2).toUpperCase();
   document.getElementById('userAvatar').textContent = iniciales;
   document.getElementById('userBadge').textContent = email;
   document.getElementById('btnLogout').style.display = 'block';
 
-  // Si es admin, mostrar botón crear usuarios
-  if(email === ADMIN_EMAIL){
+  // Redireccion por rol
+  if(rol === 'terreno'){
+    window.location.href = 'MSS-Terreno.html'; return;
+  }
+  if(rol === 'condo'){
+    // Solo puede ver Condominio → entrar directo
+    try{
+      const emp = EMPRESAS.find(e=>e.id===2);
+      if(emp) localStorage.setItem('mss_empresa_actual', JSON.stringify(emp));
+    }catch(e){}
+    window.location.href = 'MSS-Condominio.html'; return;
+  }
+
+  // admin / superadmin / user → mostrar index normal
+  // Botón + Usuario solo para admin/superadmin
+  if(rol === 'admin' || rol === 'superadmin'){
     const adminBtn = document.createElement('button');
     adminBtn.textContent = '+ Usuario';
     adminBtn.style.cssText = 'padding:6px 12px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);color:#C9A84C;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:JetBrains Mono,monospace';
     adminBtn.onclick = () => window.location.href = 'MSS-Usuarios.html';
     document.getElementById('btnLogout').before(adminBtn);
+  }
+
+  // Para rol 'user': ocultar botones editar/eliminar empresas
+  if(rol === 'user'){
+    // Aplicar después de que renderEmpresas() cargue el DOM
+    setTimeout(()=>{
+      document.querySelectorAll('.btn-icon').forEach(b=>b.style.display='none');
+      document.querySelectorAll('.add-card').forEach(b=>b.style.display='none');
+    }, 800);
   }
 });
 
