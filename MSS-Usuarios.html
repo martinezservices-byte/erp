@@ -125,24 +125,14 @@ let _user = null;
 onAuthStateChanged(auth, async u => {
   if(!u){ window.location.href='MSS-Login.html'; return; }
   _user = u;
-  // Verificar si es admin
+  // Verificar si es admin o superadmin
   const snap = await getDoc(doc(db,'usuarios/'+u.uid));
-  if(!snap.exists()){
-    // Primera vez: crear documento admin automáticamente
-    await setDoc(doc(db,'usuarios/'+u.uid),{
-      uid: u.uid,
-      nombre: u.displayName || u.email.split('@')[0],
-      email: u.email,
-      rol: 'admin',
-      creado: new Date().toISOString()
-    });
-    cargarUsuarios();
-    return;
-  }
-  const rolActual = snap.data().rol;
-  if(rolActual !== 'admin'){
-    alert('Solo administradores pueden gestionar usuarios.\nTu rol actual es: ' + rolActual + '\nContacta al administrador del sistema.');
-    window.location.href='index.html'; return;
+  if(snap.exists()){
+    const rol = snap.data().rol;
+    if(rol !== 'admin' && rol !== 'superadmin'){
+      alert('Solo administradores pueden gestionar usuarios.\nTu rol actual es: ' + rol);
+      window.location.href='index.html'; return;
+    }
   }
   cargarUsuarios();
 });
