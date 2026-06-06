@@ -344,6 +344,7 @@ try{var _e=_condoObj;if(_e&&_e.nombre){var _nd=document.getElementById('nav-emp'
     <div class="fl"><label>Estado</label><select id="coEstado" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none"><option>Pagado</option><option>Abono</option><option>Pendiente</option><option>Moroso</option></select></div>
     <div class="fl"><label>GC Ordinario ($)</label><input id="coGC" type="number"/></div>
     <div class="fl"><label>Mora ($)</label><input id="coMora" type="number" value="0"/></div>
+    <div class="fl"><label>Fondo de Reserva ($) — 0 = no aplica</label><input id="coFondoRes" type="number" value="0" placeholder="0"/></div>
     <div class="fl"><label>Monto Pagado ($)</label><input id="coPagado" type="number"/></div>
     <div class="fl"><label>Fecha Pago</label><input id="coFecha" type="date"/></div>
     <div class="fl"><label>N° Comprobante</label><input id="coComp" type="text"/></div>
@@ -703,7 +704,10 @@ function rGastos(){
   const ft=document.getElementById('filtGTorre')?.value||'';
   const selT=document.getElementById('filtGTorre');
   if(selT){const cv=selT.value;selT.innerHTML='<option value="">Todos</option>'+TORRES.map(t=>`<option ${cv===t?'selected':''}>${t}</option>`).join('');}
-  let lista=COBROS.filter(c=>c.mes===mes);
+  // Incluir siempre los "MES POR IDENTIFICAR" + los del mes seleccionado
+  let lista=COBROS.filter(c=>c.mes===mes||c.mesSinIdentificar||c.mes==='MES POR IDENTIFICAR');
+  // Si hay filtro de mes activo, MES POR IDENTIFICAR se muestra en cualquier período
+  if(mes&&mes!==MES) lista=COBROS.filter(c=>c.mes===mes||c.mesSinIdentificar||c.mes==='MES POR IDENTIFICAR');
   if(ft){const ids=UNIDADES.filter(u=>u.torre===ft).map(u=>u.id);lista=lista.filter(c=>ids.includes(c.unidadId));}
   const totE=lista.reduce((s,c)=>s+c.total,0),totP=lista.reduce((s,c)=>s+c.pagado,0);
   const pct=totE>0?Math.round(totP/totE*100):0;
@@ -762,6 +766,7 @@ function editCobro(id){
   document.getElementById('coComp').value=c.ref||'';
   document.getElementById('coForma').value=c.forma||'Transferencia';
   document.getElementById('coObs').value=c.obs||'';
+  if(document.getElementById('coFondoRes'))document.getElementById('coFondoRes').value=c.fondoReserva||0;
   document.getElementById('moCobro').classList.add('open'); // NO llamar O() — resetea coId
 }
 
@@ -785,7 +790,8 @@ function saveCobro(){
   const total=gcOrd+mora;
   const mesSinId=document.getElementById('coMes').dataset.sinMes==='1'&&!document.getElementById('coMes').value;
   const mesVal=mesSinId?'MES POR IDENTIFICAR':document.getElementById('coMes').value;
-  const obj={mes:mesVal,mesSinIdentificar:mesSinId,unidadId:uId,unidadNum:u?.num||'?',prop:u?.prop||'?',gcOrd,mora,total,pagado,saldo:Math.max(0,total-pagado),estado:document.getElementById('coEstado').value,fechaPago:document.getElementById('coFecha').value,ref:document.getElementById('coComp').value,forma:document.getElementById('coForma').value,obs:document.getElementById('coObs').value};
+  const fondoResForm=parseFloat(document.getElementById('coFondoRes')?.value)||0;
+  const obj={mes:mesVal,mesSinIdentificar:mesSinId,unidadId:uId,unidadNum:u?.num||'?',prop:u?.prop||'?',gcOrd,mora,fondoReserva:fondoResForm,total,pagado,saldo:Math.max(0,total-pagado),estado:document.getElementById('coEstado').value,fechaPago:document.getElementById('coFecha').value,ref:document.getElementById('coComp').value,forma:document.getElementById('coForma').value,obs:document.getElementById('coObs').value};
   // Asignar número correlativo de comprobante si hay pago
   if(pagado>0&&!obj.numComp){
     CFG.nextComp=(CFG.nextComp||0)+1;
@@ -976,6 +982,9 @@ function buscarResidente(){
         <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--muted)">Tel:</span> ${u.tel||'—'}</div>
         <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--muted)">Email:</span> ${u.email||'—'}</div>
         <div style="font-size:12px"><span style="color:var(--muted)">Estado:</span> ${badge(u.estado||'Al día',EC[u.estado||'Al día']||'#5A7090')}</div>
+        ${u.rut?`<div style="font-size:12px;margin-bottom:4px"><span style="color:var(--muted)">RUT:</span> ${u.rut}</div>`:''}
+        ${u.estacionamiento?`<div style="font-size:12px;margin-bottom:4px"><span style="color:var(--muted)">Estacionamiento:</span> <strong style="color:var(--teal)">${u.estacionamiento}</strong></div>`:''}
+        ${u.bodega?`<div style="font-size:12px;margin-bottom:4px"><span style="color:var(--muted)">Bodega:</span> <strong style="color:var(--teal)">${u.bodega}</strong></div>`:''}
         ${u.notas?`<div style="margin-top:6px;font-size:10px;color:var(--warn);background:rgba(245,158,11,0.08);padding:6px;border-radius:5px">${u.notas}</div>`:''}
       </div>
       <div style="background:var(--surf2);border-radius:10px;padding:14px;border:1px solid var(--b2)">
@@ -1181,7 +1190,8 @@ function impComp(id){
   const histUnidad=COBROS.filter(x=>x.unidadId===c.unidadId&&x.id!==c.id);
   const deudaHist=histUnidad.filter(x=>x.saldo>0).reduce((s,x)=>s+x.saldo,0);
   const gcMesActual=COBROS.filter(x=>x.mes===MES&&x.unidadId===c.unidadId&&x.id!==c.id).reduce((s,x)=>s+x.total,0)||0;
-  const fondoRes=Math.round(c.gcOrd*(CFG.reserva||5)/100);
+  // Fondo de reserva: usar el valor registrado en el cobro (0 = no aplica en este pago)
+  const fondoRes=c.fondoReserva||0;
   const modalidadLabel=(CFG.modalidad||'fija')==='prorrateo'?'Prorrateo Dinámico':'Cuota Fija';
   const mesSinId=c.mesSinIdentificar||c.mes==='MES POR IDENTIFICAR';
   const periodoLabel=mesSinId?'<span style="color:#dc2626;font-weight:900;font-size:13px;text-transform:uppercase">MES POR IDENTIFICAR</span>':c.mes;
@@ -1457,7 +1467,11 @@ function pdfHistorialResidente(uId){
     +'<div style="text-align:right"><div style="font-size:13px;font-weight:900">HISTORIAL DE PAGOS</div><div>'+df(HOY)+'</div></div></div>'
     +'<div style="background:#f0fff8;padding:10px;border-radius:5px;margin-bottom:14px">'
     +'<strong>Unidad:</strong> '+u.num+' &middot; <strong>Torre:</strong> '+(u.torre||'&mdash;')+' &middot; <strong>Propietario:</strong> '+u.prop+'<br>'
-    +'<strong>Tel:</strong> '+(u.tel||'&mdash;')+' &middot; <strong>Email:</strong> '+(u.email||'&mdash;')+'</div>'
+    +'<strong>RUT:</strong> '+(u.rut||'&mdash;')+' &middot; <strong>Tel:</strong> '+(u.tel||'&mdash;')+' &middot; <strong>Email:</strong> '+(u.email||'&mdash;')+'<br>'
+    +(u.estacionamiento?'<strong>Estacionamiento:</strong> '+u.estacionamiento+'&nbsp;&nbsp;':'')
+    +(u.bodega?'<strong>Bodega:</strong> '+u.bodega+'&nbsp;&nbsp;':'')
+    +(u.estacionamiento||u.bodega?'<br>':'')
+    +'</div>'
     +'<table><thead><tr><th>Per&iacute;odo</th><th>GC</th><th>Mora</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th>Fecha</th><th>Forma</th></tr></thead><tbody>'
     +hist.map(c=>'<tr><td>'+c.mes+'</td><td>'+clp(c.gcOrd)+'</td><td>'+(c.mora>0?'<span class=pend>'+clp(c.mora)+'</span>':clp(0))+'</td><td><strong>'+clp(c.total)+'</strong></td><td class=ok>'+clp(c.pagado)+'</td><td class='+(c.saldo>0?'pend':'ok')+'>'+clp(c.saldo)+'</td><td>'+c.estado+'</td><td>'+(c.fechaPago?df(c.fechaPago):'&mdash;')+'</td><td>'+(c.forma||'&mdash;')+'</td></tr>').join('')
     +'</tbody><tfoot><tr style="background:#f0fff8;font-weight:700"><td colspan="3">TOTALES</td><td>&mdash;</td><td class=ok>'+clp(totPag)+'</td><td class='+(totSaldo>0?'pend':'ok')+'>'+clp(totSaldo)+'</td><td colspan="3"></td></tr></tfoot></table>'
