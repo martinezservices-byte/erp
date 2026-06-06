@@ -834,9 +834,7 @@ function asignarMes(id){
   }
 }
 function delCobro(id){
-  if(!confirm('¿Eliminar cobro?
-
-Esta acción eliminará el registro de Firebase y no podrá recuperarse.'))return;
+  if(!confirm('¿Eliminar cobro?\n\nEsta acción eliminará el registro de Firebase y no podrá recuperarse.'))return;
   const cobro=COBROS.find(c=>c.id===id);
   COBROS=COBROS.filter(c=>c.id!==id);
   // Guardar localmente primero
