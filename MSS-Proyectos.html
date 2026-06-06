@@ -658,7 +658,7 @@ function renderActividades(){
       <td>${dateStr(t.fechaInicio)}</td>
       <td>${dateStr(t.fechaFin)}</td>
       <td style="text-align:center">${t.horasEst}</td>
-      <td style="text-align:center;color:${t.horasReal>t.horasEst?'var(--danger)':'var(--ok)';font-weight:700">${t.horasReal}</td>
+      <td style="text-align:center;color:${t.horasReal>t.horasEst?'var(--danger)':'var(--ok)'};font-weight:700">${t.horasReal}</td>
       <td style="min-width:90px"><div style="display:flex;align-items:center;gap:5px"><div class="progress-wrap" style="height:4px;flex:1"><div class="progress-bar" style="width:${av}%;background:${sc};height:4px"></div></div><span style="font-size:10px;color:var(--muted)">${av}%</span></div></td>
       <td>${statusBadge(t.estado)}</td>
       <td>${prioBadge(t.prioridad)}</td>
