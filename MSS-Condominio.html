@@ -833,7 +833,35 @@ function asignarMes(id){
     alert('✅ Mes asignado: '+mes);
   }
 }
-function delCobro(id){if(!confirm('¿Eliminar cobro?'))return;COBROS=COBROS.filter(c=>c.id!==id);save();rGastos();}
+function delCobro(id){
+  if(!confirm('¿Eliminar cobro?
+
+Esta acción eliminará el registro de Firebase y no podrá recuperarse.'))return;
+  const cobro=COBROS.find(c=>c.id===id);
+  COBROS=COBROS.filter(c=>c.id!==id);
+  // Guardar localmente primero
+  try{localStorage.setItem(SK.co,JSON.stringify(COBROS));}catch(e){}
+  // Borrar en Firebase explícitamente (deleteDoc — no solo reescribir)
+  if(_fbReady&&_db){
+    try{
+      window._fbM.deleteDoc(window._fbM.doc(_db,ep()+'/cobros/'+String(id)))
+        .then(()=>console.log('🗑 Cobro eliminado de Firebase'))
+        .catch(e=>console.error('Error delete Firebase:',e));
+    }catch(e){console.error(e);}
+  }
+  // Limpiar también la sincronización con finanzas
+  if(cobro){
+    try{
+      const condoId=_CONDO_ID||'condo_1';
+      const keyFin='mss_fin_condo_'+String(condoId)+'_movs';
+      let movs=JSON.parse(localStorage.getItem(keyFin)||'[]');
+      const refKey='gc_'+(cobro.unidadId||'')+'_'+(cobro.mes||'').replace(/ /g,'_');
+      movs=movs.filter(m=>m.ref!==refKey);
+      localStorage.setItem(keyFin,JSON.stringify(movs));
+    }catch(e){}
+  }
+  rGastos();rDash();
+}
 
 // ═══════════════════════════════════
 // EGRESOS
