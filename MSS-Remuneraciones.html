@@ -165,7 +165,10 @@ async function _initFB(){
     console.log('✅ Remuneraciones Firebase OK');
   }catch(e){_fbReady=false;console.warn('Firebase:',e.message);}
 }
-function _ep(){return 'empresas/'+(_EMP_ID||1);}
+function _ep(){
+  if(_MODO_CONDO) return 'condominios/'+(_CONDO_ID||'condo_1');
+  return 'empresas/'+(_EMP_ID||1);
+}
 async function _fbGetAll(col){
   const snap=await window._fbM.getDocs(window._fbM.collection(_db,_ep()+'/'+col));
   const arr=[];snap.forEach(d=>arr.push({id:d.id,...d.data()}));return arr;
@@ -192,25 +195,32 @@ async function _fbGetDoc(path){
 // ═══════════════════════════════════════════════════
 // EMPRESA DINÁMICA — Lee empresa seleccionada en Hub
 // ═══════════════════════════════════════════════════
-// ── EMPRESA COMERCIAL — lee mss_empresa_actual, rechaza condominios ──
+// ── MODO DUAL: Empresa Comercial O Condominio ──
+const _condoActual = (()=>{try{const r=localStorage.getItem('mss_condominio_actual');return r?JSON.parse(r):null;}catch(e){return null;}})();
 const _empRaw = localStorage.getItem('mss_empresa_actual');
-const _empObj = (()=>{
-  try{
-    const o = _empRaw ? JSON.parse(_empRaw) : null;
-    // SEGURIDAD: si es condominio, no cargar datos aquí
-    if(o && o.tipo === 'condominio') return {id:1, nombre:'Mi Empresa'};
-    return o || {id:1, nombre:'Mi Empresa'};
-  }catch(e){ return {id:1, nombre:'Mi Empresa'}; }
-})();
+const _empObjRaw = (()=>{try{return _empRaw?JSON.parse(_empRaw):null;}catch(e){return null;}})();
+// Detectar si venimos del condominio
+const _MODO_CONDO = !!(
+  _condoActual && (
+    sessionStorage.getItem('mss_origen') === 'condominio' ||
+    (_empObjRaw && _empObjRaw.tipo === 'condominio') ||
+    localStorage.getItem('mss_rem_modo') === 'condominio'
+  )
+);
+const _empObj = _MODO_CONDO
+  ? (_condoActual || {id:'condo_1', nombre:'Condominio Pioneros 2'})
+  : ((_empObjRaw && _empObjRaw.tipo !== 'condominio') ? _empObjRaw : {id:1, nombre:'Mi Empresa'});
 window._MSS_EMP = _empObj;
-const _EMP_ID   = _empObj.id || 1;
-const _EMP_NOMBRE = _empObj.nombre || 'Mi Empresa';
+const _EMP_ID     = _empObj.id || 1;
+const _CONDO_ID   = _MODO_CONDO ? (_empObj.id || 'condo_1') : null;
+const _EMP_NOMBRE = _empObj.nombre || (_MODO_CONDO ? 'Condominio' : 'Mi Empresa');
+if(_MODO_CONDO) localStorage.setItem('mss_rem_modo','condominio');
 (function(){
 try{
   var emp=_empObj;
   if(emp&&emp.nombre){
     var nd=document.getElementById("nav-emp");
-    if(nd){nd.textContent="Empresa: "+emp.nombre;nd.style.display="block";}
+    if(nd){nd.textContent=(_MODO_CONDO?'🏢 ':'🏭 ')+emp.nombre;nd.style.display="block";}
     var cur=window.location.pathname.split("/").pop();
     document.querySelectorAll("#nav-bar a").forEach(function(a){
       if(a.getAttribute("href")===cur){
@@ -675,11 +685,17 @@ try{
 // ════════════════════════════════════════
 //  STORAGE & STATE
 // ════════════════════════════════════════
-const SK_TRAB  = 'mss_rem_trabajadores_v1_'+_EMP_ID;
-const SK_LIQS  = 'mss_rem_liquidaciones_v1_'+_EMP_ID;
-const SK_VAC   = 'mss_rem_vacaciones_v1_'+_EMP_ID;
-const SK_FINIQ = 'mss_rem_finiquitos_v1_'+_EMP_ID;
-const SK_PARAM = 'mss_rem_params_v1_'+_EMP_ID;
+const _rem_prefix = _MODO_CONDO ? 'mss_condo_rem_'+String(_EMP_ID)+'_' : 'mss_rem_v1_'+String(_EMP_ID)+'_';
+const SK_TRAB  = _rem_prefix+'trabajadores';
+const SK_LIQS  = _rem_prefix+'liquidaciones';
+const SK_VAC   = _rem_prefix+'vacaciones';
+const SK_FINIQ = _rem_prefix+'finiquitos';
+const SK_PARAM = _rem_prefix+'params';
+// Colecciones Firebase según modo
+const _FB_TRAB  = _MODO_CONDO ? 'condo_rem_trabajadores'  : 'rem_trabajadores';
+const _FB_LIQS  = _MODO_CONDO ? 'condo_rem_liquidaciones' : 'rem_liquidaciones';
+const _FB_VAC   = _MODO_CONDO ? 'condo_rem_vacaciones'    : 'rem_vacaciones';
+const _FB_FINIQ = _MODO_CONDO ? 'condo_rem_finiquitos'    : 'rem_finiquitos';
 
 let _id = 2000; const uid = () => ++_id;
 
@@ -737,10 +753,10 @@ async function saveAll(){
   if(_fbReady&&_db){
     try{
       await Promise.all([
-        _fbBatch('rem_trabajadores', TRABAJADORES),
-        _fbBatch('rem_liquidaciones', LIQUIDACIONES),
-        _fbBatch('rem_vacaciones', VACACIONES),
-        _fbBatch('rem_finiquitos', FINIQUITOS),
+        _fbBatch(_FB_TRAB,  TRABAJADORES),
+        _fbBatch(_FB_LIQS,  LIQUIDACIONES),
+        _fbBatch(_FB_VAC,   VACACIONES),
+        _fbBatch(_FB_FINIQ, FINIQUITOS),
         _fbDoc(_ep()+'/rem_params/main', PARAMS)
       ]);
     }catch(e){console.error('Firebase saveAll:',e);}
@@ -751,10 +767,10 @@ async function loadAll(){
   if(_fbReady){
     try{
       const [tArr,lArr,vArr,fArr,pData]=await Promise.all([
-        _fbGetAll('rem_trabajadores'),
-        _fbGetAll('rem_liquidaciones'),
-        _fbGetAll('rem_vacaciones'),
-        _fbGetAll('rem_finiquitos'),
+        _fbGetAll(_FB_TRAB),
+        _fbGetAll(_FB_LIQS),
+        _fbGetAll(_FB_VAC),
+        _fbGetAll(_FB_FINIQ),
         _fbGetDoc(_ep()+'/rem_params/main')
       ]);
       TRABAJADORES  = tArr.length ? tArr : [];
@@ -1612,7 +1628,14 @@ function imprimirDoc(){
   };
 }
 
-try{var _l=document.getElementById('_empNombreLogo');if(_l&&window._MSS_EMP)_l.textContent=window._MSS_EMP.nombre||_empObj.nombre||'Mi Empresa';}catch(e){}
+try{
+  var _l=document.getElementById('_empNombreLogo');
+  if(_l&&window._MSS_EMP)_l.textContent=window._MSS_EMP.nombre||_empObj.nombre||'Mi Empresa';
+  var _modLabel=document.querySelector('.logo-mod');
+  if(_modLabel&&_MODO_CONDO)_modLabel.textContent='MÓDULO REMUNERACIONES — CONDOMINIO';
+  var _navEmpEl=document.getElementById('nav-emp');
+  if(_navEmpEl){_navEmpEl.textContent=(_MODO_CONDO?'🏢 ':'🏭 ')+_EMP_NOMBRE;_navEmpEl.style.display='block';}
+}catch(e){}
 </script>
 </body>
 </html>

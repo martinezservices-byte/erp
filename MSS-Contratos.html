@@ -150,7 +150,10 @@ async function _fbSyncLoad(col){
 }
 // ── FIN FIREBASE SYNC ──
 
-function _ep(){return 'empresas/'+(_EMP_ID||1);}
+function _ep(){
+  if(_MODO_CONDO) return 'condominios/'+(_CONDO_ID||'condo_1');
+  return 'empresas/'+(_EMP_ID||1);
+}
 async function _fbGetAll(col){
   const snap=await window._fbM.getDocs(window._fbM.collection(_db,_ep()+'/'+col));
   const arr=[];snap.forEach(d=>arr.push({id:d.id,...d.data()}));return arr;
@@ -177,25 +180,31 @@ async function _fbGetDoc(path){
 // ═══════════════════════════════════════════════════
 // EMPRESA DINÁMICA — Lee empresa seleccionada en Hub
 // ═══════════════════════════════════════════════════
-// ── EMPRESA COMERCIAL — lee mss_empresa_actual, rechaza condominios ──
+// ── MODO DUAL: Empresa Comercial O Condominio ──
+const _condoActual = (()=>{try{const r=localStorage.getItem('mss_condominio_actual');return r?JSON.parse(r):null;}catch(e){return null;}})();
 const _empRaw = localStorage.getItem('mss_empresa_actual');
-const _empObj = (()=>{
-  try{
-    const o = _empRaw ? JSON.parse(_empRaw) : null;
-    // SEGURIDAD: si es condominio, no cargar datos aquí
-    if(o && o.tipo === 'condominio') return {id:1, nombre:'Mi Empresa'};
-    return o || {id:1, nombre:'Mi Empresa'};
-  }catch(e){ return {id:1, nombre:'Mi Empresa'}; }
-})();
+const _empObjRaw = (()=>{try{return _empRaw?JSON.parse(_empRaw):null;}catch(e){return null;}})();
+const _MODO_CONDO = !!(
+  _condoActual && (
+    sessionStorage.getItem('mss_origen') === 'condominio' ||
+    (_empObjRaw && _empObjRaw.tipo === 'condominio') ||
+    localStorage.getItem('mss_ctr_modo') === 'condominio'
+  )
+);
+const _empObj = _MODO_CONDO
+  ? (_condoActual || {id:'condo_1', nombre:'Condominio Pioneros 2'})
+  : ((_empObjRaw && _empObjRaw.tipo !== 'condominio') ? _empObjRaw : {id:1, nombre:'Mi Empresa'});
 window._MSS_EMP = _empObj;
-const _EMP_ID   = _empObj.id || 1;
-const _EMP_NOMBRE = _empObj.nombre || 'Mi Empresa';
+const _EMP_ID     = _empObj.id || 1;
+const _CONDO_ID   = _MODO_CONDO ? (_empObj.id || 'condo_1') : null;
+const _EMP_NOMBRE = _empObj.nombre || (_MODO_CONDO ? 'Condominio' : 'Mi Empresa');
+if(_MODO_CONDO) localStorage.setItem('mss_ctr_modo','condominio');
 (function(){
 try{
   var emp=_empObj;
   if(emp&&emp.nombre){
     var nd=document.getElementById("nav-emp");
-    if(nd){nd.textContent="Empresa: "+emp.nombre;nd.style.display="block";}
+    if(nd){nd.textContent=(_MODO_CONDO?'🏢 ':'🏭 ')+emp.nombre;nd.style.display="block";}
     var cur=window.location.pathname.split("/").pop();
     document.querySelectorAll("#nav-bar a").forEach(function(a){
       if(a.getAttribute("href")===cur){
@@ -212,7 +221,10 @@ try{
 <div id="header">
   <div style="display:flex;align-items:center;gap:14px">
     <div class="logo-icon">M</div>
-    <div><div style="font-size:15px;font-weight:800">Martinez Services Spa</div><div style="font-size:10px;color:var(--acc);font-weight:700;letter-spacing:2px;font-family:monospace">MÓDULO CONTRATOS</div></div>
+    <div>
+      <div style="font-size:15px;font-weight:800" id="_ctrEmpNombre">Mi Empresa</div>
+      <div style="font-size:10px;color:var(--acc);font-weight:700;letter-spacing:2px;font-family:monospace" id="_ctrModLabel">MÓDULO CONTRATOS</div>
+    </div>
   </div>
   <div style="display:flex;gap:10px;align-items:center">
     <span style="font-size:11px;color:var(--muted);font-family:monospace" id="hInfo">Cargando...</span>
@@ -313,20 +325,24 @@ try{
   </div>
 </div>
 <script>
-const SK_CTR='mss_contratos_v1_'+_EMP_ID,SK_ANX='mss_anexos_v1_'+_EMP_ID;
+const _ctr_prefix = _MODO_CONDO ? 'mss_condo_ctr_'+String(_EMP_ID)+'_' : 'mss_contratos_v1_'+String(_EMP_ID)+'_';
+const SK_CTR = _ctr_prefix+'contratos';
+const SK_ANX = _ctr_prefix+'anexos';
+const _FB_CTR = _MODO_CONDO ? 'condo_contratos' : 'ctr_contratos';
+const _FB_ANX = _MODO_CONDO ? 'condo_anexos'    : 'ctr_anexos';
 let _id=6000;const uid=()=>++_id;
 const DEF_CONTRATOS=[]
 const DEF_ANEXOS=[]
 let CONTRATOS=[],ANEXOS=[];
 function saveAll(){
   try{localStorage.setItem(SK_CTR,JSON.stringify(CONTRATOS));localStorage.setItem(SK_ANX,JSON.stringify(ANEXOS));}catch(e){}
-  if(_fbReady&&_db){Promise.all([_fbBatch('ctr_contratos',CONTRATOS),_fbBatch('ctr_anexos',ANEXOS)]).catch(e=>console.warn('FB save:',e.message));}
+  if(_fbReady&&_db){Promise.all([_fbBatch(_FB_CTR,CONTRATOS),_fbBatch(_FB_ANX,ANEXOS)]).catch(e=>console.warn('FB save:',e.message));}
 }
 async function loadAll(){
   await _initFB();
   if(_fbReady&&_db){
     try{
-      const [cArr,aArr]=await Promise.all([_fbGetAll('ctr_contratos'),_fbGetAll('ctr_anexos')]);
+      const [cArr,aArr]=await Promise.all([_fbGetAll(_FB_CTR),_fbGetAll(_FB_ANX)]);
       CONTRATOS=cArr.length?cArr:(JSON.parse(localStorage.getItem(SK_CTR))||DEF_CONTRATOS.map(x=>({...x})));
       ANEXOS   =aArr.length?aArr:(JSON.parse(localStorage.getItem(SK_ANX))||DEF_ANEXOS.map(x=>({...x})));
       return;
@@ -471,8 +487,20 @@ function saveAnexo(){
 function delAnexo(id){if(!confirm('¿Eliminar?'))return;ANEXOS=ANEXOS.filter(a=>a.id!==id);saveAll();renderAnexos();}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
-loadAll();renderKPIs();renderContratos();
-document.getElementById('hInfo').textContent=CONTRATOS.length+' contratos · '+ANEXOS.length+' anexos';
+(async()=>{
+  await loadAll();
+  renderKPIs();renderContratos();
+  document.getElementById('hInfo').textContent=CONTRATOS.length+' contratos · '+ANEXOS.length+' anexos';
+  // Actualizar header con empresa/condominio actual
+  try{
+    const _nl=document.getElementById('_ctrEmpNombre');
+    const _ml=document.getElementById('_ctrModLabel');
+    if(_nl) _nl.textContent = _EMP_NOMBRE;
+    if(_ml) _ml.textContent = _MODO_CONDO ? 'MÓDULO CONTRATOS — CONDOMINIO' : 'MÓDULO CONTRATOS';
+    const _navEmpEl=document.getElementById('nav-emp');
+    if(_navEmpEl){_navEmpEl.textContent=(_MODO_CONDO?'🏢 ':'🏭 ')+_EMP_NOMBRE;_navEmpEl.style.display='block';}
+  }catch(e){}
+})();
 
 function imprimirDoc(){
   var prev=document.getElementById('previewContainer')||document.getElementById('docPreview')||document.getElementById('liqResult');

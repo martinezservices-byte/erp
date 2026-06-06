@@ -62,12 +62,12 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
 <a href="index.html" style="display:flex;align-items:center;padding:5px 10px;border-radius:6px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">🏠 Hub</a>
 <div style="width:1px;height:20px;background:rgba(201,168,76,0.15);margin:0 2px;flex-shrink:0"></div>
 <a href="MSS-Finanzas.html" style="padding:5px 9px;border-radius:6px;color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Finanzas</a>
-<a href="MSS-Remuneraciones.html" style="padding:5px 9px;border-radius:6px;color:#22C55E;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Remuner.</a>
+<a href="javascript:void(0)" onclick="abrirModuloCondo('MSS-Remuneraciones.html')" style="padding:5px 9px;border-radius:6px;color:#22C55E;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">👷 Remuner.</a>
 <a href="MSS-Contabilidad.html" style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Contab.</a>
 <a href="MSS-Facturacion.html" style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Factur.</a>
 <a href="MSS-Cotizacion.html" style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Cotiz.</a>
 <a href="MSS-Tesoreria.html" style="padding:5px 9px;border-radius:6px;color:#FBBF24;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Tesor.</a>
-<a href="MSS-Contratos.html" style="padding:5px 9px;border-radius:6px;color:#A78BFA;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Contratos</a>
+<a href="javascript:void(0)" onclick="abrirModuloCondo('MSS-Contratos.html')" style="padding:5px 9px;border-radius:6px;color:#A78BFA;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">📄 Contratos</a>
 <a href="MSS-Proyectos.html" style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Proyectos</a>
 <a href="MSS-Ventas-CRM.html" style="padding:5px 9px;border-radius:6px;color:#FB923C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Ventas</a>
 <a href="MSS-RRHH.html" style="padding:5px 9px;border-radius:6px;color:#A78BFA;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">RRHH</a>
@@ -465,6 +465,18 @@ async function initFirebase(){
 }
 
 function ep(){return 'condominios/'+_CONDO_ID;}
+
+// ── Navegar a módulo RRHH del condominio (setea origen) ──
+function abrirModuloCondo(archivo){
+  try{
+    sessionStorage.setItem('mss_origen','condominio');
+    localStorage.setItem('mss_condominio_actual', JSON.stringify(_condoObj));
+    // Limpiar modo anterior para que detecte el nuevo
+    if(archivo.includes('Remuner')) localStorage.setItem('mss_rem_modo','condominio');
+    if(archivo.includes('Contrato')) localStorage.setItem('mss_ctr_modo','condominio');
+  }catch(e){}
+  window.location.href = archivo;
+}
 
 async function fbGetAll(col){
   const snap=await window._fbM.getDocs(window._fbM.collection(_db,ep()+'/'+col));
