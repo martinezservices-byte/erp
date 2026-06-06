@@ -449,8 +449,22 @@ async function cargarCondominio(ep){
 function suscribirRT(ep){
   try{
     const colCobros=_modo==='condominio'?'cobros':'tes_movimientos';
-    const unsub=onSnapshot(collection(db,ep+'/'+colCobros),()=>{
-      cargarDatos();
+    const unsub=onSnapshot(collection(db,ep+'/'+colCobros),(snap)=>{
+      // Usar datos del snapshot directamente — evita cache de getDocs
+      if(_modo==='condominio'){
+        _cobros=[];
+        snap.forEach(d=>_cobros.push({id:d.id,...d.data()}));
+        // Reconstruir movimientos desde cobros actualizados
+        _movimientos=[];
+        _cobros.filter(c=>c.pagado>0).forEach(c=>_movimientos.push({
+          fecha:c.fechaPago||c.mes+'-01',tipo:'Ingreso',cat:'Gastos Comunes',
+          desc:'GC '+c.mes+' — Unidad '+(c.unidadNum||''),monto:c.pagado,src:'cobros'
+        }));
+        _egresos.forEach(e=>_movimientos.push({fecha:e.fecha,tipo:'Egreso',cat:e.cat||'Egreso',desc:e.desc||'',monto:e.monto||0,src:'egresos'}));
+        renderResumen();renderFinanciero();renderOperacional();renderComparativo();renderAlertas();
+      } else {
+        cargarDatos();
+      }
     });
     _unsubs.push(unsub);
   }catch(e){}
