@@ -1267,6 +1267,16 @@ onAuthStateChanged(auth, async user => {
     document.getElementById('btnLogout').before(saBtn);
   }
 
+  // Botón Usuarios (superadmin y admin)
+  if(rol === 'superadmin' || rol === 'admin'){
+    const usrBtn = document.createElement('button');
+    usrBtn.id = 'btnUsuarios';
+    usrBtn.textContent = '👥 Usuarios';
+    usrBtn.style.cssText = 'padding:6px 12px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);color:#38BDF8;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:JetBrains Mono,monospace';
+    usrBtn.onclick = () => window.location.href = 'MSS-Usuarios.html';
+    document.getElementById('btnLogout').before(usrBtn);
+  }
+
   // Filtrar empresas y condominios según permisos
   // superadmin ve todo — user/admin ve solo lo asignado
   if(rol !== 'superadmin'){
