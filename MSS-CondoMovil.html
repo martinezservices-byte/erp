@@ -276,14 +276,13 @@ function pedirContrasena(msg){
 
 // ══════════ INIT FIREBASE ══════════
 async function initFB(){
-  if(_auth&&_db)return;
   const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
   const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-  _fbM=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  if(!_fbM)_fbM=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
   const app=getApps().length?getApps()[0]:initializeApp(FB_CFG);
-  _auth=fa.getAuth(app);
-  _db=_fbM.getFirestore(app);
-  emailjs.init('a4vSP_VVKjQ0RTpr-');
+  if(!_auth)_auth=fa.getAuth(app);
+  if(!_db)_db=_fbM.getFirestore(app);
+  try{emailjs.init('a4vSP_VVKjQ0RTpr-');}catch(e){}
   return {fa,app};
 }
 
@@ -394,14 +393,18 @@ document.getElementById('btnRegEnviar').onclick=async()=>{
   document.getElementById('btnRegEnviar').disabled=true;
   try{
     await initFB();
-    // Buscar en Firebase
-    const snap=await _fbM.getDocs(_fbM.collection(_db,'condominios/'+EMP_ID+'/unidades'));
     let found=null;
-    snap.forEach(d=>{const u=d.data();if(u.email&&u.email.toLowerCase()===email.toLowerCase())found={id:d.id,...u};});
-    // Fallback localStorage
-    if(!found){
-      const raw=localStorage.getItem('mss_ccondo_1_u')||localStorage.getItem('mss_c_condo_1_u');
-      if(raw){const arr=JSON.parse(raw);const m=arr.find(u=>u.email&&u.email.toLowerCase()===email.toLowerCase());if(m)found=m;}
+    // Buscar primero en localStorage (no requiere permisos Firebase)
+    const rawKeys=['mss_ccondo_1_u','mss_c_condo_1_u','mss_condominio_unidades'];
+    for(const k of rawKeys){
+      try{const raw=localStorage.getItem(k);if(raw){const arr=JSON.parse(raw);const m=arr.find(u=>u.email&&u.email.toLowerCase()===email.toLowerCase());if(m){found=m;break;}}}catch(e){}
+    }
+    // Si no está en localStorage, buscar en Firebase (requiere estar autenticado)
+    if(!found&&_auth&&_db){
+      try{
+        const snap=await _fbM.getDocs(_fbM.collection(_db,'condominios/'+EMP_ID+'/unidades'));
+        snap.forEach(d=>{const u=d.data();if(u.email&&u.email.toLowerCase()===email.toLowerCase())found={id:d.id,...u};});
+      }catch(e){console.warn('Firebase sin permisos:',e.message);}
     }
     if(found){
       const codigo=String(Math.floor(100000+Math.random()*900000));
