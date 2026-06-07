@@ -225,14 +225,22 @@ window.crearUsuario = async function(){
     const empresasArr = empStr ? empStr.split(',').map(x=>{ const n=parseInt(x.trim()); return isNaN(n)?x.trim():n; }).filter(Boolean) : [];
     const condosArr   = condoStr ? condoStr.split(',').map(x=>x.trim()).filter(Boolean) : [];
 
+    const clienteId = 'cli_'+cred.user.uid;
     await setDoc(doc(db,'usuarios/'+cred.user.uid),{
       uid:cred.user.uid, nombre, email, rol, tipo,
       empresas: empresasArr,
       condominios: condosArr,
-      creadoPor:_user.email, creado:new Date().toISOString()
+      clienteId, // espacio aislado del cliente — nunca ve datos de otros
+      creadoPor:_adminEmail||_user.email, creado:new Date().toISOString()
     });
-    // Nota: al crear vía cliente, Firebase hace login automático — volvemos a loguear al admin
-    msg.textContent='✓ Usuario '+nombre+' creado correctamente. La contraseña temporal es: '+pass;
+    // Crear espacio vacío del cliente en Firestore (/espacios_cliente/{clienteId})
+    await setDoc(doc(db,'espacios_cliente/'+clienteId),{
+      uid:cred.user.uid, email, nombre, tipo, rol,
+      empresas:[], condominios:[],
+      creado:new Date().toISOString(), activo:true
+    });
+    // Nota: Firebase hace login automático con el nuevo usuario al crearlo
+    msg.textContent='✓ Usuario '+nombre+' creado. Contraseña temporal: '+pass+' — Compártela con el usuario.';
     msg.className='msg ok show';
     document.getElementById('newNombre').value='';
     document.getElementById('newEmail').value='';

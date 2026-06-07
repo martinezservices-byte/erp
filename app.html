@@ -1196,7 +1196,7 @@ onAuthStateChanged(auth, async user => {
   if(!user){ window.location.href='MSS-Login.html'; return; }
 
   // Leer perfil completo desde Firestore
-  let rol='user', empresasPermitidas=[], condosPermitidos=[], tipo='comercial';
+  let rol='user', empresasPermitidas=[], condosPermitidos=[], tipo='comercial', clienteId=null;
   try{
     const snap = await getDoc(doc(db,'usuarios/'+user.uid));
     if(snap.exists()){
@@ -1205,6 +1205,7 @@ onAuthStateChanged(auth, async user => {
       tipo = d.tipo || 'comercial';
       empresasPermitidas = d.empresas || [];
       condosPermitidos   = d.condominios || [];
+      clienteId = d.clienteId || null;
     }
   }catch(e){ console.warn('No se pudo leer perfil:', e.message); }
 
@@ -1255,16 +1256,40 @@ onAuthStateChanged(auth, async user => {
     window.location.href = 'MSS-Login.html'; return;
   }
 
-  // SEGURIDAD: admin/user con tipo 'condominio' → solo ve condominios, NUNCA el ERP comercial
+  // SEGURIDAD: admin/user con tipo 'condominio' → espacio aislado del cliente
   if(rol !== 'superadmin' && tipo === 'condominio'){
-    // Ir directo al módulo de condominio — NO mostrar el hub con empresas comerciales
-    const condoId = condosPermitidos[0] || null;
-    const condo = condoId ? CONDOMINIOS.find(c=>String(c.id)===String(condoId)) : null;
-    if(condo){
+    // Cargar condominios propios del cliente desde Firestore
+    // NUNCA cargar CONDOMINIOS_BASE (que son los de Gaudy)
+    let condosCliente = [];
+    try{
+      if(clienteId){
+        const espSnap = await getDoc(doc(db,'espacios_cliente/'+clienteId));
+        if(espSnap.exists()) condosCliente = espSnap.data().condominios || [];
+      }
+      // También buscar condominios creados por este cliente en Firestore
+      const condoSnap = await getDocs(collection(db,'condominios_clientes'));
+      condoSnap.forEach(d=>{
+        const c=d.data();
+        if(c.clienteId===clienteId||c.uid===user.uid) condosCliente.push({id:d.id,...c});
+      });
+    }catch(e){ console.warn('Error cargando condos cliente:',e.message); }
+
+    if(condosCliente.length > 0){
+      // Tiene condominios creados → ir al primero
+      const condo = condosCliente[0];
       localStorage.setItem('mss_empresa_actual', JSON.stringify(condo));
       localStorage.setItem('mss_condominio_actual', JSON.stringify(condo));
+      localStorage.setItem('mss_cliente_uid', user.uid);
+      localStorage.setItem('mss_cliente_id', clienteId||'');
+      window.location.href = 'MSS-Condominio.html'; return;
+    } else {
+      // No tiene condominios aún → pantalla de bienvenida para crear el primero
+      localStorage.setItem('mss_cliente_uid', user.uid);
+      localStorage.setItem('mss_cliente_id', clienteId||'');
+      localStorage.setItem('mss_cliente_nombre', user.email?.split('@')[0]||'Cliente');
+      localStorage.setItem('mss_cliente_tipo', tipo);
+      window.location.href = 'MSS-BienvenidaCliente.html'; return;
     }
-    window.location.href = 'MSS-Condominio.html'; return;
   }
 
   // ── SUPERADMIN / ADMIN / USER → mostrar index ──
