@@ -503,10 +503,11 @@ document.getElementById('btnIngresar').onclick=async()=>{
   const email=document.getElementById('loginEmail').value.trim();
   const pass=document.getElementById('loginPass').value;
   const err=document.getElementById('loginErr');
+  const btn=document.getElementById('btnIngresar');
   err.style.display='none';
   if(!email||!pass){err.textContent='Ingresa tu correo y contraseña.';err.style.display='block';return;}
-  document.getElementById('btnIngresar').innerHTML='<span class="spinner"></span>';
-  document.getElementById('btnIngresar').disabled=true;
+  btn.innerHTML='<span class="spinner"></span>';
+  btn.disabled=true;
   try{
     const {fa}=await initFB();
     const cred=await fa.signInWithEmailAndPassword(_auth,email,pass);
@@ -517,24 +518,26 @@ document.getElementById('btnIngresar').onclick=async()=>{
       const uSnap=await _fbM.getDoc(_fbM.doc(_db,'usuarios/'+_user.uid));
       if(uSnap.exists()) rolReal=uSnap.data().rol||'residente';
     }catch(e){ rolReal='residente'; }
-    // Si intenta entrar como admin pero su rol es residente → bloquear
+    // Si intenta entrar como admin pero su rol NO es admin → bloquear
     if(_tipoSel==='admin' && rolReal!=='admin' && rolReal!=='superadmin'){
-      const fa2=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-      await fa2.signOut(_auth);
+      await fa.signOut(_auth);
       _user=null;
+      btn.innerHTML='INGRESAR';
+      btn.disabled=false;
       err.textContent='⛔ Acceso denegado. Tu cuenta no tiene permisos de administrador.';
       err.style.display='block';
       return;
     }
-    // Si es residente intentando entrar como residente → ok
     const tipoFinal=(rolReal==='superadmin'||rolReal==='admin')?'admin':'residente';
+    btn.innerHTML='INGRESAR';
+    btn.disabled=false;
     await entrarApp(tipoFinal);
   }catch(e){
     const msgs={'auth/user-not-found':'Correo no registrado.','auth/wrong-password':'Contraseña incorrecta.','auth/invalid-credential':'Correo o contraseña incorrectos.','auth/too-many-requests':'Demasiados intentos. Espera unos minutos.'};
-    err.textContent=msgs[e.code]||'Error al iniciar sesión.';err.style.display='block';
-  }finally{
-    document.getElementById('btnIngresar').innerHTML='INGRESAR';
-    document.getElementById('btnIngresar').disabled=false;
+    err.textContent=msgs[e.code]||'Error: '+e.message;
+    err.style.display='block';
+    btn.innerHTML='INGRESAR';
+    btn.disabled=false;
   }
 };
 document.getElementById('loginPass').onkeydown=e=>{if(e.key==='Enter')document.getElementById('btnIngresar').click();};
@@ -1078,7 +1081,6 @@ function renderMiPropiedad(){
       </div>
       <div style="font-size:10px;color:#bbb;text-align:center;margin-top:8px" id="pagoAutoProx">🔒 Próximamente — Pasarela de pago en desarrollo</div>
     </div>`;
-}
 }
 
 function renderAvisosAll(){
