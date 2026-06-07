@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#1a5c3a"/>
+<title>Portal Condominios · MSS</title>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+:root{
+  --bg:#0A0F1C;--surf:#111827;--surf2:#1F2937;
+  --green:#1a5c3a;--green2:#166534;--ok:#10B981;
+  --danger:#EF4444;--warn:#F59E0B;--info:#38BDF8;
+  --text:#F9FAFB;--muted:#9CA3AF;--border:rgba(255,255,255,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;overflow-x:hidden;}
+body{padding-bottom:60px;}
+/* LOGIN */
+#sc-login{display:flex;flex-direction:column;min-height:100vh;}
+.login-hdr{background:linear-gradient(160deg,#1a5c3a,#166534,#0f4027);padding:32px 24px 28px;text-align:center;}
+.login-logo{width:72px;height:72px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;}
+.login-title{font-size:22px;font-weight:900;color:white;letter-spacing:1px;}
+.login-sub{font-size:12px;color:rgba(255,255,255,0.7);margin-top:4px;}
+.tipo-btns{display:flex;flex-direction:column;gap:10px;padding:20px 20px 0;}
+.tipo-btn{background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.12);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .2s;width:100%;text-align:left;}
+.tipo-btn.admin.sel{border-color:#1a5c3a;background:rgba(26,92,58,0.2);}
+.tipo-btn.res.sel{border-color:#1d4ed8;background:rgba(29,78,216,0.15);}
+.tipo-ico{font-size:28px;flex-shrink:0;}
+.tipo-txt strong{display:block;font-size:14px;font-weight:800;color:var(--text);}
+.tipo-txt span{font-size:11px;color:var(--muted);margin-top:1px;display:block;}
+.form-wrap{padding:16px 20px;}
+.form-box{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:18px;}
+.lbl{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px;}
+.inp{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:9px;padding:12px 14px;color:var(--text);font-size:15px;outline:none;margin-bottom:12px;font-family:inherit;transition:border .2s;}
+.inp:focus{border-color:var(--ok);}
+.btn-green{width:100%;padding:14px;background:linear-gradient(135deg,#1a5c3a,#166534);color:white;border:none;border-radius:10px;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;margin-top:4px;}
+.btn-blue{width:100%;padding:13px;background:linear-gradient(135deg,#1d4ed8,#1e40af);color:white;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-google{width:100%;padding:13px;background:white;color:#3c4043;border:1px solid #dadce0;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:4px;}
+.sep{display:flex;align-items:center;gap:10px;margin:14px 0;}
+.sep div{flex:1;height:1px;background:rgba(255,255,255,0.1);}
+.sep span{font-size:11px;color:var(--muted);}
+.err-box{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:10px 14px;font-size:12px;color:#FCA5A5;margin-top:10px;display:none;}
+.reg-panel{display:none;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:4px;}
+.reg-sep{text-align:center;font-size:12px;color:var(--muted);margin:14px 0;}
+/* VERIFICACION */
+#sc-veri{display:none;min-height:100vh;padding:40px 20px;text-align:center;}
+.veri-ico{font-size:52px;margin-bottom:16px;}
+.veri-title{font-size:20px;font-weight:900;margin-bottom:8px;}
+.veri-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:24px;}
+.veri-email{color:var(--ok);font-weight:700;}
+.digits{display:flex;gap:8px;justify-content:center;margin-bottom:20px;}
+.digit{width:46px;height:56px;background:var(--surf);border:2px solid var(--border);border-radius:10px;text-align:center;font-size:24px;font-weight:900;color:var(--text);outline:none;}
+.digit:focus{border-color:var(--ok);}
+/* APP */
+#sc-app{display:none;flex-direction:column;min-height:100vh;}
+.hdr{background:linear-gradient(135deg,#1a5c3a,#166534);padding:10px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;}
+.hdr-logo{width:34px;height:34px;background:rgba(255,255,255,0.2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.hdr-t{font-size:13px;font-weight:800;color:white;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hdr-s{font-size:10px;color:rgba(255,255,255,.7);}
+.hdr-out{background:rgba(255,255,255,0.15);border:none;color:white;border-radius:7px;padding:5px 10px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;}
+.tabs{display:flex;background:var(--surf);border-bottom:1px solid var(--border);}
+.tab{flex:1;padding:12px 4px;text-align:center;font-size:10px;font-weight:700;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;}
+.tab.on{color:var(--ok);border-bottom-color:var(--ok);}
+.sc{display:none;padding:14px;}
+.sc.on{display:block;}
+.card{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;}
+.ct{font-size:10px;font-weight:700;color:var(--ok);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.fi{background:var(--surf2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;color:var(--text);font-size:13px;width:100%;outline:none;font-family:inherit;}
+select.fi{appearance:none;}
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.fg label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.kpi{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;}
+.kpi-v{font-size:20px;font-weight:900;margin-bottom:3px;}
+.kpi-l{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;}
+.cobro-card{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;}
+.badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+.b-ok{background:rgba(16,185,129,0.15);color:var(--ok);}
+.b-warn{background:rgba(245,158,11,0.15);color:var(--warn);}
+.b-danger{background:rgba(239,68,68,0.15);color:var(--danger);}
+.empty{text-align:center;padding:36px 20px;color:var(--muted);}
+/* OVERLAY */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:flex-end;justify-content:center;}
+.overlay.open{display:flex;}
+.sheet{background:var(--surf);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.sh-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 14px;}
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#1F2937;color:var(--text);padding:10px 18px;border-radius:30px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;border:1px solid var(--border);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg);}}
+/* RESIDENTE */
+.res-hdr{background:linear-gradient(135deg,#0f2d1a,#1a5c3a);border-radius:14px;padding:16px;margin-bottom:12px;}
+.row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.row:last-child{border:none;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="sc-login">
+  <div class="login-hdr">
+    <div class="login-logo">🏢</div>
+    <div class="login-title">PORTAL CONDOMINIOS</div>
+    <div class="login-sub">Sistema de Administración y Gestión</div>
+  </div>
+  <div class="tipo-btns">
+    <button class="tipo-btn admin sel" id="btnAdmin">
+      <div class="tipo-ico">👷</div>
+      <div class="tipo-txt"><strong>Acceso Administrador</strong><span>Registrar gastos y cobros</span></div>
+    </button>
+    <button class="tipo-btn res" id="btnRes">
+      <div class="tipo-ico">🏘</div>
+      <div class="tipo-txt"><strong>Acceso Residente</strong><span>Ver gastos e historial</span></div>
+    </button>
+  </div>
+  <div class="form-wrap">
+    <div class="form-box">
+      <label class="lbl">Correo Registrado</label>
+      <input class="inp" id="loginEmail" type="email" placeholder="tu@correo.com" autocomplete="email" inputmode="email"/>
+      <label class="lbl">Contraseña</label>
+      <input class="inp" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password"/>
+      <button class="btn-green" id="btnIngresar">INGRESAR</button>
+      <div class="err-box" id="loginErr"></div>
+      <div class="sep"><div></div><span>o</span><div></div></div>
+      <button class="btn-google" id="btnGoogle">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continuar con Google
+      </button>
+    </div>
+    <div class="reg-sep">¿Usuario Nuevo?</div>
+    <div class="reg-panel" id="regPanel">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Ingresa el correo de tu ficha de unidad:</div>
+      <input class="inp" id="regEmail" type="email" placeholder="tu@correo.com" inputmode="email" style="margin-bottom:8px"/>
+      <button class="btn-green" id="btnRegEnviar" style="margin-bottom:8px">🔍 Verificar y Enviar Código</button>
+      <button class="btn-google" id="btnRegCancelar" style="font-size:12px;padding:10px">Cancelar</button>
+    </div>
+    <button class="btn-blue" id="btnRegistrarse"><span>✨</span> REGISTRARSE</button>
+  </div>
+</div>
+
+<!-- VERIFICACION -->
+<div id="sc-veri">
+  <div class="veri-ico">📧</div>
+  <div class="veri-title">Verifica tu correo</div>
+  <div class="veri-sub">Código enviado a<br><span class="veri-email" id="veriLabel">—</span></div>
+  <div class="digits">
+    <input class="digit" id="d0" maxlength="1" inputmode="numeric"/>
+    <input class="digit" id="d1" maxlength="1" inputmode="numeric"/>
+    <input class="digit" id="d2" maxlength="1" inputmode="numeric"/>
+    <input class="digit" id="d3" maxlength="1" inputmode="numeric"/>
+    <input class="digit" id="d4" maxlength="1" inputmode="numeric"/>
+    <input class="digit" id="d5" maxlength="1" inputmode="numeric"/>
+  </div>
+  <button class="btn-green" id="btnVerificar" style="max-width:320px;margin:0 auto">✅ Verificar</button>
+  <div id="veriErr" style="color:#FCA5A5;font-size:12px;margin-top:10px;display:none"></div>
+  <button id="btnVolverLogin" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;margin-top:16px;font-family:inherit">← Volver al inicio</button>
+</div>
+
+<!-- APP -->
+<div id="sc-app">
+  <div class="hdr">
+    <div class="hdr-logo">🏢</div>
+    <div style="flex:1;min-width:0">
+      <div class="hdr-t" id="appNombre">Condominio</div>
+      <div class="hdr-s" id="appUser">—</div>
+    </div>
+    <button class="hdr-out" id="btnSalir">Salir</button>
+  </div>
+  <div class="tabs" id="appTabs" style="display:none">
+    <div class="tab on" data-tab="cobros">💰 Cobros</div>
+    <div class="tab" data-tab="resumen">📊 Resumen</div>
+    <div class="tab" data-tab="registrar">➕ Registrar</div>
+    <div class="tab" data-tab="egresos">📤 Egresos</div>
+  </div>
+  <div class="sc on" id="sc-cobros">
+    <div class="card" style="padding:10px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="fg" style="margin:0"><label>Período</label><input class="fi" id="filMes" type="month"/></div>
+        <div class="fg" style="margin:0"><label>Estado</label>
+          <select class="fi" id="filEst"><option value="">Todos</option><option value="Pendiente">Pendientes</option><option value="Moroso">Morosos</option><option value="Pagado">Pagados</option></select>
+        </div>
+      </div>
+    </div>
+    <div id="listaCobros"></div>
+  </div>
+  <div class="sc" id="sc-resumen"><div class="kpi-grid" id="kpiGrid"></div><div id="resDetalle"></div></div>
+  <div class="sc" id="sc-registrar">
+    <div class="card">
+      <div class="ct">➕ Registrar Pago</div>
+      <div class="fg"><label>Período</label><input class="fi" id="regMes" type="month"/></div>
+      <div class="fg"><label>Block / Torre</label><select class="fi" id="regBlock"><option value="">— Seleccionar —</option></select></div>
+      <div class="fg"><label>Depto</label><select class="fi" id="regDepto"><option value="">— Seleccionar —</option></select></div>
+      <div id="regInfo" style="display:none">
+        <div class="fg"><label>Monto ($)</label><input class="fi" id="regMonto" type="number" style="font-size:18px;font-weight:800;color:var(--ok)"/></div>
+        <div class="fg"><label>Fecha</label><input class="fi" id="regFecha" type="date"/></div>
+        <div class="fg"><label>Forma de Pago</label><select class="fi" id="regForma"><option>Transferencia</option><option>Efectivo</option><option>Depósito</option></select></div>
+        <div class="fg"><label>N° Referencia</label><input class="fi" id="regRef" type="text" placeholder="Ej: 12345678"/></div>
+        <button class="btn-green" id="btnPagoRapido">✅ Confirmar Pago</button>
+      </div>
+    </div>
+  </div>
+  <div class="sc" id="sc-egresos">
+    <div class="card">
+      <div class="ct">📤 Registrar Egreso</div>
+      <div class="fg"><label>Fecha</label><input class="fi" id="egFecha" type="date"/></div>
+      <div class="fg"><label>Categoría</label><select class="fi" id="egCat"><option>Mantención</option><option>Limpieza</option><option>Servicios Básicos</option><option>Administración</option><option>Seguridad</option><option>Otro</option></select></div>
+      <div class="fg"><label>Descripción</label><input class="fi" id="egDesc" type="text" placeholder="Detalle..."/></div>
+      <div class="fg"><label>Monto ($)</label><input class="fi" id="egMonto" type="number" style="font-size:18px;font-weight:800;color:var(--danger)"/></div>
+      <button class="btn-green" id="btnEgreso">💾 Guardar Egreso</button>
+    </div>
+  </div>
+  <div class="sc" id="sc-residente"><div id="resContent"></div></div>
+</div>
+
+<!-- OVERLAY PAGO -->
+<div class="overlay" id="ovPago">
+  <div class="sheet">
+    <div class="sh-handle"></div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:4px" id="pagoTit">Registrar Pago</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px" id="pagoInfo">—</div>
+    <div class="fg"><label>Monto ($)</label><input class="fi" id="pagoMonto" type="number" style="font-size:18px;font-weight:800;color:var(--ok)"/></div>
+    <div class="fg"><label>Fecha</label><input class="fi" id="pagoFecha" type="date"/></div>
+    <div class="fg"><label>Forma</label><select class="fi" id="pagoForma"><option>Transferencia</option><option>Efectivo</option><option>Depósito</option></select></div>
+    <div class="fg"><label>N° Referencia</label><input class="fi" id="pagoRef" type="text"/></div>
+    <button class="btn-green" id="btnConfPago" style="margin-bottom:8px">✅ Confirmar</button>
+    <button id="btnCerrarPago" style="width:100%;padding:11px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--muted);border-radius:9px;cursor:pointer;font-family:inherit">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL CONTRASEÑA -->
+<div id="modalPass" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:none;align-items:center;justify-content:center;padding:24px">
+  <div style="background:#111827;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px;width:100%;max-width:340px">
+    <div id="passMsg" style="font-size:13px;color:var(--text);margin-bottom:14px;line-height:1.6"></div>
+    <input id="passInp" type="password" placeholder="••••••••" style="width:100%;background:#1F2937;border:1px solid rgba(255,255,255,0.08);border-radius:9px;padding:12px;color:var(--text);font-size:15px;outline:none;margin-bottom:12px;font-family:inherit"/>
+    <div style="display:flex;gap:10px">
+      <button id="passOk" style="flex:1;padding:12px;background:linear-gradient(135deg,#1a5c3a,#166534);color:white;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Confirmar</button>
+      <button id="passCancel" style="padding:12px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--muted);border-radius:9px;cursor:pointer;font-family:inherit">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════ FIREBASE CONFIG ══════════
+const FB_CFG={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
+const EMP_ID='condo_1';
+const HOY=new Date().toISOString().split('T')[0];
+const MES=HOY.substring(0,7);
+let _auth,_db,_fbM,_user,_tipoAcceso='admin';
+let COBROS=[],UNIDADES=[],EGRESOS=[],CFG={};
+let _veriCode=null,_veriEmail=null,_pendingTipo='admin';
+let _cobroActual=null;
+const clp=n=>'$'+(Math.round(n||0)).toLocaleString('es-CL');
+const df=d=>{try{return new Date((d||HOY)+'T12:00:00').toLocaleDateString('es-CL');}catch(e){return d||'—';}};
+
+// ══════════ TOAST ══════════
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+
+// ══════════ MODAL CONTRASEÑA ══════════
+function pedirContrasena(msg){
+  return new Promise(r=>{
+    const mo=document.getElementById('modalPass');
+    document.getElementById('passMsg').textContent=msg;
+    document.getElementById('passInp').value='';
+    mo.style.display='flex';
+    setTimeout(()=>document.getElementById('passInp').focus(),100);
+    document.getElementById('passOk').onclick=()=>{const v=document.getElementById('passInp').value;mo.style.display='none';r(v);};
+    document.getElementById('passCancel').onclick=()=>{mo.style.display='none';r(null);};
+    document.getElementById('passInp').onkeydown=e=>{if(e.key==='Enter'){const v=document.getElementById('passInp').value;mo.style.display='none';r(v);}};
+  });
+}
+
+// ══════════ INIT FIREBASE ══════════
+async function initFB(){
+  if(_auth&&_db)return;
+  const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+  const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+  _fbM=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  const app=getApps().length?getApps()[0]:initializeApp(FB_CFG);
+  _auth=fa.getAuth(app);
+  _db=_fbM.getFirestore(app);
+  emailjs.init('a4vSP_VVKjQ0RTpr-');
+  return {fa,app};
+}
+
+// ══════════ TIPO ACCESO ══════════
+let _tipoSel='admin';
+document.getElementById('btnAdmin').onclick=()=>{
+  _tipoSel='admin';
+  document.getElementById('btnAdmin').classList.add('sel');
+  document.getElementById('btnRes').classList.remove('sel');
+};
+document.getElementById('btnRes').onclick=()=>{
+  _tipoSel='residente';
+  document.getElementById('btnRes').classList.add('sel');
+  document.getElementById('btnAdmin').classList.remove('sel');
+};
+
+// ══════════ LOGIN EMAIL ══════════
+document.getElementById('btnIngresar').onclick=async()=>{
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  const err=document.getElementById('loginErr');
+  err.style.display='none';
+  if(!email||!pass){err.textContent='Ingresa tu correo y contraseña.';err.style.display='block';return;}
+  document.getElementById('btnIngresar').innerHTML='<span class="spinner"></span>';
+  document.getElementById('btnIngresar').disabled=true;
+  try{
+    const {fa}=await initFB();
+    const cred=await fa.signInWithEmailAndPassword(_auth,email,pass);
+    _user=cred.user;
+    await entrarApp(_tipoSel);
+  }catch(e){
+    const msgs={'auth/user-not-found':'Correo no registrado.','auth/wrong-password':'Contraseña incorrecta.','auth/invalid-credential':'Correo o contraseña incorrectos.','auth/too-many-requests':'Demasiados intentos. Espera unos minutos.'};
+    err.textContent=msgs[e.code]||'Error al iniciar sesión.';err.style.display='block';
+  }finally{
+    document.getElementById('btnIngresar').innerHTML='INGRESAR';
+    document.getElementById('btnIngresar').disabled=false;
+  }
+};
+document.getElementById('loginPass').onkeydown=e=>{if(e.key==='Enter')document.getElementById('btnIngresar').click();};
+
+// ══════════ LOGIN GOOGLE ══════════
+document.getElementById('btnGoogle').onclick=async()=>{
+  const err=document.getElementById('loginErr');
+  err.style.display='none';
+  document.getElementById('btnGoogle').innerHTML='<span class="spinner"></span> Conectando con Google...';
+  document.getElementById('btnGoogle').disabled=true;
+  try{
+    const {fa,app}=await initFB();
+    const provider=new fa.GoogleAuthProvider();
+    provider.setCustomParameters({prompt:'select_account'});
+    // Intentar popup primero, si falla usar redirect
+    let cred;
+    try{
+      cred=await fa.signInWithPopup(_auth,provider);
+    }catch(popupErr){
+      if(popupErr.code==='auth/popup-blocked'||popupErr.code==='auth/popup-closed-by-user'){
+        // Fallback a redirect
+        sessionStorage.setItem('mss_tipo_pending',_tipoSel);
+        await fa.signInWithRedirect(_auth,provider);
+        return;
+      }
+      throw popupErr;
+    }
+    _user=cred.user;
+    await procesarLoginGoogle(_tipoSel);
+  }catch(e){
+    err.textContent='Error Google: '+(e.code==='auth/unauthorized-domain'?'Dominio no autorizado en Firebase.':e.message);
+    err.style.display='block';
+  }finally{
+    const btn=document.getElementById('btnGoogle');
+    if(btn){btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Continuar con Google';btn.disabled=false;}
+  }
+};
+
+async function procesarLoginGoogle(tipo){
+  const email=_user.email;
+  const snap=await _fbM.getDocs(_fbM.collection(_db,'condominios/'+EMP_ID+'/unidades'));
+  let unidad=null;
+  snap.forEach(d=>{const u=d.data();if(u.email&&u.email.toLowerCase()===email.toLowerCase())unidad={id:d.id,...u};});
+  const uSnap=await _fbM.getDoc(_fbM.doc(_db,'usuarios/'+_user.uid));
+  const rol=uSnap.exists()?uSnap.data().rol:'';
+  if(rol==='superadmin'||rol==='admin'){await entrarApp('admin');return;}
+  if(unidad){
+    if(!uSnap.exists())await _fbM.setDoc(_fbM.doc(_db,'usuarios/'+_user.uid),{email,rol:'residente',condominios:[EMP_ID],tipo:'condominio',creado:Date.now()});
+    await entrarApp(tipo||'residente');
+  }else{
+    document.getElementById('loginErr').textContent='Tu cuenta Google ('+email+') no está en las fichas. Contacta al administrador.';
+    document.getElementById('loginErr').style.display='block';
+    const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    await fa.signOut(_auth);
+  }
+}
+
+// ══════════ REGISTRARSE ══════════
+document.getElementById('btnRegistrarse').onclick=()=>{
+  document.getElementById('regPanel').style.display='block';
+  document.getElementById('btnRegistrarse').style.display='none';
+  setTimeout(()=>document.getElementById('regEmail').focus(),100);
+};
+document.getElementById('btnRegCancelar').onclick=()=>{
+  document.getElementById('regPanel').style.display='none';
+  document.getElementById('btnRegistrarse').style.display='flex';
+};
+document.getElementById('btnRegEnviar').onclick=async()=>{
+  const email=document.getElementById('regEmail').value.trim();
+  if(!email||!email.includes('@')){toast('⚠ Ingresa un correo válido');return;}
+  document.getElementById('btnRegEnviar').innerHTML='<span class="spinner"></span> Verificando...';
+  document.getElementById('btnRegEnviar').disabled=true;
+  try{
+    await initFB();
+    // Buscar en Firebase
+    const snap=await _fbM.getDocs(_fbM.collection(_db,'condominios/'+EMP_ID+'/unidades'));
+    let found=null;
+    snap.forEach(d=>{const u=d.data();if(u.email&&u.email.toLowerCase()===email.toLowerCase())found={id:d.id,...u};});
+    // Fallback localStorage
+    if(!found){
+      const raw=localStorage.getItem('mss_ccondo_1_u')||localStorage.getItem('mss_c_condo_1_u');
+      if(raw){const arr=JSON.parse(raw);const m=arr.find(u=>u.email&&u.email.toLowerCase()===email.toLowerCase());if(m)found=m;}
+    }
+    if(found){
+      const codigo=String(Math.floor(100000+Math.random()*900000));
+      _veriCode=codigo;_veriEmail=email;_pendingTipo=_tipoSel;
+      // Guardar código en Firestore
+      await _fbM.setDoc(_fbM.doc(_db,'condominios/'+EMP_ID+'/verificaciones/'+email.replace(/[@.]/g,'_')),{codigo,email,ts:Date.now(),expira:Date.now()+600000});
+      // Enviar email
+      try{
+        await emailjs.send('mss_erp_service','template_ghdv7g1',{to_email:email,to_name:email.split('@')[0],codigo,condominio:CFG.nombre||'Condominio Pioneros 2'});
+        toast('📧 Código enviado a '+email);
+      }catch(e){
+        toast('Código: '+codigo+' (guárdalo)');
+      }
+      // Mostrar pantalla verificación
+      document.getElementById('sc-login').style.display='none';
+      document.getElementById('sc-veri').style.display='block';
+      document.getElementById('veriLabel').textContent=email;
+      document.getElementById('d0').focus();
+    }else{
+      toast('❌ Correo no encontrado en las fichas del condominio');
+    }
+  }catch(e){
+    toast('Error: '+e.message);
+  }finally{
+    document.getElementById('btnRegEnviar').innerHTML='🔍 Verificar y Enviar Código';
+    document.getElementById('btnRegEnviar').disabled=false;
+  }
+};
+
+// ══════════ VERIFICACIÓN CÓDIGO ══════════
+[0,1,2,3,4,5].forEach(i=>{
+  document.getElementById('d'+i).oninput=function(){
+    this.value=this.value.replace(/\D/g,'');
+    if(this.value&&i<5)document.getElementById('d'+(i+1)).focus();
+    if(i===5)document.getElementById('btnVerificar').click();
+  };
+});
+document.getElementById('btnVolverLogin').onclick=()=>{
+  document.getElementById('sc-veri').style.display='none';
+  document.getElementById('sc-login').style.display='flex';
+};
+document.getElementById('btnVerificar').onclick=async()=>{
+  const ing=[0,1,2,3,4,5].map(i=>document.getElementById('d'+i).value).join('');
+  const err=document.getElementById('veriErr');
+  if(ing.length<6){err.textContent='Ingresa los 6 dígitos.';err.style.display='block';return;}
+  if(ing!==_veriCode){err.textContent='Código incorrecto.';err.style.display='block';[0,1,2,3,4,5].forEach(i=>document.getElementById('d'+i).value='');document.getElementById('d0').focus();return;}
+  try{
+    const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const pass=await pedirContrasena('¡Correo verificado! ✅\nCrea tu contraseña (mín. 6 caracteres):');
+    if(!pass||pass.length<6){toast('⚠ Contraseña mínimo 6 caracteres');return;}
+    try{
+      const cred=await fa.createUserWithEmailAndPassword(_auth,_veriEmail,pass);
+      _user=cred.user;
+      await _fbM.setDoc(_fbM.doc(_db,'usuarios/'+cred.user.uid),{email:_veriEmail,rol:'residente',condominios:[EMP_ID],tipo:'condominio',creado:Date.now()});
+      toast('✅ ¡Cuenta creada!');
+      document.getElementById('sc-veri').style.display='none';
+      await entrarApp(_pendingTipo);
+    }catch(e){
+      if(e.code==='auth/email-already-in-use'){
+        const p2=await pedirContrasena('Este correo ya tiene cuenta.\nIngresa tu contraseña:');
+        if(p2){const c2=await fa.signInWithEmailAndPassword(_auth,_veriEmail,p2);_user=c2.user;document.getElementById('sc-veri').style.display='none';await entrarApp(_pendingTipo);}
+      }else{toast('Error: '+e.message);}
+    }
+  }catch(e){toast('Error: '+e.message);}
+};
+
+// ══════════ ENTRAR APP ══════════
+async function entrarApp(tipo){
+  _tipoAcceso=tipo;
+  document.getElementById('sc-login').style.display='none';
+  document.getElementById('sc-veri').style.display='none';
+  document.getElementById('sc-app').style.display='flex';
+  document.getElementById('sc-app').style.flexDirection='column';
+  document.getElementById('appNombre').textContent=CFG.nombre||'Condominio Pioneros 2';
+  document.getElementById('appUser').textContent=(tipo==='admin'?'👷 Administrador':'🏠 Residente')+' · '+(_user.email||'');
+  await cargarDatos();
+  if(tipo==='admin'){
+    document.getElementById('appTabs').style.display='flex';
+    renderCobros();renderResumen();
+    llenarBlocks();
+    document.getElementById('regMes').value=MES;
+    document.getElementById('egFecha').value=HOY;
+  }else{
+    document.getElementById('appTabs').style.display='none';
+    document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));
+    document.getElementById('sc-residente').classList.add('on');
+    renderResidente();
+  }
+}
+
+// ══════════ CARGAR DATOS ══════════
+async function cargarDatos(){
+  try{
+    await initFB();
+    const ep='condominios/'+EMP_ID;
+    const [uS,cS,eS,cfgS]=await Promise.all([
+      _fbM.getDocs(_fbM.collection(_db,ep+'/unidades')),
+      _fbM.getDocs(_fbM.collection(_db,ep+'/cobros')),
+      _fbM.getDocs(_fbM.collection(_db,ep+'/egresos')),
+      _fbM.getDoc(_fbM.doc(_db,ep+'/config/main'))
+    ]);
+    UNIDADES=[];uS.forEach(d=>UNIDADES.push({id:d.id,...d.data()}));
+    COBROS=[];cS.forEach(d=>COBROS.push({id:d.id,...d.data()}));
+    EGRESOS=[];eS.forEach(d=>EGRESOS.push({id:d.id,...d.data()}));
+    if(cfgS.exists())CFG={...CFG,...cfgS.data()};
+    document.getElementById('appNombre').textContent=CFG.nombre||'Condominio Pioneros 2';
+    _fbM.onSnapshot(_fbM.collection(_db,ep+'/cobros'),snap=>{COBROS=[];snap.forEach(d=>COBROS.push({id:d.id,...d.data()}));if(_tipoAcceso==='admin'){renderCobros();renderResumen();}else renderResidente();});
+  }catch(e){
+    // Fallback localStorage
+    try{const r=localStorage.getItem('mss_ccondo_1_u');if(r)UNIDADES=JSON.parse(r);}catch(e){}
+    try{const r=localStorage.getItem('mss_ccondo_1_co');if(r)COBROS=JSON.parse(r);}catch(e){}
+  }
+}
+
+// ══════════ RENDER COBROS ══════════
+function renderCobros(){
+  const mes=document.getElementById('filMes').value||MES;
+  if(!document.getElementById('filMes').value)document.getElementById('filMes').value=MES;
+  const est=document.getElementById('filEst').value;
+  let lista=COBROS.filter(c=>c.mes===mes||c.mesSinIdentificar||c.mes==='MES POR IDENTIFICAR');
+  if(est)lista=lista.filter(c=>c.estado===est);
+  const div=document.getElementById('listaCobros');
+  if(!lista.length){div.innerHTML='<div class="empty">Sin cobros para este período</div>';return;}
+  div.innerHTML=lista.map(c=>`
+    <div class="cobro-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div>
+          <div style="font-size:13px;font-weight:800">${c.unidadNum||'?'} — ${c.prop||'—'}</div>
+          <div style="font-size:10px;color:var(--muted)">${c.mes==='MES POR IDENTIFICAR'?'⚠ SIN MES':c.mes}</div>
+        </div>
+        <span class="badge ${c.estado==='Pagado'?'b-ok':c.estado==='Moroso'?'b-danger':'b-warn'}">${c.estado||'—'}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px">
+        <span style="color:var(--muted)">Cuota: ${clp(c.gcOrd)}</span>
+        <span style="color:var(--ok)">Pagado: ${clp(c.pagado)}</span>
+        <span style="color:${c.saldo>0?'var(--danger)':'var(--ok)'}">${c.saldo>0?'Debe: '+clp(c.saldo):'✓ Al día'}</span>
+      </div>
+      ${c.saldo>0?`<button onclick="abrirPago('${c.id}')" class="btn-green" style="margin-top:8px;padding:9px;font-size:12px">💰 Registrar Pago</button>`:''}
+    </div>`).join('');
+}
+
+// ══════════ RENDER RESUMEN ══════════
+function renderResumen(){
+  const mes=document.getElementById('filMes')?.value||MES;
+  const cobMes=COBROS.filter(c=>c.mes===mes);
+  const rec=cobMes.reduce((s,c)=>s+c.pagado,0);
+  const pend=cobMes.reduce((s,c)=>s+c.saldo,0);
+  document.getElementById('kpiGrid').innerHTML=`
+    <div class="kpi"><div class="kpi-v" style="color:var(--ok)">${clp(rec)}</div><div class="kpi-l">Recaudado</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--danger)">${clp(pend)}</div><div class="kpi-l">Por cobrar</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--ok)">${cobMes.filter(c=>c.estado==='Pagado').length}</div><div class="kpi-l">Pagados</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--danger)">${cobMes.filter(c=>c.saldo>0).length}</div><div class="kpi-l">Morosos</div></div>`;
+}
+
+// ══════════ REGISTRAR PAGO RAPIDO ══════════
+function llenarBlocks(){
+  const sel=document.getElementById('regBlock');
+  const torres=[...new Set(UNIDADES.map(u=>u.torre).filter(Boolean))].sort();
+  sel.innerHTML='<option value="">— Seleccionar —</option>'+torres.map(t=>`<option>${t}</option>`).join('');
+}
+document.getElementById('regBlock').onchange=function(){
+  const sel=document.getElementById('regDepto');
+  const us=UNIDADES.filter(u=>u.torre===this.value).sort((a,b)=>String(a.num).localeCompare(String(b.num)));
+  sel.innerHTML='<option value="">— Seleccionar —</option>'+us.map(u=>`<option value="${u.id}">${u.num}${u.prop&&u.prop!=='(Por completar)'?' — '+u.prop:''}</option>`).join('');
+  document.getElementById('regInfo').style.display='none';
+};
+document.getElementById('regDepto').onchange=function(){
+  const u=UNIDADES.find(x=>String(x.id)===this.value);
+  if(!u){document.getElementById('regInfo').style.display='none';return;}
+  document.getElementById('regMonto').value=u.gcCustom||CFG.gc||40000;
+  document.getElementById('regFecha').value=HOY;
+  document.getElementById('regInfo').style.display='block';
+};
+document.getElementById('btnPagoRapido').onclick=async()=>{
+  const uId=document.getElementById('regDepto').value;
+  const monto=parseFloat(document.getElementById('regMonto').value)||0;
+  const u=UNIDADES.find(x=>String(x.id)===uId);
+  if(!uId||!monto){toast('⚠ Completa los campos');return;}
+  const gcOrd=u?.gcCustom||CFG.gc||40000;
+  const mes=document.getElementById('regMes').value||MES;
+  const obj={id:'cm_'+Date.now(),mes,unidadId:uId,unidadNum:u?.num||'?',prop:u?.prop||'?',gcOrd,mora:0,total:gcOrd,pagado:monto,saldo:Math.max(0,gcOrd-monto),estado:monto>=gcOrd?'Pagado':'Abono',fechaPago:document.getElementById('regFecha').value,forma:document.getElementById('regForma').value,ref:document.getElementById('regRef').value,obs:'CondoMóvil'};
+  try{await _fbM.setDoc(_fbM.doc(_db,'condominios/'+EMP_ID+'/cobros/'+obj.id),obj);toast('✅ Pago registrado');document.getElementById('regInfo').style.display='none';}catch(e){toast('Error: '+e.message);}
+};
+
+// ══════════ OVERLAY PAGO ══════════
+function abrirPago(id){
+  const c=COBROS.find(x=>x.id===id);if(!c)return;
+  _cobroActual=c;
+  document.getElementById('pagoTit').textContent=c.unidadNum+' — '+c.prop;
+  document.getElementById('pagoInfo').textContent='Saldo: '+clp(c.saldo);
+  document.getElementById('pagoMonto').value=c.saldo||c.gcOrd;
+  document.getElementById('pagoFecha').value=HOY;
+  document.getElementById('ovPago').classList.add('open');
+}
+document.getElementById('btnConfPago').onclick=async()=>{
+  if(!_cobroActual)return;
+  const monto=parseFloat(document.getElementById('pagoMonto').value)||0;
+  if(!monto){toast('⚠ Ingresa el monto');return;}
+  const nuevo={..._cobroActual,pagado:(_cobroActual.pagado||0)+monto,saldo:Math.max(0,(_cobroActual.saldo||0)-monto),estado:(_cobroActual.saldo||0)-monto<=0?'Pagado':'Abono',fechaPago:document.getElementById('pagoFecha').value,forma:document.getElementById('pagoForma').value,ref:document.getElementById('pagoRef').value};
+  try{await _fbM.setDoc(_fbM.doc(_db,'condominios/'+EMP_ID+'/cobros/'+String(_cobroActual.id)),nuevo);document.getElementById('ovPago').classList.remove('open');toast('✅ Pago registrado');}catch(e){toast('Error: '+e.message);}
+};
+document.getElementById('btnCerrarPago').onclick=()=>document.getElementById('ovPago').classList.remove('open');
+
+// ══════════ EGRESO ══════════
+document.getElementById('btnEgreso').onclick=async()=>{
+  const monto=parseFloat(document.getElementById('egMonto').value)||0;
+  if(!monto){toast('⚠ Ingresa el monto');return;}
+  const obj={id:'eg_'+Date.now(),fecha:document.getElementById('egFecha').value,cat:document.getElementById('egCat').value,desc:document.getElementById('egDesc').value,monto,origen:'CondoMóvil'};
+  try{await _fbM.setDoc(_fbM.doc(_db,'condominios/'+EMP_ID+'/egresos/'+obj.id),obj);toast('✅ Egreso guardado');document.getElementById('egDesc').value='';document.getElementById('egMonto').value='';}catch(e){toast('Error: '+e.message);}
+};
+
+// ══════════ RESIDENTE ══════════
+function renderResidente(){
+  const div=document.getElementById('resContent');
+  const email=_user?.email?.toLowerCase()||'';
+  const u=UNIDADES.find(x=>x.email&&x.email.toLowerCase()===email);
+  if(!u){
+    div.innerHTML=`<div class="card"><div class="ct">🏠 Mi Unidad</div><div style="font-size:12px;color:var(--muted);margin-bottom:12px">Tu correo <strong>${email}</strong> no está vinculado a una unidad.<br>Contacta al administrador.</div>
+    <div class="fg"><label>O busca tu unidad</label><select class="fi" id="resBusca" onchange="renderResManual()"><option value="">— Selecciona —</option>${UNIDADES.map(u=>`<option value="${u.id}">${u.torre||''} — ${u.num} ${u.prop&&u.prop!=='(Por completar)'?'('+u.prop+')':''}</option>`).join('')}</select></div><div id="resManual"></div></div>`;
+    return;
+  }
+  mostrarPanelRes(u);
+}
+function renderResManual(){const uId=document.getElementById('resBusca')?.value;const u=UNIDADES.find(x=>String(x.id)===uId);if(u)mostrarPanelRes(u);}
+function mostrarPanelRes(u){
+  const hist=COBROS.filter(c=>String(c.unidadId)===String(u.id)).sort((a,b)=>String(b.mes||'').localeCompare(String(a.mes||'')));
+  const deuda=hist.filter(x=>x.saldo>0).reduce((s,x)=>s+x.saldo,0);
+  document.getElementById('resContent').innerHTML=`
+    <div class="res-hdr">
+      <div style="font-size:15px;font-weight:900;color:white">${u.torre||''} — Unidad ${u.num}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:3px">${u.prop||'—'}</div>
+      ${u.rut?`<div style="font-size:11px;color:rgba(255,255,255,.6)">RUT: ${u.rut}</div>`:''}
+      ${u.estacionamiento?`<div style="font-size:11px;color:rgba(255,255,255,.7)">🚗 ${u.estacionamiento}</div>`:''}
+      ${u.bodega?`<div style="font-size:11px;color:rgba(255,255,255,.7)">📦 ${u.bodega}</div>`:''}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+        <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:18px;font-weight:900;color:${deuda>0?'#FCA5A5':'#6EE7B7'}">${clp(deuda)}</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.6)">Saldo Total</div>
+        </div>
+        <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:18px;font-weight:900;color:white">${hist.length}</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.6)">Pagos</div>
+        </div>
+      </div>
+    </div>
+    ${hist.map(x=>`<div class="cobro-card"><div style="display:flex;justify-content:space-between"><div><div style="font-size:12px;font-weight:700">${x.mes}</div><div style="font-size:10px;color:var(--muted)">${x.estado} · ${df(x.fechaPago)}</div></div><div style="text-align:right"><div style="font-size:13px;font-weight:800;color:var(--ok)">${clp(x.pagado)}</div>${x.saldo>0?`<div style="font-size:10px;color:var(--danger)">Debe: ${clp(x.saldo)}</div>`:''}</div></div></div>`).join('')||'<div class="empty" style="padding:16px">Sin registros de pago</div>'}
+    <div class="card" style="margin-top:10px"><div class="ct">📊 Últimos Egresos</div>${EGRESOS.slice(0,5).map(e=>`<div class="row"><span>${e.desc||e.cat}</span><span style="color:var(--danger)">${clp(e.monto)}</span></div>`).join('')||'<div style="font-size:12px;color:var(--muted)">Sin egresos</div>'}</div>`;
+}
+
+// ══════════ TABS ══════════
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick=function(){
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.sc').forEach(x=>x.classList.remove('on'));
+    this.classList.add('on');
+    document.getElementById('sc-'+this.dataset.tab)?.classList.add('on');
+    if(this.dataset.tab==='cobros')renderCobros();
+    if(this.dataset.tab==='resumen')renderResumen();
+    if(this.dataset.tab==='registrar'){llenarBlocks();if(!document.getElementById('regMes').value)document.getElementById('regMes').value=MES;}
+  };
+});
+
+// ══════════ SALIR ══════════
+document.getElementById('btnSalir').onclick=async()=>{
+  if(!confirm('¿Cerrar sesión?'))return;
+  try{const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');await fa.signOut(_auth);}catch(e){}
+  sessionStorage.clear();
+  document.getElementById('sc-app').style.display='none';
+  document.getElementById('sc-login').style.display='flex';
+};
+
+// ══════════ FILTROS ══════════
+document.getElementById('filMes').onchange=renderCobros;
+document.getElementById('filEst').onchange=renderCobros;
+
+// ══════════ VERIFICAR SESION AL CARGAR ══════════
+(async()=>{
+  try{
+    const {fa}=await initFB();
+    // Verificar resultado de redirect Google
+    try{
+      const result=await fa.getRedirectResult(_auth);
+      if(result&&result.user){_user=result.user;const tipo=sessionStorage.getItem('mss_tipo_pending')||'residente';await procesarLoginGoogle(tipo);return;}
+    }catch(e){}
+    // Verificar sesión existente
+    fa.onAuthStateChanged(_auth,async user=>{
+      if(user&&!_user){_user=user;const tipo=sessionStorage.getItem('mss_movil_tipo')||'admin';await entrarApp(tipo);}
+    });
+  }catch(e){console.warn('Init:',e);}
+})();
+</script>
+</body>
+</html>
