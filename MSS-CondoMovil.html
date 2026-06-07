@@ -312,7 +312,10 @@ document.getElementById('btnIngresar').onclick=async()=>{
     const {fa}=await initFB();
     const cred=await fa.signInWithEmailAndPassword(_auth,email,pass);
     _user=cred.user;
-    await entrarApp(_tipoSel);
+    // Verificar rol real en Firestore
+    let tipoReal="residente";
+    try{const uSnap=await _fbM.getDoc(_fbM.doc(_db,"usuarios/"+_user.uid));if(uSnap.exists()){const r=uSnap.data().rol||"residente";if(r==="superadmin"||r==="admin")tipoReal="admin";}}catch(e){tipoReal=_tipoSel;}
+    await entrarApp(tipoReal);
   }catch(e){
     const msgs={'auth/user-not-found':'Correo no registrado.','auth/wrong-password':'Contraseña incorrecta.','auth/invalid-credential':'Correo o contraseña incorrectos.','auth/too-many-requests':'Demasiados intentos. Espera unos minutos.'};
     err.textContent=msgs[e.code]||'Error al iniciar sesión.';err.style.display='block';
@@ -363,17 +366,18 @@ async function procesarLoginGoogle(tipo){
   let unidad=null;
   snap.forEach(d=>{const u=d.data();if(u.email&&u.email.toLowerCase()===email.toLowerCase())unidad={id:d.id,...u};});
   const uSnap=await _fbM.getDoc(_fbM.doc(_db,'usuarios/'+_user.uid));
-  const rol=uSnap.exists()?uSnap.data().rol:'';
-  if(rol==='superadmin'||rol==='admin'){await entrarApp('admin');return;}
-  if(unidad){
+  const rolGuardado=uSnap.exists()?uSnap.data().rol:'';
+  // Siempre respetar el rol guardado en Firestore — nunca sobreescribir con el parámetro tipo
+  if(rolGuardado==='superadmin'||rolGuardado==='admin'){await entrarApp('admin');return;}
+  if(rolGuardado==='residente'||unidad){
     if(!uSnap.exists())await _fbM.setDoc(_fbM.doc(_db,'usuarios/'+_user.uid),{email,rol:'residente',condominios:[EMP_ID],tipo:'condominio',creado:Date.now()});
-    await entrarApp(tipo||'residente');
-  }else{
-    document.getElementById('loginErr').textContent='Tu cuenta Google ('+email+') no está en las fichas. Contacta al administrador.';
-    document.getElementById('loginErr').style.display='block';
-    const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-    await fa.signOut(_auth);
+    await entrarApp('residente'); // siempre residente, ignorar parámetro tipo
+    return;
   }
+  document.getElementById('loginErr').textContent='Tu cuenta Google ('+email+') no está en las fichas. Contacta al administrador.';
+  document.getElementById('loginErr').style.display='block';
+  const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+  await fa.signOut(_auth);
 }
 
 // ══════════ REGISTRARSE ══════════
@@ -689,9 +693,21 @@ document.getElementById('filEst').onchange=renderCobros;
       const result=await fa.getRedirectResult(_auth);
       if(result&&result.user){_user=result.user;const tipo=sessionStorage.getItem('mss_tipo_pending')||'residente';await procesarLoginGoogle(tipo);return;}
     }catch(e){}
-    // Verificar sesión existente
+    // Verificar sesión existente — consultar rol en Firestore para determinar tipo correcto
     fa.onAuthStateChanged(_auth,async user=>{
-      if(user&&!_user){_user=user;const tipo=sessionStorage.getItem('mss_movil_tipo')||'admin';await entrarApp(tipo);}
+      if(user&&!_user){
+        _user=user;
+        // Nunca asumir 'admin' por defecto — siempre verificar rol real
+        let tipo='residente';
+        try{
+          const uSnap=await _fbM.getDoc(_fbM.doc(_db,'usuarios/'+user.uid));
+          if(uSnap.exists()){
+            const rol=uSnap.data().rol||'residente';
+            if(rol==='superadmin'||rol==='admin')tipo='admin';
+          }
+        }catch(e){tipo='residente';} // sin permisos = es residente
+        await entrarApp(tipo);
+      }
     });
   }catch(e){console.warn('Init:',e);}
 })();
