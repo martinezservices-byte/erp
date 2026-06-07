@@ -978,6 +978,14 @@ onAuthStateChanged(auth, async user => {
   document.getElementById('btnLogout').style.display = 'block';
 
   // ── REDIRECCIÓN POR ROL ──
+
+  // SEGURIDAD: Roles que NUNCA deben ver el ERP general
+  // residente = usuario de condominio móvil (MSS-CondoMovil)
+  // condominio = alias alternativo de residente
+  if(rol === 'residente' || rol === 'condominio'){
+    window.location.href = 'MSS-CondoMovil.html'; return;
+  }
+
   if(rol === 'terreno'){
     window.location.href = 'MSS-Terreno.html'; return;
   }
@@ -991,6 +999,15 @@ onAuthStateChanged(auth, async user => {
       localStorage.setItem('mss_condominio_actual', JSON.stringify(condo));
     }
     window.location.href = 'MSS-Condominio.html'; return;
+  }
+
+  // SEGURIDAD: Bloqueo final — cualquier rol no reconocido como staff
+  // no debe tener acceso al ERP general bajo ninguna circunstancia
+  const ROLES_STAFF = ['superadmin', 'admin', 'user'];
+  if(!ROLES_STAFF.includes(rol)){
+    console.warn('Acceso denegado. Rol no autorizado para ERP general:', rol);
+    await signOut(auth);
+    window.location.href = 'MSS-Login.html'; return;
   }
 
   // ── SUPERADMIN / ADMIN / USER → mostrar index ──
