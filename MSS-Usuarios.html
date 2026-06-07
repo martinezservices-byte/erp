@@ -72,12 +72,23 @@ select.fi{appearance:none;}
     <div class="fg">
       <label>Rol</label>
       <select class="fi" id="newRol">
-        <option value="superadmin">⭐ Super Administrador — control total</option>
-        <option value="admin">👑 Administrador — acceso total</option>
-        <option value="user">👤 Usuario — acceso estándar</option>
-        <option value="condo">🏢 Solo Condominio</option>
-        <option value="terreno">📍 Solo Terreno/App móvil</option>
+        <!-- ══ ROLES INTERNOS — Tu equipo ══ -->
+        <optgroup label="── Tu Equipo Interno ──">
+          <option value="superadmin">⭐ Superadmin — Solo Gaudy Martínez (control total)</option>
+          <option value="admin">👑 Admin Interno — Staff de confianza (acceso completo)</option>
+          <option value="user">👤 Operador Interno — Personal básico (acceso limitado)</option>
+        </optgroup>
+        <!-- ══ ROLES CLIENTES EXTERNOS — Demos y contratados ══ -->
+        <optgroup label="── Clientes Externos ──">
+          <option value="condo">🏢 Cliente Condominio — Solo ve y gestiona su condominio</option>
+          <option value="terreno">🏭 Cliente Comercial — Solo ve y gestiona sus empresas</option>
+        </optgroup>
       </select>
+      <div style="font-size:10px;color:#6B7280;margin-top:6px;line-height:1.7;font-family:monospace">
+        💡 <strong style="color:#C9A84C">Equipo interno:</strong> ven tu ERP completo según empresas asignadas.<br>
+        🔒 <strong style="color:#10B981">Clientes externos:</strong> ven SOLO sus propios datos — nunca los tuyos.<br>
+        ⚠ <strong style="color:#F59E0B">Trabajadores y vendedores</strong> acceden por sus propias apps — no se crean aquí.
+      </div>
     </div>
   </div>
   <div class="grid2">
@@ -162,7 +173,13 @@ async function cargarUsuarios(){
   const snap = await getDocs(collection(db,'usuarios'));
   const lista = document.getElementById('listaUsuarios');
   if(snap.empty){ lista.innerHTML='<div style="color:#6B7280;font-size:12px">Sin usuarios registrados aún</div>'; return; }
-  const roles = {admin:'👑 Admin',user:'👤 Usuario',condo:'🏢 Condominio',terreno:'📍 Terreno'};
+  const roles = {
+    superadmin: '⭐ Superadmin',
+    admin:      '👑 Admin Interno',
+    user:       '👤 Operador',
+    condo:      '🏢 Cliente Condo',
+    terreno:    '🏭 Cliente Comercial'
+  };
   lista.innerHTML = '';
   snap.forEach(d=>{
     const u = d.data();
