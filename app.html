@@ -1255,6 +1255,18 @@ onAuthStateChanged(auth, async user => {
     window.location.href = 'MSS-Login.html'; return;
   }
 
+  // SEGURIDAD: admin/user con tipo 'condominio' → solo ve condominios, NUNCA el ERP comercial
+  if(rol !== 'superadmin' && tipo === 'condominio'){
+    // Ir directo al módulo de condominio — NO mostrar el hub con empresas comerciales
+    const condoId = condosPermitidos[0] || null;
+    const condo = condoId ? CONDOMINIOS.find(c=>String(c.id)===String(condoId)) : null;
+    if(condo){
+      localStorage.setItem('mss_empresa_actual', JSON.stringify(condo));
+      localStorage.setItem('mss_condominio_actual', JSON.stringify(condo));
+    }
+    window.location.href = 'MSS-Condominio.html'; return;
+  }
+
   // ── SUPERADMIN / ADMIN / USER → mostrar index ──
 
   // Botón Panel Superadmin (solo superadmin)
@@ -1267,8 +1279,8 @@ onAuthStateChanged(auth, async user => {
     document.getElementById('btnLogout').before(saBtn);
   }
 
-  // Botón Usuarios (superadmin y admin)
-  if(rol === 'superadmin' || rol === 'admin'){
+  // Botón Usuarios — SOLO superadmin puede gestionar usuarios
+  if(rol === 'superadmin'){
     const usrBtn = document.createElement('button');
     usrBtn.id = 'btnUsuarios';
     usrBtn.textContent = '👥 Usuarios';
@@ -1280,7 +1292,10 @@ onAuthStateChanged(auth, async user => {
   // Filtrar empresas y condominios según permisos
   // superadmin ve todo — user/admin ve solo lo asignado
   if(rol !== 'superadmin'){
-    if(empresasPermitidas.length > 0){
+    // admin tipo 'condominio' → NO debe ver empresas comerciales bajo ninguna circunstancia
+    if(tipo === 'condominio'){
+      EMPRESAS = []; // vaciar completamente las empresas comerciales
+    } else if(empresasPermitidas.length > 0){
       EMPRESAS = EMPRESAS.filter(e => empresasPermitidas.includes(e.id) || empresasPermitidas.includes(String(e.id)));
     }
     if(condosPermitidos.length > 0){
