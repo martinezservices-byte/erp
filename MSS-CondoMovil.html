@@ -138,6 +138,8 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .row-fin:last-child{border:none;}
 .divider{height:1px;background:var(--border);margin:12px 0;}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>emailjs.init("a4vSP_VVKjQ0RTpr-");</script>
 </head>
 <body>
 
@@ -512,9 +514,19 @@ window.abrirRegistro=async function(){
       document.getElementById('veriEmailLabel').textContent=email;
       document.getElementById('vc0').focus();
       toast('📧 Código enviado a '+email);
-      // En producción conectar Firebase Email Extension; en desarrollo mostrar código
-      console.log('🔑 Código de verificación:',_veriCode);
-      alert('📧 Código de verificación enviado a: '+email+'\n\n(Desarrollo: el código es '+_veriCode+')');
+      // Enviar email real con EmailJS
+      try{
+        await emailjs.send('mss_erp_service','template_ghdv7g1',{
+          to_email: email,
+          to_name: email.split('@')[0],
+          codigo: _veriCode,
+          condominio: _COND_NOMBRE||'Condominio Pioneros 2'
+        });
+        toast('📧 Código enviado a '+email+' — revisa tu bandeja');
+      }catch(err){
+        console.warn('EmailJS:',err);
+        alert('No se pudo enviar el email.\nCódigo: '+_veriCode+'\nMuéstraselo al administrador.');
+      }
     }else{
       alert('❌ Este correo no está registrado en las fichas del condominio.\n\nContacta al administrador para que agregue tu email a tu ficha de unidad.');
     }
