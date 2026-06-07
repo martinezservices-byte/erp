@@ -3,305 +3,362 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="theme-color" content="#0A0F1C"/>
-<title>Condo Móvil · MSS</title>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#1a5c3a"/>
+<title>Portal Condominios · MSS</title>
 <style>
 :root{
   --bg:#0A0F1C;--surf:#111827;--surf2:#1F2937;--surf3:#374151;
-  --gold:#F59E0B;--gold2:#FCD34D;
-  --ok:#10B981;--danger:#EF4444;--warn:#F59E0B;--info:#38BDF8;--wa:#25D366;
+  --green:#1a5c3a;--green2:#166534;--green3:#10B981;--green4:#d1fae5;
+  --gold:#F59E0B;--ok:#10B981;--danger:#EF4444;--warn:#F59E0B;--info:#38BDF8;
   --text:#F9FAFB;--muted:#9CA3AF;--border:rgba(255,255,255,0.08);
   --r:14px;--r2:10px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;overflow-x:hidden;}
-body{padding-bottom:80px;}
+body{padding-bottom:60px;}
 
-/* HEADER */
-.hdr{background:var(--surf);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;}
-.hdr-logo{width:36px;height:36px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;color:#0A0F1C;flex-shrink:0;}
+/* ══════════ PANTALLA LOGIN ══════════ */
+#sc-login{display:flex;flex-direction:column;min-height:100vh;background:var(--bg);}
+.login-header{background:linear-gradient(160deg,#1a5c3a 0%,#166534 60%,#0f4027 100%);padding:32px 24px 28px;text-align:center;}
+.login-logo{width:72px;height:72px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;}
+.login-title{font-size:22px;font-weight:900;color:white;letter-spacing:1px;}
+.login-sub{font-size:12px;color:rgba(255,255,255,0.7);margin-top:4px;}
+.login-tipo-btns{display:flex;flex-direction:column;gap:10px;padding:20px 20px 0;}
+.tipo-btn{background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.12);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .2s;width:100%;}
+.tipo-btn.admin.sel{border-color:#1a5c3a;background:rgba(26,92,58,0.2);}
+.tipo-btn.residente.sel{border-color:#1d4ed8;background:rgba(29,78,216,0.15);}
+.tipo-btn-ico{font-size:28px;flex-shrink:0;}
+.tipo-btn-txt{text-align:left;}
+.tipo-btn-txt strong{display:block;font-size:14px;font-weight:800;color:var(--text);}
+.tipo-btn-txt span{font-size:11px;color:var(--muted);margin-top:1px;display:block;}
+.login-form-wrap{padding:16px 20px;}
+.login-form{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:18px;}
+.lf-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:block;}
+.lf-input{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:9px;padding:12px 14px;color:var(--text);font-size:15px;outline:none;margin-bottom:12px;font-family:inherit;transition:border .2s;}
+.lf-input:focus{border-color:var(--ok);}
+.btn-ingresar{width:100%;padding:14px;background:linear-gradient(135deg,#1a5c3a,#166534);color:white;border:none;border-radius:10px;font-size:15px;font-weight:900;letter-spacing:1px;cursor:pointer;font-family:inherit;margin-top:4px;transition:opacity .2s;}
+.btn-ingresar:active{opacity:.85;}
+.btn-ingresar:disabled{opacity:.5;cursor:default;}
+.login-error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:10px 14px;font-size:12px;color:#FCA5A5;margin-top:10px;display:none;}
+.login-sep{text-align:center;font-size:12px;color:var(--muted);margin:14px 0;}
+.btn-registrarse{width:100%;padding:13px;background:linear-gradient(135deg,#1d4ed8,#1e40af);color:white;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-registrarse:active{opacity:.85;}
+.spinner{width:20px;height:20px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ══════════ PANTALLA VERIFICACION ══════════ */
+#sc-verificacion{display:none;min-height:100vh;background:var(--bg);padding:32px 20px;text-align:center;}
+.veri-icon{font-size:52px;margin-bottom:16px;}
+.veri-title{font-size:20px;font-weight:900;margin-bottom:8px;}
+.veri-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:24px;}
+.veri-email{color:var(--ok);font-weight:700;}
+.veri-code-wrap{display:flex;gap:8px;justify-content:center;margin-bottom:20px;}
+.veri-digit{width:46px;height:56px;background:var(--surf);border:2px solid var(--border);border-radius:10px;text-align:center;font-size:24px;font-weight:900;color:var(--text);outline:none;transition:border .2s;}
+.veri-digit:focus{border-color:var(--ok);}
+.btn-verificar{width:100%;max-width:320px;padding:14px;background:linear-gradient(135deg,#1a5c3a,#166534);color:white;border:none;border-radius:10px;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;}
+.btn-reenviar{background:none;border:none;color:var(--ok);font-size:13px;cursor:pointer;margin-top:14px;font-family:inherit;text-decoration:underline;}
+.btn-volver-login{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;margin-top:10px;font-family:inherit;}
+
+/* ══════════ APP PRINCIPAL ══════════ */
+#sc-app{display:none;flex-direction:column;min-height:100vh;}
+.hdr{background:linear-gradient(135deg,#1a5c3a,#166534);padding:10px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;}
+.hdr-logo{width:36px;height:36px;background:rgba(255,255,255,0.2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
 .hdr-info{flex:1;min-width:0;}
-.hdr-title{font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.hdr-sub{font-size:10px;color:var(--muted);}
-.hdr-emp{background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--gold);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;white-space:nowrap;cursor:pointer;}
+.hdr-title{font-size:14px;font-weight:800;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hdr-sub{font-size:10px;color:rgba(255,255,255,.7);}
+.hdr-salir{background:rgba(255,255,255,0.15);border:none;color:white;border-radius:7px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
 
 /* TABS */
 .tabs{display:flex;background:var(--surf);border-bottom:1px solid var(--border);}
 .tab{flex:1;padding:12px 4px;text-align:center;font-size:11px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;transition:all .2s;}
-.tab.on{color:var(--gold);border-bottom-color:var(--gold);}
+.tab.on{color:var(--ok);border-bottom-color:var(--ok);}
 
+/* SCREENS */
 .screen{display:none;padding:14px;}
 .screen.on{display:block;}
 
 /* CARDS */
 .card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;}
-.card-title{font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.card-title{font-size:10px;font-weight:700;color:var(--ok);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
 
 /* FORMS */
 .fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
 .fg label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
-.fi{background:var(--surf2);border:1px solid var(--border);border-radius:var(--r2);padding:11px 12px;color:var(--text);font-size:14px;width:100%;outline:none;transition:border .2s;}
-.fi:focus{border-color:var(--gold);}
+.fi{background:var(--surf2);border:1px solid var(--border);border-radius:var(--r2);padding:11px 12px;color:var(--text);font-size:14px;width:100%;outline:none;transition:border .2s;font-family:inherit;}
+.fi:focus{border-color:var(--ok);}
 select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239CA3AF' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
 
 /* BUTTONS */
 .btn{width:100%;padding:13px;border-radius:var(--r2);border:none;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;}
-.btn-gold{background:var(--gold);color:#0A0F1C;}
-.btn-gold:active{opacity:.85;}
-.btn-ok{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:var(--ok);}
-.btn-danger{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:var(--danger);}
-.btn-outline{background:none;border:1px solid var(--border);color:var(--muted);}
-.btn-wa{background:var(--wa);color:white;border:none;}
-.btn-sm{padding:7px 12px;font-size:12px;border-radius:8px;width:auto;}
-.btn-xs{padding:5px 9px;font-size:11px;border-radius:6px;width:auto;}
-
-/* BADGES */
-.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;}
-.ok{background:rgba(16,185,129,0.15);color:var(--ok);}
-.warn{background:rgba(245,158,11,0.15);color:var(--warn);}
-.danger{background:rgba(239,68,68,0.15);color:var(--danger);}
-.info{background:rgba(56,189,248,0.15);color:var(--info);}
+.btn-green{background:linear-gradient(135deg,#1a5c3a,#166534);color:white;}
+.btn-blue{background:linear-gradient(135deg,#1d4ed8,#1e40af);color:white;}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted);}
 
 /* COBRO CARDS */
-.cobro-card{background:var(--surf2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px;}
-.cobro-card.moroso{border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.04);}
-.cobro-card.pendiente{border-color:rgba(245,158,11,0.25);}
-.cobro-card.pagado{border-color:rgba(16,185,129,0.25);background:rgba(16,185,129,0.03);}
+.cobro-card{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;}
+.cobro-card.pagado{border-color:rgba(16,185,129,0.3);}
+.cobro-card.moroso{border-color:rgba(239,68,68,0.3);}
 
 /* KPI */
-.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
-.kpi{background:var(--surf2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;}
-.kpi-val{font-size:18px;font-weight:900;margin-bottom:2px;}
-.kpi-lbl{font-size:10px;color:var(--muted);}
-
-/* OVERLAY / MODAL */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:300;display:none;align-items:flex-end;justify-content:center;}
-.overlay.on{display:flex;}
-.sheet{background:var(--surf);border-radius:20px 20px 0 0;padding:20px 16px 32px;width:100%;max-height:92vh;overflow-y:auto;}
-.sheet-handle{width:40px;height:4px;background:var(--surf3);border-radius:2px;margin:0 auto 16px;}
-.sheet-title{font-size:16px;font-weight:800;margin-bottom:4px;}
-.sheet-sub{font-size:12px;color:var(--muted);margin-bottom:16px;}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.kpi{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;}
+.kpi-v{font-size:22px;font-weight:900;margin-bottom:4px;}
+.kpi-l{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;}
 
 /* EMPTY */
-.empty{text-align:center;padding:40px 16px;color:var(--muted);}
-.empty-icon{font-size:40px;margin-bottom:10px;}
+.empty{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+
+/* BADGE */
+.badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+.badge-ok{background:rgba(16,185,129,0.15);color:#10B981;}
+.badge-danger{background:rgba(239,68,68,0.15);color:#EF4444;}
+.badge-warn{background:rgba(245,158,11,0.15);color:#F59E0B;}
+.badge-info{background:rgba(56,189,248,0.15);color:#38BDF8;}
+
+/* OVERLAY / SHEET */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;align-items:flex-end;justify-content:center;}
+.overlay.open{display:flex;}
+.sheet{background:var(--surf);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.sheet-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px;}
+.sheet-title{font-size:16px;font-weight:800;margin-bottom:4px;}
+.sheet-sub{font-size:12px;color:var(--muted);margin-bottom:14px;}
 
 /* ALERTA */
-.alerta{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:12px 14px;font-size:12px;margin-bottom:12px;line-height:1.6;}
+.alerta{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:9px;padding:10px 12px;font-size:12px;color:var(--warn);margin-bottom:12px;line-height:1.5;}
 
 /* TOAST */
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--surf3);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none;}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#1F2937;color:#F9FAFB;padding:10px 18px;border-radius:30px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-/* RESUMEN FINANCIERO */
+/* RESIDENTE VIEW */
+.res-header{background:linear-gradient(135deg,#0f2d1a,#1a5c3a);border-radius:14px;padding:18px;margin-bottom:14px;}
 .row-fin{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
 .row-fin:last-child{border:none;}
-
-/* EMPRESA CARDS */
-.emp-card{background:var(--surf2);border:2px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px;}
-.emp-card:active{background:rgba(245,158,11,0.1);}
-.emp-card.activa{border-color:var(--gold);background:rgba(245,158,11,0.07);}
-.emp-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
-.emp-info{flex:1;}
-.emp-nombre{font-size:14px;font-weight:800;}
-.emp-rut{font-size:11px;color:var(--muted);margin-top:2px;}
-.emp-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(245,158,11,0.15);color:var(--gold);}
-
-/* DIVIDER */
 .divider{height:1px;background:var(--border);margin:12px 0;}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<div class="hdr">
-  <div class="hdr-logo">🏢</div>
-  <div class="hdr-info">
-    <div class="hdr-title" id="hdrNombre">Condominio</div>
-    <div class="hdr-sub" id="hdrSub">Cargando...</div>
+<!-- ══════════════════════════════════════════════ -->
+<!-- PANTALLA 1: LOGIN SEGURO                       -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="sc-login">
+  <!-- ENCABEZADO VERDE -->
+  <div class="login-header">
+    <div class="login-logo">🏢</div>
+    <div class="login-title">PORTAL CONDOMINIOS</div>
+    <div class="login-sub">Sistema de Administración y Gestión</div>
   </div>
-  <div class="hdr-emp" onclick="abrirSelectorEmp()" id="hdrEmpBadge">🏢 Condominio</div>
-</div>
 
-<!-- SELECTOR EMPRESA (aparece al inicio o al tocar el badge) -->
-<div class="overlay" id="overlayEmp" style="align-items:flex-start;padding-top:0">
-  <div class="sheet" style="border-radius:0 0 20px 20px;padding-top:24px">
-    <div style="text-align:center;margin-bottom:20px">
-      <div style="font-size:28px;margin-bottom:6px">🏢</div>
-      <div style="font-size:17px;font-weight:900">Seleccionar Condominio</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:4px">¿En cuál condominio vas a trabajar?</div>
+  <!-- BOTONES TIPO DE ACCESO -->
+  <div class="login-tipo-btns">
+    <button class="tipo-btn admin" id="btnTipoAdmin" onclick="selTipo('admin')">
+      <div class="tipo-btn-ico">👷</div>
+      <div class="tipo-btn-txt">
+        <strong>Acceso Administrador</strong>
+        <span>Registrar gastos y cobros</span>
+      </div>
+    </button>
+    <button class="tipo-btn residente" id="btnTipoRes" onclick="selTipo('residente')">
+      <div class="tipo-btn-ico">🏘</div>
+      <div class="tipo-btn-txt">
+        <strong>Acceso Residente</strong>
+        <span>Ver gastos e historial</span>
+      </div>
+    </button>
+  </div>
+
+  <!-- FORMULARIO LOGIN -->
+  <div class="login-form-wrap">
+    <div class="login-form">
+      <label class="lf-label">Correo Registrado</label>
+      <input class="lf-input" id="loginEmail" type="email" placeholder="tu@correo.com" autocomplete="email" inputmode="email"/>
+      <label class="lf-label">Contraseña</label>
+      <input class="lf-input" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <button class="btn-ingresar" id="btnIngresar" onclick="doLogin()">INGRESAR</button>
+      <div class="login-error" id="loginError"></div>
     </div>
-    <div id="listaEmpresas"></div>
-    <button class="btn btn-outline" onclick="cerrar('overlayEmp')" style="margin-top:8px">Cancelar</button>
-  </div>
-</div>
 
-<!-- PANTALLA BIENVENIDA / SELECTOR ROL -->
-<div id="sc-bienvenida" style="display:none;padding:24px 16px">
-  <div style="text-align:center;margin-bottom:28px">
-    <div style="font-size:36px;margin-bottom:8px">🏢</div>
-    <div style="font-size:20px;font-weight:900;color:var(--white)" id="bvCondoNombre">Condominio</div>
-    <div style="font-size:12px;color:var(--muted);margin-top:4px">Selecciona tu tipo de acceso</div>
-  </div>
-  <div style="display:flex;flex-direction:column;gap:14px">
-    <button onclick="entrarComoAdmin()" style="width:100%;padding:18px;background:linear-gradient(135deg,#1a5c3a,#166534);color:white;border:none;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left">
-      <span style="font-size:28px">👩‍💼</span>
-      <div>
-        <div>Acceso Administrador</div>
-        <div style="font-size:11px;font-weight:400;opacity:.8;margin-top:2px">Gestión completa: cobros, egresos, resumen</div>
-      </div>
-    </button>
-    <button onclick="entrarComoResidente()" style="width:100%;padding:18px;background:linear-gradient(135deg,#1e3a5f,#1d4ed8);color:white;border:none;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left">
-      <span style="font-size:28px">🏠</span>
-      <div>
-        <div>Acceso Residente</div>
-        <div style="font-size:11px;font-weight:400;opacity:.8;margin-top:2px">Consulta tu estado de cuenta y pagos</div>
-      </div>
+    <div class="login-sep">¿Usuario Nuevo?</div>
+    <button class="btn-registrarse" onclick="abrirRegistro()">
+      <span>✨</span> REGISTRARSE
     </button>
   </div>
 </div>
 
-<!-- TABS -->
-<div class="tabs" id="mainTabs" style="display:none">
-  <div class="tab on"  onclick="cambiarTab('cobros',this)">💰 Cobros</div>
-  <div class="tab"     onclick="cambiarTab('resumen',this)">📊 Resumen</div>
-  <div class="tab"     onclick="cambiarTab('registrar',this)">➕ Registrar</div>
-  <div class="tab"     onclick="cambiarTab('config',this)">⚙ Config</div>
+<!-- ══════════════════════════════════════════════ -->
+<!-- PANTALLA 2: VERIFICACIÓN DE CÓDIGO             -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="sc-verificacion">
+  <div class="veri-icon">📧</div>
+  <div class="veri-title">Verifica tu correo</div>
+  <div class="veri-sub">
+    Enviamos un código de 6 dígitos a<br>
+    <span class="veri-email" id="veriEmailLabel">tu@correo.com</span><br>
+    Ingrésalo para activar tu cuenta.
+  </div>
+  <div class="veri-code-wrap">
+    <input class="veri-digit" id="vc0" maxlength="1" inputmode="numeric" oninput="veriNext(this,0)"/>
+    <input class="veri-digit" id="vc1" maxlength="1" inputmode="numeric" oninput="veriNext(this,1)"/>
+    <input class="veri-digit" id="vc2" maxlength="1" inputmode="numeric" oninput="veriNext(this,2)"/>
+    <input class="veri-digit" id="vc3" maxlength="1" inputmode="numeric" oninput="veriNext(this,3)"/>
+    <input class="veri-digit" id="vc4" maxlength="1" inputmode="numeric" oninput="veriNext(this,4)"/>
+    <input class="veri-digit" id="vc5" maxlength="1" inputmode="numeric" oninput="veriNext(this,5)"/>
+  </div>
+  <button class="btn-verificar" onclick="verificarCodigo()">✅ Verificar y Entrar</button>
+  <div id="veriError" style="color:#FCA5A5;font-size:12px;margin-top:10px;display:none"></div>
+  <br>
+  <button class="btn-reenviar" onclick="reenviarCodigo()">Reenviar código</button>
+  <br>
+  <button class="btn-volver-login" onclick="volverLogin()">← Volver al inicio</button>
 </div>
 
-<!-- PANTALLA RESIDENTE -->
-<div id="sc-residente" class="screen" style="display:none;padding:16px">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-    <button onclick="volverBienvenida()" style="padding:6px 12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:var(--muted);border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit">← Volver</button>
-    <div style="font-size:14px;font-weight:800;color:var(--white)">Mi Cuenta</div>
+<!-- ══════════════════════════════════════════════ -->
+<!-- PANTALLA 3: APP PRINCIPAL (post-login)         -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="sc-app">
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="hdr-logo">🏢</div>
+    <div class="hdr-info">
+      <div class="hdr-title" id="appCondoNombre">Condominio</div>
+      <div class="hdr-sub" id="appUserLabel">—</div>
+    </div>
+    <button class="hdr-salir" onclick="cerrarSesion()">Salir</button>
   </div>
-  <div style="margin-bottom:14px">
-    <select id="resBuscaUnidad" class="fi" style="width:100%" onchange="cargarCuentaResidente()">
-      <option value="">— Selecciona tu unidad —</option>
-    </select>
-  </div>
-  <div id="residentePanel"></div>
-</div>
 
-<!-- ═══════ COBROS ═══════ -->
-<div class="screen on" id="sc-cobros">
-  <div class="card">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div class="fg" style="margin:0">
+  <!-- TABS ADMIN -->
+  <div class="tabs" id="tabsAdmin" style="display:none">
+    <div class="tab on" onclick="cambiarTab('cobros',this)">💰 Cobros</div>
+    <div class="tab" onclick="cambiarTab('resumen',this)">📊 Resumen</div>
+    <div class="tab" onclick="cambiarTab('registrar',this)">➕ Registrar</div>
+    <div class="tab" onclick="cambiarTab('egresos',this)">📤 Egresos</div>
+  </div>
+
+  <!-- COBROS (admin) -->
+  <div class="screen on" id="sc-cobros">
+    <div class="card">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="fg" style="margin:0">
+          <label>Período</label>
+          <input class="fi" id="filMes" type="month" onchange="renderCobros()"/>
+        </div>
+        <div class="fg" style="margin:0">
+          <label>Estado</label>
+          <select class="fi" id="filEstado" onchange="renderCobros()">
+            <option value="">Todos</option>
+            <option value="Pendiente">Pendientes</option>
+            <option value="Moroso">Morosos</option>
+            <option value="Pagado">Pagados</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div id="listaCobros"></div>
+  </div>
+
+  <!-- RESUMEN (admin) -->
+  <div class="screen" id="sc-resumen">
+    <div class="kpi-grid" id="kpiGrid"></div>
+    <div id="resumenDetalle"></div>
+  </div>
+
+  <!-- REGISTRAR PAGO (admin) -->
+  <div class="screen" id="sc-registrar">
+    <div class="card">
+      <div class="card-title">➕ Registrar Pago</div>
+      <div class="alerta">💡 Selecciona Block y Depto para registrar el pago.</div>
+      <div class="fg">
         <label>Período</label>
-        <input class="fi" id="filMes" type="month" onchange="renderCobros()"/>
-      </div>
-      <div class="fg" style="margin:0">
-        <label>Estado</label>
-        <select class="fi" id="filEstado" onchange="renderCobros()">
-          <option value="">Todos</option>
-          <option value="Pendiente">Pendientes</option>
-          <option value="Moroso">Morosos</option>
-          <option value="Abono">Abonos</option>
-          <option value="Pagado">Pagados</option>
-        </select>
-      </div>
-    </div>
-  </div>
-  <div id="listaCobros"></div>
-</div>
-
-<!-- ═══════ RESUMEN ═══════ -->
-<div class="screen" id="sc-resumen">
-  <div class="kpi-grid" id="kpiGrid"></div>
-  <div id="resumenDetalle"></div>
-</div>
-
-<!-- ═══════ REGISTRAR PAGO RÁPIDO ═══════ -->
-<div class="screen" id="sc-registrar">
-  <div class="card">
-    <div class="card-title">➕ Registrar Pago</div>
-    <div class="alerta">💡 Selecciona Block y Depto, o busca por nombre del propietario.</div>
-
-    <div class="fg">
-      <label>Período</label>
-      <input class="fi" id="regMes" type="month"/>
-    </div>
-    <div class="fg">
-      <label>Block / Torre</label>
-      <select class="fi" id="regBlock" onchange="llenarDeptos()">
-        <option value="">— Seleccionar Block —</option>
-      </select>
-    </div>
-    <div class="fg">
-      <label>Depto / Unidad</label>
-      <select class="fi" id="regDepto" onchange="precargarCobro()">
-        <option value="">— Seleccionar Depto —</option>
-      </select>
-    </div>
-
-    <div id="regInfo" style="display:none">
-      <div class="divider"></div>
-      <div id="regInfoContent"></div>
-      <div class="divider"></div>
-      <div class="fg">
-        <label>Monto a pagar ($)</label>
-        <input class="fi" id="regMonto" type="number" placeholder="0" style="font-size:20px;font-weight:800;color:var(--gold)"/>
+        <input class="fi" id="regMes" type="month"/>
       </div>
       <div class="fg">
-        <label>Fecha de pago</label>
-        <input class="fi" id="regFecha" type="date"/>
-      </div>
-      <div class="fg">
-        <label>Forma de pago</label>
-        <select class="fi" id="regForma">
-          <option value="Transferencia">🏦 Transferencia</option>
-          <option value="Efectivo">💵 Efectivo</option>
-          <option value="Depósito">🏧 Depósito</option>
-          <option value="Cheque">📄 Cheque</option>
+        <label>Block / Torre</label>
+        <select class="fi" id="regBlock" onchange="llenarDeptos()">
+          <option value="">— Seleccionar Block —</option>
         </select>
       </div>
       <div class="fg">
-        <label>N° Referencia / Comprobante</label>
-        <input class="fi" id="regRef" type="text" placeholder="Ej: 12345678"/>
+        <label>Depto / Unidad</label>
+        <select class="fi" id="regDepto" onchange="precargarCobro()">
+          <option value="">— Seleccionar Depto —</option>
+        </select>
+      </div>
+      <div id="regInfo" style="display:none">
+        <div class="divider"></div>
+        <div id="regInfoContent"></div>
+        <div class="divider"></div>
+        <div class="fg">
+          <label>Monto ($)</label>
+          <input class="fi" id="regMonto" type="number" placeholder="0" style="font-size:20px;font-weight:800;color:var(--ok)"/>
+        </div>
+        <div class="fg">
+          <label>Fecha de pago</label>
+          <input class="fi" id="regFecha" type="date"/>
+        </div>
+        <div class="fg">
+          <label>Forma de pago</label>
+          <select class="fi" id="regForma">
+            <option value="Transferencia">🏦 Transferencia</option>
+            <option value="Efectivo">💵 Efectivo</option>
+            <option value="Depósito">🏧 Depósito</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>N° Referencia</label>
+          <input class="fi" id="regRef" type="text" placeholder="Ej: 12345678"/>
+        </div>
+        <button class="btn btn-green" onclick="confirmarPagoRapido()">✅ Confirmar Pago</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EGRESOS (admin) -->
+  <div class="screen" id="sc-egresos">
+    <div class="card">
+      <div class="card-title">📤 Registrar Egreso</div>
+      <div class="fg">
+        <label>Fecha</label>
+        <input class="fi" id="egFecha" type="date"/>
       </div>
       <div class="fg">
-        <label>Observaciones (opcional)</label>
-        <input class="fi" id="regObs" type="text" placeholder="Ej: Pago parcial, deuda pendiente..."/>
+        <label>Categoría</label>
+        <select class="fi" id="egCat">
+          <option value="Mantención">🔧 Mantención</option>
+          <option value="Limpieza">🧹 Limpieza</option>
+          <option value="Servicios Básicos">💡 Servicios Básicos</option>
+          <option value="Administración">📋 Administración</option>
+          <option value="Seguridad">🔐 Seguridad</option>
+          <option value="Fondo Reserva">🏦 Fondo Reserva</option>
+          <option value="Otro">📌 Otro</option>
+        </select>
       </div>
-      <button class="btn btn-gold" onclick="confirmarPagoRapido()">✅ Confirmar y Guardar Pago</button>
+      <div class="fg">
+        <label>Descripción</label>
+        <input class="fi" id="egDesc" type="text" placeholder="Ej: Cambio de ampolleta pasillo..."/>
+      </div>
+      <div class="fg">
+        <label>Monto ($)</label>
+        <input class="fi" id="egMonto" type="number" placeholder="0" style="font-size:18px;font-weight:800;color:var(--danger)"/>
+      </div>
+      <div class="fg">
+        <label>N° Factura / Boleta (opcional)</label>
+        <input class="fi" id="egRef" type="text" placeholder="Ej: F-12345"/>
+      </div>
+      <button class="btn btn-green" onclick="guardarEgreso()">💾 Guardar Egreso</button>
     </div>
+    <div id="listaEgresos"></div>
+  </div>
+
+  <!-- PANEL RESIDENTE (post-login como residente) -->
+  <div class="screen" id="sc-residente">
+    <div id="residenteContent"></div>
   </div>
 </div>
 
-<!-- ═══════ CONFIG ═══════ -->
-<div class="screen" id="sc-config">
-  <div class="card">
-    <div class="card-title">🏢 Empresa activa</div>
-    <div id="cfgEmpCards"></div>
-    <div style="display:none">
-      <input id="cfgEmpId" type="number" value="2"/>
-      <input id="cfgNombre" type="text"/>
-    </div>
-    <button class="btn btn-gold" onclick="guardarConfig()" style="margin-bottom:10px">💾 Guardar y recargar datos</button>
-    <button class="btn btn-outline btn-sm" onclick="debugLS()" style="width:auto">🔍 Diagnóstico localStorage</button>
-  </div>
-
-  <div class="card" id="debugCard" style="display:none">
-    <div class="card-title">🔍 Diagnóstico</div>
-    <div id="debugContent" style="font-size:11px;font-family:monospace;line-height:2;color:var(--muted)"></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">ℹ️ Información</div>
-    <div style="font-size:12px;color:var(--muted);line-height:1.8">
-      Esta app <strong style="color:var(--text)">comparte datos con el ERP</strong> via localStorage del navegador.<br><br>
-      Deben estar en el <strong style="color:var(--gold)">mismo navegador y dominio</strong> (GitHub Pages).<br><br>
-      Pasos:<br>
-      1. Abre el ERP → Condominio<br>
-      2. Genera cobros del mes<br>
-      3. Vuelve aquí y recarga
-    </div>
-  </div>
-</div>
-
-<!-- ═══════ SHEET: DETALLE COBRO ═══════ -->
+<!-- SHEETS -->
 <div class="overlay" id="overlayDetalle">
   <div class="sheet">
     <div class="sheet-handle"></div>
@@ -311,16 +368,15 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
   </div>
 </div>
 
-<!-- ═══════ SHEET: PAGO DESDE COBRO ═══════ -->
 <div class="overlay" id="overlayPago">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">💰 Registrar Pago</div>
     <div class="sheet-sub" id="pagoSub">—</div>
-    <div style="background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px;line-height:2" id="pagoResumen"></div>
+    <div style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px;line-height:2" id="pagoResumen"></div>
     <div class="fg">
       <label>Monto recibido ($)</label>
-      <input class="fi" id="pagoMonto" type="number" placeholder="0" style="font-size:20px;font-weight:800;color:var(--gold)"/>
+      <input class="fi" id="pagoMonto" type="number" placeholder="0" style="font-size:20px;font-weight:800;color:var(--ok)"/>
     </div>
     <div class="fg">
       <label>Fecha</label>
@@ -332,777 +388,549 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
         <option value="Transferencia">🏦 Transferencia</option>
         <option value="Efectivo">💵 Efectivo</option>
         <option value="Depósito">🏧 Depósito</option>
-        <option value="Cheque">📄 Cheque</option>
       </select>
     </div>
     <div class="fg">
       <label>N° Referencia</label>
       <input class="fi" id="pagoRef" type="text" placeholder="Ej: 12345678"/>
     </div>
-    <div style="display:flex;gap:8px;margin-top:6px">
-      <button class="btn btn-gold" onclick="confirmarPago()" style="flex:2">✅ Confirmar</button>
-      <button class="btn btn-outline" onclick="cerrar('overlayPago')" style="flex:1">Cancelar</button>
-    </div>
+    <button class="btn btn-green" onclick="confirmarPago()" style="margin-bottom:10px">✅ Confirmar Pago</button>
+    <button class="btn btn-outline" onclick="cerrar('overlayPago')">Cancelar</button>
   </div>
 </div>
 
-<!-- ═══════ SHEET: COMPROBANTE ═══════ -->
-<div class="overlay" id="overlayComp">
-  <div class="sheet">
-    <div class="sheet-handle"></div>
-    <div style="text-align:center;margin-bottom:14px">
-      <div style="font-size:48px">✅</div>
-      <div style="font-size:17px;font-weight:900;margin-top:6px">¡Pago registrado!</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:4px" id="compSub">—</div>
-    </div>
-    <div style="background:var(--surf2);border-radius:12px;padding:16px;margin-bottom:16px;font-size:13px" id="compDetalle"></div>
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <button class="btn btn-wa" id="btnWA" onclick="enviarWA()">📱 Enviar comprobante por WhatsApp</button>
-      <button class="btn btn-outline btn-sm" onclick="cerrar('overlayComp')">Cerrar</button>
-    </div>
-  </div>
-</div>
-
+<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<script>
+<script type="module">
 // ══════════════════════════════════════════
-// ESTADO GLOBAL
+// FIREBASE CONFIG
 // ══════════════════════════════════════════
-// ── CONDO_ID — lee mss_condominio_actual ──
-let EMP_ID = (()=>{
-  try{
-    const raw = localStorage.getItem('mss_condominio_actual') || localStorage.getItem('mss_empresa_actual');
-    const o = raw ? JSON.parse(raw) : null;
-    return (o && o.id) ? o.id : 'condo_1';
-  }catch(e){ return 'condo_1'; }
-})();
-let CFG = {};
-let COBROS = [];
-let UNIDADES = [];
-let _pagoId = null;
-let _waMsg = '';
-let _waTel = '';
+const FB_CFG={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
+
+let _app,_auth,_db,_fbM,_user;
+let COBROS=[],UNIDADES=[],EGRESOS=[],CFG={};
+let EMP_ID='condo_1',_TIPO_ACCESO='admin',_COND_NOMBRE='Condominio';
+let _veriCode=null,_veriEmail=null,_pendingTipo='admin';
+
+const HOY=new Date().toISOString().split('T')[0];
+const MES=HOY.substring(0,7);
+const clp=n=>'$'+(Math.round(n||0)).toLocaleString('es-CL');
+const df=d=>{try{return new Date((d||HOY)+'T12:00:00').toLocaleDateString('es-CL');}catch(e){return d||'—';}};
 
 // ══════════════════════════════════════════
-// CONDOMINIOS — solo el mundo de condominios
-// Se leen desde localStorage (guardados por index.html)
+// INIT — verificar sesión existente
 // ══════════════════════════════════════════
-function cargarCondominiosDisp(){
+async function init(){
   try{
-    const raw = localStorage.getItem('mss_condominios_v1');
-    if(raw){
-      const arr = JSON.parse(raw);
-      if(arr.length) return arr;
-    }
-  }catch(e){}
-  // Default: Pioneros 2
-  return [{id:'condo_1', nombre:'Condominio Pioneros 2', rut:'65.184.252-2', icon:'🏢', color:'#10B981', tipo:'condominio'}];
+    const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    _fbM=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    _app=getApps().length?getApps()[0]:initializeApp(FB_CFG);
+    _auth=fa.getAuth(_app);
+    _db=_fbM.getFirestore(_app);
+    // Si ya hay sesión activa, ir directo a la app
+    fa.onAuthStateChanged(_auth,async user=>{
+      if(user){
+        _user=user;
+        const tipo=sessionStorage.getItem('mss_movil_tipo')||'admin';
+        await entrarApp(tipo);
+      }
+      // si no hay sesión, mostrar login (ya visible por defecto)
+    });
+  }catch(e){console.error('Firebase init:',e);}
 }
-const EMPRESAS = cargarCondominiosDisp();
 
-function renderEmpCards(containerId){
-  const lista = document.getElementById(containerId);
-  if(!lista) return;
-  lista.innerHTML = EMPRESAS.map(e=>`
-    <div class="emp-card ${String(EMP_ID)===String(e.id)?'activa':''}" onclick="elegirEmpresa('${e.id}')">
-      <div class="emp-icon" style="background:${e.color}22;color:${e.color}">${e.icon}</div>
-      <div class="emp-info">
-        <div class="emp-nombre">${e.nombre}</div>
-        <div class="emp-rut">${e.rut}</div>
+// ══════════════════════════════════════════
+// LOGIN
+// ══════════════════════════════════════════
+let _tipoSel='admin';
+window.selTipo=function(tipo){
+  _tipoSel=tipo;
+  document.getElementById('btnTipoAdmin').classList.toggle('sel',tipo==='admin');
+  document.getElementById('btnTipoRes').classList.toggle('sel',tipo==='residente');
+};
+// Seleccionar admin por defecto
+selTipo('admin');
+
+window.doLogin=async function(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  const errDiv=document.getElementById('loginError');
+  const btn=document.getElementById('btnIngresar');
+  errDiv.style.display='none';
+  if(!email||!pass){errDiv.textContent='Ingresa tu correo y contraseña.';errDiv.style.display='block';return;}
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';
+  try{
+    const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const cred=await fa.signInWithEmailAndPassword(_auth,email,pass);
+    _user=cred.user;
+    sessionStorage.setItem('mss_movil_tipo',_tipoSel);
+    await entrarApp(_tipoSel);
+  }catch(e){
+    const msg={
+      'auth/user-not-found':'Correo no registrado en el sistema.',
+      'auth/wrong-password':'Contraseña incorrecta.',
+      'auth/invalid-email':'Correo inválido.',
+      'auth/too-many-requests':'Demasiados intentos. Espera unos minutos.',
+      'auth/invalid-credential':'Correo o contraseña incorrectos.',
+    }[e.code]||'Error al iniciar sesión. Intenta de nuevo.';
+    errDiv.textContent=msg;errDiv.style.display='block';
+  }finally{
+    btn.disabled=false;btn.innerHTML='INGRESAR';
+  }
+};
+
+// ══════════════════════════════════════════
+// REGISTRO / AUTO-REGISTRO
+// ══════════════════════════════════════════
+window.abrirRegistro=async function(){
+  const email=prompt('Ingresa tu correo electrónico registrado en el condominio:');
+  if(!email||!email.includes('@'))return;
+  // Verificar si el correo existe en las fichas de unidades en Firebase
+  try{
+    toast('🔍 Verificando tu correo...');
+    const condoSnap=await _fbM.getDocs(_fbM.collection(_db,'condominios/'+EMP_ID+'/unidades'));
+    let unidadMatch=null;
+    condoSnap.forEach(d=>{
+      const u=d.data();
+      if(u.email&&u.email.toLowerCase()===email.toLowerCase()) unidadMatch={id:d.id,...u};
+    });
+    if(unidadMatch){
+      // Correo encontrado — enviar código de verificación
+      const codigo=Math.floor(100000+Math.random()*900000);
+      _veriCode=String(codigo);
+      _veriEmail=email;
+      _pendingTipo=_tipoSel;
+      // Guardar código en Firestore con TTL (5 min)
+      await _fbM.setDoc(_fbM.doc(_db,'condominios/'+EMP_ID+'/verificaciones/'+email.replace('@','_').replace('.','_')),{
+        codigo:_veriCode,unidadId:unidadMatch.id,email,ts:Date.now(),expira:Date.now()+300000
+      });
+      // Enviar email con código (via Firebase Extensions o simplemente mostrar para prueba)
+      document.getElementById('sc-login').style.display='none';
+      document.getElementById('sc-verificacion').style.display='block';
+      document.getElementById('veriEmailLabel').textContent=email;
+      document.getElementById('vc0').focus();
+      toast('📧 Código enviado a '+email);
+      // En producción conectar Firebase Email Extension; en desarrollo mostrar código
+      console.log('🔑 Código de verificación:',_veriCode);
+      alert('📧 Código de verificación enviado a: '+email+'\n\n(Desarrollo: el código es '+_veriCode+')');
+    }else{
+      alert('❌ Este correo no está registrado en las fichas del condominio.\n\nContacta al administrador para que agregue tu email a tu ficha de unidad.');
+    }
+  }catch(e){
+    alert('Error al verificar. Intenta de nuevo.');
+    console.error(e);
+  }
+};
+
+window.veriNext=function(el,idx){
+  el.value=el.value.replace(/\D/g,'');
+  if(el.value&&idx<5)document.getElementById('vc'+(idx+1)).focus();
+  if(idx===5)verificarCodigo();
+};
+
+window.verificarCodigo=async function(){
+  const ingresado=[0,1,2,3,4,5].map(i=>document.getElementById('vc'+i).value).join('');
+  const errDiv=document.getElementById('veriError');
+  if(ingresado.length<6){errDiv.textContent='Ingresa los 6 dígitos.';errDiv.style.display='block';return;}
+  if(ingresado===_veriCode){
+    // Código correcto — crear cuenta Firebase Auth
+    try{
+      const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+      const nuevaPass=prompt('¡Correo verificado! ✅\n\nCrea tu contraseña para futuros accesos (mín. 6 caracteres):');
+      if(!nuevaPass||nuevaPass.length<6){alert('La contraseña debe tener al menos 6 caracteres.');return;}
+      // Registrar usuario en Firebase Auth
+      const cred=await fa.createUserWithEmailAndPassword(_auth,_veriEmail,nuevaPass);
+      _user=cred.user;
+      // Guardar perfil en Firestore
+      await _fbM.setDoc(_fbM.doc(_db,'usuarios/'+cred.user.uid),{
+        email:_veriEmail,rol:'residente',condominios:[EMP_ID],tipo:'condominio',creado:Date.now()
+      });
+      sessionStorage.setItem('mss_movil_tipo',_pendingTipo);
+      toast('✅ ¡Cuenta creada! Bienvenida/o.');
+      document.getElementById('sc-verificacion').style.display='none';
+      await entrarApp(_pendingTipo);
+    }catch(e){
+      if(e.code==='auth/email-already-in-use'){
+        // Ya existe — solo hacer login
+        const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+        const pass=prompt('Este correo ya tiene cuenta. Ingresa tu contraseña:');
+        if(pass){
+          try{
+            const cred=await fa.signInWithEmailAndPassword(_auth,_veriEmail,pass);
+            _user=cred.user;
+            sessionStorage.setItem('mss_movil_tipo',_pendingTipo);
+            document.getElementById('sc-verificacion').style.display='none';
+            await entrarApp(_pendingTipo);
+          }catch(e2){alert('Contraseña incorrecta.');}
+        }
+      }else{alert('Error al crear cuenta: '+e.message);}
+    }
+  }else{
+    errDiv.textContent='Código incorrecto. Verifica e intenta de nuevo.';errDiv.style.display='block';
+    [0,1,2,3,4,5].forEach(i=>{document.getElementById('vc'+i).value='';});
+    document.getElementById('vc0').focus();
+  }
+};
+
+window.reenviarCodigo=function(){
+  if(_veriEmail)abrirRegistro();
+};
+window.volverLogin=function(){
+  document.getElementById('sc-verificacion').style.display='none';
+  document.getElementById('sc-login').style.display='flex';
+};
+
+// ══════════════════════════════════════════
+// ENTRAR A LA APP
+// ══════════════════════════════════════════
+async function entrarApp(tipo){
+  _TIPO_ACCESO=tipo;
+  document.getElementById('sc-login').style.display='none';
+  document.getElementById('sc-verificacion').style.display='none';
+  document.getElementById('sc-app').style.display='flex';
+  document.getElementById('sc-app').style.flexDirection='column';
+  document.getElementById('appUserLabel').textContent=(tipo==='admin'?'👷 Administrador':'🏠 Residente')+' · '+(_user.email||'');
+  // Cargar datos
+  await cargarDatos();
+  if(tipo==='admin'){
+    document.getElementById('tabsAdmin').style.display='flex';
+    document.getElementById('sc-cobros').classList.add('on');
+    renderCobros();
+  }else{
+    document.getElementById('tabsAdmin').style.display='none';
+    // Solo vista residente
+    document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('on');});
+    document.getElementById('sc-residente').classList.add('on');
+    renderResidente();
+  }
+}
+
+window.cerrarSesion=async function(){
+  if(!confirm('¿Cerrar sesión?'))return;
+  try{
+    const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    await fa.signOut(_auth);
+  }catch(e){}
+  sessionStorage.clear();
+  document.getElementById('sc-app').style.display='none';
+  document.getElementById('sc-login').style.display='flex';
+  COBROS=[];UNIDADES=[];EGRESOS=[];
+};
+
+// ══════════════════════════════════════════
+// CARGAR DATOS FIREBASE
+// ══════════════════════════════════════════
+async function cargarDatos(){
+  if(!_db)return;
+  try{
+    const ep='condominios/'+EMP_ID;
+    const uSnap=await _fbM.getDocs(_fbM.collection(_db,ep+'/unidades'));
+    UNIDADES=[];uSnap.forEach(d=>UNIDADES.push({id:d.id,...d.data()}));
+    const coSnap=await _fbM.getDocs(_fbM.collection(_db,ep+'/cobros'));
+    COBROS=[];coSnap.forEach(d=>COBROS.push({id:d.id,...d.data()}));
+    const egSnap=await _fbM.getDocs(_fbM.collection(_db,ep+'/egresos'));
+    EGRESOS=[];egSnap.forEach(d=>EGRESOS.push({id:d.id,...d.data()}));
+    const cfgSnap=await _fbM.getDoc(_fbM.doc(_db,ep+'/config/main'));
+    if(cfgSnap.exists())CFG={...CFG,...cfgSnap.data()};
+    _COND_NOMBRE=CFG.nombre||'Condominio Pioneros 2';
+    document.getElementById('appCondoNombre').textContent=_COND_NOMBRE;
+    // Tiempo real cobros
+    _fbM.onSnapshot(_fbM.collection(_db,ep+'/cobros'),snap=>{
+      COBROS=[];snap.forEach(d=>COBROS.push({id:d.id,...d.data()}));
+      if(_TIPO_ACCESO==='admin'){renderCobros();renderResumen();}
+      else renderResidente();
+    });
+  }catch(e){console.warn('cargarDatos:',e.message);}
+  // Fallback localStorage
+  if(!UNIDADES.length){
+    try{const r=localStorage.getItem('mss_ccondo_1_u');if(r)UNIDADES=JSON.parse(r);}catch(e){}
+  }
+  if(!COBROS.length){
+    try{const r=localStorage.getItem('mss_ccondo_1_co');if(r)COBROS=JSON.parse(r);}catch(e){}
+  }
+}
+
+// ══════════════════════════════════════════
+// RENDER COBROS (admin)
+// ══════════════════════════════════════════
+function renderCobros(){
+  const mes=document.getElementById('filMes')?.value||MES;
+  const est=document.getElementById('filEstado')?.value||'';
+  if(document.getElementById('filMes')&&!document.getElementById('filMes').value)
+    document.getElementById('filMes').value=MES;
+  let lista=COBROS.filter(c=>c.mes===mes||c.mesSinIdentificar||c.mes==='MES POR IDENTIFICAR');
+  if(est)lista=lista.filter(c=>c.estado===est);
+  const div=document.getElementById('listaCobros');
+  if(!COBROS.length){
+    div.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><div>Sin datos del condominio</div><div style="font-size:12px;margin-top:6px">Abre primero MSS-Condominio en este navegador</div></div>';
+    return;
+  }
+  if(!lista.length){
+    div.innerHTML='<div class="empty"><div class="empty-icon">🔍</div><div>Sin cobros para este período</div><div style="font-size:12px;margin-top:6px">Genera los cobros del mes desde MSS-Condominio</div></div>';
+    return;
+  }
+  const EC={Pagado:'badge-ok',Moroso:'badge-danger',Pendiente:'badge-warn',Abono:'badge-info'};
+  div.innerHTML=lista.map(c=>`
+    <div class="cobro-card ${(c.estado||'').toLowerCase()}" onclick="verDetalle('${c.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <div style="font-size:14px;font-weight:800">${c.unidadNum||'?'} — ${c.prop||'—'}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${c.mes==='MES POR IDENTIFICAR'?'⚠ MES POR IDENTIFICAR':c.mes||'—'}</div>
+        </div>
+        <span class="badge ${EC[c.estado]||'badge-info'}">${c.estado||'—'}</span>
       </div>
-      ${EMP_ID===e.id?'<span class="emp-badge">✓ Activa</span>':''}
+      <div style="display:flex;justify-content:space-between;font-size:12px">
+        <span style="color:var(--muted)">Cuota: ${clp(c.gcOrd)}</span>
+        <span style="color:var(--ok);font-weight:700">Pagado: ${clp(c.pagado)}</span>
+        ${c.saldo>0?`<span style="color:var(--danger);font-weight:700">Debe: ${clp(c.saldo)}</span>`:'<span style="color:var(--ok)">✓ Al día</span>'}
+      </div>
+      ${c.saldo>0?`<button onclick="event.stopPropagation();abrirPago('${c.id}')" class="btn btn-green" style="margin-top:10px;padding:10px;font-size:13px">💰 Registrar Pago</button>`:''}
     </div>`).join('');
 }
 
-function abrirSelectorEmp(){
-  renderEmpCards('listaEmpresas');
-  abrir('overlayEmp');
-}
-
-function elegirEmpresa(id){
-  EMP_ID = id;
-  const emp = EMPRESAS.find(e=>e.id===id);
-  const nombre = emp?.nombre||'';
-  localStorage.setItem('mss_condo_movil_cfg', JSON.stringify({empId:EMP_ID, nombre}));
-  localStorage.setItem('mss_condominio_actual', JSON.stringify({id:EMP_ID, nombre}));
-  document.getElementById('hdrEmpBadge').textContent = emp?.icon+' '+nombre.split(' ').slice(0,2).join(' ');
-  document.getElementById('cfgEmpId').value = EMP_ID;
-  document.getElementById('cfgNombre').value = nombre;
-  renderEmpCards('cfgEmpCards');
-  cerrar('overlayEmp');
-  toast('✅ '+nombre);
-  cargarDatos().then(()=>{
-    document.getElementById('sc-bienvenida').style.display='block';
-    document.getElementById('bvCondoNombre').textContent=CFG.nombre||nombre;
-  });
+// ══════════════════════════════════════════
+// RENDER RESUMEN (admin)
+// ══════════════════════════════════════════
+function renderResumen(){
+  const mes=document.getElementById('filMes')?.value||MES;
+  const cobMes=COBROS.filter(c=>c.mes===mes);
+  const recaudado=cobMes.reduce((s,c)=>s+c.pagado,0);
+  const porCobrar=cobMes.reduce((s,c)=>s+c.saldo,0);
+  const pagados=cobMes.filter(c=>c.estado==='Pagado').length;
+  const morosos=cobMes.filter(c=>c.saldo>0).length;
+  const div=document.getElementById('kpiGrid');
+  if(div)div.innerHTML=`
+    <div class="kpi"><div class="kpi-v" style="color:var(--ok)">${clp(recaudado)}</div><div class="kpi-l">Recaudado</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--danger)">${clp(porCobrar)}</div><div class="kpi-l">Por cobrar</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--ok)">${pagados}</div><div class="kpi-l">Pagados</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:${morosos>0?'var(--danger)':'var(--ok)'}">${morosos}</div><div class="kpi-l">Morosos</div></div>`;
 }
 
 // ══════════════════════════════════════════
-// INIT
+// RENDER RESIDENTE (solo su unidad)
 // ══════════════════════════════════════════
-function entrarComoAdmin(){
-  document.getElementById('sc-bienvenida').style.display='none';
-  document.getElementById('mainTabs').style.display='flex';
-  // Mostrar primera pantalla activa
-  document.querySelectorAll('.screen').forEach(s=>s.style.display='none');
-  const sc=document.getElementById('sc-cobros');
-  if(sc){sc.style.display='block';sc.classList.add('on');}
+function renderResidente(){
+  const div=document.getElementById('residenteContent');
+  if(!div)return;
+  // Buscar unidad por email del usuario logueado
+  const miEmail=_user?.email?.toLowerCase()||'';
+  const miUnidad=UNIDADES.find(u=>u.email&&u.email.toLowerCase()===miEmail);
+  if(!miUnidad){
+    div.innerHTML=`<div class="card"><div class="card-title">🏠 Mi Unidad</div>
+      <div class="alerta">Tu correo <strong>${miEmail}</strong> no está vinculado a ninguna unidad.<br><br>Contacta al administrador para que actualice tu ficha.</div>
+      <div class="fg" style="margin-top:12px"><label>O busca tu unidad</label>
+      <select class="fi" id="resSelUnidad" onchange="renderResidenteManual()">
+        <option value="">— Selecciona tu unidad —</option>
+        ${UNIDADES.map(u=>`<option value="${u.id}">${u.torre||''} — ${u.num} ${u.prop&&u.prop!=='(Por completar)'?'('+u.prop+')':''}</option>`).join('')}
+      </select></div>
+      <div id="resManualPanel"></div>
+    </div>`;
+    return;
+  }
+  mostrarPanelResidente(miUnidad);
 }
 
-function entrarComoResidente(){
-  document.getElementById('sc-bienvenida').style.display='none';
-  document.getElementById('mainTabs').style.display='none';
-  document.querySelectorAll('.screen').forEach(s=>{s.style.display='none';s.classList.remove('on');});
-  document.getElementById('sc-residente').style.display='block';
-  // Poblar selector de unidades
-  const sel=document.getElementById('resBuscaUnidad');
-  sel.innerHTML='<option value="">— Selecciona tu unidad —</option>';
-  UNIDADES.filter(u=>u.tipo==='Departamento'||!u.tipo).forEach(u=>{
-    const opt=document.createElement('option');
-    opt.value=u.id;
-    opt.textContent=(u.torre?u.torre+' · ':'')+u.num+(u.prop&&u.prop!=='(Por completar)'?' — '+u.prop:'');
-    sel.appendChild(opt);
-  });
-}
-
-function volverBienvenida(){
-  document.querySelectorAll('.screen').forEach(s=>{s.style.display='none';s.classList.remove('on');});
-  document.getElementById('sc-residente').style.display='none';
-  document.getElementById('mainTabs').style.display='none';
-  document.getElementById('sc-bienvenida').style.display='block';
-}
-
-function cargarCuentaResidente(){
-  const uId=document.getElementById('resBuscaUnidad').value;
-  const panel=document.getElementById('residentePanel');
-  if(!uId){panel.innerHTML='';return;}
-  const u=UNIDADES.find(x=>String(x.id)===String(uId));
-  const historial=COBROS.filter(x=>String(x.unidadId)===String(uId)).sort((a,b)=>String(b.mes).localeCompare(String(a.mes)));
+function mostrarPanelResidente(u){
+  const div=document.getElementById('residenteContent');
+  const historial=COBROS.filter(c=>String(c.unidadId)===String(u.id)).sort((a,b)=>String(b.mes||'').localeCompare(String(a.mes||'')));
   const deuda=historial.filter(x=>x.saldo>0).reduce((s,x)=>s+x.saldo,0);
-  panel.innerHTML=`
-    <div style="background:rgba(26,92,58,0.15);border:1px solid rgba(26,92,58,0.3);border-radius:12px;padding:14px;margin-bottom:14px">
-      <div style="font-size:13px;font-weight:800;color:var(--acc)">Unidad ${u?.num||'?'}${u?.torre?' — '+u.torre:''}</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:3px">${u?.prop||'—'}</div>
-      ${u?.estacionamiento?`<div style="font-size:11px;color:var(--muted)">Estacionamiento: ${u.estacionamiento}</div>`:''}
-      ${u?.bodega?`<div style="font-size:11px;color:var(--muted)">Bodega: ${u.bodega}</div>`:''}
-      <div style="margin-top:10px;display:flex;gap:8px">
-        <div style="flex:1;text-align:center;padding:10px;background:rgba(255,255,255,0.05);border-radius:8px">
-          <div style="font-size:18px;font-weight:900;color:${deuda>0?'var(--danger)':'var(--ok)'}">${clp(deuda)}</div>
-          <div style="font-size:10px;color:var(--muted)">Saldo Total</div>
+  const EC={Pagado:'badge-ok',Moroso:'badge-danger',Pendiente:'badge-warn'};
+  div.innerHTML=`
+    <div class="res-header">
+      <div style="font-size:16px;font-weight:900;color:white;margin-bottom:8px">🏠 ${u.torre||''} — Unidad ${u.num}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.8)">${u.prop||'—'}</div>
+      ${u.rut?`<div style="font-size:11px;color:rgba(255,255,255,.6)">RUT: ${u.rut}</div>`:''}
+      ${u.estacionamiento?`<div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:4px">🚗 Est.: ${u.estacionamiento}</div>`:''}
+      ${u.bodega?`<div style="font-size:11px;color:rgba(255,255,255,.7)">📦 Bodega: ${u.bodega}</div>`:''}
+      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:18px;font-weight:900;color:${deuda>0?'#FCA5A5':'#6EE7B7'}">${clp(deuda)}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.6)">Saldo Total</div>
         </div>
-        <div style="flex:1;text-align:center;padding:10px;background:rgba(255,255,255,0.05);border-radius:8px">
-          <div style="font-size:18px;font-weight:900;color:var(--acc)">${historial.length}</div>
-          <div style="font-size:10px;color:var(--muted)">Registros</div>
+        <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:18px;font-weight:900;color:white">${historial.length}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.6)">Registros</div>
         </div>
       </div>
     </div>
-    <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Historial de Pagos</div>
+    <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Historial de Pagos</div>
     ${historial.length?historial.map(x=>`
-      <div style="padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;margin-bottom:8px">
+      <div class="cobro-card ${(x.estado||'').toLowerCase()}">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div>
-            <div style="font-size:12px;font-weight:700;color:${x.mes==='MES POR IDENTIFICAR'?'var(--warn)':'var(--white)'}">${x.mes==='MES POR IDENTIFICAR'?'⚠ '+x.mes:x.mes}</div>
-            <div style="font-size:10px;color:var(--muted)">${x.estado} · ${x.forma||'—'} · ${x.fechaPago?df(x.fechaPago):'Sin fecha'}</div>
+            <div style="font-size:13px;font-weight:700;color:${x.mes==='MES POR IDENTIFICAR'?'var(--warn)':'var(--text)'}">${x.mes==='MES POR IDENTIFICAR'?'⚠ '+x.mes:x.mes}</div>
+            <div style="font-size:11px;color:var(--muted)">${x.estado} · ${x.forma||'—'} · ${x.fechaPago?df(x.fechaPago):'—'}</div>
           </div>
           <div style="text-align:right">
-            <div style="font-size:13px;font-weight:700;color:var(--ok)">${clp(x.pagado)}</div>
-            ${x.saldo>0?`<div style="font-size:10px;color:var(--danger)">Debe: ${clp(x.saldo)}</div>`:''}
+            <div style="font-size:14px;font-weight:800;color:var(--ok)">${clp(x.pagado)}</div>
+            ${x.saldo>0?`<div style="font-size:11px;color:var(--danger)">Debe: ${clp(x.saldo)}</div>`:''}
           </div>
         </div>
       </div>`).join('')
-    :'<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">Sin registros de pago para esta unidad</div>'}
-  `;
-}
-
-function init(){
-  // Leer config guardada
-  let configGuardada = false;
-  try{
-    const c = JSON.parse(localStorage.getItem('mss_condo_movil_cfg')||'{}');
-    if(c.empId){
-      EMP_ID = c.empId;
-      configGuardada = true;
-    }
-    if(c.nombre) document.getElementById('cfgNombre').value = c.nombre;
-  }catch(e){}
-  document.getElementById('cfgEmpId').value = EMP_ID;
-
-  // Actualizar badge header
-  const emp = EMPRESAS.find(e=>e.id===EMP_ID);
-  document.getElementById('hdrEmpBadge').textContent = (emp?.icon||'🏢')+' '+(emp?.nombre||'Empresa').split(' ').slice(0,2).join(' ');
-  renderEmpCards('cfgEmpCards'); // mostrar tarjetas en pantalla Config
-
-  // Fechas por defecto
-  const hoy = new Date();
-  const mes = hoy.getFullYear()+'-'+String(hoy.getMonth()+1).padStart(2,'0');
-  document.getElementById('filMes').value = mes;
-  document.getElementById('pagoFecha').value = hoy.toISOString().split('T')[0];
-  document.getElementById('regMes').value = mes;
-  document.getElementById('regFecha').value = hoy.toISOString().split('T')[0];
-
-  // Si nunca eligió empresa → mostrar selector automáticamente
-  if(!configGuardada){
-    setTimeout(()=>abrirSelectorEmp(), 400);
-  } else {
-    cargarDatos().then(()=>{
-      // Mostrar pantalla de bienvenida
-      document.getElementById('sc-bienvenida').style.display='block';
-      document.getElementById('bvCondoNombre').textContent=CFG.nombre||EMPRESAS.find(e=>String(e.id)===String(EMP_ID))?.nombre||'Condominio';
-    });
-  }
-}
-
-// ══════════════════════════════════════════
-// CARGAR DATOS DESDE ERP (localStorage)
-// ══════════════════════════════════════════
-// ══════════════════════════════════════════
-// FIREBASE
-// ══════════════════════════════════════════
-let _db=null,_fbReady=false;
-
-async function initFirebase(){
-  if(_fbReady)return;
-  try{
-    const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-    const fb=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-    const FB={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
-    const app=getApps().length?getApps()[0]:initializeApp(FB);
-    const auth=fa.getAuth(app);
-    await new Promise(resolve=>{
-      const unsub=fa.onAuthStateChanged(auth,user=>{
-        unsub();
-        if(!user){window.location.href='MSS-Login.html';}
-        else{window._MSS_USER=user;_db=fb.getFirestore(app);window._fbM=fb;_fbReady=true;resolve();}
-      });
-    });
-  }catch(e){_fbReady=false;}
-}
-
-async function cargarDatos(){
-  await initFirebase();
-  try{
-    const ep='condominios/'+EMP_ID;
-    let cobros=[],unidades=[],cfg={};
-    if(_fbReady){
-      const {getDocs,collection,getDoc,doc,onSnapshot}=window._fbM;
-      const uSnap=await getDocs(collection(_db,ep+'/unidades'));
-      uSnap.forEach(d=>unidades.push({id:d.id,...d.data()}));
-      const coSnap=await getDocs(collection(_db,ep+'/cobros'));
-      coSnap.forEach(d=>cobros.push({id:d.id,...d.data()}));
-      const cfgSnap=await getDoc(doc(_db,ep+'/config/main'));
-      if(cfgSnap.exists())cfg=cfgSnap.data();
-      // Tiempo real — cobros
-      onSnapshot(collection(_db,ep+'/cobros'),snap=>{
-        COBROS=[];snap.forEach(d=>COBROS.push({id:d.id,...d.data()}));
-        renderCobros();renderResumen();
-      });
-    } else {
-      // Fallback localStorage
-      const rawCo=localStorage.getItem('mss_c'+EMP_ID+'_co')||localStorage.getItem('mss_c2_co');
-      const rawU=localStorage.getItem('mss_c'+EMP_ID+'_u')||localStorage.getItem('mss_c2_u');
-      const rawCfg=localStorage.getItem('mss_c'+EMP_ID+'_cfg')||localStorage.getItem('mss_c2_cfg');
-      cobros=rawCo?JSON.parse(rawCo):[];
-      unidades=rawU?JSON.parse(rawU):[];
-      cfg=rawCfg?JSON.parse(rawCfg):{};
-    }
-    COBROS=cobros;UNIDADES=unidades;CFG=cfg;
-    const emp=EMPRESAS.find(e=>e.id===EMP_ID);
-    const nombre=CFG.nombre||emp?.nombre||'Empresa '+EMP_ID;
-    document.getElementById('hdrNombre').textContent=nombre;
-    document.getElementById('hdrSub').textContent=UNIDADES.length+' unidades · '+COBROS.length+' cobros · '+((_fbReady)?'🟢 Nube':'🟡 Local');
-    document.getElementById('hdrEmpBadge').textContent=(emp?.icon||'🏢')+' '+nombre.split(' ').slice(0,2).join(' ');
-    llenarBlocks();renderCobros();renderResumen();
-    if(!COBROS.length&&!UNIDADES.length)toast('⚠ Sin datos — genera cobros en el ERP primero');
-  }catch(e){
-    console.error(e);
-    toast('⚠ Error: '+e.message);
-  }
-}
-
-// ══════════════════════════════════════════
-// HELPERS
-// ══════════════════════════════════════════
-function clp(n){ return '$'+Math.round(n||0).toLocaleString('es-CL'); }
-function df(s){ if(!s)return '—'; const p=s.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
-function fmtMes(m){
-  if(!m) return '—';
-  const N=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  const p = m.split('-');
-  return p.length===2 ? N[parseInt(p[1])-1]+' '+p[0] : m;
-}
-function badgeEstado(e){
-  const map={Pagado:'ok',Abono:'warn',Pendiente:'warn',Moroso:'danger'};
-  return `<span class="badge ${map[e]||'info'}">${e}</span>`;
-}
-
-// ══════════════════════════════════════════
-// TABS
-// ══════════════════════════════════════════
-function cambiarTab(id, el){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
-  el.classList.add('on');
-  document.getElementById('sc-'+id).classList.add('on');
-  if(id==='cobros') renderCobros();
-  if(id==='resumen') renderResumen();
-  if(id==='registrar') llenarBlocks();
-}
-
-// ══════════════════════════════════════════
-// RENDER COBROS
-// ══════════════════════════════════════════
-function renderCobros(){
-  const mesFil    = document.getElementById('filMes').value;
-  const estadoFil = document.getElementById('filEstado').value;
-
-  let lista = COBROS.slice();
-  if(mesFil)    lista = lista.filter(c=>c.mes===mesFil);
-  if(estadoFil) lista = lista.filter(c=>c.estado===estadoFil);
-
-  const div = document.getElementById('listaCobros');
-
-  if(!COBROS.length){
-    div.innerHTML = `<div class="empty">
-      <div class="empty-icon">⚠️</div>
-      <div style="font-size:13px;font-weight:700;margin-bottom:8px">Sin datos del ERP</div>
-      <div style="font-size:12px">Ve a ⚙ Config y verifica el ID de empresa, o abre primero el ERP de Condominio en este navegador.</div>
+    :'<div class="empty" style="padding:20px"><div>Sin registros de pago</div></div>'}
+    <div class="card" style="margin-top:14px">
+      <div class="card-title">📊 Transparencia de Egresos</div>
+      ${EGRESOS.length?EGRESOS.slice(0,5).map(e=>`
+        <div class="row-fin">
+          <div><div style="font-size:12px">${e.desc||e.cat||'—'}</div><div style="font-size:10px;color:var(--muted)">${e.cat||''} · ${df(e.fecha)}</div></div>
+          <div style="font-size:13px;font-weight:700;color:var(--danger)">${clp(e.monto)}</div>
+        </div>`).join('')
+      :'<div style="font-size:12px;color:var(--muted);padding:8px 0">Sin egresos registrados</div>'}
     </div>`;
-    return;
-  }
-
-  if(!lista.length){
-    div.innerHTML = `<div class="empty">
-      <div class="empty-icon">🔍</div>
-      <div style="font-size:13px;font-weight:700;margin-bottom:6px">Sin cobros para ${fmtMes(mesFil)||'este período'}</div>
-      <div style="font-size:12px">En el ERP → Condominio → pestaña "Gastos Comunes" → usa "⚡ Generar Cobros del Mes" para crear los cobros de este período.</div>
-    </div>`;
-    return;
-  }
-
-  // Ordenar: morosos, pendientes, abonos, pagados
-  lista.sort((a,b)=>{
-    const o={Moroso:0,Pendiente:1,Abono:2,Pagado:3};
-    return (o[a.estado]||5)-(o[b.estado]||5);
-  });
-
-  div.innerHTML = lista.map(c=>{
-    const u = UNIDADES.find(x=>x.id===c.unidadId)||{};
-    const cls = c.estado==='Pagado'?'pagado':c.estado==='Moroso'?'moroso':'pendiente';
-    const tel = (u.tel||'').replace(/[^0-9]/g,'');
-    return `<div class="cobro-card ${cls}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
-        <div>
-          <div style="font-size:14px;font-weight:800">${c.unidadNum}${u.torre?' · '+u.torre:''}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px">${c.prop}</div>
-          <div style="font-size:10px;color:var(--gold);margin-top:2px">${fmtMes(c.mes)}</div>
-        </div>
-        ${badgeEstado(c.estado)}
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px;text-align:center">
-        <div style="background:var(--surf);border-radius:8px;padding:7px">
-          <div style="font-size:10px;color:var(--muted)">Total</div>
-          <div style="font-size:12px;font-weight:700">${clp(c.total)}</div>
-        </div>
-        <div style="background:var(--surf);border-radius:8px;padding:7px">
-          <div style="font-size:10px;color:var(--muted)">Pagado</div>
-          <div style="font-size:12px;font-weight:700;color:var(--ok)">${clp(c.pagado)}</div>
-        </div>
-        <div style="background:var(--surf);border-radius:8px;padding:7px">
-          <div style="font-size:10px;color:var(--muted)">Saldo</div>
-          <div style="font-size:12px;font-weight:700;color:${c.saldo>0?'var(--danger)':'var(--ok)'}">${clp(c.saldo)}</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:6px">
-        ${c.estado!=='Pagado'
-          ? `<button class="btn btn-gold btn-sm" onclick="abrirPago('${c.id}')" style="flex:1">💰 Pagar</button>`
-          : `<button class="btn btn-ok btn-sm" onclick="verComp('${c.id}')" style="flex:1">✓ Comprobante</button>`}
-        <button class="btn btn-outline btn-xs" onclick="verDetalle('${c.id}')">🔍</button>
-        ${tel ? `<button class="btn btn-xs btn-wa" onclick="waCobro('${c.id}')">📱</button>` : ''}
-      </div>
-    </div>`;
-  }).join('');
 }
 
-// ══════════════════════════════════════════
-// RENDER RESUMEN
-// ══════════════════════════════════════════
-function renderResumen(){
-  const mesFil = document.getElementById('filMes')?.value||'';
-  let lista = mesFil ? COBROS.filter(c=>c.mes===mesFil) : COBROS;
-
-  const recaudado  = lista.reduce((s,c)=>s+c.pagado,0);
-  const porCobrar  = lista.reduce((s,c)=>s+c.saldo,0);
-  const nPagados   = lista.filter(c=>c.estado==='Pagado').length;
-  const nMorosos   = lista.filter(c=>c.estado==='Moroso').length;
-  const nPendientes= lista.filter(c=>c.estado==='Pendiente').length;
-  const pct = lista.length>0 ? Math.round(nPagados/lista.length*100) : 0;
-
-  document.getElementById('kpiGrid').innerHTML = `
-    <div class="kpi"><div class="kpi-val" style="color:var(--ok)">${clp(recaudado)}</div><div class="kpi-lbl">Recaudado</div></div>
-    <div class="kpi"><div class="kpi-val" style="color:var(--danger)">${clp(porCobrar)}</div><div class="kpi-lbl">Por cobrar</div></div>
-    <div class="kpi"><div class="kpi-val" style="color:var(--ok)">${nPagados}</div><div class="kpi-lbl">Pagados</div></div>
-    <div class="kpi"><div class="kpi-val" style="color:var(--danger)">${nMorosos+nPendientes}</div><div class="kpi-lbl">Pendientes</div></div>`;
-
-  // Barra progreso
-  const morosos = lista.filter(c=>c.saldo>0).sort((a,b)=>b.saldo-a.saldo);
-  document.getElementById('resumenDetalle').innerHTML = `
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-        <span style="font-size:12px;color:var(--muted)">% Recaudación</span>
-        <span style="font-size:13px;font-weight:800;color:${pct>=80?'var(--ok)':'var(--warn)'}">${pct}%</span>
-      </div>
-      <div style="height:8px;background:var(--surf3);border-radius:4px">
-        <div style="width:${pct}%;height:8px;background:${pct>=80?'var(--ok)':'var(--warn)'};border-radius:4px;transition:width .5s"></div>
-      </div>
-    </div>
-    ${morosos.length===0
-      ? `<div class="card" style="text-align:center;padding:20px"><div style="font-size:32px">🎉</div><div style="color:var(--ok);margin-top:6px;font-weight:700">Todos al día</div></div>`
-      : `<div class="card">
-          <div class="card-title">⚠ Con saldo pendiente (${morosos.length})</div>
-          ${morosos.slice(0,10).map(c=>`
-            <div class="row-fin">
-              <div>
-                <div style="font-weight:700;font-size:13px">${c.unidadNum} · ${c.prop.split(' ').slice(0,2).join(' ')}</div>
-                <div style="font-size:10px;color:var(--muted)">${fmtMes(c.mes)} · ${c.estado}</div>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <span style="color:var(--danger);font-weight:700;font-size:13px">${clp(c.saldo)}</span>
-                <button class="btn btn-gold btn-xs" onclick="abrirPago('${c.id}')">Pagar</button>
-              </div>
-            </div>`).join('')}
-          ${morosos.length>10?`<div style="text-align:center;font-size:11px;color:var(--muted);padding-top:8px">...y ${morosos.length-10} más</div>`:''}
-        </div>`}`;
-}
+window.renderResidenteManual=function(){
+  const uId=document.getElementById('resSelUnidad')?.value;
+  if(!uId)return;
+  const u=UNIDADES.find(x=>String(x.id)===String(uId));
+  if(u)mostrarPanelResidente(u);
+};
 
 // ══════════════════════════════════════════
-// REGISTRAR PAGO RÁPIDO (desde pestaña Registrar)
+// PAGO RÁPIDO
 // ══════════════════════════════════════════
 function llenarBlocks(){
-  const torres = [...new Set(UNIDADES.map(u=>u.torre).filter(Boolean))].sort((a,b)=>(parseInt(a.replace(/\D/g,''))||0)-(parseInt(b.replace(/\D/g,''))||0));
-  const sel = document.getElementById('regBlock');
-  if(!sel) return;
-  const cur = sel.value;
-  sel.innerHTML = '<option value="">— Seleccionar Block —</option>'+torres.map(t=>`<option value="${t}"${cur===t?' selected':''}>${t}</option>`).join('');
+  const sel=document.getElementById('regBlock');
+  if(!sel)return;
+  const torres=[...new Set(UNIDADES.map(u=>u.torre).filter(Boolean))].sort();
+  sel.innerHTML='<option value="">— Seleccionar Block —</option>'+torres.map(t=>`<option value="${t}">${t}</option>`).join('');
 }
-
-function llenarDeptos(){
-  const torre = document.getElementById('regBlock').value;
-  const sel = document.getElementById('regDepto');
-  sel.innerHTML = '<option value="">— Seleccionar Depto —</option>';
-  if(!torre) return;
-  const deptos = UNIDADES.filter(u=>u.torre===torre).sort((a,b)=>parseInt(a.num)-parseInt(b.num));
-  sel.innerHTML += deptos.map(u=>`<option value="${u.id}">${u.num} — ${u.prop}</option>`).join('');
+window.llenarDeptos=function(){
+  const block=document.getElementById('regBlock')?.value;
+  const sel=document.getElementById('regDepto');
+  if(!sel)return;
+  const us=UNIDADES.filter(u=>u.torre===block).sort((a,b)=>String(a.num).localeCompare(String(b.num)));
+  sel.innerHTML='<option value="">— Seleccionar Depto —</option>'+us.map(u=>`<option value="${u.id}">${u.num}${u.prop&&u.prop!=='(Por completar)'?' — '+u.prop:''}</option>`).join('');
   document.getElementById('regInfo').style.display='none';
-}
-
-function precargarCobro(){
-  const uId = parseInt(document.getElementById('regDepto').value)||0;
-  const mes = document.getElementById('regMes').value;
-  if(!uId){ document.getElementById('regInfo').style.display='none'; return; }
-
-  const u = UNIDADES.find(x=>x.id===uId);
-  const cobro = COBROS.find(c=>c.unidadId===uId && c.mes===mes);
-  const gcMonto = (u?.gcCustom>0?u.gcCustom:(CFG?.gc||40000));
-
+};
+window.precargarCobro=function(){
+  const uId=document.getElementById('regDepto')?.value;
+  if(!uId){document.getElementById('regInfo').style.display='none';return;}
+  const u=UNIDADES.find(x=>String(x.id)===String(uId));
+  const mes=document.getElementById('regMes')?.value||MES;
+  const cobExist=COBROS.find(c=>String(c.unidadId)===String(uId)&&c.mes===mes);
+  document.getElementById('regInfoContent').innerHTML=`
+    <div style="font-size:13px;font-weight:700">${u?.torre} — Unidad ${u?.num}</div>
+    <div style="font-size:12px;color:var(--muted)">${u?.prop||'—'}</div>
+    ${cobExist?`<div class="alerta" style="margin-top:8px">Saldo pendiente: ${clp(cobExist.saldo)}</div>`:''}`;
+  document.getElementById('regMonto').value=u?.gcCustom||CFG.gc||40000;
+  document.getElementById('regFecha').value=HOY;
   document.getElementById('regInfo').style.display='block';
-  document.getElementById('regMonto').value = cobro ? cobro.saldo : gcMonto;
-
-  document.getElementById('regInfoContent').innerHTML = `
-    <div style="background:var(--surf2);border-radius:10px;padding:12px;margin-bottom:10px">
-      <div style="font-size:10px;color:var(--gold);font-weight:700;margin-bottom:6px">RESIDENTE</div>
-      <div class="row-fin" style="padding:4px 0"><span style="color:var(--muted)">Unidad</span><strong>${u?.torre} ${u?.num}</strong></div>
-      <div class="row-fin" style="padding:4px 0"><span style="color:var(--muted)">Propietario</span><strong>${u?.prop}</strong></div>
-      <div class="row-fin" style="padding:4px 0;border:none"><span style="color:var(--muted)">Teléfono</span><span>${u?.tel||'—'}</span></div>
-    </div>
-    ${cobro ? `
-    <div style="background:${cobro.saldo>0?'rgba(239,68,68,0.07)':'rgba(16,185,129,0.07)'};border-radius:10px;padding:12px;margin-bottom:10px">
-      <div style="font-size:10px;color:var(--gold);font-weight:700;margin-bottom:6px">COBRO ${fmtMes(mes).toUpperCase()}</div>
-      <div class="row-fin" style="padding:4px 0"><span style="color:var(--muted)">Estado actual</span>${badgeEstado(cobro.estado)}</div>
-      <div class="row-fin" style="padding:4px 0"><span style="color:var(--muted)">Total a pagar</span><strong>${clp(cobro.total)}</strong></div>
-      <div class="row-fin" style="padding:4px 0"><span style="color:var(--muted)">Ya pagado</span><strong style="color:var(--ok)">${clp(cobro.pagado)}</strong></div>
-      <div class="row-fin" style="padding:4px 0;border:none"><span style="color:var(--muted)">Saldo pendiente</span><strong style="color:${cobro.saldo>0?'var(--danger)':'var(--ok)'}">${clp(cobro.saldo)}</strong></div>
-    </div>` : `
-    <div class="alerta">⚠ No hay cobro generado para ${fmtMes(mes)}. Se creará uno nuevo al guardar.</div>`}`;
-}
-
-function confirmarPagoRapido(){
-  const uId   = parseInt(document.getElementById('regDepto').value)||0;
-  const mes   = document.getElementById('regMes').value;
-  const monto = parseFloat(document.getElementById('regMonto').value)||0;
-  const fecha = document.getElementById('regFecha').value;
-  const forma = document.getElementById('regForma').value;
-  const ref   = document.getElementById('regRef').value;
-  const obs   = document.getElementById('regObs').value;
-
-  if(!uId)  { toast('⚠ Selecciona una unidad'); return; }
-  if(!mes)  { toast('⚠ Selecciona el período'); return; }
-  if(!monto){ toast('⚠ Ingresa el monto'); return; }
-
-  const u = UNIDADES.find(x=>x.id===uId);
-  let idx = COBROS.findIndex(c=>c.unidadId===uId && c.mes===mes);
-
-  if(idx<0){
-    // Crear cobro nuevo
-    const gcMonto = u?.gcCustom>0?u.gcCustom:(CFG?.gc||40000);
-    const nuevoId = Date.now();
-    COBROS.push({id:nuevoId,mes,unidadId:uId,unidadNum:u?.num||'?',prop:u?.prop||'?',
-      gcOrd:gcMonto,mora:0,total:gcMonto,pagado:0,saldo:gcMonto,
-      estado:'Pendiente',fechaPago:'',ref:'',forma:'',obs:''});
-    idx = COBROS.length-1;
-  }
-
-  const c = COBROS[idx];
-  const pagadoTotal = (c.pagado||0) + monto;
-  const saldo = Math.max(0, c.total - pagadoTotal);
-  const estado = saldo===0?'Pagado':pagadoTotal>0?'Abono':'Pendiente';
-
-  COBROS[idx] = {...c, pagado:pagadoTotal, saldo, estado, fechaPago:fecha, forma, ref, obs};
-  guardarCobros();
-  sincFinanzas(COBROS[idx]);
-
-  _pagoId = COBROS[idx].id;
-  mostrarComprobante(_pagoId);
-  toast('✅ Pago guardado');
-
-  // Limpiar
-  document.getElementById('regDepto').value='';
-  document.getElementById('regInfo').style.display='none';
-}
-
-// ══════════════════════════════════════════
-// PAGO DESDE LISTA DE COBROS
-// ══════════════════════════════════════════
-function abrirPago(id){
-  const c = COBROS.find(x=>String(x.id)===String(id)); if(!c)return;
-  _pagoId = id;
-  const u = UNIDADES.find(x=>x.id===c.unidadId)||{};
-  document.getElementById('pagoSub').textContent = c.unidadNum+' · '+c.prop+' · '+fmtMes(c.mes);
-  document.getElementById('pagoMonto').value = c.saldo||c.total;
-  document.getElementById('pagoFecha').value = new Date().toISOString().split('T')[0];
-  document.getElementById('pagoRef').value = '';
-  document.getElementById('pagoResumen').innerHTML = `
-    <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:var(--muted)">Total cobro</span><strong>${clp(c.total)}</strong></div>
-    <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:var(--muted)">Ya pagado</span><strong style="color:var(--ok)">${clp(c.pagado)}</strong></div>
-    <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Saldo pendiente</span><strong style="color:var(--danger)">${clp(c.saldo)}</strong></div>`;
-  abrir('overlayPago');
-}
-
-function confirmarPago(){
-  const c = COBROS.find(x=>String(x.id)===String(_pagoId)); if(!c)return;
-  const monto = parseFloat(document.getElementById('pagoMonto').value)||0;
-  const fecha = document.getElementById('pagoFecha').value;
-  const forma = document.getElementById('pagoForma').value;
-  const ref   = document.getElementById('pagoRef').value;
-  if(!monto){ toast('⚠ Ingresa el monto'); return; }
-
-  const pagadoTotal = (c.pagado||0)+monto;
-  const saldo = Math.max(0,c.total-pagadoTotal);
-  const estado = saldo===0?'Pagado':pagadoTotal>0?'Abono':'Pendiente';
-  const idx = COBROS.findIndex(x=>String(x.id)===String(_pagoId));
-  COBROS[idx] = {...c, pagado:pagadoTotal, saldo, estado, fechaPago:fecha, forma, ref};
-  guardarCobros();
-  sincFinanzas(COBROS[idx]);
-  cerrar('overlayPago');
-  mostrarComprobante(_pagoId);
-  renderCobros();
-  renderResumen();
-}
-
-// ══════════════════════════════════════════
-// VER DETALLE
-// ══════════════════════════════════════════
-function verDetalle(id){
-  const c = COBROS.find(x=>String(x.id)===String(id)); if(!c)return;
-  const u = UNIDADES.find(x=>x.id===c.unidadId)||{};
-  document.getElementById('detTitulo').textContent = 'Unidad '+c.unidadNum+(u.torre?' · '+u.torre:'');
-  document.getElementById('detSub').textContent = c.prop+' · '+fmtMes(c.mes);
-  document.getElementById('detContent').innerHTML = `
-    <div style="margin-bottom:14px">
-      ${[
-        ['Propietario',c.prop],['Torre/Block',u.torre||'—'],['Teléfono',u.tel||'—'],
-        ['Email',u.email||'—'],['Estado',badgeEstado(c.estado)],
-        ['GC Ordinario',clp(c.gcOrd)],['Mora',clp(c.mora||0)],
-        ['Total',`<strong>${clp(c.total)}</strong>`],
-        ['Pagado',`<span style="color:var(--ok);font-weight:700">${clp(c.pagado)}</span>`],
-        ['Saldo',`<span style="color:${c.saldo>0?'var(--danger)':'var(--ok)'};font-weight:700">${clp(c.saldo)}</span>`],
-        ['Fecha pago',df(c.fechaPago)],['Forma',c.forma||'—'],['Ref',c.ref||'—'],
-      ].map(([l,v])=>`<div class="row-fin"><span style="color:var(--muted)">${l}</span><span>${v}</span></div>`).join('')}
-    </div>
-    ${c.estado!=='Pagado'
-      ?`<button class="btn btn-gold" onclick="cerrar('overlayDetalle');abrirPago('${c.id}')">💰 Registrar Pago</button>`
-      :`<button class="btn btn-ok" onclick="cerrar('overlayDetalle');mostrarComprobante('${c.id}')">✓ Ver Comprobante</button>`}`;
-  abrir('overlayDetalle');
-}
-
-// ══════════════════════════════════════════
-// COMPROBANTE + WHATSAPP
-// ══════════════════════════════════════════
-function verComp(id){ mostrarComprobante(id); }
-
-function mostrarComprobante(id){
-  const c = COBROS.find(x=>String(x.id)===String(id)); if(!c)return;
-  const u = UNIDADES.find(x=>x.id===c.unidadId)||{};
-  const tel = (u.tel||'').replace(/[^0-9]/g,'');
-  _waTel = tel ? '56'+tel.replace(/^0+/,'').replace(/^56/,'') : '';
-  _waMsg = encodeURIComponent(
-    '✅ *Comprobante de Pago GC*\n'
-    +'*'+(CFG.nombre||'Condominio Pioneros 2')+'*\n\n'
-    +'🏠 *Unidad:* '+c.unidadNum+(u.torre?' · '+u.torre:'')+'\n'
-    +'👤 *Propietario:* '+c.prop+'\n'
-    +'📅 *Período:* '+fmtMes(c.mes)+'\n'
-    +'💰 *Monto pagado:* '+clp(c.pagado)+'\n'
-    +(c.ref?'🔖 *Ref:* '+c.ref+'\n':'')
-    +(c.forma?'💳 *Forma:* '+c.forma+'\n':'')
-    +(c.saldo>0?'⚠ *Saldo pendiente:* '+clp(c.saldo)+'\n':'✅ *Pagado en su totalidad*\n')
-    +'\nGracias por su pago.\n_'+(CFG.admin||'Administración')+' · '+(CFG.tel||'')+'_'
-  );
-
-  document.getElementById('compSub').textContent = c.unidadNum+' · '+c.prop;
-  document.getElementById('compDetalle').innerHTML = `
-    ${[
-      ['Unidad', c.unidadNum+(u.torre?' · '+u.torre:'')],
-      ['Propietario', c.prop],
-      ['Período', fmtMes(c.mes)],
-      ['Monto pagado', `<strong style="color:var(--ok)">${clp(c.pagado)}</strong>`],
-      ['Forma de pago', c.forma||'—'],
-      ...(c.ref?[['Referencia',c.ref]]:[]),
-      ...(c.saldo>0?[['Saldo pendiente',`<strong style="color:var(--danger)">${clp(c.saldo)}</strong>`]]:[]),
-    ].map(([l,v])=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">${l}</span><span>${v}</span></div>`).join('')}
-    ${c.saldo===0?`<div style="text-align:center;margin-top:10px;color:var(--ok);font-weight:700;font-size:13px">✅ Pagado en su totalidad</div>`:''}`;
-
-  const btnWA = document.getElementById('btnWA');
-  btnWA.style.display = _waTel ? 'flex' : 'none';
-  abrir('overlayComp');
-}
-
-function enviarWA(){
-  if(_waTel) window.open('https://wa.me/'+_waTel+'?text='+_waMsg,'_blank');
-  else toast('⚠ Sin teléfono registrado');
-}
-
-function waCobro(id){
-  const c = COBROS.find(x=>String(x.id)===String(id)); if(!c)return;
-  const u = UNIDADES.find(x=>x.id===c.unidadId)||{};
-  const tel = (u.tel||'').replace(/[^0-9]/g,'');
-  if(!tel){ toast('⚠ Sin teléfono en esta unidad'); return; }
-  const num = '56'+tel.replace(/^0+/,'').replace(/^56/,'');
-  const msg = encodeURIComponent(
-    '🏢 *'+( CFG.nombre||'Condominio')+' — Aviso GC*\n'
-    +'Estimado/a *'+c.prop+'*, le recordamos:\n\n'
-    +'🏠 Unidad: '+c.unidadNum+(u.torre?' · '+u.torre:'')+'\n'
-    +'📅 Período: '+fmtMes(c.mes)+'\n'
-    +(c.saldo>0?'⚠ Saldo pendiente: *'+clp(c.saldo)+'*\n':'✅ Pago al día\n')
-    +'\n_'+(CFG.admin||'Administración')+'_'
-  );
-  window.open('https://wa.me/'+num+'?text='+msg,'_blank');
-}
-
-// ══════════════════════════════════════════
-// GUARDAR EN ERP + SINCRONIZAR FINANZAS
-// ══════════════════════════════════════════
-async function guardarCobros(){
+};
+window.confirmarPagoRapido=async function(){
+  const uId=document.getElementById('regDepto')?.value;
+  const monto=parseFloat(document.getElementById('regMonto')?.value)||0;
+  const fecha=document.getElementById('regFecha')?.value||HOY;
+  const forma=document.getElementById('regForma')?.value||'Transferencia';
+  const ref=document.getElementById('regRef')?.value||'';
+  const mes=document.getElementById('regMes')?.value||MES;
+  if(!uId||!monto){toast('⚠ Completa todos los campos');return;}
+  const u=UNIDADES.find(x=>String(x.id)===String(uId));
+  const gcOrd=u?.gcCustom||CFG.gc||40000;
+  const obj={mes,unidadId:uId,unidadNum:u?.num||'?',prop:u?.prop||'?',gcOrd,mora:0,total:gcOrd,pagado:monto,saldo:Math.max(0,gcOrd-monto),estado:monto>=gcOrd?'Pagado':'Abono',fechaPago:fecha,forma,ref,obs:'Registrado desde CondoMóvil'};
   try{
-    // localStorage respaldo
-    localStorage.setItem('mss_c'+String(EMP_ID)+'_co', JSON.stringify(COBROS));
-    localStorage.setItem('mss_condominio_actual', JSON.stringify({id:EMP_ID}));
-    // Firebase
-    if(_fbReady&&_db){
-      const {writeBatch,doc}=window._fbM;
-      const batch=writeBatch(_db);
-      COBROS.forEach(c=>batch.set(doc(_db,'condominios/'+EMP_ID+'/cobros/'+String(c.id)),{...c}));
-      await batch.commit();
-    }
-    toast('✅ Guardado en nube');
-  }catch(e){toast('⚠ Error al guardar: '+e.message);}
-}
+    const newId='cm_'+Date.now();
+    await _fbM.setDoc(_fbM.doc(_db,'condominios/'+EMP_ID+'/cobros/'+newId),{id:newId,...obj});
+    toast('✅ Pago registrado correctamente');
+    document.getElementById('regInfo').style.display='none';
+    document.getElementById('regDepto').value='';
+    document.getElementById('regBlock').value='';
+    cambiarTab('cobros',document.querySelector('.tab.on'));
+  }catch(e){toast('❌ Error al guardar: '+e.message);}
+};
 
-function sincFinanzas(cobro){
+// ══════════════════════════════════════════
+// EGRESO
+// ══════════════════════════════════════════
+window.guardarEgreso=async function(){
+  const fecha=document.getElementById('egFecha')?.value||HOY;
+  const cat=document.getElementById('egCat')?.value||'Otro';
+  const desc=document.getElementById('egDesc')?.value.trim()||'';
+  const monto=parseFloat(document.getElementById('egMonto')?.value)||0;
+  const ref=document.getElementById('egRef')?.value.trim()||'';
+  if(!monto){toast('⚠ Ingresa el monto');return;}
   try{
-    const key = 'mss_fin_condo_'+String(EMP_ID)+'_movs';
-    let movs = [];
-    try{ movs = JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){}
-    const ref = 'cond_'+cobro.unidadId+'_'+cobro.mes;
-    movs = movs.filter(m=>m.ref!==ref);
-    movs.push({
-      id:'cond_'+Date.now(),
-      fecha: cobro.fechaPago||new Date().toISOString().split('T')[0],
-      desc: 'GC '+fmtMes(cobro.mes)+' — Unidad '+cobro.unidadNum+' ('+cobro.prop+')',
-      monto: cobro.pagado, tipo:'i', cat:'Gastos Comunes',
-      forma: cobro.forma||'Transferencia', ref, origen:'condominio'
-    });
-    localStorage.setItem(key, JSON.stringify(movs));
-  }catch(e){}
-}
+    const newId='eg_'+Date.now();
+    const obj={id:newId,fecha,cat,desc,monto,ref,origen:'CondoMóvil'};
+    await _fbM.setDoc(_fbM.doc(_db,'condominios/'+EMP_ID+'/egresos/'+newId),obj);
+    EGRESOS.unshift(obj);
+    toast('✅ Egreso guardado');
+    document.getElementById('egDesc').value='';
+    document.getElementById('egMonto').value='';
+    document.getElementById('egRef').value='';
+  }catch(e){toast('❌ Error: '+e.message);}
+};
 
 // ══════════════════════════════════════════
-// CONFIG
+// DETALLE Y PAGO SHEET
 // ══════════════════════════════════════════
-function guardarConfig(){
-  EMP_ID = document.getElementById('cfgEmpId').value||'condo_1';
-  const nombre = document.getElementById('cfgNombre').value.trim();
-  const emp = EMPRESAS.find(e=>e.id===EMP_ID);
-  const nombreFinal = nombre || emp?.nombre || 'Empresa '+EMP_ID;
-  localStorage.setItem('mss_condo_movil_cfg', JSON.stringify({empId:EMP_ID, nombre:nombreFinal}));
-  document.getElementById('hdrEmpBadge').textContent = (emp?.icon||'🏢')+' '+nombreFinal.split(' ').slice(0,2).join(' ');
-  toast('✅ Config guardada — recargando...');
-  setTimeout(()=>{ cargarDatos(); cambiarTab('cobros',document.querySelectorAll('.tab')[0]); },800);
-}
-
-function debugLS(){
-  const card = document.getElementById('debugCard');
-  const cont = document.getElementById('debugContent');
-  card.style.display = 'block';
-
-  const keyCo  = 'mss_c'+EMP_ID+'_co';
-  const keyU   = 'mss_c'+EMP_ID+'_u';
-  const keyCfg = 'mss_c'+EMP_ID+'_cfg';
-  const keyFin = 'mss_fin'+EMP_ID+'_movs';
-  const keyEmp = 'mss_empresa_actual';
-
-  const checks = [
-    [keyEmp,  'Empresa activa ERP'],
-    [keyCfg,  'Config Condominio'],
-    [keyU,    'Unidades ('+UNIDADES.length+' cargadas)'],
-    [keyCo,   'Cobros ('+COBROS.length+' cargados)'],
-    [keyFin,  'Sync Finanzas'],
-  ];
-
-  cont.innerHTML = checks.map(([k,lbl])=>{
-    const val = localStorage.getItem(k);
-    const ok = !!val;
-    let extra = '';
-    if(ok){
-      try{ const p=JSON.parse(val); if(Array.isArray(p)) extra=' → '+p.length+' registros'; else if(p.nombre) extra=' → '+p.nombre; }catch(e){}
-    }
-    return `<div style="color:${ok?'var(--ok)':'var(--danger)'}">${ok?'✓':'✗'} <strong>${lbl}</strong>${extra}<br><span style="color:var(--muted);font-size:10px">${k}</span></div>`;
-  }).join('');
-
-  // Empresa actual
+let _pagoActual=null;
+window.verDetalle=function(id){
+  const c=COBROS.find(x=>x.id===id);if(!c)return;
+  const u=UNIDADES.find(x=>String(x.id)===String(c.unidadId));
+  document.getElementById('detTitulo').textContent=(u?.torre||'')+' — Unidad '+(c.unidadNum||'?');
+  document.getElementById('detSub').textContent=c.prop||'—';
+  document.getElementById('detContent').innerHTML=`
+    <div class="row-fin"><span style="color:var(--muted)">Período</span><strong>${c.mes}</strong></div>
+    <div class="row-fin"><span style="color:var(--muted)">Cuota GC</span><strong>${clp(c.gcOrd)}</strong></div>
+    <div class="row-fin"><span style="color:var(--muted)">Pagado</span><strong style="color:var(--ok)">${clp(c.pagado)}</strong></div>
+    <div class="row-fin"><span style="color:var(--muted)">Saldo</span><strong style="color:${c.saldo>0?'var(--danger)':'var(--ok)'}">${clp(c.saldo)}</strong></div>
+    <div class="row-fin"><span style="color:var(--muted)">Estado</span><span class="badge ${c.estado==='Pagado'?'badge-ok':c.estado==='Moroso'?'badge-danger':'badge-warn'}">${c.estado}</span></div>
+    <div class="row-fin"><span style="color:var(--muted)">Fecha pago</span><strong>${c.fechaPago?df(c.fechaPago):'—'}</strong></div>
+    ${u?.estacionamiento?`<div class="row-fin"><span style="color:var(--muted)">Estacionamiento</span><strong>${u.estacionamiento}</strong></div>`:''}
+    ${u?.bodega?`<div class="row-fin"><span style="color:var(--muted)">Bodega</span><strong>${u.bodega}</strong></div>`:''}
+    ${c.saldo>0?`<button class="btn btn-green" onclick="cerrar('overlayDetalle');abrirPago('${c.id}')" style="margin-top:16px">💰 Registrar Pago</button>`:''}
+    <button class="btn btn-outline" onclick="cerrar('overlayDetalle')" style="margin-top:8px">Cerrar</button>`;
+  document.getElementById('overlayDetalle').classList.add('open');
+};
+window.abrirPago=function(id){
+  const c=COBROS.find(x=>x.id===id);if(!c)return;
+  _pagoActual=c;
+  document.getElementById('pagoSub').textContent=c.unidadNum+' — '+c.prop;
+  document.getElementById('pagoResumen').innerHTML=`Cuota: ${clp(c.gcOrd)} · Saldo: <strong style="color:var(--danger)">${clp(c.saldo)}</strong>`;
+  document.getElementById('pagoMonto').value=c.saldo||c.gcOrd;
+  document.getElementById('pagoFecha').value=HOY;
+  document.getElementById('overlayPago').classList.add('open');
+};
+window.confirmarPago=async function(){
+  if(!_pagoActual)return;
+  const monto=parseFloat(document.getElementById('pagoMonto')?.value)||0;
+  const fecha=document.getElementById('pagoFecha')?.value||HOY;
+  const forma=document.getElementById('pagoForma')?.value||'Transferencia';
+  const ref=document.getElementById('pagoRef')?.value||'';
+  if(!monto){toast('⚠ Ingresa el monto');return;}
+  const nuevo={..._pagoActual,pagado:(_pagoActual.pagado||0)+monto,saldo:Math.max(0,(_pagoActual.saldo||0)-monto),estado:(_pagoActual.saldo||0)-monto<=0?'Pagado':'Abono',fechaPago:fecha,forma,ref};
   try{
-    const emp = JSON.parse(localStorage.getItem(keyEmp)||'{}');
-    cont.innerHTML += `<div style="margin-top:8px;color:var(--info)">Empresa activa en ERP: <strong>${emp.nombre||'—'}</strong> (id:${emp.id||'—'})</div>`;
-  }catch(e){}
-}
+    await _fbM.setDoc(_fbM.doc(_db,'condominios/'+EMP_ID+'/cobros/'+String(_pagoActual.id)),nuevo);
+    cerrar('overlayPago');
+    toast('✅ Pago registrado');
+  }catch(e){toast('❌ Error: '+e.message);}
+};
 
 // ══════════════════════════════════════════
-// OVERLAYS
+// UI HELPERS
 // ══════════════════════════════════════════
-function abrir(id){ document.getElementById(id).classList.add('on'); }
-function cerrar(id){ document.getElementById(id).classList.remove('on'); }
-document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('on');}));
+window.cambiarTab=function(id,btn){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('sc-'+id)?.classList.add('on');
+  if(btn){btn.classList.add('on');}
+  if(id==='cobros')renderCobros();
+  else if(id==='resumen')renderResumen();
+  else if(id==='registrar'){llenarBlocks();if(!document.getElementById('regMes').value)document.getElementById('regMes').value=MES;}
+};
+window.cerrar=function(id){document.getElementById(id)?.classList.remove('open');};
+window.toast=function(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);};
+function toast(msg){window.toast(msg);}
+
+// Cerrar overlays al tocar fuera
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
 
 // ══════════════════════════════════════════
-// TOAST
+// ARRANQUE
 // ══════════════════════════════════════════
-function toast(msg,dur=2800){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),dur);
-}
-
-// INICIO
 init();
 </script>
 </body>
