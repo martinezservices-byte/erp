@@ -196,7 +196,13 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
     </div>
 
     <div class="login-sep">¿Usuario Nuevo?</div>
-    <button class="btn-registrarse" onclick="abrirRegistro()">
+    <div id="panelRegistro" style="display:none;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px;margin-top:4px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Ingresa el correo registrado en tu ficha de unidad:</div>
+      <input class="lf-input" id="regEmail" type="email" placeholder="tu@correo.com" inputmode="email" style="margin-bottom:10px"/>
+      <button class="btn-ingresar" onclick="confirmarRegistro()" style="margin-bottom:8px">🔍 Verificar y Enviar Código</button>
+      <button onclick="document.getElementById('panelRegistro').style.display='none';document.getElementById('btnMostrarReg').style.display='block'" style="width:100%;background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit">Cancelar</button>
+    </div>
+    <button class="btn-registrarse" id="btnMostrarReg" onclick="mostrarPanelRegistro()">
       <span>✨</span> REGISTRARSE
     </button>
   </div>
@@ -436,6 +442,52 @@ const df=d=>{try{return new Date((d||HOY)+'T12:00:00').toLocaleDateString('es-CL
 // INIT — verificar sesión existente
 // ══════════════════════════════════════════
 async function init(){
+  // Manejar resultado de redirect de Google
+  try{
+    const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    _fbM=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    _app=getApps().length?getApps()[0]:initializeApp(FB_CFG);
+    _auth=fa.getAuth(_app);
+    _db=_fbM.getFirestore(_app);
+    // Verificar si venimos de un redirect de Google
+    const result=await fa.getRedirectResult(_auth);
+    if(result&&result.user){
+      _user=result.user;
+      const tipoGuardado=sessionStorage.getItem('mss_movil_tipo_pending')||'residente';
+      const email=_user.email;
+      // Buscar unidad en Firebase
+      const condoSnap=await _fbM.getDocs(_fbM.collection(_db,'condominios/'+EMP_ID+'/unidades'));
+      let unidadMatch=null;
+      condoSnap.forEach(d=>{
+        const u=d.data();
+        if(u.email&&u.email.toLowerCase()===email.toLowerCase()) unidadMatch={id:d.id,...u};
+      });
+      const userSnap=await _fbM.getDoc(_fbM.doc(_db,'usuarios/'+_user.uid));
+      const userRol=userSnap.exists()?userSnap.data().rol:'';
+      if(userRol==='superadmin'||userRol==='admin'){
+        sessionStorage.setItem('mss_movil_tipo','admin');
+        await entrarApp('admin');
+        return;
+      } else if(unidadMatch){
+        if(!userSnap.exists()){
+          await _fbM.setDoc(_fbM.doc(_db,'usuarios/'+_user.uid),{
+            email,rol:'residente',condominios:[EMP_ID],tipo:'condominio',creado:Date.now()
+          });
+        }
+        sessionStorage.setItem('mss_movil_tipo',tipoGuardado);
+        await entrarApp(tipoGuardado);
+        return;
+      } else {
+        document.getElementById('loginError').textContent='Tu cuenta Google ('+email+') no está en las fichas del condominio. Contacta al administrador.';
+        document.getElementById('loginError').style.display='block';
+        await fa.signOut(_auth);
+        return;
+      }
+    }
+  }catch(e){
+    if(e.code!=='auth/no-current-user')console.warn('Redirect result:',e.message);
+  }
   try{
     const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
     _fbM=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
@@ -473,8 +525,13 @@ window.loginConGoogle=async function(){
     const provider=new fa.GoogleAuthProvider();
     provider.setCustomParameters({prompt:'select_account'});
     const btn=document.getElementById('btnGoogle');
-    btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Conectando...';
-    const cred=await fa.signInWithPopup(_auth,provider);
+    btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Redirigiendo a Google...';
+    // Guardar tipo de acceso antes del redirect
+    sessionStorage.setItem('mss_movil_tipo_pending',_tipoSel||'residente');
+    // Usar redirect en vez de popup — funciona en todos los navegadores móviles
+    await fa.signInWithRedirect(_auth,provider);
+    // El código de abajo no se ejecuta — la página se recarga automáticamente
+    return;
     _user=cred.user;
     const email=_user.email;
     // Verificar si el email existe en las fichas del condominio
@@ -549,9 +606,26 @@ window.doLogin=async function(){
 // ══════════════════════════════════════════
 // REGISTRO / AUTO-REGISTRO
 // ══════════════════════════════════════════
-window.abrirRegistro=async function(){
-  const email=prompt('Ingresa tu correo electrónico registrado en el condominio:');
-  if(!email||!email.includes('@'))return;
+window.mostrarPanelRegistro=function(){
+  document.getElementById('panelRegistro').style.display='block';
+  document.getElementById('btnMostrarReg').style.display='none';
+  setTimeout(()=>document.getElementById('regEmail')?.focus(),100);
+};
+
+window.confirmarRegistro=async function(){
+  const email=document.getElementById('regEmail')?.value.trim();
+  if(!email||!email.includes('@')){
+    toast('⚠ Ingresa un correo válido');return;
+  }
+  document.getElementById('panelRegistro').style.display='none';
+  document.getElementById('btnMostrarReg').style.display='block';
+  await abrirRegistro(email);
+};
+
+window.abrirRegistro=async function(email){
+  if(!email){
+    window.mostrarPanelRegistro();return;
+  }
   // Verificar si el correo existe en las fichas de unidades en Firebase
   try{
     toast('🔍 Verificando tu correo...');
@@ -649,8 +723,9 @@ window.verificarCodigo=async function(){
     // Código correcto — crear cuenta Firebase Auth
     try{
       const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-      const nuevaPass=prompt('¡Correo verificado! ✅\n\nCrea tu contraseña para futuros accesos (mín. 6 caracteres):');
-      if(!nuevaPass||nuevaPass.length<6){alert('La contraseña debe tener al menos 6 caracteres.');return;}
+      // Pedir contraseña con campo HTML en vez de prompt
+      const nuevaPass=await pedirContrasena('¡Correo verificado! ✅\nCrea tu contraseña (mín. 6 caracteres):');
+      if(!nuevaPass||nuevaPass.length<6){toast('⚠ La contraseña debe tener al menos 6 caracteres.');return;}
       // Registrar usuario en Firebase Auth
       const cred=await fa.createUserWithEmailAndPassword(_auth,_veriEmail,nuevaPass);
       _user=cred.user;
@@ -666,7 +741,7 @@ window.verificarCodigo=async function(){
       if(e.code==='auth/email-already-in-use'){
         // Ya existe — solo hacer login
         const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-        const pass=prompt('Este correo ya tiene cuenta. Ingresa tu contraseña:');
+        const pass=await pedirContrasena('Este correo ya tiene cuenta.\nIngresa tu contraseña:');
         if(pass){
           try{
             const cred=await fa.signInWithEmailAndPassword(_auth,_veriEmail,pass);
@@ -1042,6 +1117,38 @@ document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{
 // ══════════════════════════════════════════
 // ARRANQUE
 // ══════════════════════════════════════════
+// Modal de contraseña sin prompt del navegador
+function pedirContrasena(mensaje){
+  return new Promise(resolve=>{
+    let mo=document.getElementById('_moPass');
+    if(!mo){
+      mo=document.createElement('div');
+      mo.id='_moPass';
+      mo.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
+      mo.innerHTML=`<div style="background:#111827;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px;width:100%;max-width:360px">
+        <div id="_moPassMsg" style="font-size:13px;color:#F9FAFB;margin-bottom:14px;line-height:1.5"></div>
+        <input id="_moPassInp" type="password" placeholder="••••••••" style="width:100%;background:#1F2937;border:1px solid rgba(255,255,255,0.08);border-radius:9px;padding:12px;color:#F9FAFB;font-size:15px;outline:none;margin-bottom:12px;font-family:inherit"/>
+        <div style="display:flex;gap:10px">
+          <button id="_moPassOk" style="flex:1;padding:12px;background:linear-gradient(135deg,#1a5c3a,#166534);color:white;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Confirmar</button>
+          <button id="_moPassCancel" style="padding:12px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#9CA3AF;border-radius:9px;cursor:pointer;font-family:inherit">Cancelar</button>
+        </div>
+      </div>`;
+      document.body.appendChild(mo);
+    }
+    document.getElementById('_moPassMsg').innerHTML=mensaje.replace(/\n/g,'<br>');
+    document.getElementById('_moPassInp').value='';
+    mo.style.display='flex';
+    setTimeout(()=>document.getElementById('_moPassInp')?.focus(),100);
+    const ok=document.getElementById('_moPassOk');
+    const cancel=document.getElementById('_moPassCancel');
+    const inp=document.getElementById('_moPassInp');
+    const cleanup=()=>{mo.style.display='none';ok.onclick=null;cancel.onclick=null;inp.onkeydown=null;};
+    ok.onclick=()=>{const v=inp.value;cleanup();resolve(v);};
+    cancel.onclick=()=>{cleanup();resolve(null);};
+    inp.onkeydown=e=>{if(e.key==='Enter'){const v=inp.value;cleanup();resolve(v);}};
+  });
+}
+
 init();
 </script>
 </body>
