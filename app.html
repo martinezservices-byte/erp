@@ -220,6 +220,20 @@ body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;m
       <div class="field full"><label>Notas / Descripción</label><textarea id="eNotas" rows="2" placeholder="Ej: Cliente auditoría Q1 2025, contrato vigente..."></textarea></div>
       <div class="field"><label>Banco</label><input id="eBanco" type="text" placeholder="Ej: BCI / Cuenta Corriente"/></div>
       <div class="field"><label>Nº Cuenta</label><input id="eCuenta" type="text" placeholder="Ej: 13772970"/></div>
+      <div class="field full">
+        <label>Logo de la Empresa</label>
+        <div style="display:flex;align-items:center;gap:14px;margin-top:6px">
+          <div id="eLogoPreview" style="width:72px;height:72px;border-radius:10px;background:rgba(255,255,255,0.05);border:2px dashed rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">
+            <span style="font-size:22px">🏢</span>
+          </div>
+          <div style="flex:1">
+            <input type="file" id="eLogoFile" accept="image/*" style="display:none" onchange="previewLogoEmp(this)"/>
+            <button type="button" onclick="document.getElementById('eLogoFile').click()" style="padding:8px 16px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);color:var(--gold);border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;font-family:monospace;display:block;margin-bottom:6px">📁 Subir Logo</button>
+            <div style="font-size:10px;color:var(--muted);line-height:1.5">PNG, JPG o SVG · Máx. 300KB recomendado<br>Se guarda independiente por empresa</div>
+            <button type="button" id="eLogo_quitarBtn" onclick="quitarLogoEmp()" style="display:none;margin-top:6px;padding:4px 10px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:var(--danger);border-radius:5px;cursor:pointer;font-size:10px;font-family:monospace">✕ Quitar logo</button>
+          </div>
+        </div>
+      </div>
     </div>
     <div style="display:flex;gap:10px;margin-top:16px">
       <button class="btn-gold" style="flex:1" onclick="saveEmpresa()">Guardar Empresa</button>
@@ -438,13 +452,14 @@ function renderHeroStats(){
 }
 
 function renderEmpresas(){
-  let LOGOS={};
-  try{LOGOS=JSON.parse(localStorage.getItem('mss_logos_v1')||'{}');}catch(e){}
   const grid=document.getElementById('empGrid');
   grid.innerHTML='';
 
   EMPRESAS.forEach(emp=>{
-    const logo=LOGOS[String(emp.id)];
+    // Leer logo por clave separada (nuevo sistema independiente por empresa)
+    const logo=localStorage.getItem('mss_logo_emp_'+emp.id)||
+               localStorage.getItem('mss_logo_emp_'+String(emp.id))||
+               (()=>{try{return JSON.parse(localStorage.getItem('mss_logos_v1')||'{}')[String(emp.id)]||null;}catch(e){return null;}})();
     const ing = getIngresosReales(emp.id)||emp.ingresos||0;
     const egr = getEgresosReales(emp.id);
     const util = ing - egr;
@@ -760,6 +775,19 @@ function openEmpresaModal(id){
   document.getElementById('eCuenta').value=emp?.cuenta||'';
   if(emp) selColor=emp.color;
   document.getElementById('modalEmp').classList.add('open');
+  // Cargar logo existente
+  _empLogoData = null;
+  const logoExist = id ? getLogo(id) : null;
+  const prev = document.getElementById('eLogoPreview');
+  const qBtn = document.getElementById('eLogo_quitarBtn');
+  if(logoExist){
+    prev.innerHTML = `<img src="${logoExist}" style="width:100%;height:100%;object-fit:contain"/>`;
+    qBtn.style.display = 'block';
+  } else {
+    prev.innerHTML = '<span style="font-size:22px">🏢</span>';
+    qBtn.style.display = 'none';
+  }
+  document.getElementById('eLogoFile').value = '';
 }
 function editEmpresa(id){openEmpresaModal(id);}
 function deleteEmpresa(id){
@@ -793,9 +821,97 @@ function saveEmpresa(){
   } else {
     EMPRESAS.push({id:Date.now(),...obj,ingresos:0,proyectos:0,trabajadores:0,clientes:0});
   }
+  // Guardar empresa primero
   save();closeModal();render();
+  // Subir logo a Firebase Storage en background
+  const empId = id || String(EMPRESAS[EMPRESAS.length-1]?.id||Date.now());
+  if(_empLogoData === 'QUITAR'){
+    localStorage.removeItem('mss_logo_url_'+empId);
+    localStorage.removeItem('mss_logo_emp_'+empId);
+    if(window._db&&window._fbM){
+      window._fbM.deleteDoc(window._fbM.doc(window._db,'empresas/'+empId+'/config/logo')).catch(()=>{});
+    }
+  } else if(_empLogoData){
+    subirLogoFirebase(empId, _empLogoData).then(()=>{
+      renderEmpresas();
+    });
+  }
+  _empLogoData = null;
 }
 function closeModal(){document.getElementById('modalEmp').classList.remove('open');}
+
+// ── LOGO POR EMPRESA ──
+let _empLogoData = null;
+
+function previewLogoEmp(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(file.size > 500000){ alert('Imagen muy grande. Usa una imagen de menos de 500KB para mejor rendimiento.'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    _empLogoData = e.target.result;
+    const prev = document.getElementById('eLogoPreview');
+    prev.innerHTML = `<img src="${_empLogoData}" style="width:100%;height:100%;object-fit:contain"/>`;
+    document.getElementById('eLogo_quitarBtn').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function quitarLogoEmp(){
+  _empLogoData = 'QUITAR';
+  document.getElementById('eLogoPreview').innerHTML = '<span style="font-size:22px">🏢</span>';
+  document.getElementById('eLogo_quitarBtn').style.display = 'none';
+}
+
+function getLogo(empId){
+  // Primero Firebase Storage URL (nube), fallback localStorage
+  return localStorage.getItem('mss_logo_url_'+empId)||
+         localStorage.getItem('mss_logo_emp_'+empId)||null;
+}
+
+async function subirLogoFirebase(empId, dataUrl){
+  try{
+    const {getStorage,ref,uploadString,getDownloadURL}=
+      await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js');
+    const storage=getStorage(window._fbApp||
+      (await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js'))
+        .getApps()[0]);
+    const storageRef=ref(storage,'logos/empresa_'+empId+'.png');
+    await uploadString(storageRef, dataUrl, 'data_url');
+    const url=await getDownloadURL(storageRef);
+    // Guardar URL en localStorage como caché rápido
+    localStorage.setItem('mss_logo_url_'+empId, url);
+    // Guardar URL en Firestore también
+    if(window._db&&window._fbM){
+      try{
+        window._fbM.setDoc(
+          window._fbM.doc(window._db,'empresas/'+empId+'/config/logo'),
+          {url, updatedAt: Date.now()},{merge:true}
+        );
+      }catch(e){}
+    }
+    return url;
+  }catch(e){
+    console.warn('Firebase Storage error:', e.message);
+    // Fallback: guardar en localStorage
+    try{localStorage.setItem('mss_logo_emp_'+empId, dataUrl);}catch(ex){}
+    return dataUrl;
+  }
+}
+
+async function cargarLogosFirebase(){
+  if(!window._db||!window._fbM)return;
+  for(const emp of EMPRESAS){
+    try{
+      const snap=await window._fbM.getDoc(
+        window._fbM.doc(window._db,'empresas/'+emp.id+'/config/logo'));
+      if(snap.exists()&&snap.data().url){
+        localStorage.setItem('mss_logo_url_'+emp.id, snap.data().url);
+      }
+    }catch(e){}
+  }
+  renderEmpresas();
+}
 document.querySelectorAll('.modal-overlay').forEach(m=>{
   m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});
 });
@@ -804,6 +920,8 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
 load();
 render();
 renderCondominios();
+// Cargar logos desde Firebase en background
+setTimeout(()=>{ if(typeof cargarLogosFirebase==='function') cargarLogosFirebase(); }, 1500);
 </script>
 
 

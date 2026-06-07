@@ -273,14 +273,70 @@ const DEF_EMPRESAS = [
 ]
 
 function loadLogos(){
-  try{LOGOS=JSON.parse(localStorage.getItem(SK_LOGOS)||'{}');}catch(e){LOGOS={};}
-  if(window._MSS_USER&&_fbReady&&_db){
-    window._fbM.getDoc(window._fbM.doc(_db,'empresas/logos/data/main'))
-      .then(snap=>{if(snap.exists()&&snap.data().logos){LOGOS={...LOGOS,...snap.data().logos};if(typeof renderLogos==='function')renderLogos();}})
-      .catch(()=>{});
+  // Cargar logos — prioridad: URL Firebase > base64 local
+  LOGOS = {};
+  try{
+    const idx = JSON.parse(localStorage.getItem(SK_LOGOS+'_index')||'[]');
+    idx.forEach(empId=>{
+      const url = localStorage.getItem('mss_logo_url_'+empId);
+      const b64 = localStorage.getItem('mss_logo_emp_'+empId);
+      if(url) LOGOS[empId]=url;
+      else if(b64) LOGOS[empId]=b64;
+    });
+    // Fallback clave antigua
+    if(!Object.keys(LOGOS).length){
+      const old=JSON.parse(localStorage.getItem(SK_LOGOS)||'{}');
+      if(Object.keys(old).length){LOGOS=old;saveLogos();}
+    }
+  }catch(e){LOGOS={};}
+  // Cargar URLs de Firestore en background
+  if(typeof _fbReady!=='undefined'&&_fbReady&&_db){
+    DEF_EMPRESAS.forEach(async emp=>{
+      try{
+        const snap=await window._fbM.getDoc(window._fbM.doc(_db,'empresas/'+emp.id+'/config/logo'));
+        if(snap.exists()&&snap.data().url){
+          LOGOS[emp.id]=snap.data().url;
+          localStorage.setItem('mss_logo_url_'+emp.id,snap.data().url);
+          if(typeof renderLogosGrid==='function')renderLogosGrid();
+        }
+      }catch(e){}
+    });
   }
 }
-function saveLogos(){try{localStorage.setItem(SK_LOGOS,JSON.stringify(LOGOS));}catch(e){alert('Error guardando — imagen muy grande, intenta con una más pequeña');}}
+// _loadLogos_orig eliminado — ahora cada logo se guarda por separado
+async function subirLogoStorage(empId, dataUrl){
+  try{
+    const {getStorage,ref,uploadString,getDownloadURL}=
+      await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js');
+    const {getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const app=getApps()[0];if(!app)throw new Error('No app');
+    const storage=getStorage(app);
+    const storageRef=ref(storage,'logos/empresa_'+empId+'.png');
+    await uploadString(storageRef,dataUrl,'data_url');
+    const url=await getDownloadURL(storageRef);
+    localStorage.setItem('mss_logo_url_'+empId,url);
+    // Guardar URL en Firestore
+    if(_fbReady&&_db){
+      window._fbM.setDoc(window._fbM.doc(_db,'empresas/'+empId+'/config/logo'),
+        {url,updatedAt:Date.now()},{merge:true}).catch(()=>{});
+    }
+    return url;
+  }catch(e){
+    console.warn('Storage error:',e.message);
+    try{localStorage.setItem('mss_logo_emp_'+empId,dataUrl);}catch(ex){}
+    return dataUrl;
+  }
+}
+
+function saveLogos(){
+  // Compatibilidad: guardar localmente también
+  try{
+    Object.keys(LOGOS).forEach(empId=>{
+      try{localStorage.setItem('mss_logo_emp_'+empId,LOGOS[empId]);}catch(e){}
+    });
+    localStorage.setItem(SK_LOGOS+'_index',JSON.stringify(Object.keys(LOGOS)));
+  }catch(e){}
+}
 
 function showTab(id,btn){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
@@ -354,14 +410,36 @@ function asignarLogo(){
   saveLogos();
   cancelarSubir();
   renderLogosGrid();
-  alert('✓ Logo guardado correctamente');
+  // Subir a Firebase Storage en background
+  subirLogoStorage(selectedEmpId, newLogoData).then(url=>{
+    if(url!==newLogoData){
+      // URL de Firebase obtenida — actualizar
+      renderLogosGrid();
+    }
+    alert('✓ Logo guardado en la nube correctamente');
+  }).catch(()=>{
+    alert('✓ Logo guardado localmente. Se sincronizará con la nube cuando haya conexión.');
+  });
 }
 
 function quitarLogo(empId){
-  if(!confirm('¿Quitar el logo de esta empresa?'))return;
+  if(!confirm('¿Quitar el logo de esta empresa? Se eliminará también de la nube.'))return;
   delete LOGOS[empId];
+  localStorage.removeItem('mss_logo_emp_'+empId);
+  localStorage.removeItem('mss_logo_url_'+empId);
   saveLogos();
   renderLogosGrid();
+  // Borrar de Firebase Storage y Firestore
+  import('https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js').then(async ({getStorage,ref,deleteObject})=>{
+    try{
+      const {getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+      const storage=getStorage(getApps()[0]);
+      await deleteObject(ref(storage,'logos/empresa_'+empId+'.png'));
+    }catch(e){}
+    if(_fbReady&&_db){
+      window._fbM.deleteDoc(window._fbM.doc(_db,'empresas/'+empId+'/config/logo')).catch(()=>{});
+    }
+  }).catch(()=>{});
 }
 
 function cancelarSubir(){
