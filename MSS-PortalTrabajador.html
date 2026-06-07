@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>Portal Colaborador · Martinez Services</title>
+<style>
+:root{
+  --bg:#f4f6f8;--surf:white;--surf2:#f8fafc;
+  --green:#1a5c3a;--green2:#166534;--green3:#0f4027;
+  --gold:#C9A84C;--ok:#10B981;--danger:#EF4444;--warn:#F59E0B;--info:#6366f1;
+  --text:#1a1a2e;--muted:#6B7280;--border:#e5e7eb;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;}
+body{padding-bottom:70px;}
+
+/* LOGIN */
+#sc-login{display:flex;flex-direction:column;min-height:100vh;background:linear-gradient(160deg,var(--green3),var(--green),var(--green2));}
+.login-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;}
+.login-logo-wrap{width:80px;height:80px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:16px;}
+.login-title{font-size:24px;font-weight:900;color:white;margin-bottom:4px;text-align:center;}
+.login-sub{font-size:12px;color:rgba(255,255,255,0.75);margin-bottom:32px;text-align:center;}
+.login-card{background:white;border-radius:20px;padding:28px 24px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.2);}
+.lbl{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px;}
+.inp{width:100%;background:var(--surf2);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:15px;outline:none;margin-bottom:14px;font-family:inherit;transition:border .2s;}
+.inp:focus{border-color:var(--green);}
+.btn-green{width:100%;padding:14px;background:linear-gradient(135deg,var(--green),var(--green2));color:white;border:none;border-radius:10px;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;}
+.btn-google{width:100%;padding:13px;background:white;color:#3c4043;border:1.5px solid #dadce0;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px;}
+.sep{display:flex;align-items:center;gap:10px;margin:14px 0;}
+.sep div{flex:1;height:1px;background:var(--border);}
+.sep span{font-size:11px;color:var(--muted);}
+.err-box{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:12px;color:#dc2626;margin-top:10px;display:none;}
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* APP */
+#sc-app{display:none;flex-direction:column;min-height:100vh;}
+
+/* TOPBAR */
+.topbar{background:linear-gradient(135deg,var(--green3) 0%,var(--green) 60%,var(--green2) 100%);padding:48px 20px 28px;position:relative;}
+.topbar-salir{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.15);border:none;color:white;border-radius:8px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;}
+.topbar-empresa{font-size:10px;color:rgba(255,255,255,0.65);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.topbar-nombre{font-size:24px;font-weight:900;color:white;margin-bottom:2px;}
+.topbar-cargo{font-size:12px;color:rgba(255,255,255,0.75);}
+.topbar-avatar{position:absolute;top:36px;right:20px;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.2);border:3px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:white;}
+
+/* BODY */
+.app-body{flex:1;padding:0 14px 16px;margin-top:-14px;}
+
+/* CARDS */
+.card{background:white;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,0.06);}
+.card-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
+.card-title-ver{font-size:10px;color:var(--green);font-weight:700;cursor:pointer;}
+
+/* RESUMEN SUELDO */
+.sueldo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.sueldo-kpi{background:var(--surf2);border-radius:12px;padding:12px;text-align:center;}
+.sueldo-kpi-v{font-size:18px;font-weight:900;margin-bottom:2px;}
+.sueldo-kpi-l{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;}
+
+/* ACCESOS RÁPIDOS */
+.accesos{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;}
+.acceso-btn{background:white;border-radius:14px;padding:14px 6px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border:none;cursor:pointer;font-family:inherit;}
+.acceso-ico{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.acceso-lbl{font-size:10px;font-weight:700;color:#444;text-align:center;line-height:1.2;}
+
+/* LIQUIDACIONES */
+.liq-item{background:var(--surf2);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;border-left:4px solid var(--green);}
+.liq-periodo{font-size:13px;font-weight:800;color:var(--text);}
+.liq-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+.liq-neto{font-size:14px;font-weight:900;color:var(--green);}
+.liq-btn{background:rgba(26,92,58,0.08);border:1px solid rgba(26,92,58,0.2);color:var(--green);border-radius:8px;padding:6px 12px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;}
+
+/* VACACIONES */
+.vac-bar-wrap{height:10px;background:#f0f0f0;border-radius:5px;overflow:hidden;margin:8px 0;}
+.vac-bar{height:10px;border-radius:5px;background:linear-gradient(90deg,var(--green),var(--ok));}
+.vac-row{display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);}
+.vac-row:last-child{border:none;}
+
+/* PERMISOS */
+.perm-item{background:var(--surf2);border-radius:10px;padding:10px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
+.perm-tipo{font-size:12px;font-weight:700;}
+.perm-fecha{font-size:10px;color:var(--muted);margin-top:2px;}
+.pill{display:inline-flex;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;}
+.pill-ok{background:rgba(16,185,129,0.12);color:var(--ok);}
+.pill-warn{background:rgba(245,158,11,0.12);color:var(--warn);}
+.pill-info{background:rgba(99,102,241,0.12);color:var(--info);}
+.pill-danger{background:rgba(239,68,68,0.12);color:var(--danger);}
+
+/* PERFIL */
+.perfil-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.perfil-row:last-child{border:none;}
+.perfil-label{color:var(--muted);font-weight:600;}
+.perfil-val{font-weight:700;color:var(--text);text-align:right;}
+
+/* ANTIGÜEDAD */
+.antig-badge{background:linear-gradient(135deg,var(--green),var(--ok));border-radius:14px;padding:16px;color:white;text-align:center;margin-bottom:12px;}
+.antig-años{font-size:32px;font-weight:900;margin-bottom:2px;}
+.antig-lbl{font-size:11px;opacity:.8;}
+
+/* DOCUMENTO CERT */
+.cert-wrap{background:white;border:2px solid var(--green);border-radius:14px;padding:20px;margin-top:8px;}
+.cert-hdr{background:var(--green);color:white;padding:12px 16px;border-radius:8px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+.cert-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:12px;}
+.cert-row:last-child{border:none;}
+.cert-firma{margin-top:16px;text-align:center;padding-top:16px;border-top:2px solid var(--green);}
+
+/* SOLICITUD */
+.sol-form{background:var(--surf2);border-radius:12px;padding:14px;margin-top:10px;display:none;}
+.sol-form.open{display:block;}
+.sol-inp{width:100%;padding:10px 12px;background:white;border:1.5px solid var(--border);border-radius:9px;font-size:13px;font-family:inherit;outline:none;color:var(--text);margin-bottom:8px;}
+.sol-inp:focus{border-color:var(--green);}
+.btn-sm-green{padding:10px 18px;background:linear-gradient(135deg,var(--green),var(--green2));color:white;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+
+/* NAV */
+.nav-bottom{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--border);display:flex;z-index:100;box-shadow:0 -2px 10px rgba(0,0,0,0.08);}
+.nav-btn{flex:1;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:transparent;cursor:pointer;font-family:inherit;}
+.nav-ico{font-size:20px;}
+.nav-lbl{font-size:9px;font-weight:700;color:#9CA3AF;}
+.nav-btn.on .nav-lbl{color:var(--green);}
+
+/* SECCIONES */
+.sec{display:none;}.sec.on{display:block;}
+.sec-title{font-size:18px;font-weight:900;color:var(--text);margin:16px 0 12px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#1F2937;color:white;padding:10px 18px;border-radius:30px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* PRINT */
+@media print{
+  body>*{display:none!important;}
+  #printZone{display:block!important;position:fixed;top:0;left:0;width:100%;background:white;}
+  @page{margin:10mm;}
+}
+#printZone{display:none;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="sc-login">
+  <div class="login-body">
+    <div class="login-logo-wrap">👔</div>
+    <div class="login-title">Portal Colaborador</div>
+    <div class="login-sub">Martinez Services · Acceso exclusivo para trabajadores</div>
+    <div class="login-card">
+      <label class="lbl">Correo Electrónico</label>
+      <input class="inp" id="loginEmail" type="email" placeholder="tu@correo.cl" autocomplete="email" inputmode="email"/>
+      <label class="lbl">Contraseña</label>
+      <input class="inp" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password" style="margin-bottom:4px"/>
+      <button class="btn-green" id="btnIngresar">INGRESAR</button>
+      <div class="err-box" id="loginErr"></div>
+      <div class="sep"><div></div><span>o</span><div></div></div>
+      <button class="btn-google" id="btnGoogle">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continuar con Google
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="sc-app">
+  <div class="topbar">
+    <div class="topbar-empresa" id="appEmpresa">Martinez Services Spa</div>
+    <div class="topbar-nombre" id="appNombre">Colaborador</div>
+    <div class="topbar-cargo" id="appCargo">—</div>
+    <button class="topbar-salir" id="btnSalir">Salir</button>
+    <div class="topbar-avatar" id="appAvatar">👤</div>
+  </div>
+
+  <div class="app-body">
+
+    <!-- INICIO -->
+    <div class="sec on" id="sec-inicio">
+
+      <!-- SUELDO MES -->
+      <div class="card" id="cardSueldo">
+        <div class="card-title">💰 Mi Sueldo <span class="card-title-ver" onclick="irSec('liquidaciones')">Ver historial ›</span></div>
+        <div class="sueldo-grid" id="sueldoGrid"></div>
+        <div id="sueldoEstado"></div>
+      </div>
+
+      <!-- ACCESOS RÁPIDOS -->
+      <div class="accesos">
+        <button class="acceso-btn" onclick="irSec('liquidaciones')">
+          <div class="acceso-ico" style="background:#e8f5ee">📄</div>
+          <div class="acceso-lbl">Liquidaciones</div>
+        </button>
+        <button class="acceso-btn" onclick="irSec('vacaciones')">
+          <div class="acceso-ico" style="background:#fff8e1">🏖</div>
+          <div class="acceso-lbl">Vacaciones</div>
+        </button>
+        <button class="acceso-btn" onclick="irSec('permisos')">
+          <div class="acceso-ico" style="background:#f0f4ff">📅</div>
+          <div class="acceso-lbl">Permisos</div>
+        </button>
+        <button class="acceso-btn" onclick="irSec('perfil')">
+          <div class="acceso-ico" style="background:#fce4ec">👤</div>
+          <div class="acceso-lbl">Mi Perfil</div>
+        </button>
+      </div>
+
+      <!-- ÚLTIMAS LIQUIDACIONES HOME -->
+      <div class="card">
+        <div class="card-title">📋 Últimas Liquidaciones <span class="card-title-ver" onclick="irSec('liquidaciones')">Ver todo ›</span></div>
+        <div id="liqHome"></div>
+      </div>
+
+      <!-- ESTADO VACACIONES HOME -->
+      <div class="card">
+        <div class="card-title">🏖 Mis Vacaciones</div>
+        <div id="vacHome"></div>
+      </div>
+
+    </div>
+
+    <!-- LIQUIDACIONES -->
+    <div class="sec" id="sec-liquidaciones">
+      <div class="sec-title">📄 Mis Liquidaciones</div>
+      <div id="liqList"></div>
+    </div>
+
+    <!-- VACACIONES -->
+    <div class="sec" id="sec-vacaciones">
+      <div class="sec-title">🏖 Vacaciones y Permisos</div>
+      <div id="vacDetalle"></div>
+      <!-- Solicitar vacaciones -->
+      <div class="card">
+        <div class="card-title">✉ Solicitar Vacaciones</div>
+        <button class="btn-sm-green" style="width:100%" onclick="toggleSol('solVac')">+ Nueva Solicitud</button>
+        <div class="sol-form" id="solVac">
+          <label class="lbl">Fecha Inicio</label>
+          <input class="sol-inp" id="vacDesde" type="date"/>
+          <label class="lbl">Fecha Término</label>
+          <input class="sol-inp" id="vacHasta" type="date"/>
+          <label class="lbl">Observaciones</label>
+          <input class="sol-inp" id="vacObs" placeholder="Opcional..."/>
+          <button class="btn-sm-green" onclick="enviarSolicitud('vacaciones')">Enviar Solicitud</button>
+        </div>
+        <div id="solVacList" style="margin-top:10px"></div>
+      </div>
+    </div>
+
+    <!-- PERMISOS -->
+    <div class="sec" id="sec-permisos">
+      <div class="sec-title">📅 Permisos Administrativos</div>
+      <div class="card">
+        <div class="card-title">✉ Solicitar Permiso</div>
+        <button class="btn-sm-green" style="width:100%" onclick="toggleSol('solPerm')">+ Nueva Solicitud</button>
+        <div class="sol-form" id="solPerm">
+          <label class="lbl">Tipo de Permiso</label>
+          <select class="sol-inp" id="permTipo">
+            <option>Permiso con goce de sueldo</option>
+            <option>Permiso sin goce de sueldo</option>
+            <option>Licencia médica</option>
+            <option>Permiso por fallecimiento</option>
+            <option>Permiso por matrimonio</option>
+            <option>Permiso por nacimiento</option>
+            <option>Otro</option>
+          </select>
+          <label class="lbl">Fecha</label>
+          <input class="sol-inp" id="permFecha" type="date"/>
+          <label class="lbl">Días solicitados</label>
+          <input class="sol-inp" id="permDias" type="number" min="1" value="1"/>
+          <label class="lbl">Motivo</label>
+          <input class="sol-inp" id="permMotivo" placeholder="Describe brevemente..."/>
+          <button class="btn-sm-green" onclick="enviarSolicitud('permiso')">Enviar Solicitud</button>
+        </div>
+        <div id="solPermList" style="margin-top:10px"></div>
+      </div>
+      <!-- Anticipos -->
+      <div class="card">
+        <div class="card-title">💵 Solicitar Anticipo de Sueldo</div>
+        <button class="btn-sm-green" style="width:100%" onclick="toggleSol('solAntic')">+ Solicitar Anticipo</button>
+        <div class="sol-form" id="solAntic">
+          <label class="lbl">Monto Solicitado ($)</label>
+          <input class="sol-inp" id="anticMonto" type="number" min="0" placeholder="Ej: 150000"/>
+          <label class="lbl">Motivo</label>
+          <input class="sol-inp" id="anticMotivo" placeholder="Describe brevemente..."/>
+          <button class="btn-sm-green" onclick="enviarSolicitud('anticipo')">Enviar Solicitud</button>
+        </div>
+        <div id="solAnticList" style="margin-top:10px"></div>
+      </div>
+    </div>
+
+    <!-- PERFIL -->
+    <div class="sec" id="sec-perfil">
+      <div class="sec-title">👤 Mi Perfil</div>
+      <div id="perfilInfo"></div>
+      <!-- Certificado Antigüedad -->
+      <div class="card">
+        <div class="card-title">📜 Certificado de Antigüedad</div>
+        <button class="btn-sm-green" style="width:100%;margin-bottom:8px" onclick="generarCertificado()">Generar Certificado</button>
+        <div id="certZone"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- NAV BOTTOM -->
+  <div class="nav-bottom">
+    <button class="nav-btn on" id="nb-inicio" onclick="irSec('inicio')"><span class="nav-ico">🏠</span><span class="nav-lbl">Inicio</span></button>
+    <button class="nav-btn" id="nb-liquidaciones" onclick="irSec('liquidaciones')"><span class="nav-ico">📄</span><span class="nav-lbl">Liquidaciones</span></button>
+    <button class="nav-btn" id="nb-vacaciones" onclick="irSec('vacaciones')"><span class="nav-ico">🏖</span><span class="nav-lbl">Vacaciones</span></button>
+    <button class="nav-btn" id="nb-permisos" onclick="irSec('permisos')"><span class="nav-ico">📅</span><span class="nav-lbl">Permisos</span></button>
+    <button class="nav-btn" id="nb-perfil" onclick="irSec('perfil')"><span class="nav-ico">👤</span><span class="nav-lbl">Mi Perfil</span></button>
+  </div>
+</div>
+
+<div id="printZone"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  MSS — Portal Colaborador / Trabajador
+//  Conectado a Firebase Remuneraciones y RRHH
+//  Diseño inspirado en Defontana — 100% dinámico
+// ══════════════════════════════════════════════════════
+
+const FB_CFG={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
+const HOY=new Date().toISOString().split('T')[0];
+const MES=HOY.substring(0,7);
+let _auth,_db,_fbM,_user,_trab=null,_persona=null;
+let LIQUIDACIONES=[],VACACIONES=[],SOLICITUDES=[];
+let _empId=1; // default empresa
+const clp=n=>'$'+(Math.round(n||0)).toLocaleString('es-CL');
+const df=d=>{try{return new Date((d||HOY)+'T12:00:00').toLocaleDateString('es-CL');}catch(e){return d||'—';}};
+
+// ── TOAST ──
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+
+// ── FIREBASE INIT ──
+async function initFB(){
+  const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+  const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+  if(!_fbM)_fbM=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  const app=getApps().length?getApps()[0]:initializeApp(FB_CFG);
+  if(!_auth)_auth=fa.getAuth(app);
+  if(!_db)_db=_fbM.getFirestore(app);
+  return {fa,app};
+}
+
+// ── SECCIONES ──
+function irSec(sec){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('sec-'+sec)?.classList.add('on');
+  document.getElementById('nb-'+sec)?.classList.add('on');
+  if(sec==='liquidaciones')renderLiquidaciones();
+  if(sec==='vacaciones')renderVacaciones();
+  if(sec==='permisos')renderPermisos();
+  if(sec==='perfil')renderPerfil();
+}
+
+// ── LOGIN EMAIL ──
+document.getElementById('btnIngresar').onclick=async()=>{
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  const err=document.getElementById('loginErr');
+  const btn=document.getElementById('btnIngresar');
+  err.style.display='none';
+  if(!email||!pass){err.textContent='Ingresa tu correo y contraseña.';err.style.display='block';return;}
+  btn.innerHTML='<span class="spinner"></span>';btn.disabled=true;
+  try{
+    const {fa}=await initFB();
+    const cred=await fa.signInWithEmailAndPassword(_auth,email,pass);
+    _user=cred.user;
+    // Verificar que sea trabajador
+    const uSnap=await _fbM.getDoc(_fbM.doc(_db,'usuarios/'+_user.uid));
+    const rol=uSnap.exists()?uSnap.data().rol||'trabajador':'trabajador';
+    if(rol==='residente'||rol==='condominio'){
+      await fa.signOut(_auth);_user=null;
+      err.textContent='⛔ Este portal es para colaboradores. Usa el Portal de Condominios.';err.style.display='block';
+      btn.innerHTML='INGRESAR';btn.disabled=false;return;
+    }
+    btn.innerHTML='INGRESAR';btn.disabled=false;
+    await cargarYEntrar();
+  }catch(e){
+    const msgs={'auth/invalid-credential':'Correo o contraseña incorrectos.','auth/too-many-requests':'Demasiados intentos.'};
+    err.textContent=msgs[e.code]||'Error: '+e.message;err.style.display='block';
+    btn.innerHTML='INGRESAR';btn.disabled=false;
+  }
+};
+document.getElementById('loginPass').onkeydown=e=>{if(e.key==='Enter')document.getElementById('btnIngresar').click();};
+
+// ── LOGIN GOOGLE ──
+document.getElementById('btnGoogle').onclick=async()=>{
+  const btn=document.getElementById('btnGoogle');
+  const err=document.getElementById('loginErr');
+  btn.innerHTML='<span class="spinner"></span> Conectando...';btn.disabled=true;
+  try{
+    const {fa}=await initFB();
+    const provider=new fa.GoogleAuthProvider();
+    provider.setCustomParameters({prompt:'select_account'});
+    let cred;
+    try{cred=await fa.signInWithPopup(_auth,provider);}
+    catch(pe){
+      if(pe.code==='auth/popup-blocked'){await fa.signInWithRedirect(_auth,provider);return;}
+      throw pe;
+    }
+    _user=cred.user;
+    btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Continuar con Google';
+    btn.disabled=false;
+    await cargarYEntrar();
+  }catch(e){
+    err.textContent='Error Google: '+e.message;err.style.display='block';
+    btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Continuar con Google';
+    btn.disabled=false;
+  }
+};
+
+// ── CARGAR DATOS Y ENTRAR ──
+async function cargarYEntrar(){
+  try{
+    await initFB();
+    const email=_user.email.toLowerCase();
+    // Buscar trabajador por email en todas las empresas
+    // Primero en Firebase (rem_trabajadores), luego localStorage
+    let trabajador=null;
+    try{
+      const snap=await _fbM.getDocs(_fbM.collection(_db,'rem_trabajadores'));
+      snap.forEach(d=>{const t=d.data();if(t.email&&t.email.toLowerCase()===email)trabajador={id:d.id,...t};});
+      // Buscar también en empresa 1 y 3
+      if(!trabajador){
+        for(const eid of [1,3]){
+          const s2=await _fbM.getDocs(_fbM.collection(_db,'empresas/'+eid+'/rem_trabajadores'));
+          s2.forEach(d=>{const t=d.data();if(t.email&&t.email.toLowerCase()===email){trabajador={id:d.id,...t};_empId=eid;}});
+          if(trabajador)break;
+        }
+      }
+    }catch(e){console.warn('FB trabajador:',e.message);}
+    // Fallback localStorage
+    if(!trabajador){
+      for(const eid of [1,3]){
+        const raw=localStorage.getItem('mss_rem_'+eid+'_trabajadores')||localStorage.getItem('mss_remuneraciones_v1_'+eid+'_trabajadores');
+        if(raw){
+          const arr=JSON.parse(raw);
+          const t=arr.find(x=>x.email&&x.email.toLowerCase()===email);
+          if(t){trabajador=t;_empId=eid;break;}
+        }
+      }
+    }
+    _trab=trabajador;
+    // Cargar liquidaciones
+    await cargarLiquidaciones();
+    // Cargar solicitudes guardadas
+    cargarSolicitudesLocal();
+    // Mostrar app
+    entrarApp();
+  }catch(e){
+    console.error('Error cargarYEntrar:',e);
+    // Entrar igual aunque no se encuentre trabajador
+    entrarApp();
+  }
+}
+
+async function cargarLiquidaciones(){
+  LIQUIDACIONES=[];
+  const email=_user?.email?.toLowerCase()||'';
+  try{
+    // Firebase
+    const snap=await _fbM.getDocs(_fbM.collection(_db,'rem_liquidaciones'));
+    snap.forEach(d=>{
+      const l=d.data();
+      // Cruzar con trabajador por trabId o email
+      if(_trab&&String(l.trabId)===String(_trab.id))LIQUIDACIONES.push({id:d.id,...l});
+    });
+    // Si no hay en raíz, buscar en empresa
+    if(!LIQUIDACIONES.length&&_empId){
+      const s2=await _fbM.getDocs(_fbM.collection(_db,'empresas/'+_empId+'/rem_liquidaciones'));
+      s2.forEach(d=>{const l=d.data();if(_trab&&String(l.trabId)===String(_trab.id))LIQUIDACIONES.push({id:d.id,...l});});
+    }
+  }catch(e){}
+  // Fallback localStorage
+  if(!LIQUIDACIONES.length){
+    for(const eid of [1,3]){
+      const raw=localStorage.getItem('mss_rem_'+eid+'_liquidaciones')||localStorage.getItem('mss_remuneraciones_v1_'+eid+'_liquidaciones');
+      if(raw&&_trab){
+        const arr=JSON.parse(raw);
+        LIQUIDACIONES.push(...arr.filter(l=>String(l.trabId)===String(_trab.id)));
+      }
+    }
+  }
+  LIQUIDACIONES.sort((a,b)=>String(b.periodo||'').localeCompare(String(a.periodo||'')));
+}
+
+function cargarSolicitudesLocal(){
+  try{SOLICITUDES=JSON.parse(localStorage.getItem('mss_portal_sol_'+(_user?.uid||''))||'[]');}catch(e){SOLICITUDES=[];}
+}
+function guardarSolicitudesLocal(){
+  try{localStorage.setItem('mss_portal_sol_'+(_user?.uid||''),JSON.stringify(SOLICITUDES));}catch(e){}
+}
+
+// ── ENTRAR APP ──
+function entrarApp(){
+  document.getElementById('sc-login').style.display='none';
+  document.getElementById('sc-app').style.display='flex';
+  document.getElementById('sc-app').style.flexDirection='column';
+  // Header
+  const nombre=_trab?.nombre||_user?.email?.split('@')[0]||'Colaborador';
+  const iniciales=nombre.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase();
+  document.getElementById('appNombre').textContent=nombre.split(' ')[0];
+  document.getElementById('appCargo').textContent=(_trab?.cargo||'Colaborador')+(_trab?.area?' · '+_trab.area:'');
+  document.getElementById('appAvatar').textContent=iniciales||'👤';
+  renderInicio();
+}
+
+// ── RENDER INICIO ──
+function renderInicio(){
+  renderSueldoCard();
+  renderLiqHome();
+  renderVacHome();
+}
+
+function renderSueldoCard(){
+  const liqActual=LIQUIDACIONES[0]||null;
+  const liqAnterior=LIQUIDACIONES[1]||null;
+  const sueldoBase=_trab?.sueldo||0;
+  const neto=liqActual?.neto||liqActual?.liquido||0;
+  const bruto=liqActual?.totalHaberes||liqActual?.bruto||sueldoBase;
+  const netoAnt=liqAnterior?.neto||liqAnterior?.liquido||0;
+
+  document.getElementById('sueldoGrid').innerHTML=`
+    <div class="sueldo-kpi">
+      <div class="sueldo-kpi-v" style="color:var(--green)">${clp(neto||sueldoBase)}</div>
+      <div class="sueldo-kpi-l">Sueldo Líquido</div>
+    </div>
+    <div class="sueldo-kpi">
+      <div class="sueldo-kpi-v" style="color:var(--muted)">${clp(bruto||sueldoBase)}</div>
+      <div class="sueldo-kpi-l">Sueldo Bruto</div>
+    </div>`;
+
+  const mesLabel=liqActual?formatMes(liqActual.periodo):formatMes(MES);
+  const diff=netoAnt>0?Math.round(((neto-netoAnt)/netoAnt)*100):0;
+  document.getElementById('sueldoEstado').innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border);margin-top:4px">
+      <span style="font-size:11px;color:var(--muted)">${mesLabel}</span>
+      ${netoAnt>0?`<span style="font-size:11px;font-weight:700;color:${diff>=0?'var(--ok)':'var(--danger)'}">${diff>=0?'▲':'▼'} ${Math.abs(diff)}% vs mes anterior</span>`:''}
+    </div>`;
+}
+
+function renderLiqHome(){
+  const div=document.getElementById('liqHome');
+  const items=LIQUIDACIONES.slice(0,3);
+  if(!items.length){div.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:12px">Sin liquidaciones registradas</div>';return;}
+  div.innerHTML=items.map(l=>`
+    <div class="liq-item">
+      <div>
+        <div class="liq-periodo">${formatMes(l.periodo)}</div>
+        <div class="liq-sub">${l.trab?.contrato||_trab?.contrato||'—'}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="liq-neto">${clp(l.neto||l.liquido||0)}</div>
+        <button class="liq-btn" onclick="imprimirLiq('${l.id||l.periodo}')">⬇ Descargar</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderVacHome(){
+  const div=document.getElementById('vacHome');
+  const ingreso=_trab?.ingreso||_trab?.fechaIngreso||null;
+  if(!ingreso){div.innerHTML='<div style="font-size:12px;color:var(--muted)">Sin fecha de ingreso registrada</div>';return;}
+  const diasLegales=calcDiasVacaciones(ingreso);
+  const diasUsados=SOLICITUDES.filter(s=>s.tipo==='vacaciones'&&s.estado==='aprobado').reduce((s,x)=>s+(x.dias||0),0);
+  const diasDisp=Math.max(0,diasLegales-diasUsados);
+  const pct=diasLegales>0?Math.round((diasUsados/diasLegales)*100):0;
+  div.innerHTML=`
+    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
+      <span style="color:var(--muted)">Días disponibles</span>
+      <span style="font-weight:900;color:var(--green)">${diasDisp} días</span>
+    </div>
+    <div class="vac-bar-wrap"><div class="vac-bar" style="width:${Math.min(pct,100)}%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:4px">
+      <span>Usados: ${diasUsados} días</span>
+      <span>Legal: ${diasLegales} días/año</span>
+    </div>`;
+}
+
+// ── LIQUIDACIONES COMPLETAS ──
+function renderLiquidaciones(){
+  const div=document.getElementById('liqList');
+  if(!LIQUIDACIONES.length){div.innerHTML='<div class="card" style="text-align:center;color:var(--muted);padding:24px">Sin liquidaciones registradas aún</div>';return;}
+  div.innerHTML=LIQUIDACIONES.map(l=>`
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="font-size:15px;font-weight:900;color:var(--text)">${formatMes(l.periodo)}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">${l.trab?.contrato||_trab?.contrato||'—'} · ${df(l.periodo+'-01')}</div>
+        </div>
+        <button class="liq-btn" onclick="imprimirLiq('${l.id||l.periodo}')">⬇ Descargar PDF</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px">
+        <div style="background:var(--surf2);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:14px;font-weight:900;color:var(--muted)">${clp(l.sueldoBase||l.totalHaberes||0)}</div>
+          <div style="font-size:9px;color:var(--muted);margin-top:2px">BRUTO</div>
+        </div>
+        <div style="background:var(--surf2);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:14px;font-weight:900;color:var(--danger)">${clp(l.totalDescuentos||0)}</div>
+          <div style="font-size:9px;color:var(--muted);margin-top:2px">DESCUENTOS</div>
+        </div>
+        <div style="background:#e8f5ee;border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:14px;font-weight:900;color:var(--green)">${clp(l.neto||l.liquido||0)}</div>
+          <div style="font-size:9px;color:var(--muted);margin-top:2px">LÍQUIDO</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── VACACIONES ──
+function renderVacaciones(){
+  const div=document.getElementById('vacDetalle');
+  const ingreso=_trab?.ingreso||_trab?.fechaIngreso||null;
+  const diasLegales=ingreso?calcDiasVacaciones(ingreso):15;
+  const diasUsados=SOLICITUDES.filter(s=>s.tipo==='vacaciones'&&s.estado==='aprobado').reduce((s,x)=>s+(x.dias||0),0);
+  const diasDisp=Math.max(0,diasLegales-diasUsados);
+  div.innerHTML=`
+    <div class="card">
+      <div style="background:linear-gradient(135deg,var(--green),var(--ok));border-radius:12px;padding:16px;color:white;margin-bottom:12px;text-align:center">
+        <div style="font-size:32px;font-weight:900">${diasDisp}</div>
+        <div style="font-size:12px;opacity:.8">Días disponibles</div>
+      </div>
+      <div class="vac-row"><span class="perfil-label">Días legales anuales</span><span class="perfil-val">${diasLegales}</span></div>
+      <div class="vac-row"><span class="perfil-label">Días usados</span><span class="perfil-val" style="color:var(--warn)">${diasUsados}</span></div>
+      <div class="vac-row"><span class="perfil-label">Días disponibles</span><span class="perfil-val" style="color:var(--green)">${diasDisp}</span></div>
+      ${ingreso?`<div class="vac-row"><span class="perfil-label">Fecha ingreso</span><span class="perfil-val">${df(ingreso)}</span></div>`:''}
+    </div>`;
+  // Historial solicitudes
+  renderSolicitudesList('solVacList','vacaciones');
+}
+
+// ── PERMISOS ──
+function renderPermisos(){
+  renderSolicitudesList('solPermList','permiso');
+  renderSolicitudesList('solAnticList','anticipo');
+}
+
+function renderSolicitudesList(divId, tipo){
+  const div=document.getElementById(divId);
+  if(!div)return;
+  const items=SOLICITUDES.filter(s=>s.tipo===tipo).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  if(!items.length){div.innerHTML='<div style="font-size:11px;color:var(--muted);padding:8px 0">Sin solicitudes previas</div>';return;}
+  div.innerHTML=`<div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px">SOLICITUDES PREVIAS</div>`+
+  items.map(s=>`
+    <div class="perm-item">
+      <div>
+        <div class="perm-tipo">${s.descripcion}</div>
+        <div class="perm-fecha">${df(s.fecha)}</div>
+      </div>
+      <span class="pill ${s.estado==='aprobado'?'pill-ok':s.estado==='rechazado'?'pill-danger':'pill-warn'}">${s.estado}</span>
+    </div>`).join('');
+}
+
+// ── PERFIL ──
+function renderPerfil(){
+  const div=document.getElementById('perfilInfo');
+  const t=_trab;
+  if(!t){
+    div.innerHTML='<div class="card"><div style="text-align:center;color:var(--muted);padding:20px">Tu correo no está vinculado a un trabajador.<br>Contacta al área de RRHH.</div></div>';
+    return;
+  }
+  // Antigüedad
+  const ingreso=t.ingreso||t.fechaIngreso||null;
+  const {años,meses}=calcAntigüedad(ingreso);
+  div.innerHTML=`
+    <div class="card">
+      <div class="antig-badge">
+        <div class="antig-años">${años} ${años===1?'año':'años'}</div>
+        <div class="antig-lbl">${meses} meses de antigüedad · Ingreso ${ingreso?df(ingreso):'sin registrar'}</div>
+      </div>
+      <div class="perfil-row"><span class="perfil-label">Nombre</span><span class="perfil-val">${t.nombre||'—'}</span></div>
+      <div class="perfil-row"><span class="perfil-label">RUT</span><span class="perfil-val">${t.rut||'—'}</span></div>
+      <div class="perfil-row"><span class="perfil-label">Cargo</span><span class="perfil-val">${t.cargo||'—'}</span></div>
+      <div class="perfil-row"><span class="perfil-label">Área</span><span class="perfil-val">${t.area||'—'}</span></div>
+      <div class="perfil-row"><span class="perfil-label">Tipo contrato</span><span class="perfil-val">${t.contrato||'—'}</span></div>
+      <div class="perfil-row"><span class="perfil-label">Sueldo base</span><span class="perfil-val" style="color:var(--green)">${clp(t.sueldo||0)}</span></div>
+      <div class="perfil-row"><span class="perfil-label">AFP</span><span class="perfil-val">${t.afp||'—'}</span></div>
+      <div class="perfil-row"><span class="perfil-label">Salud</span><span class="perfil-val">${t.salud||'—'}</span></div>
+      <div class="perfil-row"><span class="perfil-label">Banco</span><span class="perfil-val">${t.banco||'—'}</span></div>
+      <div class="perfil-row"><span class="perfil-label">N° Cuenta</span><span class="perfil-val">${t.cuenta||'—'}</span></div>
+      <div class="perfil-row"><span class="perfil-label">Email</span><span class="perfil-val">${t.email||_user?.email||'—'}</span></div>
+      <div class="perfil-row"><span class="perfil-label">Estado</span><span class="perfil-val">
+        <span class="pill ${t.estado==='activo'?'pill-ok':t.estado==='licencia'?'pill-warn':'pill-info'}">${t.estado||'activo'}</span>
+      </span></div>
+    </div>`;
+}
+
+// ── CERTIFICADO ANTIGÜEDAD ──
+function generarCertificado(){
+  const t=_trab;
+  if(!t){toast('⚠ Sin datos de trabajador');return;}
+  const ingreso=t.ingreso||t.fechaIngreso||'—';
+  const {años,meses}=calcAntigüedad(ingreso);
+  const hoy=new Date().toLocaleDateString('es-CL',{year:'numeric',month:'long',day:'numeric'});
+  const html=`
+    <div class="cert-wrap" id="certDoc">
+      <div class="cert-hdr">
+        <div><div style="font-size:14px;font-weight:900">MARTINEZ SERVICES SPA</div><div style="font-size:10px;opacity:.8">RUT: 76.782.954-K</div></div>
+        <div style="text-align:right"><div style="font-size:12px;font-weight:700">CERTIFICADO DE ANTIGÜEDAD</div><div style="font-size:10px;opacity:.8">${hoy}</div></div>
+      </div>
+      <div style="padding:14px 0;font-size:12px;line-height:1.8;color:#333">
+        Por medio del presente certificado, <strong>Martinez Services Spa</strong>, RUT 76.782.954-K, certifica que:
+      </div>
+      <div class="cert-row"><span style="color:#666">Nombre completo</span><strong>${t.nombre||'—'}</strong></div>
+      <div class="cert-row"><span style="color:#666">RUT</span><strong>${t.rut||'—'}</strong></div>
+      <div class="cert-row"><span style="color:#666">Cargo</span><strong>${t.cargo||'—'}</strong></div>
+      <div class="cert-row"><span style="color:#666">Tipo de contrato</span><strong>${t.contrato||'—'}</strong></div>
+      <div class="cert-row"><span style="color:#666">Fecha de ingreso</span><strong>${df(ingreso)}</strong></div>
+      <div class="cert-row"><span style="color:#666">Antigüedad</span><strong style="color:var(--green)">${años} año(s) y ${meses} mes(es)</strong></div>
+      <div class="cert-row"><span style="color:#666">Remuneración base</span><strong>${clp(t.sueldo||0)}</strong></div>
+      <div class="cert-row"><span style="color:#666">Estado</span><strong>${t.estado||'Activo'}</strong></div>
+      <div class="cert-firma">
+        <div style="font-size:11px;color:#666">Se extiende el presente certificado a petición del interesado/a en Alto Hospicio, ${hoy}.</div>
+        <div style="margin-top:20px;border-top:1px solid #ccc;padding-top:10px">
+          <div style="font-weight:900;font-size:12px">Gaudy Martínez</div>
+          <div style="font-size:10px;color:#666">Administradora · Martinez Services Spa</div>
+        </div>
+      </div>
+    </div>
+    <button onclick="imprimirCert()" style="width:100%;margin-top:10px;padding:12px;background:linear-gradient(135deg,var(--green),var(--green2));color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🖨 Imprimir / Guardar PDF</button>`;
+  document.getElementById('certZone').innerHTML=html;
+}
+
+function imprimirCert(){
+  const doc=document.getElementById('certDoc');
+  if(!doc)return;
+  document.getElementById('printZone').innerHTML=doc.outerHTML;
+  window.print();
+}
+
+// ── IMPRIMIR LIQUIDACIÓN ──
+function imprimirLiq(idOrPeriodo){
+  const l=LIQUIDACIONES.find(x=>(x.id||x.periodo)===idOrPeriodo)||LIQUIDACIONES[0];
+  if(!l){toast('⚠ Liquidación no encontrada');return;}
+  const t=l.trab||_trab||{};
+  const hoy=new Date().toLocaleDateString('es-CL');
+  const html=`
+    <div style="font-family:Arial,sans-serif;font-size:11px;max-width:600px;margin:0 auto;color:#1a1a1a">
+      <div style="background:#1a5c3a;color:white;padding:14px 20px;display:flex;justify-content:space-between">
+        <div><strong style="font-size:14px">MARTINEZ SERVICES SPA</strong><div style="font-size:10px;opacity:.8">RUT: 76.782.954-K</div></div>
+        <div style="text-align:right"><strong>LIQUIDACIÓN DE SUELDO</strong><div style="font-size:10px;opacity:.8">${formatMes(l.periodo)}</div></div>
+      </div>
+      <div style="padding:12px 20px;background:#f8fffe;border-bottom:2px solid #1a5c3a">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">
+          <div><span style="color:#666">Trabajador:</span> <strong>${t.nombre||'—'}</strong></div>
+          <div><span style="color:#666">RUT:</span> <strong>${t.rut||'—'}</strong></div>
+          <div><span style="color:#666">Cargo:</span> <strong>${t.cargo||'—'}</strong></div>
+          <div><span style="color:#666">AFP:</span> <strong>${t.afp||'—'}</strong></div>
+          <div><span style="color:#666">Salud:</span> <strong>${t.salud||'—'}</strong></div>
+          <div><span style="color:#666">Contrato:</span> <strong>${t.contrato||'—'}</strong></div>
+        </div>
+      </div>
+      <div style="padding:14px 20px">
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0"><span>Sueldo Base</span><span>${clp(l.sueldoBase||0)}</span></div>
+        ${(l.gratif||0)>0?`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0"><span>Gratificación</span><span>${clp(l.gratif)}</span></div>`:''}
+        ${(l.bonoExtra||0)>0?`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0"><span>Bono Extra</span><span>${clp(l.bonoExtra)}</span></div>`:''}
+        <div style="display:flex;justify-content:space-between;padding:6px 0;font-weight:700;border-bottom:2px solid #1a5c3a"><span>Total Haberes</span><span>${clp(l.totalHaberes||l.bruto||0)}</span></div>
+        ${(l.montAFP||0)>0?`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;color:#dc2626"><span>AFP ${(t.afp||'').toUpperCase()}</span><span>-${clp(l.montAFP)}</span></div>`:''}
+        ${(l.montSalud||0)>0?`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;color:#dc2626"><span>Salud</span><span>-${clp(l.montSalud)}</span></div>`:''}
+        ${(l.impuesto||0)>0?`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;color:#dc2626"><span>Impuesto 2ª Cat.</span><span>-${clp(l.impuesto)}</span></div>`:''}
+        <div style="display:flex;justify-content:space-between;padding:6px 0;font-weight:700;color:#dc2626;border-bottom:2px solid #1a5c3a"><span>Total Descuentos</span><span>-${clp(l.totalDescuentos||0)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:10px 0;font-weight:900;font-size:14px;background:#e8f5ee;margin:8px -14px -14px;padding:12px 14px;border-radius:0 0 8px 8px"><span style="color:#1a5c3a">SUELDO LÍQUIDO</span><span style="color:#1a5c3a">${clp(l.neto||l.liquido||0)}</span></div>
+      </div>
+      <div style="text-align:center;padding:10px 20px;font-size:9px;color:#888;border-top:1px solid #eee">Generado por Martinez Services ERP · ${hoy} · Portal Colaborador</div>
+    </div>`;
+  document.getElementById('printZone').innerHTML=html;
+  window.print();
+}
+
+// ── SOLICITUDES ──
+function toggleSol(id){
+  const el=document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+function enviarSolicitud(tipo){
+  let descripcion='',dias=0,monto=0,fecha=HOY,motivo='';
+  if(tipo==='vacaciones'){
+    const desde=document.getElementById('vacDesde').value;
+    const hasta=document.getElementById('vacHasta').value;
+    const obs=document.getElementById('vacObs').value;
+    if(!desde||!hasta){toast('⚠ Ingresa fechas de inicio y término');return;}
+    dias=Math.max(1,Math.round((new Date(hasta)-new Date(desde))/(1000*60*60*24))+1);
+    descripcion=`Vacaciones ${df(desde)} al ${df(hasta)} (${dias} días)`;
+    fecha=desde;motivo=obs;
+  } else if(tipo==='permiso'){
+    const pt=document.getElementById('permTipo').value;
+    const pf=document.getElementById('permFecha').value;
+    const pd=parseInt(document.getElementById('permDias').value)||1;
+    const pm=document.getElementById('permMotivo').value;
+    if(!pf){toast('⚠ Ingresa la fecha');return;}
+    descripcion=pt;fecha=pf;dias=pd;motivo=pm;
+  } else if(tipo==='anticipo'){
+    const am=parseFloat(document.getElementById('anticMonto').value)||0;
+    const amot=document.getElementById('anticMotivo').value;
+    if(!am){toast('⚠ Ingresa el monto');return;}
+    descripcion=`Anticipo de sueldo ${clp(am)}`;monto=am;motivo=amot;
+  }
+  const sol={id:'sol_'+Date.now(),tipo,descripcion,fecha,dias,monto,motivo,estado:'pendiente',creado:new Date().toISOString(),trabajador:_trab?.nombre||_user?.email||'—'};
+  SOLICITUDES.unshift(sol);
+  guardarSolicitudesLocal();
+  // Guardar en Firestore para que el admin vea
+  guardarSolicitudFirestore(sol);
+  toast('✅ Solicitud enviada correctamente');
+  toggleSol(tipo==='vacaciones'?'solVac':tipo==='permiso'?'solPerm':'solAntic');
+  if(tipo==='vacaciones')renderSolicitudesList('solVacList','vacaciones');
+  if(tipo==='permiso')renderSolicitudesList('solPermList','permiso');
+  if(tipo==='anticipo')renderSolicitudesList('solAnticList','anticipo');
+  renderVacHome();
+}
+
+async function guardarSolicitudFirestore(sol){
+  try{
+    await _fbM.setDoc(_fbM.doc(_db,'solicitudes_trabajador/'+sol.id),{
+      ...sol,empId:_empId,uid:_user?.uid||'',email:_user?.email||''
+    });
+  }catch(e){console.warn('No se pudo guardar solicitud en FB:',e.message);}
+}
+
+// ── HELPERS ──
+function calcDiasVacaciones(ingreso){
+  if(!ingreso)return 15;
+  const años=Math.floor((Date.now()-new Date(ingreso))/(1000*60*60*24*365));
+  return Math.min(15+Math.max(0,años-10),30); // 15 días base, +1 por año desde año 10, max 30
+}
+
+function calcAntigüedad(ingreso){
+  if(!ingreso)return{años:0,meses:0};
+  const d=new Date(ingreso);const h=new Date();
+  let años=h.getFullYear()-d.getFullYear();
+  let meses=h.getMonth()-d.getMonth();
+  if(meses<0){años--;meses+=12;}
+  return{años:Math.max(0,años),meses:Math.max(0,meses)};
+}
+
+function formatMes(m){
+  if(!m)return'—';
+  try{const[y,mo]=m.split('-');const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];return(meses[parseInt(mo)-1]||mo)+' '+y;}catch(e){return m;}
+}
+
+// ── SALIR ──
+document.getElementById('btnSalir').onclick=async()=>{
+  if(!confirm('¿Cerrar sesión?'))return;
+  try{const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');await fa.signOut(_auth);}catch(e){}
+  document.getElementById('sc-app').style.display='none';
+  document.getElementById('sc-login').style.display='flex';
+  _user=null;_trab=null;LIQUIDACIONES=[];
+};
+
+// ── VERIFICAR SESIÓN AL CARGAR ──
+(async()=>{
+  try{
+    const {fa}=await initFB();
+    try{
+      const result=await fa.getRedirectResult(_auth);
+      if(result&&result.user){_user=result.user;await cargarYEntrar();return;}
+    }catch(e){}
+    fa.onAuthStateChanged(_auth,async user=>{
+      if(user&&!_user){_user=user;await cargarYEntrar();}
+    });
+  }catch(e){console.warn('Init:',e);}
+})();
+</script>
+</body>
+</html>
