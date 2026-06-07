@@ -511,7 +511,24 @@ document.getElementById('btnIngresar').onclick=async()=>{
     const {fa}=await initFB();
     const cred=await fa.signInWithEmailAndPassword(_auth,email,pass);
     _user=cred.user;
-    await entrarApp(_tipoSel);
+    // ── SEGURIDAD: verificar rol real en Firestore ──
+    let rolReal='residente';
+    try{
+      const uSnap=await _fbM.getDoc(_fbM.doc(_db,'usuarios/'+_user.uid));
+      if(uSnap.exists()) rolReal=uSnap.data().rol||'residente';
+    }catch(e){ rolReal='residente'; }
+    // Si intenta entrar como admin pero su rol es residente → bloquear
+    if(_tipoSel==='admin' && rolReal!=='admin' && rolReal!=='superadmin'){
+      const fa2=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+      await fa2.signOut(_auth);
+      _user=null;
+      err.textContent='⛔ Acceso denegado. Tu cuenta no tiene permisos de administrador.';
+      err.style.display='block';
+      return;
+    }
+    // Si es residente intentando entrar como residente → ok
+    const tipoFinal=(rolReal==='superadmin'||rolReal==='admin')?'admin':'residente';
+    await entrarApp(tipoFinal);
   }catch(e){
     const msgs={'auth/user-not-found':'Correo no registrado.','auth/wrong-password':'Contraseña incorrecta.','auth/invalid-credential':'Correo o contraseña incorrectos.','auth/too-many-requests':'Demasiados intentos. Espera unos minutos.'};
     err.textContent=msgs[e.code]||'Error al iniciar sesión.';err.style.display='block';
@@ -886,14 +903,18 @@ function renderGastoComun(u){
   const montoActual=actual?actual.gcOrd||gcBase:gcBase;
   const montoAnt=anterior?anterior.gcOrd||gcBase:gcBase;
   const maxBar=Math.max(montoActual,montoAnt,1);
-  const hAct=Math.round((montoActual/maxBar)*48)+4;
-  const hAnt=Math.round((montoAnt/maxBar)*48)+4;
+  // Siempre mostrar barras proporcionales con mínimo visual de 20%
+  const hAct=Math.max(Math.round((montoActual/maxBar)*48),10);
+  const hAnt=Math.max(Math.round((montoAnt/maxBar)*48),10);
 
-  document.getElementById('gcMesLabel').textContent=actual?formatMes(actual.mes):(formatMes(MES));
+  document.getElementById('gcMesLabel').textContent=actual?formatMes(actual.mes):formatMes(MES);
   document.getElementById('gcActual').textContent=clp(montoActual);
   document.getElementById('gcAnterior').textContent=clp(montoAnt);
   document.getElementById('barActual').style.height=hAct+'px';
   document.getElementById('barAnterior').style.height=hAnt+'px';
+  // Etiquetas sobre barras
+  document.getElementById('barActual').title='Actual: '+clp(montoActual);
+  document.getElementById('barAnterior').title='Anterior: '+clp(montoAnt);
 
   let estadoHtml='';
   if(actual){
@@ -903,12 +924,12 @@ function renderGastoComun(u){
     const colores={Pagado:{bg:'#e8f5ee',c:'#10B981'},Moroso:{bg:'#fdecea',c:'#EF4444'},Abono:{bg:'#fff8e1',c:'#F59E0B'},Pendiente:{bg:'#fff8e1',c:'#F59E0B'}};
     const col=colores[estado]||colores.Pendiente;
     estadoHtml=`<div class="gc-estado-badge" style="background:${col.bg};color:${col.c}">
-      ${estado==='Pagado'?'✅':estado==='Moroso'?'⚠':'⏳'} ${estado}
-      ${pagado>0?'· Pagado: '+clp(pagado):''}
-      ${saldo>0?'· Debe: '+clp(saldo):''}
+      ${estado==='Pagado'?'✅':estado==='Moroso'?'⚠️':'⏳'} ${estado}
+      ${pagado>0?' · Pagado: '+clp(pagado):''}
+      ${saldo>0?' · Debe: '+clp(saldo):''}
     </div>`;
   } else {
-    estadoHtml=`<div class="gc-estado-badge" style="background:#fff8e1;color:#F59E0B">⏳ Sin cobro registrado este mes</div>`;
+    estadoHtml=`<div class="gc-estado-badge" style="background:#f0f4ff;color:#6366f1">📋 Cuota base: ${clp(gcBase)} · Sin cobro registrado aún</div>`;
   }
   document.getElementById('gcEstado').innerHTML=estadoHtml;
 }
@@ -988,9 +1009,12 @@ function renderMiPropiedad(){
   if(!u)return;
   const deuda=COBROS.filter(c=>String(c.unidadId)===String(u.id)&&c.saldo>0).reduce((s,c)=>s+c.saldo,0);
   const pagos=COBROS.filter(c=>String(c.unidadId)===String(u.id)).length;
+  // Estacionamiento: leer de todos los campos posibles de la ficha
+  const estac=u.estacionamiento||u.estac||u.parking||u.numeroEstacionamiento||'';
+  const bodega=u.bodega||u.numeroBodega||u.bodegas||'';
   document.getElementById('resPropInfo').innerHTML=`
     <div style="background:linear-gradient(135deg,#1a5c3a,#166534);border-radius:16px;padding:20px;color:white;margin-bottom:14px">
-      <div style="font-size:18px;font-weight:900;margin-bottom:4px">${u.torre?u.torre+' — ':''} Unidad ${u.num}</div>
+      <div style="font-size:18px;font-weight:900;margin-bottom:4px">${u.torre?u.torre+' — ':''} Unidad ${u.num||'—'}</div>
       <div style="font-size:12px;opacity:.8">${u.prop&&u.prop!=='(Por completar)'?u.prop:'—'}</div>
       ${u.rut?`<div style="font-size:11px;opacity:.7;margin-top:4px">RUT: ${u.rut}</div>`:''}
     </div>
@@ -1004,13 +1028,57 @@ function renderMiPropiedad(){
         <div style="font-size:10px;color:#888;margin-top:3px;font-weight:700">PAGOS REGISTRADOS</div>
       </div>
     </div>
-    <div style="background:white;border-radius:14px;padding:16px;box-shadow:0 1px 6px rgba(0,0,0,.06)">
-      <div style="font-size:12px;font-weight:800;color:#1a1a2e;margin-bottom:12px">DATOS DE LA UNIDAD</div>
-      ${u.estacionamiento?`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:12px"><span style="color:#888">Estacionamiento</span><span style="font-weight:700">🚗 ${u.estacionamiento}</span></div>`:''}
-      ${u.bodega?`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:12px"><span style="color:#888">Bodega</span><span style="font-weight:700">📦 ${u.bodega}</span></div>`:''}
-      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:12px"><span style="color:#888">Gasto Común Base</span><span style="font-weight:700;color:#1a5c3a">${clp(u.gcCustom||CFG.gc||40000)}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:12px"><span style="color:#888">Condominio</span><span style="font-weight:700">${CFG.nombre||'Condominio Pioneros 2'}</span></div>
+
+    <!-- DATOS UNIDAD -->
+    <div style="background:white;border-radius:14px;padding:16px;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-bottom:14px">
+      <div style="font-size:12px;font-weight:800;color:#1a1a2e;margin-bottom:12px">📋 DATOS DE LA UNIDAD</div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:12px">
+        <span style="color:#888">Estacionamiento</span>
+        <span style="font-weight:700">${estac?'🚗 N° '+estac:'<span style="color:#bbb">Sin asignar</span>'}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:12px">
+        <span style="color:#888">Bodega</span>
+        <span style="font-weight:700">${bodega?'📦 N° '+bodega:'<span style="color:#bbb">Sin asignar</span>'}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:12px">
+        <span style="color:#888">Gasto Común Base</span>
+        <span style="font-weight:700;color:#1a5c3a">${clp(u.gcCustom||CFG.gc||40000)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:12px">
+        <span style="color:#888">Condominio</span>
+        <span style="font-weight:700">${CFG.nombre||'Condominio Pioneros 2'}</span>
+      </div>
+    </div>
+
+    <!-- CASCARÓN PAGO AUTOMÁTICO (estructura lista para futura pasarela) -->
+    <div style="background:white;border-radius:14px;padding:16px;box-shadow:0 1px 6px rgba(0,0,0,.06);border:2px dashed #e5e7eb" id="pagoAutoCard">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div>
+          <div style="font-size:13px;font-weight:800;color:#1a1a2e">💳 Pago Automático</div>
+          <div style="font-size:10px;color:#888;margin-top:2px">Débito automático mensual</div>
+        </div>
+        <!-- Toggle switch -->
+        <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer" title="Próximamente disponible">
+          <input type="checkbox" id="togglePagoAuto" style="opacity:0;width:0;height:0" disabled onchange="togglePagoAutomatico(this.checked)">
+          <span id="sliderPagoAuto" style="position:absolute;inset:0;background:#e5e7eb;border-radius:24px;transition:.3s">
+            <span style="position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.2)" id="sliderThumb"></span>
+          </span>
+        </label>
+      </div>
+      <div id="pagoAutoDetalle" style="display:none">
+        <div style="background:#f8fffe;border:1px solid #d1fae5;border-radius:10px;padding:12px;margin-bottom:10px">
+          <div style="font-size:11px;font-weight:700;color:#1a5c3a;margin-bottom:8px">TOPE MÁXIMO DE COBRO</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:13px;color:#888">$</span>
+            <input type="number" id="pagoAutoTope" placeholder="Ej: 50000" style="flex:1;padding:8px;background:#f0f0f0;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;font-weight:700;outline:none;color:#1a1a2e" min="0" step="1000"/>
+          </div>
+          <div style="font-size:10px;color:#888;margin-top:6px">Si el cobro supera este monto, el pago automático no se ejecutará.</div>
+        </div>
+        <button onclick="guardarConfigPagoAuto()" style="width:100%;padding:11px;background:linear-gradient(135deg,#1a5c3a,#166534);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit">Guardar configuración</button>
+      </div>
+      <div style="font-size:10px;color:#bbb;text-align:center;margin-top:8px" id="pagoAutoProx">🔒 Próximamente — Pasarela de pago en desarrollo</div>
     </div>`;
+}
 }
 
 function renderAvisosAll(){
@@ -1026,7 +1094,36 @@ function renderAvisosAll(){
   </div>`).join('');
 }
 
-// Helper formato mes
+// ══════════ PAGO AUTOMÁTICO (cascarón — estructura lista para pasarela futura) ══════════
+function togglePagoAutomatico(activo){
+  const detalle=document.getElementById('pagoAutoDetalle');
+  const prox=document.getElementById('pagoAutoProx');
+  const slider=document.getElementById('sliderPagoAuto');
+  const thumb=document.getElementById('sliderThumb');
+  if(activo){
+    detalle.style.display='block';
+    prox.style.display='none';
+    slider.style.background='#1a5c3a';
+    thumb.style.transform='translateX(20px)';
+  }else{
+    detalle.style.display='none';
+    prox.style.display='block';
+    slider.style.background='#e5e7eb';
+    thumb.style.transform='translateX(0)';
+  }
+}
+function guardarConfigPagoAuto(){
+  const tope=parseFloat(document.getElementById('pagoAutoTope')?.value)||0;
+  if(!tope){toast('⚠ Ingresa un tope máximo');return;}
+  // Guardar en Firestore cuando esté disponible la pasarela
+  // Por ahora guarda en localStorage como estructura preparada
+  try{
+    localStorage.setItem('mss_pago_auto_'+EMP_ID+'_'+((_unidadRes?.id)||''),JSON.stringify({activo:true,tope,configurado:Date.now()}));
+    toast('✅ Configuración guardada — Se activará cuando la pasarela esté disponible');
+  }catch(e){toast('Error al guardar');}
+}
+
+
 function formatMes(m){
   if(!m)return '—';
   try{
@@ -1080,9 +1177,17 @@ document.getElementById('filEst').onchange=renderCobros;
       const result=await fa.getRedirectResult(_auth);
       if(result&&result.user){_user=result.user;const tipo=sessionStorage.getItem('mss_tipo_pending')||'residente';await procesarLoginGoogle(tipo);return;}
     }catch(e){}
-    // Verificar sesión existente
+    // Verificar sesión existente — siempre consultar rol real en Firestore
     fa.onAuthStateChanged(_auth,async user=>{
-      if(user&&!_user){_user=user;const tipo=sessionStorage.getItem('mss_movil_tipo')||'admin';await entrarApp(tipo);}
+      if(user&&!_user){
+        _user=user;
+        let tipo='residente';
+        try{
+          const uSnap=await _fbM.getDoc(_fbM.doc(_db,'usuarios/'+user.uid));
+          if(uSnap.exists()){const r=uSnap.data().rol||'residente';if(r==='superadmin'||r==='admin')tipo='admin';}
+        }catch(e){tipo='residente';}
+        await entrarApp(tipo);
+      }
     });
   }catch(e){console.warn('Init:',e);}
 })();
