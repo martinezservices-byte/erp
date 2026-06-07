@@ -142,6 +142,14 @@ textarea.fi{resize:vertical;min-height:80px;}
 .stock-warn{color:var(--warn);}
 .stock-out{color:var(--danger);}
 
+/* RESERVAS */
+.res-estado{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;}
+.res-libre{background:rgba(34,197,94,0.15);color:var(--ok);}
+.res-reservado{background:rgba(239,68,68,0.15);color:var(--danger);}
+.res-parcial{background:rgba(245,158,11,0.15);color:var(--warn);}
+.inv-item{cursor:pointer;transition:all .2s;}
+.inv-item:active{background:rgba(201,168,76,0.05);border-color:rgba(201,168,76,0.3);}
+
 /* COTIZACION */
 .cot-linea{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
 .cot-linea .fi{flex:1;}
@@ -278,6 +286,23 @@ textarea.fi{resize:vertical;min-height:80px;}
     <div id="listaInventario"></div>
   </div>
 
+  <!-- PANTALLA: RESERVAS -->
+  <div class="sc" id="sc-reservas">
+    <div class="card" style="padding:10px 14px;margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="fg" style="margin:0">
+          <label>Desde</label>
+          <input class="fi" id="resFechaI" type="date" onchange="renderReservas()"/>
+        </div>
+        <div class="fg" style="margin:0">
+          <label>Hasta</label>
+          <input class="fi" id="resFechaF" type="date" onchange="renderReservas()"/>
+        </div>
+      </div>
+    </div>
+    <div id="listaReservas"></div>
+  </div>
+
   <!-- PANTALLA: PERFIL -->
   <div class="sc" id="sc-perfil">
     <div class="card">
@@ -305,6 +330,10 @@ textarea.fi{resize:vertical;min-height:80px;}
   <div class="btab" onclick="irTab('inventario',this)">
     <div class="btico">📦</div>
     <div class="btlbl">Inventario</div>
+  </div>
+  <div class="btab" onclick="irTab('reservas',this)">
+    <div class="btico">🔖</div>
+    <div class="btlbl">Reservas</div>
   </div>
   <div class="btab" onclick="irTab('perfil',this)">
     <div class="btico">👤</div>
@@ -356,6 +385,40 @@ textarea.fi{resize:vertical;min-height:80px;}
   </div>
 </div>
 
+<!-- SHEET: RESERVAR EQUIPO -->
+<div class="overlay" id="ovReservar">
+  <div class="sheet">
+    <div class="sh-handle"></div>
+    <div class="sh-title" id="resEquipoTit">Reservar Equipo</div>
+    <div class="sh-sub" id="resEquipoSub">—</div>
+    <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:12px;margin-bottom:14px" id="resEquipoInfo"></div>
+    <div class="fg">
+      <label>Cliente / Proyecto</label>
+      <input class="fi" id="resCliente" type="text" placeholder="¿Para quién es la reserva?"/>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="fg">
+        <label>Fecha Inicio</label>
+        <input class="fi" id="resDesde" type="date"/>
+      </div>
+      <div class="fg">
+        <label>Fecha Término</label>
+        <input class="fi" id="resHasta" type="date"/>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Cantidad</label>
+      <input class="fi" id="resCantidad" type="number" value="1" min="1"/>
+    </div>
+    <div class="fg">
+      <label>Notas (opcional)</label>
+      <input class="fi" id="resNotas" type="text" placeholder="Detalles de la reserva..."/>
+    </div>
+    <button class="btn btn-gold" onclick="confirmarReserva()" style="margin-bottom:10px">🔖 Confirmar Reserva</button>
+    <button class="btn btn-outline" onclick="cerrar('ovReservar')">Cancelar</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -365,7 +428,8 @@ textarea.fi{resize:vertical;min-height:80px;}
 const FB_CFG={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
 
 let _app,_auth,_db,_fbM,_user,_userRol='vendedor',_userEmpresas=[];
-let _empActual=null,INVENTARIO=[],CITAS=[],COTIZACIONES=[];
+let _empActual=null,INVENTARIO=[],CITAS=[],COTIZACIONES=[],RESERVAS=[];
+let _equipoReserva=null;
 
 const HOY=new Date().toISOString().split('T')[0];
 const clp=n=>'$'+(Math.round(n||0)).toLocaleString('es-CL');
@@ -525,6 +589,14 @@ async function cargarDatos(){
     // Cotizaciones del usuario
     const cotSnap=await _fbM.getDocs(_fbM.collection(_db,ep+'/cotizaciones_movil'));
     COTIZACIONES=[];cotSnap.forEach(d=>{const r=d.data();if(r.uid===_user.uid||_userRol==='admin'||_userRol==='superadmin')COTIZACIONES.push({id:d.id,...r});});
+    const resSnap=await _fbM.getDocs(_fbM.collection(_db,ep+'/reservas'));
+    RESERVAS=[];resSnap.forEach(d=>RESERVAS.push({id:d.id,...d.data()}));
+    // Tiempo real reservas
+    _fbM.onSnapshot(_fbM.collection(_db,ep+'/reservas'),snap=>{
+      RESERVAS=[];snap.forEach(d=>RESERVAS.push({id:d.id,...d.data()}));
+      if(document.getElementById('sc-reservas')?.classList.contains('on'))renderReservas();
+      renderInventario();
+    });
     // Tiempo real citas
     _fbM.onSnapshot(_fbM.collection(_db,ep+'/citas_movil'),snap=>{
       CITAS=[];snap.forEach(d=>{const r=d.data();if(r.uid===_user.uid||_userRol==='admin'||_userRol==='superadmin')CITAS.push({id:d.id,...r});});
@@ -707,20 +779,122 @@ window.renderInventario=function(){
   div.innerHTML=lista.map(i=>{
     const stock=i.stock??i.cantidad??null;
     const stClass=stock===null?'':stock===0?'stock-out':stock<5?'stock-warn':'stock-ok';
-    return`<div class="inv-item">
+    // Verificar reservas activas del equipo
+    const hoy=new Date().toISOString().split('T')[0];
+    const resActivas=RESERVAS.filter(r=>r.equipoId===i.id&&r.estado!=='Cancelada'&&r.hasta>=hoy);
+    const cantRes=resActivas.reduce((s,r)=>s+(r.cantidad||1),0);
+    const disponible=stock!==null?Math.max(0,stock-cantRes):null;
+    const estadoRes=disponible===0?'reservado':cantRes>0?'parcial':'libre';
+    const estadoLabel={'libre':'✓ Disponible','parcial':'Parcialmente reservado','reservado':'🔴 Sin disponibilidad'}[estadoRes];
+    const estadoClass={'libre':'res-libre','parcial':'res-parcial','reservado':'res-reservado'}[estadoRes];
+    return`<div class="inv-item" onclick="abrirReservar('${i.id}')">
       <div class="inv-ico">${i.tipo==='Vehículo'?'🚗':i.tipo==='Equipo'?'⚙':i.tipo==='Herramienta'?'🔧':'📦'}</div>
-      <div class="inv-info">
+      <div class="inv-info" style="flex:1">
         <div class="inv-name">${i.nombre||i.modelo||'—'}</div>
-        <div class="inv-det">${i.marca||''} ${i.modelo||''} · ${i.estado||i.tipo||'—'}</div>
+        <div class="inv-det">${i.marca||''} ${i.modelo||''} · ${i.tipo||'—'}</div>
         ${i.patente?`<div class="inv-det">Patente: ${i.patente}</div>`:''}
+        <div style="margin-top:5px;display:flex;align-items:center;gap:8px">
+          <span class="res-estado ${estadoClass}">${estadoLabel}</span>
+          ${resActivas.length>0?`<span style="font-size:10px;color:var(--muted)">${resActivas.length} reserva(s)</span>`:''}
+        </div>
       </div>
-      ${stock!==null?`<div class="inv-stock"><div class="inv-num ${stClass}">${stock}</div><div style="font-size:9px;color:var(--muted)">stock</div></div>`:`<span class="badge ${i.estado==='Activo'?'b-ok':'b-warn'}">${i.estado||'—'}</span>`}
+      <div style="text-align:right;flex-shrink:0">
+        ${disponible!==null?`<div class="inv-num ${stClass}" style="font-size:16px">${disponible}</div><div style="font-size:9px;color:var(--muted)">dispon.</div>`:''}
+        <button onclick="event.stopPropagation();abrirReservar('${i.id}')" style="margin-top:6px;padding:5px 10px;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.3);color:var(--gold);border-radius:7px;font-size:10px;font-weight:700;cursor:pointer">🔖 Reservar</button>
+      </div>
     </div>`;}).join('');
 };
 
 // ══════════════════════════════════════════
 // PERFIL
 // ══════════════════════════════════════════
+// ══════════════════════════════════════════
+// RESERVAS
+// ══════════════════════════════════════════
+window.abrirReservar=function(equipoId){
+  const eq=INVENTARIO.find(i=>i.id===equipoId);if(!eq)return;
+  _equipoReserva=eq;
+  document.getElementById('resEquipoTit').textContent='Reservar: '+(eq.nombre||eq.modelo||'Equipo');
+  document.getElementById('resEquipoSub').textContent=(eq.marca||'')+' · '+(eq.tipo||'—')+(eq.patente?' · '+eq.patente:'');
+  // Info de disponibilidad
+  const hoy=new Date().toISOString().split('T')[0];
+  const resActivas=RESERVAS.filter(r=>r.equipoId===equipoId&&r.estado!=='Cancelada'&&r.hasta>=hoy);
+  const stock=eq.stock??eq.cantidad??null;
+  document.getElementById('resEquipoInfo').innerHTML=`
+    <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">Estado de disponibilidad</div>
+    ${stock!==null?`<div style="font-size:12px">Stock total: <strong>${stock}</strong> unidades</div>`:''}
+    <div style="font-size:12px">Reservas activas: <strong style="color:${resActivas.length>0?'var(--warn)':'var(--ok)'}">${resActivas.length}</strong></div>
+    ${resActivas.length>0?`<div style="margin-top:8px;font-size:11px;color:var(--muted)">${resActivas.map(r=>`${r.cliente||'—'}: ${r.desde} → ${r.hasta} (${r.cantidad||1} ud.)`).join('<br>')}</div>`:''}`;
+  const f=new Date().toISOString().split('T')[0];
+  document.getElementById('resDesde').value=f;
+  const f2=new Date(Date.now()+86400000).toISOString().split('T')[0];
+  document.getElementById('resHasta').value=f2;
+  document.getElementById('resCliente').value='';
+  document.getElementById('resCantidad').value='1';
+  document.getElementById('resNotas').value='';
+  document.getElementById('ovReservar').classList.add('open');
+};
+
+window.confirmarReserva=async function(){
+  if(!_equipoReserva)return;
+  const cliente=document.getElementById('resCliente').value.trim();
+  const desde=document.getElementById('resDesde').value;
+  const hasta=document.getElementById('resHasta').value;
+  const cantidad=parseInt(document.getElementById('resCantidad').value)||1;
+  const notas=document.getElementById('resNotas').value.trim();
+  if(!cliente){toast('⚠ Ingresa el nombre del cliente o proyecto');return;}
+  if(!desde||!hasta){toast('⚠ Selecciona las fechas');return;}
+  if(desde>hasta){toast('⚠ La fecha de inicio no puede ser mayor al término');return;}
+  const obj={id:'res_'+Date.now(),equipoId:_equipoReserva.id,equipoNombre:_equipoReserva.nombre||_equipoReserva.modelo||'Equipo',cliente,desde,hasta,cantidad,notas,estado:'Confirmada',uid:_user.uid,vendedor:_user.displayName||_user.email,ts:Date.now()};
+  try{
+    await _fbM.setDoc(_fbM.doc(_db,'empresas/'+_empActual.id+'/reservas/'+obj.id),obj);
+    cerrar('ovReservar');
+    toast('✅ Reserva confirmada para '+cliente);
+    renderInventario();
+  }catch(e){toast('❌ Error: '+e.message);}
+};
+
+function renderReservas(){
+  const div=document.getElementById('listaReservas');if(!div)return;
+  const fi=document.getElementById('resFechaI')?.value||new Date().toISOString().split('T')[0];
+  const ff=document.getElementById('resFechaF')?.value||'2099-12-31';
+  if(!document.getElementById('resFechaI').value) document.getElementById('resFechaI').value=fi;
+  const hoy=new Date().toISOString().split('T')[0];
+  const lista=RESERVAS.filter(r=>r.estado!=='Cancelada'&&r.hasta>=fi&&r.desde<=ff)
+    .sort((a,b)=>a.desde.localeCompare(b.desde));
+  if(!lista.length){
+    div.innerHTML='<div class="empty"><div class="empty-ico">🔖</div><div>Sin reservas en el período</div></div>';
+    return;
+  }
+  div.innerHTML=lista.map(r=>{
+    const vencida=r.hasta<hoy;
+    const activa=r.desde<=hoy&&r.hasta>=hoy;
+    return`<div class="item">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div>
+          <div class="item-titulo">📦 ${r.equipoNombre||'—'}</div>
+          <div class="item-sub">👤 ${r.cliente||'—'} · ${r.cantidad||1} ud.</div>
+          <div class="item-sub">📅 ${r.desde} → ${r.hasta}</div>
+          ${r.notas?`<div class="item-sub" style="color:var(--mutedHi)">${r.notas}</div>`:''}
+        </div>
+        <div style="text-align:right">
+          <span class="badge ${activa?'b-ok':vencida?'':'b-info'}">${activa?'En curso':vencida?'Finalizada':'Próxima'}</span>
+          <div style="font-size:10px;color:var(--muted);margin-top:4px">${r.vendedor||'—'}</div>
+        </div>
+      </div>
+      ${r.uid===_user.uid||_userRol==='admin'||_userRol==='superadmin'?
+        `<button onclick="cancelarReserva('${r.id}')" style="padding:5px 12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:var(--danger);border-radius:6px;font-size:10px;cursor:pointer;font-family:monospace">✕ Cancelar reserva</button>`:''}
+    </div>`;}).join('');
+}
+
+window.cancelarReserva=async function(id){
+  if(!confirm('¿Cancelar esta reserva?'))return;
+  try{
+    await _fbM.setDoc(_fbM.doc(_db,'empresas/'+_empActual.id+'/reservas/'+id),{estado:'Cancelada'},{merge:true});
+    toast('✅ Reserva cancelada');
+  }catch(e){toast('❌ Error: '+e.message);}
+};
+
 function renderPerfil(){
   const div=document.getElementById('perfilContent');
   if(div)div.innerHTML=`
@@ -756,6 +930,7 @@ window.irTab=function(id,btn){
   if(btn)btn.classList.add('on');
   if(id==='cotizar')renderListaCotizaciones();
   if(id==='inventario')renderInventario();
+  if(id==='reservas')renderReservas();
   if(id==='perfil')renderPerfil();
 };
 window.cerrar=function(id){document.getElementById(id)?.classList.remove('open');};
