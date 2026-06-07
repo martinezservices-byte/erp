@@ -275,6 +275,9 @@ try{
   <button class="tab" onclick="showTab('libro',this)">📚 Libro Remuneraciones</button>
   <button class="tab" onclick="showTab('vacaciones',this)">🏖 Vacaciones</button>
   <button class="tab" onclick="showTab('finiquitos',this)">📋 Finiquitos</button>
+  <button class="tab" onclick="showTab('previred',this)">🏦 Previred / DT</button>
+  <button class="tab" onclick="showTab('exportar',this)">📤 Exportar</button>
+  <button class="tab" onclick="showTab('importar',this)">📥 Importar</button>
   <button class="tab" onclick="showTab('parametros',this)">⚙ Parámetros</button>
 </div>
 
@@ -473,6 +476,181 @@ try{
     </div>
   </div>
 
+  <!-- ══ PREVIRED / DT ══ -->
+  <div id="sec-previred" class="section">
+    <div class="card-title" style="font-size:16px;font-weight:900;margin-bottom:6px">🏦 Previred y Dirección del Trabajo (DT)</div>
+    <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:20px">Exporta los datos en los formatos exigidos por Previred (pago cotizaciones) y DT (contratos, libros, finiquitos).</div>
+
+    <!-- SELECTOR MES -->
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap">
+      <div>
+        <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:4px;font-family:var(--mono)">PERÍODO</label>
+        <input type="month" id="previredMes" style="padding:8px 12px;background:var(--surf);border:1px solid var(--border);border-radius:8px;color:var(--white);font-family:var(--mono);font-size:12px;outline:none"/>
+      </div>
+      <button class="btn-gold" style="margin-top:16px;padding:8px 20px;font-size:12px" onclick="generarPrevired()">📊 Calcular Previred</button>
+    </div>
+
+    <!-- TABLA PREVIRED -->
+    <div style="overflow-x:auto;margin-bottom:24px">
+      <table id="tblPrevired" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono)">
+        <thead>
+          <tr style="background:rgba(201,168,76,0.15)">
+            <th style="padding:8px 10px;text-align:left;color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.2)">RUT</th>
+            <th style="padding:8px 10px;text-align:left;color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.2)">Nombre</th>
+            <th style="padding:8px 10px;text-align:right;color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.2)">Rem. Imponible</th>
+            <th style="padding:8px 10px;text-align:right;color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.2)">AFP</th>
+            <th style="padding:8px 10px;text-align:right;color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.2)">Cot. AFP ($)</th>
+            <th style="padding:8px 10px;text-align:left;color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.2)">Salud</th>
+            <th style="padding:8px 10px;text-align:right;color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.2)">Cot. Salud ($)</th>
+            <th style="padding:8px 10px;text-align:right;color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.2)">SIS Emp. ($)</th>
+            <th style="padding:8px 10px;text-align:right;color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.2)">Seg. Cesantía T. ($)</th>
+            <th style="padding:8px 10px;text-align:right;color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.2)">Seg. Cesantía E. ($)</th>
+            <th style="padding:8px 10px;text-align:right;color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.2)">Total Cotiz.</th>
+          </tr>
+        </thead>
+        <tbody id="bodyPrevired">
+          <tr><td colspan="11" style="text-align:center;padding:20px;color:var(--muted)">Selecciona un período y haz clic en "Calcular Previred"</td></tr>
+        </tbody>
+        <tfoot id="footPrevired"></tfoot>
+      </table>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px">
+      <button class="btn-gold" onclick="exportarPreviredCSV()">📥 Descargar CSV Previred</button>
+      <button class="btn-ghost" onclick="exportarPreviredExcel()">📊 Descargar Excel Previred</button>
+    </div>
+
+    <!-- DT — LIBRO DE REMUNERACIONES OFICIAL -->
+    <div style="border-top:1px solid var(--border);padding-top:20px;margin-bottom:20px">
+      <div style="font-size:14px;font-weight:800;color:var(--white);margin-bottom:4px">📋 DT — Libro de Remuneraciones Oficial</div>
+      <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:14px">Formato exigido por la Dirección del Trabajo. Incluye todos los campos requeridos por la Ley 20.022.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn-gold" onclick="generarLibroDT()">📄 Generar Libro DT (PDF)</button>
+        <button class="btn-ghost" onclick="exportarLibroDTExcel()">📊 Exportar Libro DT (Excel)</button>
+      </div>
+    </div>
+
+    <!-- DT — CONTRATO -->
+    <div style="border-top:1px solid var(--border);padding-top:20px;margin-bottom:20px">
+      <div style="font-size:14px;font-weight:800;color:var(--white);margin-bottom:4px">📝 DT — Contrato de Trabajo</div>
+      <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:14px">Genera el contrato de trabajo según Art. 10 del Código del Trabajo con los datos del trabajador seleccionado.</div>
+      <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+        <div>
+          <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:4px;font-family:var(--mono)">TRABAJADOR</label>
+          <select id="dtTrabContrato" style="padding:8px 12px;background:var(--surf);border:1px solid var(--border);border-radius:8px;color:var(--white);font-family:var(--mono);font-size:12px;outline:none;min-width:220px"></select>
+        </div>
+        <button class="btn-gold" onclick="generarContratoDT()">📄 Generar Contrato (PDF)</button>
+      </div>
+    </div>
+
+    <!-- DT — FINIQUITO -->
+    <div style="border-top:1px solid var(--border);padding-top:20px">
+      <div style="font-size:14px;font-weight:800;color:var(--white);margin-bottom:4px">🔚 DT — Finiquito Legal</div>
+      <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:14px">Genera el finiquito con causales del Código del Trabajo (Art. 159, 160, 161) para la DT.</div>
+      <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+        <div>
+          <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:4px;font-family:var(--mono)">TRABAJADOR</label>
+          <select id="dtTrabFiniquito" style="padding:8px 12px;background:var(--surf);border:1px solid var(--border);border-radius:8px;color:var(--white);font-family:var(--mono);font-size:12px;outline:none;min-width:220px"></select>
+        </div>
+        <div>
+          <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:4px;font-family:var(--mono)">CAUSAL</label>
+          <select id="dtCausal" style="padding:8px 12px;background:var(--surf);border:1px solid var(--border);border-radius:8px;color:var(--white);font-family:var(--mono);font-size:12px;outline:none">
+            <option value="159_1">Art. 159 N°1 — Mutuo acuerdo</option>
+            <option value="159_2">Art. 159 N°2 — Renuncia voluntaria</option>
+            <option value="159_3">Art. 159 N°3 — Muerte del trabajador</option>
+            <option value="159_4">Art. 159 N°4 — Vencimiento plazo fijo</option>
+            <option value="159_5">Art. 159 N°5 — Conclusión del trabajo</option>
+            <option value="161">Art. 161 — Necesidades de la empresa</option>
+            <option value="160_1">Art. 160 N°1 — Falta de probidad</option>
+            <option value="160_3">Art. 160 N°3 — No concurrencia sin causa justificada</option>
+            <option value="160_7">Art. 160 N°7 — Incumplimiento grave del contrato</option>
+          </select>
+        </div>
+        <button class="btn-gold" onclick="generarFiniquitoDT()">📄 Generar Finiquito (PDF)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ EXPORTAR ══ -->
+  <div id="sec-exportar" class="section">
+    <div class="card-title" style="font-size:16px;font-weight:900;margin-bottom:6px">📤 Exportar Datos</div>
+    <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:20px">Descarga todos los datos del módulo en Excel o CSV para respaldo, análisis externo o migración.</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">
+      <div style="background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:18px">
+        <div style="font-size:13px;font-weight:800;color:var(--white);margin-bottom:4px">👥 Nómina de Trabajadores</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Todos los campos de la ficha del trabajador</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-gold" style="flex:1;font-size:11px;padding:7px" onclick="exportarTrabajadoresExcel()">Excel</button>
+          <button class="btn-ghost" style="flex:1;font-size:11px;padding:7px" onclick="exportarTrabajadoresCSV()">CSV</button>
+        </div>
+      </div>
+      <div style="background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:18px">
+        <div style="font-size:13px;font-weight:800;color:var(--white);margin-bottom:4px">📄 Historial de Liquidaciones</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Todas las liquidaciones del período visible</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-gold" style="flex:1;font-size:11px;padding:7px" onclick="exportarLiquidacionesExcel()">Excel</button>
+          <button class="btn-ghost" style="flex:1;font-size:11px;padding:7px" onclick="exportarLiquidacionesCSV()">CSV</button>
+        </div>
+      </div>
+      <div style="background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:18px">
+        <div style="font-size:13px;font-weight:800;color:var(--white);margin-bottom:4px">📚 Libro de Remuneraciones</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Formato legal completo para DT</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-gold" style="flex:1;font-size:11px;padding:7px" onclick="exportarLibroDTExcel()">Excel</button>
+          <button class="btn-ghost" style="flex:1;font-size:11px;padding:7px" onclick="exportarPreviredCSV()">CSV Previred</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ IMPORTAR ══ -->
+  <div id="sec-importar" class="section">
+    <div class="card-title" style="font-size:16px;font-weight:900;margin-bottom:6px">📥 Importar Datos Masivos</div>
+    <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:20px">Carga tu plantilla Excel o CSV para migrar desde otro sistema o ingresar nóminas completas en un solo clic.</div>
+
+    <!-- DESCARGAR PLANTILLA -->
+    <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:14px;margin-bottom:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px">Paso 1 — Descarga la plantilla oficial</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px">La plantilla incluye los encabezados exactos que el sistema necesita. Complétala y luego súbela.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-gold" style="font-size:11px;padding:7px 16px" onclick="descargarPlantillaTrabajadores()">📥 Plantilla Trabajadores (.csv)</button>
+        <button class="btn-ghost" style="font-size:11px;padding:7px 16px" onclick="descargarPlantillaLiquidaciones()">📥 Plantilla Liquidaciones (.csv)</button>
+      </div>
+    </div>
+
+    <!-- SUBIR ARCHIVO -->
+    <div style="background:var(--surf);border:1px dashed rgba(255,255,255,0.15);border-radius:10px;padding:20px;text-align:center;margin-bottom:16px" id="dropZoneRem"
+         ondragover="event.preventDefault()" ondrop="handleDropRem(event)">
+      <div style="font-size:28px;margin-bottom:8px">📂</div>
+      <div style="font-size:13px;font-weight:700;color:var(--white);margin-bottom:4px">Arrastra tu archivo aquí</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px">o haz clic para buscar (Excel .xlsx o CSV .csv)</div>
+      <input type="file" id="fileImportRem" accept=".csv,.xlsx" style="display:none" onchange="procesarArchivoRem(this)"/>
+      <button class="btn-gold" style="font-size:12px;padding:8px 20px" onclick="document.getElementById('fileImportRem').click()">Seleccionar Archivo</button>
+    </div>
+
+    <!-- TIPO DE IMPORTACIÓN -->
+    <div style="margin-bottom:16px">
+      <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:6px;font-family:var(--mono)">¿QUÉ ESTÁS IMPORTANDO?</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="btnImpTrab" class="btn-gold" style="font-size:11px;padding:7px 14px" onclick="setTipoImport('trabajadores')">👥 Trabajadores</button>
+        <button id="btnImpLiq" class="btn-ghost" style="font-size:11px;padding:7px 14px" onclick="setTipoImport('liquidaciones')">📄 Liquidaciones</button>
+      </div>
+    </div>
+    <input type="hidden" id="tipoImportRem" value="trabajadores"/>
+
+    <!-- VISTA PREVIA -->
+    <div id="previewImportRem" style="display:none">
+      <div style="font-size:12px;font-weight:700;color:var(--white);margin-bottom:8px">Vista previa de datos a importar</div>
+      <div style="overflow-x:auto;margin-bottom:12px">
+        <table id="tblPreviewImport" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono)"></table>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-gold" onclick="confirmarImportRem()">✅ Confirmar Importación</button>
+        <button class="btn-ghost" onclick="cancelarImportRem()">✕ Cancelar</button>
+      </div>
+    </div>
+    <div id="msgImportRem" style="margin-top:12px;font-size:12px;font-family:var(--mono)"></div>
+  </div>
+
   <div id="sec-parametros" class="section">
     <div class="card-title" style="font-size:16px;font-weight:900;margin-bottom:6px">⚙ Parámetros Legales Chile</div>
     <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:20px">Actualiza estos valores cuando cambien las tasas legales. Se aplican a todos los cálculos.</div>
@@ -645,6 +823,30 @@ try{
       </div>
       <div class="field"><label>Estado</label>
         <select id="tEstado"><option value="activo">Activo</option><option value="licencia">Licencia Médica</option><option value="vacaciones">Vacaciones</option><option value="desvinculado">Desvinculado</option></select>
+      </div>
+      <!-- PORTAL COLABORADOR -->
+      <div class="field full" style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.25);border-radius:10px;padding:14px;margin-top:4px">
+        <div style="font-size:10px;color:var(--gold);font-family:var(--mono);font-weight:700;letter-spacing:1px;margin-bottom:10px">👔 PORTAL COLABORADOR</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--white)">Acceso al Portal Colaborador</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px">El trabajador podrá ver sus liquidaciones, solicitar vacaciones y permisos desde la app</div>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <span style="font-size:11px;color:var(--muted)" id="portalLabel">Deshabilitado</span>
+            <div style="position:relative;width:44px;height:24px">
+              <input type="checkbox" id="tPortalActivo" style="opacity:0;width:0;height:0;position:absolute" onchange="togglePortalLabel(this)"/>
+              <span id="sliderPortal" style="position:absolute;inset:0;background:#374151;border-radius:24px;transition:.3s;cursor:pointer" onclick="document.getElementById('tPortalActivo').click()">
+                <span id="thumbPortal" style="position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.3)"></span>
+              </span>
+            </div>
+          </label>
+        </div>
+        <div id="portalEmailWrap" style="margin-top:10px;display:none">
+          <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;font-family:var(--mono)">Email de acceso al portal (puede ser distinto al laboral)</label>
+          <input id="tPortalEmail" type="email" placeholder="trabajador@correo.cl" style="width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--white);font-size:13px;font-family:var(--mono);outline:none"/>
+          <div style="font-size:10px;color:var(--muted);margin-top:4px">💡 Este email debe coincidir con la cuenta que el trabajador use en MSS-PortalTrabajador.html</div>
+        </div>
       </div>
     </div>
     <div style="display:flex;gap:10px;margin-top:16px">
@@ -1500,6 +1702,17 @@ function openTrabajadorModal(id){
       const map={tContrato:'contrato',tAFP:'afp',tSalud:'salud',tBanco:'banco',tTipoCuenta:'tipoCuenta',tEstado:'estado'};
       const el=document.getElementById(sId);if(el&&t[map[sId]])el.value=t[map[sId]];
     });
+    // Cargar estado Portal Colaborador
+    const cb=document.getElementById('tPortalActivo');
+    if(cb){cb.checked=t.portalActivo||false;togglePortalLabel(cb);}
+    const pe=document.getElementById('tPortalEmail');
+    if(pe)pe.value=t.portalEmail||t.email||'';
+  } else {
+    // Reset portal al abrir vacío
+    const cb=document.getElementById('tPortalActivo');
+    if(cb){cb.checked=false;togglePortalLabel(cb);}
+    const pe=document.getElementById('tPortalEmail');
+    if(pe)pe.value='';
   }
   document.getElementById('modalTrab').classList.add('open');
 }
@@ -1526,6 +1739,8 @@ function saveTrabajador(){
     cuenta:document.getElementById('tCuenta').value,
     tipoCuenta:document.getElementById('tTipoCuenta').value,
     estado:document.getElementById('tEstado').value,
+    portalActivo:document.getElementById('tPortalActivo')?.checked||false,
+    portalEmail:document.getElementById('tPortalEmail')?.value?.trim()||document.getElementById('tEmail')?.value?.trim()||'',
   };
   if(!obj.nombre||!obj.rut){alert('Ingresa nombre y RUT');return;}
   if(id){const idx=TRABAJADORES.findIndex(t=>t.id==id);if(idx>=0)TRABAJADORES[idx]={...TRABAJADORES[idx],...obj};}
@@ -1656,6 +1871,408 @@ try{
   var _navEmpEl=document.getElementById('nav-emp');
   if(_navEmpEl){_navEmpEl.textContent=(_MODO_CONDO?'🏢 ':'🏭 ')+_EMP_NOMBRE;_navEmpEl.style.display='block';}
 }catch(e){}
+
+// ══════════════════════════════════════════════
+// PORTAL COLABORADOR — toggle en ficha
+// ══════════════════════════════════════════════
+function togglePortalLabel(cb){
+  const lbl=document.getElementById('portalLabel');
+  const wrap=document.getElementById('portalEmailWrap');
+  const slider=document.getElementById('sliderPortal');
+  const thumb=document.getElementById('thumbPortal');
+  if(cb.checked){
+    lbl.textContent='Habilitado';lbl.style.color='#22C55E';
+    wrap.style.display='block';
+    slider.style.background='#22C55E';
+    thumb.style.transform='translateX(20px)';
+  }else{
+    lbl.textContent='Deshabilitado';lbl.style.color='';
+    wrap.style.display='none';
+    slider.style.background='#374151';
+    thumb.style.transform='translateX(0)';
+  }
+}
+
+// Llenar selects de DT cuando carguen trabajadores
+function fillDTSelects(){
+  const opts=TRABAJADORES.map(t=>`<option value="${t.id}">${t.nombre} — ${t.rut||'—'}</option>`).join('');
+  const s1=document.getElementById('dtTrabContrato');
+  const s2=document.getElementById('dtTrabFiniquito');
+  if(s1)s1.innerHTML=opts||'<option>Sin trabajadores</option>';
+  if(s2)s2.innerHTML=opts||'<option>Sin trabajadores</option>';
+}
+
+// ══════════════════════════════════════════════
+// PREVIRED
+// ══════════════════════════════════════════════
+const SIS_EMPLEADOR=0.0153; // 1.53% SIS que paga el empleador
+const SEG_CESANTIA_TRAB=0.006; // 0.6% trabajador
+const SEG_CESANTIA_EMP=0.024;  // 2.4% empleador (contrato indefinido)
+
+function generarPrevired(){
+  const mes=document.getElementById('previredMes')?.value;
+  if(!mes){alert('Selecciona el período');return;}
+  const liqs=LIQUIDACIONES.filter(l=>l.periodo===mes);
+  const body=document.getElementById('bodyPrevired');
+  const foot=document.getElementById('footPrevired');
+  if(!liqs.length){
+    body.innerHTML=`<tr><td colspan="11" style="text-align:center;padding:20px;color:var(--muted)">Sin liquidaciones para ${mes}</td></tr>`;
+    foot.innerHTML='';return;
+  }
+  let totImpl=0,totSalud=0,totSIS=0,totCesT=0,totCesE=0,totTotal=0;
+  const clpN=n=>new Intl.NumberFormat('es-CL').format(Math.round(n||0));
+  body.innerHTML=liqs.map(l=>{
+    const t=TRABAJADORES.find(x=>String(x.id)===String(l.trabId))||{};
+    const impon=l.sueldoBase||0;
+    const afpPct=(AFP_TASAS[t.afp]||10.44)/100;
+    const cotAFP=Math.round(impon*afpPct);
+    const cotSalud=Math.round(impon*((t.pctSalud||7)/100));
+    const sis=Math.round(impon*SIS_EMPLEADOR);
+    const cesT=Math.round(impon*SEG_CESANTIA_TRAB);
+    const cesE=Math.round(impon*SEG_CESANTIA_EMP);
+    const tot=cotAFP+cotSalud+sis+cesT+cesE;
+    totImpl+=impon;totSalud+=cotSalud;totSIS+=sis;totCesT+=cesT;totCesE+=cesE;totTotal+=tot;
+    return `<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:7px 10px;font-family:var(--mono)">${t.rut||'—'}</td>
+      <td style="padding:7px 10px">${t.nombre||'—'}</td>
+      <td style="padding:7px 10px;text-align:right;font-family:var(--mono)">${clpN(impon)}</td>
+      <td style="padding:7px 10px;font-family:var(--mono);text-transform:uppercase">${t.afp||'—'}</td>
+      <td style="padding:7px 10px;text-align:right;font-family:var(--mono)">${clpN(cotAFP)}</td>
+      <td style="padding:7px 10px;font-family:var(--mono)">${t.salud||'Fonasa'}</td>
+      <td style="padding:7px 10px;text-align:right;font-family:var(--mono)">${clpN(cotSalud)}</td>
+      <td style="padding:7px 10px;text-align:right;font-family:var(--mono)">${clpN(sis)}</td>
+      <td style="padding:7px 10px;text-align:right;font-family:var(--mono)">${clpN(cesT)}</td>
+      <td style="padding:7px 10px;text-align:right;font-family:var(--mono)">${clpN(cesE)}</td>
+      <td style="padding:7px 10px;text-align:right;font-family:var(--mono);font-weight:700;color:var(--gold)">${clpN(tot)}</td>
+    </tr>`;
+  }).join('');
+  foot.innerHTML=`<tr style="background:rgba(201,168,76,0.1);font-weight:700">
+    <td colspan="2" style="padding:8px 10px;color:var(--gold);font-family:var(--mono)">TOTALES ${mes}</td>
+    <td style="padding:8px 10px;text-align:right;font-family:var(--mono)">${clpN(totImpl)}</td>
+    <td colspan="2" style="padding:8px 10px;text-align:right;font-family:var(--mono)">—</td>
+    <td style="padding:8px 10px;text-align:right;font-family:var(--mono)">${clpN(totSalud)}</td>
+    <td colspan="2" style="padding:8px 10px;text-align:right;font-family:var(--mono)">${clpN(totSIS)}</td>
+    <td style="padding:8px 10px;text-align:right;font-family:var(--mono)">${clpN(totCesT)}</td>
+    <td style="padding:8px 10px;text-align:right;font-family:var(--mono)">${clpN(totCesE)}</td>
+    <td style="padding:8px 10px;text-align:right;font-family:var(--mono);color:var(--gold)">${clpN(totTotal)}</td>
+  </tr>`;
+  fillDTSelects();
+}
+
+function exportarPreviredCSV(){
+  const mes=document.getElementById('previredMes')?.value||'periodo';
+  const liqs=LIQUIDACIONES.filter(l=>l.periodo===mes);
+  if(!liqs.length){alert('Genera primero el Previred');return;}
+  let csv='RUT;Nombre;Remuneracion Imponible;AFP;Cotizacion AFP;Salud;Cotizacion Salud;SIS Empleador;Seg Cesantia Trabajador;Seg Cesantia Empleador;Total\n';
+  liqs.forEach(l=>{
+    const t=TRABAJADORES.find(x=>String(x.id)===String(l.trabId))||{};
+    const impon=l.sueldoBase||0;
+    const afpPct=(AFP_TASAS[t.afp]||10.44)/100;
+    const cotAFP=Math.round(impon*afpPct);
+    const cotSalud=Math.round(impon*((t.pctSalud||7)/100));
+    const sis=Math.round(impon*SIS_EMPLEADOR);
+    const cesT=Math.round(impon*SEG_CESANTIA_TRAB);
+    const cesE=Math.round(impon*SEG_CESANTIA_EMP);
+    csv+=`${t.rut||''};${t.nombre||''};${impon};${t.afp||''};${cotAFP};${t.salud||''};${cotSalud};${sis};${cesT};${cesE};${cotAFP+cotSalud+sis+cesT+cesE}\n`;
+  });
+  descargarArchivo('Previred_'+mes+'.csv', csv, 'text/csv;charset=utf-8;');
+}
+
+function exportarPreviredExcel(){
+  const mes=document.getElementById('previredMes')?.value||'periodo';
+  const liqs=LIQUIDACIONES.filter(l=>l.periodo===mes);
+  if(!liqs.length){alert('Genera primero el Previred');return;}
+  const rows=[['RUT','Nombre','Rem. Imponible','AFP','Cot. AFP','Salud','Cot. Salud','SIS Emp.','Seg. Ces. Trab.','Seg. Ces. Emp.','Total']];
+  liqs.forEach(l=>{
+    const t=TRABAJADORES.find(x=>String(x.id)===String(l.trabId))||{};
+    const impon=l.sueldoBase||0;
+    const afpPct=(AFP_TASAS[t.afp]||10.44)/100;
+    rows.push([t.rut||'',t.nombre||'',impon,(t.afp||'').toUpperCase(),Math.round(impon*afpPct),t.salud||'Fonasa',Math.round(impon*((t.pctSalud||7)/100)),Math.round(impon*SIS_EMPLEADOR),Math.round(impon*SEG_CESANTIA_TRAB),Math.round(impon*SEG_CESANTIA_EMP),Math.round(impon*(afpPct+(t.pctSalud||7)/100+SIS_EMPLEADOR+SEG_CESANTIA_TRAB+SEG_CESANTIA_EMP))]);
+  });
+  exportarExcel(rows,'Previred_'+mes);
+}
+
+// ══════════════════════════════════════════════
+// DT — DOCUMENTOS LEGALES
+// ══════════════════════════════════════════════
+function generarLibroDT(){
+  const mes=document.getElementById('previredMes')?.value||document.getElementById('selLibroMes')?.value||'';
+  const liqs=mes?LIQUIDACIONES.filter(l=>l.periodo===mes):LIQUIDACIONES;
+  const emp=window._MSS_EMP||{nombre:'Martinez Services Spa',rut:'76.782.954-K',direccion:'Calle Nueva 2 N°3345, Alto Hospicio'};
+  const clpN=n=>new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(n||0);
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+    *{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,sans-serif;font-size:9px;color:#000;}
+    .hdr{background:#1a3a5c;color:white;padding:12px 16px;display:flex;justify-content:space-between;margin-bottom:12px;}
+    table{width:100%;border-collapse:collapse;}th{background:#1a3a5c;color:white;padding:5px 6px;text-align:center;font-size:8px;}
+    td{padding:4px 6px;border:1px solid #ccc;text-align:right;}td:first-child,td:nth-child(2),td:nth-child(3){text-align:left;}
+    tr:nth-child(even){background:#f5f5f5;}.total{font-weight:bold;background:#e8f0ff;}
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  </style></head><body>
+  <div class="hdr">
+    <div><div style="font-size:13px;font-weight:900">${emp.nombre}</div><div>RUT: ${emp.rut||'—'} · ${emp.direccion||'—'}</div></div>
+    <div style="text-align:right"><div style="font-size:11px;font-weight:700">LIBRO DE REMUNERACIONES OFICIAL</div><div>Período: ${mes||'Todos'} · Art. 62 Código del Trabajo</div></div>
+  </div>
+  <table><thead><tr>
+    <th>RUT</th><th>Nombre Trabajador</th><th>Cargo</th><th>Contrato</th>
+    <th>Sueldo Base</th><th>Gratificación</th><th>Bono Extra</th><th>Total Haberes</th>
+    <th>AFP</th><th>Cot. AFP</th><th>Salud</th><th>Cot. Salud</th><th>Imp. 2ª Cat.</th>
+    <th>Total Desc.</th><th>Líquido</th><th>Banco</th><th>N° Cuenta</th>
+  </tr></thead><tbody>
+  ${liqs.map(l=>{const t=TRABAJADORES.find(x=>String(x.id)===String(l.trabId))||{};return`<tr>
+    <td>${t.rut||'—'}</td><td>${t.nombre||'—'}</td><td>${t.cargo||'—'}</td><td>${t.contrato||'indefinido'}</td>
+    <td>${clpN(l.sueldoBase||0)}</td><td>${clpN(l.gratif||0)}</td><td>${clpN(l.bonoExtra||0)}</td><td>${clpN(l.totalHaberes||0)}</td>
+    <td style="text-transform:uppercase">${t.afp||'—'}</td><td>${clpN(l.montAFP||0)}</td>
+    <td>${t.salud||'Fonasa'}</td><td>${clpN(l.montSalud||0)}</td><td>${clpN(l.impuesto||0)}</td>
+    <td>${clpN(l.totalDescuentos||0)}</td><td style="font-weight:700">${clpN(l.neto||0)}</td>
+    <td>${t.banco||'—'}</td><td>${t.cuenta||'—'}</td>
+  </tr>`;}).join('')}
+  </tbody></table>
+  <div style="margin-top:12px;font-size:8px;color:#666">Documento generado por ERP Martinez Services · ${new Date().toLocaleDateString('es-CL')} · Cumple con Art. 62 CT y normativa DT vigente</div>
+  </body></html>`;
+  abrirVentanaImpresion(html);
+}
+
+function exportarLibroDTExcel(){
+  const mes=document.getElementById('previredMes')?.value||'';
+  const liqs=mes?LIQUIDACIONES.filter(l=>l.periodo===mes):LIQUIDACIONES;
+  const rows=[['RUT','Nombre','Cargo','Contrato','Sueldo Base','Gratificación','Bono Extra','Total Haberes','AFP','Cot AFP','Salud','Cot Salud','Imp 2ª Cat','Total Desc','Líquido','Banco','N° Cuenta']];
+  liqs.forEach(l=>{const t=TRABAJADORES.find(x=>String(x.id)===String(l.trabId))||{};
+    rows.push([t.rut||'',t.nombre||'',t.cargo||'',t.contrato||'indefinido',l.sueldoBase||0,l.gratif||0,l.bonoExtra||0,l.totalHaberes||0,(t.afp||'').toUpperCase(),l.montAFP||0,t.salud||'Fonasa',l.montSalud||0,l.impuesto||0,l.totalDescuentos||0,l.neto||0,t.banco||'',t.cuenta||'']);
+  });
+  exportarExcel(rows,'LibroDT_'+(mes||'todos'));
+}
+
+function generarContratoDT(){
+  const uid=document.getElementById('dtTrabContrato')?.value;
+  const t=TRABAJADORES.find(x=>String(x.id)===uid);
+  if(!t){alert('Selecciona un trabajador');return;}
+  const emp=window._MSS_EMP||{nombre:'Martinez Services Spa',rut:'76.782.954-K',direccion:'Calle Nueva 2 N°3345, Alto Hospicio'};
+  const hoy=new Date().toLocaleDateString('es-CL',{year:'numeric',month:'long',day:'numeric'});
+  const clpN=n=>new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(n||0);
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+    *{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Times New Roman',serif;font-size:11pt;line-height:1.6;margin:2cm;}
+    h1{font-size:14pt;text-align:center;margin-bottom:20px;text-transform:uppercase;}
+    .clausula{margin-bottom:16px;}.clausula-num{font-weight:bold;text-decoration:underline;}
+    .firma{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:60px;}
+    .firma-box{text-align:center;}.firma-line{border-top:1px solid #000;padding-top:6px;margin-top:50px;}
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  </style></head><body>
+  <h1>CONTRATO INDIVIDUAL DE TRABAJO</h1>
+  <p style="text-align:right;margin-bottom:20px">Alto Hospicio, ${hoy}</p>
+  <div class="clausula"><span class="clausula-num">PRIMERA: PARTES.</span> Comparecen, por una parte, <strong>${emp.nombre}</strong>, RUT ${emp.rut||'—'}, con domicilio en ${emp.direccion||'—'}, en adelante "el Empleador"; y por otra parte, don/doña <strong>${t.nombre}</strong>, RUT ${t.rut||'—'}, de nacionalidad ${t.nacionalidad||'chilena'}, con domicilio en ${t.direccion||'—'}, en adelante "el Trabajador".</div>
+  <div class="clausula"><span class="clausula-num">SEGUNDA: FUNCIÓN Y CARGO.</span> El Trabajador se desempeñará como <strong>${t.cargo||'—'}</strong>, en el área de <strong>${t.area||'—'}</strong>, realizando las funciones propias del cargo y aquellas que le encomiende el Empleador.</div>
+  <div class="clausula"><span class="clausula-num">TERCERA: LUGAR DE TRABAJO.</span> El Trabajador prestará sus servicios en las dependencias de ${emp.nombre}, ubicadas en ${emp.direccion||'—'}, sin perjuicio de que el Empleador pueda cambiar el lugar de trabajo por razones fundadas.</div>
+  <div class="clausula"><span class="clausula-num">CUARTA: JORNADA DE TRABAJO.</span> La jornada de trabajo será de 45 horas semanales, distribuidas de lunes a viernes, con los horarios que fije el Empleador, conforme a lo establecido en el Art. 22 del Código del Trabajo.</div>
+  <div class="clausula"><span class="clausula-num">QUINTA: REMUNERACIÓN.</span> El Empleador pagará al Trabajador la suma de <strong>${clpN(t.sueldo||0)}</strong> mensuales brutos, a título de sueldo base. Las remuneraciones se pagarán mediante depósito en cuenta bancaria ${t.banco||'—'} N° ${t.cuenta||'—'} del Trabajador.</div>
+  <div class="clausula"><span class="clausula-num">SEXTA: TIPO DE CONTRATO.</span> El presente contrato es de carácter <strong>${t.contrato==='indefinido'?'INDEFINIDO':t.contrato==='plazo_fijo'?'PLAZO FIJO':'HONORARIOS'}</strong>, con vigencia a partir del día ${t.ingreso?new Date(t.ingreso+'T12:00:00').toLocaleDateString('es-CL',{year:'numeric',month:'long',day:'numeric'}):hoy}.</div>
+  <div class="clausula"><span class="clausula-num">SÉPTIMA: PREVISIÓN Y SALUD.</span> El Trabajador cotizará en ${(t.afp||'AFP').toUpperCase()} para previsión y en ${t.salud||'FONASA'} para salud, según las tasas legales vigentes.</div>
+  <div class="clausula"><span class="clausula-num">OCTAVA: LEGISLACIÓN APLICABLE.</span> En todo lo no previsto en este contrato se aplicarán las disposiciones del Código del Trabajo y demás legislación laboral vigente en Chile.</div>
+  <div class="firma">
+    <div class="firma-box"><div class="firma-line"><strong>${emp.nombre}</strong><br>RUT ${emp.rut||'—'}<br>El Empleador</div></div>
+    <div class="firma-box"><div class="firma-line"><strong>${t.nombre}</strong><br>RUT ${t.rut||'—'}<br>El Trabajador</div></div>
+  </div>
+  <p style="margin-top:20px;font-size:9pt;color:#666;text-align:center">Se firma en dos ejemplares del mismo tenor y fecha, quedando uno en poder de cada parte.</p>
+  </body></html>`;
+  abrirVentanaImpresion(html);
+}
+
+function generarFiniquitoDT(){
+  const uid=document.getElementById('dtTrabFiniquito')?.value;
+  const t=TRABAJADORES.find(x=>String(x.id)===uid);
+  const causal=document.getElementById('dtCausal')?.value||'159_2';
+  if(!t){alert('Selecciona un trabajador');return;}
+  const emp=window._MSS_EMP||{nombre:'Martinez Services Spa',rut:'76.782.954-K',direccion:'Calle Nueva 2 N°3345, Alto Hospicio'};
+  const hoy=new Date().toLocaleDateString('es-CL',{year:'numeric',month:'long',day:'numeric'});
+  const clpN=n=>new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(n||0);
+  // Calcular años de antigüedad para indemnización si aplica
+  const ingreso=t.ingreso?new Date(t.ingreso+'T12:00:00'):null;
+  const años=ingreso?Math.floor((Date.now()-ingreso)/(1000*60*60*24*365)):0;
+  const indemn=causal==='161'?Math.round((t.sueldo||0)*Math.min(años,11)):0;
+  const causales={
+    '159_1':'Art. 159 N°1 del Código del Trabajo — Mutuo acuerdo de las partes',
+    '159_2':'Art. 159 N°2 del Código del Trabajo — Renuncia voluntaria del Trabajador',
+    '159_3':'Art. 159 N°3 del Código del Trabajo — Muerte del Trabajador',
+    '159_4':'Art. 159 N°4 del Código del Trabajo — Vencimiento del plazo convenido',
+    '159_5':'Art. 159 N°5 del Código del Trabajo — Conclusión del trabajo o servicio que dio origen al contrato',
+    '161':'Art. 161 del Código del Trabajo — Necesidades de la empresa, establecimiento o servicio',
+    '160_1':'Art. 160 N°1 del Código del Trabajo — Falta de probidad, conducta inmoral grave',
+    '160_3':'Art. 160 N°3 del Código del Trabajo — No concurrencia del trabajador a sus labores sin causa justificada',
+    '160_7':'Art. 160 N°7 del Código del Trabajo — Incumplimiento grave de las obligaciones que impone el contrato',
+  };
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+    *{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Times New Roman',serif;font-size:11pt;line-height:1.7;margin:2cm;}
+    h1{font-size:14pt;text-align:center;margin-bottom:20px;text-transform:uppercase;}
+    .clausula{margin-bottom:14px;}.clausula-num{font-weight:bold;text-decoration:underline;}
+    table{width:100%;border-collapse:collapse;margin:10px 0;}th{background:#1a3a5c;color:white;padding:5px 8px;text-align:left;}
+    td{padding:5px 8px;border:1px solid #ccc;}
+    .firma{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:60px;}
+    .firma-box{text-align:center;}.firma-line{border-top:1px solid #000;padding-top:6px;margin-top:50px;}
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  </style></head><body>
+  <h1>FINIQUITO DE CONTRATO DE TRABAJO</h1>
+  <p style="text-align:right;margin-bottom:20px">Alto Hospicio, ${hoy}</p>
+  <div class="clausula">En Alto Hospicio, a ${hoy}, entre <strong>${emp.nombre}</strong>, RUT ${emp.rut||'—'}, representada por Gaudy Martínez, en adelante "el Empleador"; y don/doña <strong>${t.nombre}</strong>, RUT ${t.rut||'—'}, en adelante "el Trabajador", se ha acordado el siguiente finiquito:</div>
+  <div class="clausula"><span class="clausula-num">CAUSAL DE TÉRMINO:</span> El contrato de trabajo termina por <strong>${causales[causal]||causal}</strong>.</div>
+  <div class="clausula"><span class="clausula-num">DATOS LABORALES:</span><br>Cargo: ${t.cargo||'—'} · Fecha ingreso: ${ingreso?ingreso.toLocaleDateString('es-CL'):'—'} · Antigüedad: ${años} año(s) · Sueldo base: ${clpN(t.sueldo||0)}</div>
+  <div class="clausula"><span class="clausula-num">LIQUIDACIÓN FINAL:</span>
+    <table><thead><tr><th>Concepto</th><th>Monto</th></tr></thead><tbody>
+      <tr><td>Sueldo proporcional mes de término</td><td>${clpN(Math.round((t.sueldo||0)/30*new Date().getDate()))}</td></tr>
+      <tr><td>Feriado legal proporcional (${Math.max(0,años)*15} días base)</td><td>${clpN(Math.round(((t.sueldo||0)/30)*Math.max(0,Math.min(años,1)*15)))}</td></tr>
+      ${causal==='161'?`<tr><td>Indemnización por años de servicio (${Math.min(años,11)} meses)</td><td>${clpN(indemn)}</td></tr>`:''}
+      ${causal==='161'?`<tr><td>Indemnización sustitutiva del aviso previo (1 mes)</td><td>${clpN(t.sueldo||0)}</td></tr>`:''}
+    </tbody></table>
+  </div>
+  <div class="clausula">El Trabajador declara que con el pago de las sumas indicadas, queda totalmente solucionado y cancelado cualquier crédito que tuviere o pudiere tener en contra del Empleador, por concepto de remuneraciones, beneficios, indemnizaciones y demás emolumentos derivados del contrato de trabajo y de su terminación, renunciando expresamente a ejercer cualquier acción judicial o extrajudicial al respecto.</div>
+  <div class="firma">
+    <div class="firma-box"><div class="firma-line"><strong>${emp.nombre}</strong><br>RUT ${emp.rut||'—'}<br>El Empleador</div></div>
+    <div class="firma-box"><div class="firma-line"><strong>${t.nombre}</strong><br>RUT ${t.rut||'—'}<br>El Trabajador</div></div>
+  </div>
+  </body></html>`;
+  abrirVentanaImpresion(html);
+}
+
+// ══════════════════════════════════════════════
+// EXPORTACIÓN
+// ══════════════════════════════════════════════
+function exportarTrabajadoresExcel(){
+  const rows=[['Nombre','RUT','Cargo','Área','Fecha Ingreso','Sueldo Base','AFP','Salud','% Salud','Banco','N° Cuenta','Tipo Cuenta','Email','Teléfono','Contrato','Estado','Portal Activo']];
+  TRABAJADORES.forEach(t=>rows.push([t.nombre||'',t.rut||'',t.cargo||'',t.area||'',t.ingreso||'',t.sueldo||0,t.afp||'',t.salud||'',t.pctSalud||7,t.banco||'',t.cuenta||'',t.tipoCuenta||'',t.email||'',t.telefono||'',t.contrato||'',t.estado||'activo',t.portalActivo?'Sí':'No']));
+  exportarExcel(rows,'Trabajadores');
+}
+
+function exportarTrabajadoresCSV(){
+  const h='Nombre;RUT;Cargo;Area;Fecha Ingreso;Sueldo Base;AFP;Salud;% Salud;Banco;Cuenta;Email;Telefono;Contrato;Estado\n';
+  const rows=TRABAJADORES.map(t=>`${t.nombre||''};${t.rut||''};${t.cargo||''};${t.area||''};${t.ingreso||''};${t.sueldo||0};${t.afp||''};${t.salud||''};${t.pctSalud||7};${t.banco||''};${t.cuenta||''};${t.email||''};${t.telefono||''};${t.contrato||''};${t.estado||'activo'}`).join('\n');
+  descargarArchivo('Trabajadores.csv',h+rows,'text/csv;charset=utf-8;');
+}
+
+function exportarLiquidacionesExcel(){
+  const rows=[['Período','RUT','Nombre','Sueldo Base','Gratificación','Bono Extra','Total Haberes','AFP Monto','Salud Monto','Impuesto','Total Desc.','Líquido']];
+  LIQUIDACIONES.forEach(l=>{const t=TRABAJADORES.find(x=>String(x.id)===String(l.trabId))||{};rows.push([l.periodo||'',t.rut||'',t.nombre||'',l.sueldoBase||0,l.gratif||0,l.bonoExtra||0,l.totalHaberes||0,l.montAFP||0,l.montSalud||0,l.impuesto||0,l.totalDescuentos||0,l.neto||0]);});
+  exportarExcel(rows,'Liquidaciones');
+}
+
+function exportarLiquidacionesCSV(){
+  const h='Periodo;RUT;Nombre;Sueldo Base;Gratificacion;Bono Extra;Total Haberes;AFP;Salud;Impuesto;Total Desc;Liquido\n';
+  const rows=LIQUIDACIONES.map(l=>{const t=TRABAJADORES.find(x=>String(x.id)===String(l.trabId))||{};return`${l.periodo||''};${t.rut||''};${t.nombre||''};${l.sueldoBase||0};${l.gratif||0};${l.bonoExtra||0};${l.totalHaberes||0};${l.montAFP||0};${l.montSalud||0};${l.impuesto||0};${l.totalDescuentos||0};${l.neto||0}`;}).join('\n');
+  descargarArchivo('Liquidaciones.csv',h+rows,'text/csv;charset=utf-8;');
+}
+
+// ══════════════════════════════════════════════
+// IMPORTACIÓN MASIVA
+// ══════════════════════════════════════════════
+let _importDataRem=[];
+
+function setTipoImport(tipo){
+  document.getElementById('tipoImportRem').value=tipo;
+  document.getElementById('btnImpTrab').className=tipo==='trabajadores'?'btn-gold':'btn-ghost';
+  document.getElementById('btnImpLiq').className=tipo==='liquidaciones'?'btn-gold':'btn-ghost';
+  document.getElementById('btnImpTrab').style.cssText='font-size:11px;padding:7px 14px';
+  document.getElementById('btnImpLiq').style.cssText='font-size:11px;padding:7px 14px';
+}
+
+function descargarPlantillaTrabajadores(){
+  const csv='Nombre;RUT;Cargo;Area;Fecha Ingreso (YYYY-MM-DD);Sueldo Base;AFP;Salud;% Salud;Banco;N° Cuenta;Tipo Cuenta;Email;Telefono;Contrato (indefinido/plazo_fijo/honorarios)\n'+
+    'Juan Pérez González;12.345.678-9;Contador;Administración;2023-01-15;800000;habitat;fonasa;7;BCI;123456789;Cuenta Corriente;juan@email.cl;+56912345678;indefinido\n';
+  descargarArchivo('Plantilla_Trabajadores.csv',csv,'text/csv;charset=utf-8;');
+}
+
+function descargarPlantillaLiquidaciones(){
+  const csv='RUT Trabajador;Período (YYYY-MM);Sueldo Base;Gratificación;Bono Extra;Descuento AFP;Descuento Salud;Impuesto;Total Haberes;Total Descuentos;Líquido\n'+
+    '12.345.678-9;2026-06;800000;200000;0;90000;56000;0;1000000;146000;854000\n';
+  descargarArchivo('Plantilla_Liquidaciones.csv',csv,'text/csv;charset=utf-8;');
+}
+
+function handleDropRem(event){
+  event.preventDefault();
+  const file=event.dataTransfer.files[0];
+  if(file)procesarArchivoRem({files:[file]});
+}
+
+function procesarArchivoRem(input){
+  const file=input.files[0];
+  if(!file)return;
+  const tipo=document.getElementById('tipoImportRem').value;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const text=e.target.result;
+    const lines=text.split('\n').map(l=>l.trim()).filter(Boolean);
+    const headers=lines[0].split(';').map(h=>h.trim());
+    _importDataRem=lines.slice(1).map(l=>l.split(';').map(c=>c.trim()));
+    // Vista previa
+    const tbl=document.getElementById('tblPreviewImport');
+    tbl.innerHTML=`<thead><tr>${headers.map(h=>`<th style="padding:5px 8px;background:rgba(201,168,76,0.15);color:var(--gold);text-align:left;font-size:10px;font-family:var(--mono)">${h}</th>`).join('')}</tr></thead>
+    <tbody>${_importDataRem.slice(0,5).map(r=>`<tr>${r.map(c=>`<td style="padding:4px 8px;border-bottom:1px solid var(--border);font-size:11px;font-family:var(--mono)">${c}</td>`).join('')}</tr>`).join('')}</tbody>`;
+    document.getElementById('previewImportRem').style.display='block';
+    document.getElementById('msgImportRem').textContent=`${_importDataRem.length} registros listos para importar (mostrando los primeros 5)`;
+    document.getElementById('msgImportRem').style.color='var(--gold)';
+  };
+  reader.readAsText(file,'UTF-8');
+}
+
+async function confirmarImportRem(){
+  const tipo=document.getElementById('tipoImportRem').value;
+  const msg=document.getElementById('msgImportRem');
+  msg.textContent='Importando...';msg.style.color='var(--muted)';
+  let ok=0,err=0;
+  if(tipo==='trabajadores'){
+    for(const row of _importDataRem){
+      if(!row[0])continue;
+      try{
+        const obj={nombre:row[0]||'',rut:row[1]||'',cargo:row[2]||'',area:row[3]||'',ingreso:row[4]||'',sueldo:parseFloat(row[5])||0,afp:(row[6]||'habitat').toLowerCase(),salud:(row[7]||'fonasa').toLowerCase(),pctSalud:parseFloat(row[8])||7,banco:row[9]||'',cuenta:row[10]||'',tipoCuenta:row[11]||'Cuenta Vista',email:row[12]||'',telefono:row[13]||'',contrato:row[14]||'indefinido',estado:'activo'};
+        const id='imp_'+Date.now()+'_'+ok;
+        await _fbSet(_FB_TRAB,id,obj);
+        ok++;
+      }catch(e){err++;}
+    }
+    await init();
+  } else {
+    for(const row of _importDataRem){
+      if(!row[0])continue;
+      try{
+        const t=TRABAJADORES.find(x=>x.rut===row[0]);
+        if(!t)continue;
+        const obj={trabId:t.id,periodo:row[1]||'',sueldoBase:parseFloat(row[2])||0,gratif:parseFloat(row[3])||0,bonoExtra:parseFloat(row[4])||0,montAFP:parseFloat(row[5])||0,montSalud:parseFloat(row[6])||0,impuesto:parseFloat(row[7])||0,totalHaberes:parseFloat(row[8])||0,totalDescuentos:parseFloat(row[9])||0,neto:parseFloat(row[10])||0};
+        await _fbSet(_FB_LIQ||'rem_liquidaciones','liq_'+Date.now()+'_'+ok,obj);
+        ok++;
+      }catch(e){err++;}
+    }
+    await init();
+  }
+  msg.textContent=`✅ Importados: ${ok} registros${err>0?' · ⚠ Errores: '+err:''}`;
+  msg.style.color=ok>0?'#22C55E':'#EF4444';
+  document.getElementById('previewImportRem').style.display='none';
+  _importDataRem=[];
+}
+
+function cancelarImportRem(){
+  _importDataRem=[];
+  document.getElementById('previewImportRem').style.display='none';
+  document.getElementById('msgImportRem').textContent='';
+}
+
+// ══════════════════════════════════════════════
+// HELPERS COMUNES
+// ══════════════════════════════════════════════
+function abrirVentanaImpresion(html){
+  const w=window.open('','_blank');
+  w.document.write(html);w.document.close();
+  setTimeout(()=>{w.focus();w.print();},600);
+}
+
+function descargarArchivo(nombre,contenido,tipo){
+  const bom=tipo.includes('csv')?'\uFEFF':'';
+  const blob=new Blob([bom+contenido],{type:tipo});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=nombre;a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+function exportarExcel(rows,nombre){
+  // Exportar como CSV con extensión .xlsx compatible con Excel
+  const csv=rows.map(r=>r.map(c=>typeof c==='string'&&c.includes(';')?'"'+c+'"':c).join(';')).join('\n');
+  descargarArchivo(nombre+'.csv',csv,'text/csv;charset=utf-8;');
+}
 </script>
 </body>
 </html>
