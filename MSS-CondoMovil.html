@@ -796,7 +796,7 @@ document.getElementById('regBlock').onchange=function(){
 document.getElementById('regDepto').onchange=function(){
   const u=UNIDADES.find(x=>String(x.id)===this.value);
   if(!u){document.getElementById('regInfo').style.display='none';return;}
-  document.getElementById('regMonto').value=u.gcCustom||CFG.gc||40000;
+  document.getElementById('regMonto').value=(u.gcCustom!=null&&u.gcCustom!==0)?u.gcCustom:(CFG.gc||40000);
   document.getElementById('regFecha').value=HOY;
   document.getElementById('regInfo').style.display='block';
 };
@@ -805,7 +805,7 @@ document.getElementById('btnPagoRapido').onclick=async()=>{
   const monto=parseFloat(document.getElementById('regMonto').value)||0;
   const u=UNIDADES.find(x=>String(x.id)===uId);
   if(!uId||!monto){toast('⚠ Completa los campos');return;}
-  const gcOrd=u?.gcCustom||CFG.gc||40000;
+  const gcOrd=(u?.gcCustom!=null&&u?.gcCustom!==0)?u.gcCustom:(CFG.gc||40000);
   const mes=document.getElementById('regMes').value||MES;
   const obj={id:'cm_'+Date.now(),mes,unidadId:uId,unidadNum:u?.num||'?',prop:u?.prop||'?',gcOrd,mora:0,total:gcOrd,pagado:monto,saldo:Math.max(0,gcOrd-monto),estado:monto>=gcOrd?'Pagado':'Abono',fechaPago:document.getElementById('regFecha').value,forma:document.getElementById('regForma').value,ref:document.getElementById('regRef').value,obs:'CondoMóvil'};
   try{await _fbM.setDoc(_fbM.doc(_db,'condominios/'+EMP_ID+'/cobros/'+obj.id),obj);toast('✅ Pago registrado');document.getElementById('regInfo').style.display='none';}catch(e){toast('Error: '+e.message);}
@@ -901,7 +901,7 @@ function renderGastoComun(u){
   const hist=COBROS.filter(c=>String(c.unidadId)===String(u.id)).sort((a,b)=>String(b.mes||'').localeCompare(String(a.mes||'')));
   const actual=hist[0]||null;
   const anterior=hist[1]||null;
-  const gcBase=u.gcCustom||CFG.gc||40000;
+  const gcBase=(u.gcCustom!=null&&u.gcCustom!==0)?u.gcCustom:(CFG.gc||40000);
 
   const montoActual=actual?actual.gcOrd||gcBase:gcBase;
   const montoAnt=anterior?anterior.gcOrd||gcBase:gcBase;
@@ -1010,8 +1010,6 @@ function renderEgresosRes(){
 function renderMiPropiedad(){
   const u=_unidadRes;
   if(!u)return;
-  // DEBUG — ver todos los campos que llegan desde Firestore
-  console.log('🏠 Datos unidad Firestore:', JSON.stringify(u));
   const deuda=COBROS.filter(c=>String(c.unidadId)===String(u.id)&&c.saldo>0).reduce((s,c)=>s+c.saldo,0);
   const pagos=COBROS.filter(c=>String(c.unidadId)===String(u.id)).length;
   // Estacionamiento: convertir a string para evitar que el número 0 sea falsy
@@ -1042,15 +1040,15 @@ function renderMiPropiedad(){
       <div style="font-size:12px;font-weight:800;color:#1a1a2e;margin-bottom:12px">📋 DATOS DE LA UNIDAD</div>
       <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:12px">
         <span style="color:#888">Estacionamiento</span>
-        <span style="font-weight:700">${estac?'🚗 N° '+estac:'<span style="color:#bbb">Sin asignar</span>'}</span>
+        <span style="font-weight:700;color:#1a1a2e">${estac&&estac!=='undefined'&&estac!==''?'🚗 N° '+estac:'<em style=color:#bbb;font-style:normal>Sin asignar</em>'}</span>
       </div>
       <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:12px">
         <span style="color:#888">Bodega</span>
-        <span style="font-weight:700">${bodega?'📦 N° '+bodega:'<span style="color:#bbb">Sin asignar</span>'}</span>
+        <span style="font-weight:700;color:#1a1a2e">${bodega&&bodega!=='undefined'&&bodega!==''?'📦 N° '+bodega:'<em style=color:#bbb;font-style:normal>Sin asignar</em>'}</span>
       </div>
       <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:12px">
         <span style="color:#888">Gasto Común Base</span>
-        <span style="font-weight:700;color:#1a5c3a">${clp(u.gcCustom||CFG.gc||40000)}</span>
+        <span style="font-weight:700;color:#1a5c3a">${clp(u.gcCustom!=null&&u.gcCustom!==0?u.gcCustom:(CFG.gc||40000))}</span>
       </div>
       <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:12px">
         <span style="color:#888">Condominio</span>
