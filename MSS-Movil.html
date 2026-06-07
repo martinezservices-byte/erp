@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#0A0F1C"/>
+<title>MSS Móvil · Comercial</title>
+<style>
+:root{
+  --bg:#030609;--surf:#0E1520;--surf2:#1A2235;--surf3:#243047;
+  --gold:#C9A84C;--gold2:#F59E0B;
+  --ok:#22C55E;--danger:#EF4444;--warn:#F59E0B;--info:#38BDF8;--purple:#A78BFA;
+  --text:#F9FAFB;--muted:#6B7280;--mutedHi:#9CA3AF;
+  --border:rgba(255,255,255,0.07);--r:14px;--r2:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;overflow-x:hidden;}
+body{padding-bottom:70px;}
+
+/* ══════ LOGIN ══════ */
+#sc-login{min-height:100vh;display:flex;flex-direction:column;background:var(--bg);}
+.login-hdr{background:linear-gradient(160deg,#0A0F1C 0%,#111827 100%);padding:40px 24px 32px;text-align:center;border-bottom:1px solid rgba(201,168,76,0.15);}
+.login-logo{width:72px;height:72px;background:linear-gradient(135deg,var(--gold),#F59E0B);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:900;color:#0A0F1C;margin:0 auto 14px;}
+.login-brand{font-size:20px;font-weight:900;color:var(--gold);letter-spacing:1px;}
+.login-sub{font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:1.5px;text-transform:uppercase;}
+.login-body{padding:24px 20px;flex:1;}
+.lbl{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px;}
+.inp{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:10px;padding:13px 14px;color:var(--text);font-size:15px;outline:none;margin-bottom:14px;font-family:inherit;transition:border .2s;}
+.inp:focus{border-color:var(--gold);}
+.btn-login{width:100%;padding:15px;background:linear-gradient(135deg,var(--gold),#F59E0B);color:#0A0F1C;border:none;border-radius:11px;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;letter-spacing:.5px;transition:opacity .2s;}
+.btn-login:active{opacity:.85;}
+.btn-login:disabled{opacity:.5;}
+.login-err{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:10px 14px;font-size:12px;color:#FCA5A5;margin-top:10px;display:none;}
+.login-footer{text-align:center;font-size:11px;color:var(--muted);margin-top:20px;}
+.spinner-sm{width:18px;height:18px;border:2px solid rgba(10,15,28,.4);border-top-color:#0A0F1C;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ══════ SELECTOR EMPRESA ══════ */
+#sc-empresa{display:none;min-height:100vh;background:var(--bg);}
+.emp-hdr{background:linear-gradient(135deg,#0A0F1C,#111827);border-bottom:1px solid rgba(201,168,76,0.15);padding:16px 20px;display:flex;align-items:center;gap:12px;}
+.emp-hdr-ico{width:38px;height:38px;background:linear-gradient(135deg,var(--gold),#F59E0B);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#0A0F1C;flex-shrink:0;}
+.emp-hdr-t{font-size:15px;font-weight:800;color:var(--text);}
+.emp-hdr-s{font-size:11px;color:var(--muted);margin-top:1px;}
+.emp-list{padding:16px;}
+.emp-card{background:var(--surf);border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:all .2s;active:background:rgba(201,168,76,0.08);}
+.emp-card:active{border-color:var(--gold);background:rgba(201,168,76,0.07);}
+.emp-ico{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.emp-info{flex:1;min-width:0;}
+.emp-name{font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.emp-rut{font-size:11px;color:var(--muted);margin-top:2px;}
+.emp-chevron{color:var(--muted);font-size:18px;}
+.emp-noacceso{text-align:center;padding:40px 20px;color:var(--muted);}
+
+/* ══════ APP PRINCIPAL ══════ */
+#sc-app{display:none;flex-direction:column;min-height:100vh;}
+.hdr{background:var(--surf);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;}
+.hdr-logo{width:34px;height:34px;background:linear-gradient(135deg,var(--gold),#F59E0B);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#0A0F1C;flex-shrink:0;}
+.hdr-info{flex:1;min-width:0;}
+.hdr-t{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hdr-s{font-size:10px;color:var(--muted);}
+.hdr-btn{background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);color:var(--gold);border-radius:7px;padding:5px 10px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
+
+/* BOTTOM TABS */
+.btabs{position:fixed;bottom:0;left:0;right:0;background:var(--surf);border-top:1px solid var(--border);display:none;z-index:100;}
+.btabs.on{display:flex;}
+.btab{flex:1;padding:10px 4px 8px;text-align:center;cursor:pointer;transition:all .2s;}
+.btab .btico{font-size:20px;line-height:1;}
+.btab .btlbl{font-size:9px;font-weight:700;color:var(--muted);margin-top:3px;text-transform:uppercase;}
+.btab.on .btlbl{color:var(--gold);}
+
+/* SCREENS */
+.sc{display:none;padding:14px;padding-bottom:80px;}
+.sc.on{display:block;}
+
+/* CARDS */
+.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;}
+.card-title{font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.kpi{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;}
+.kpi-v{font-size:20px;font-weight:900;margin-bottom:4px;}
+.kpi-l{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;}
+
+/* FORMS */
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+.fg label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.fi{background:var(--surf2);border:1px solid var(--border);border-radius:var(--r2);padding:11px 12px;color:var(--text);font-size:14px;width:100%;outline:none;transition:border .2s;font-family:inherit;}
+.fi:focus{border-color:var(--gold);}
+select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239CA3AF' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+textarea.fi{resize:vertical;min-height:80px;}
+
+/* BUTTONS */
+.btn{width:100%;padding:13px;border-radius:var(--r2);border:none;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#F59E0B);color:#0A0F1C;}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--mutedHi);}
+.btn-danger{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:var(--danger);}
+.btn:active{opacity:.85;}
+
+/* ITEMS LISTA */
+.item{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px;}
+.item-titulo{font-size:13px;font-weight:800;margin-bottom:4px;}
+.item-sub{font-size:11px;color:var(--muted);line-height:1.5;}
+.item-monto{font-size:16px;font-weight:900;color:var(--gold);}
+
+/* BADGE */
+.badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+.b-ok{background:rgba(34,197,94,0.15);color:var(--ok);}
+.b-warn{background:rgba(245,158,11,0.15);color:var(--warn);}
+.b-info{background:rgba(56,189,248,0.15);color:var(--info);}
+.b-purple{background:rgba(167,139,250,0.15);color:var(--purple);}
+
+/* EMPTY */
+.empty{text-align:center;padding:36px 20px;color:var(--muted);}
+.empty-ico{font-size:36px;margin-bottom:10px;}
+
+/* OVERLAY / SHEET */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:flex-end;justify-content:center;}
+.overlay.open{display:flex;}
+.sheet{background:var(--surf);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.sh-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 14px;}
+.sh-title{font-size:16px;font-weight:800;margin-bottom:4px;}
+.sh-sub{font-size:12px;color:var(--muted);margin-bottom:14px;}
+
+/* DIVIDER */
+.div{height:1px;background:var(--border);margin:12px 0;}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surf2);color:var(--text);padding:10px 18px;border-radius:30px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;border:1px solid var(--border);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* INVENTARIO */
+.inv-item{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.inv-ico{width:40px;height:40px;background:var(--surf2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.inv-info{flex:1;}
+.inv-name{font-size:13px;font-weight:700;}
+.inv-det{font-size:11px;color:var(--muted);margin-top:2px;}
+.inv-stock{text-align:right;}
+.inv-num{font-size:18px;font-weight:900;}
+.stock-ok{color:var(--ok);}
+.stock-warn{color:var(--warn);}
+.stock-out{color:var(--danger);}
+
+/* COTIZACION */
+.cot-linea{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.cot-linea .fi{flex:1;}
+.cot-x{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.2);color:var(--danger);border-radius:7px;padding:8px;cursor:pointer;font-size:14px;line-height:1;flex-shrink:0;}
+.cot-total{background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- PANTALLA 1: LOGIN                              -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="sc-login">
+  <div class="login-hdr">
+    <div class="login-logo">M</div>
+    <div class="login-brand">MSS COMERCIAL</div>
+    <div class="login-sub">App de Terreno · Vendedor / Operario</div>
+  </div>
+  <div class="login-body">
+    <label class="lbl">Correo Registrado</label>
+    <input class="inp" id="loginEmail" type="email" placeholder="tu@correo.com" autocomplete="email" inputmode="email"/>
+    <label class="lbl">Contraseña</label>
+    <input class="inp" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="btn-login" id="btnLogin" onclick="doLogin()">INGRESAR AL SISTEMA</button>
+    <div class="login-err" id="loginErr"></div>
+    <div class="login-footer">Sistema protegido · Solo acceso autorizado<br>Solicita acceso al Super Administrador</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- PANTALLA 2: SELECTOR DE EMPRESA                -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="sc-empresa">
+  <div class="emp-hdr">
+    <div class="emp-hdr-ico">M</div>
+    <div>
+      <div class="emp-hdr-t">Seleccionar Empresa</div>
+      <div class="emp-hdr-s" id="empHdrSub">Bienvenida/o</div>
+    </div>
+  </div>
+  <div class="emp-list" id="empList"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- PANTALLA 3: APP PRINCIPAL                      -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="sc-app">
+  <div class="hdr">
+    <div class="hdr-logo">M</div>
+    <div class="hdr-info">
+      <div class="hdr-t" id="appEmpNombre">Empresa</div>
+      <div class="hdr-s" id="appUserNombre">—</div>
+    </div>
+    <button class="hdr-btn" onclick="cambiarEmpresa()">Cambiar</button>
+    <button class="hdr-btn" onclick="cerrarSesion()" style="margin-left:4px;background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.2);color:var(--danger)">Salir</button>
+  </div>
+
+  <!-- PANTALLA: INICIO (resumen del día) -->
+  <div class="sc on" id="sc-inicio">
+    <div class="kpi-grid" id="kpiInicio"></div>
+    <div class="card">
+      <div class="card-title">📋 Actividad Reciente</div>
+      <div id="actividadReciente"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">⚡ Acceso Rápido</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn btn-gold" onclick="irTab('cotizar',document.querySelectorAll('.btab')[1])">📄 Nueva Cotización</button>
+        <button class="btn btn-outline" onclick="irTab('agenda',document.querySelectorAll('.btab')[0])" style="border-color:rgba(56,189,248,.3);color:var(--info)">📅 Nueva Cita</button>
+        <button class="btn btn-outline" onclick="irTab('inventario',document.querySelectorAll('.btab')[2])" style="border-color:rgba(167,139,250,.3);color:var(--purple)">📦 Ver Inventario</button>
+        <button class="btn btn-outline" onclick="irTab('perfil',document.querySelectorAll('.btab')[3])" style="border-color:rgba(34,197,94,.3);color:var(--ok)">👤 Mi Perfil</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANTALLA: AGENDA / CITAS -->
+  <div class="sc" id="sc-agenda">
+    <button class="btn btn-gold" onclick="abrirNuevaCita()" style="margin-bottom:14px">📅 Agendar Nueva Cita</button>
+    <div id="listaCitas"></div>
+  </div>
+
+  <!-- PANTALLA: COTIZADOR -->
+  <div class="sc" id="sc-cotizar">
+    <div class="card">
+      <div class="card-title">📄 Nueva Cotización</div>
+      <div class="fg">
+        <label>Cliente</label>
+        <input class="fi" id="cotCliente" type="text" placeholder="Nombre del cliente"/>
+      </div>
+      <div class="fg">
+        <label>RUT / Contacto</label>
+        <input class="fi" id="cotRut" type="text" placeholder="Ej: 12.345.678-9"/>
+      </div>
+      <div class="fg">
+        <label>Teléfono</label>
+        <input class="fi" id="cotTel" type="tel" inputmode="tel" placeholder="+56 9 XXXX XXXX"/>
+      </div>
+      <div class="fg">
+        <label>Descripción del Servicio</label>
+        <textarea class="fi" id="cotDesc" placeholder="Describe el servicio o producto cotizado..."></textarea>
+      </div>
+      <div class="div"></div>
+      <div class="card-title">📦 Líneas de Cotización</div>
+      <div id="cotLineas"></div>
+      <button onclick="agregarLinea()" class="btn btn-outline" style="margin-bottom:12px">+ Agregar ítem</button>
+      <div class="cot-total">
+        <span style="font-size:12px;color:var(--muted);font-weight:700">TOTAL COTIZACIÓN</span>
+        <span class="item-monto" id="cotTotal">$0</span>
+      </div>
+      <div class="div"></div>
+      <div class="fg">
+        <label>Validez (días)</label>
+        <select class="fi" id="cotValidez">
+          <option value="7">7 días</option>
+          <option value="15" selected>15 días</option>
+          <option value="30">30 días</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Observaciones</label>
+        <textarea class="fi" id="cotObs" placeholder="Condiciones, descuentos, notas..."></textarea>
+      </div>
+      <button class="btn btn-gold" onclick="guardarCotizacion()">💾 Guardar Cotización</button>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;margin-top:4px">Cotizaciones Guardadas</div>
+    <div id="listaCotizaciones"></div>
+  </div>
+
+  <!-- PANTALLA: INVENTARIO -->
+  <div class="sc" id="sc-inventario">
+    <div class="card" style="padding:10px 14px;margin-bottom:12px">
+      <input class="fi" id="invBuscar" type="text" placeholder="🔍 Buscar producto o servicio..." oninput="renderInventario()"/>
+    </div>
+    <div id="listaInventario"></div>
+  </div>
+
+  <!-- PANTALLA: PERFIL -->
+  <div class="sc" id="sc-perfil">
+    <div class="card">
+      <div class="card-title">👤 Mi Perfil</div>
+      <div id="perfilContent"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Mi Actividad</div>
+      <div id="actividadPerfil"></div>
+    </div>
+    <button class="btn btn-danger" onclick="cerrarSesion()" style="margin-top:4px">🚪 Cerrar Sesión</button>
+  </div>
+</div>
+
+<!-- BOTTOM TABS -->
+<div class="btabs" id="btabs">
+  <div class="btab on" onclick="irTab('agenda',this)">
+    <div class="btico">📅</div>
+    <div class="btlbl">Agenda</div>
+  </div>
+  <div class="btab" onclick="irTab('cotizar',this)">
+    <div class="btico">📄</div>
+    <div class="btlbl">Cotizar</div>
+  </div>
+  <div class="btab" onclick="irTab('inventario',this)">
+    <div class="btico">📦</div>
+    <div class="btlbl">Inventario</div>
+  </div>
+  <div class="btab" onclick="irTab('perfil',this)">
+    <div class="btico">👤</div>
+    <div class="btlbl">Perfil</div>
+  </div>
+</div>
+
+<!-- SHEETS -->
+<div class="overlay" id="ovCita">
+  <div class="sheet">
+    <div class="sh-handle"></div>
+    <div class="sh-title" id="citaTit">Nueva Cita</div>
+    <div class="sh-sub">Agenda una visita o servicio en terreno</div>
+    <div class="fg"><label>Cliente</label><input class="fi" id="citaCliente" type="text" placeholder="Nombre del cliente"/></div>
+    <div class="fg"><label>Teléfono</label><input class="fi" id="citaTel" type="tel" inputmode="tel" placeholder="+56 9 XXXX XXXX"/></div>
+    <div class="fg"><label>Fecha</label><input class="fi" id="citaFecha" type="date"/></div>
+    <div class="fg"><label>Hora</label><input class="fi" id="citaHora" type="time"/></div>
+    <div class="fg"><label>Tipo de Servicio</label>
+      <select class="fi" id="citaTipo">
+        <option value="Visita">🏠 Visita en terreno</option>
+        <option value="Instalacion">🔧 Instalación</option>
+        <option value="Mantencion">⚙ Mantención</option>
+        <option value="Cotizacion">📄 Cotización en sitio</option>
+        <option value="Entrega">🚛 Entrega</option>
+        <option value="Otro">📌 Otro</option>
+      </select>
+    </div>
+    <div class="fg"><label>Dirección</label><input class="fi" id="citaDir" type="text" placeholder="Calle, número, ciudad"/></div>
+    <div class="fg"><label>Notas</label><textarea class="fi" id="citaNotas" placeholder="Instrucciones, acceso, detalles..."></textarea></div>
+    <button class="btn btn-gold" onclick="guardarCita()" style="margin-bottom:10px">✅ Agendar Cita</button>
+    <button class="btn btn-outline" onclick="cerrar('ovCita')">Cancelar</button>
+  </div>
+</div>
+
+<div class="overlay" id="ovDetCita">
+  <div class="sheet">
+    <div class="sh-handle"></div>
+    <div class="sh-title" id="detCitaTit">Detalle Cita</div>
+    <div id="detCitaContent"></div>
+  </div>
+</div>
+
+<div class="overlay" id="ovDetCot">
+  <div class="sheet">
+    <div class="sh-handle"></div>
+    <div class="sh-title" id="detCotTit">Cotización</div>
+    <div id="detCotContent"></div>
+    <button class="btn btn-outline" onclick="cerrar('ovDetCot')" style="margin-top:10px">Cerrar</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+// ══════════════════════════════════════════
+// FIREBASE
+// ══════════════════════════════════════════
+const FB_CFG={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
+
+let _app,_auth,_db,_fbM,_user,_userRol='vendedor',_userEmpresas=[];
+let _empActual=null,INVENTARIO=[],CITAS=[],COTIZACIONES=[];
+
+const HOY=new Date().toISOString().split('T')[0];
+const clp=n=>'$'+(Math.round(n||0)).toLocaleString('es-CL');
+const df=d=>{try{return new Date((d||HOY)+'T12:00:00').toLocaleDateString('es-CL');}catch(e){return d||'—';}};
+const uid=()=>'m'+Date.now()+Math.random().toString(36).slice(2,6);
+
+const EMPRESAS_DEF=[
+  {id:1,nombre:'Martinez Services Spa',rut:'76.782.954-K',ico:'🔧',color:'#C9A84C'},
+  {id:3,nombre:'M&P Arriendos y Servicios SpA',rut:'78.361.479-0',ico:'🚛',color:'#38BDF8'},
+];
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+async function init(){
+  try{
+    const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    _fbM=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    _app=getApps().length?getApps()[0]:initializeApp(FB_CFG);
+    _auth=fa.getAuth(_app);
+    _db=_fbM.getFirestore(_app);
+    fa.onAuthStateChanged(_auth,async user=>{
+      if(user){
+        _user=user;
+        await cargarPerfil();
+        const empGuardada=sessionStorage.getItem('mss_movil_emp');
+        if(empGuardada){
+          _empActual=JSON.parse(empGuardada);
+          await entrarApp();
+        }else{
+          mostrarSelectorEmpresa();
+        }
+      }
+      // sin sesión → pantalla login visible
+    });
+  }catch(e){console.error('Firebase:',e);}
+}
+
+// ══════════════════════════════════════════
+// LOGIN
+// ══════════════════════════════════════════
+window.doLogin=async function(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  const errDiv=document.getElementById('loginErr');
+  const btn=document.getElementById('btnLogin');
+  errDiv.style.display='none';
+  if(!email||!pass){errDiv.textContent='Ingresa tu correo y contraseña.';errDiv.style.display='block';return;}
+  btn.disabled=true;btn.innerHTML='<span class="spinner-sm"></span> Verificando...';
+  try{
+    const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const cred=await fa.signInWithEmailAndPassword(_auth,email,pass);
+    _user=cred.user;
+    await cargarPerfil();
+    document.getElementById('sc-login').style.display='none';
+    mostrarSelectorEmpresa();
+  }catch(e){
+    const msg={
+      'auth/user-not-found':'Correo no autorizado en el sistema.',
+      'auth/wrong-password':'Contraseña incorrecta.',
+      'auth/invalid-credential':'Correo o contraseña incorrectos.',
+      'auth/too-many-requests':'Demasiados intentos. Espera unos minutos.',
+    }[e.code]||'Error al iniciar sesión.';
+    errDiv.textContent=msg;errDiv.style.display='block';
+  }finally{
+    btn.disabled=false;btn.innerHTML='INGRESAR AL SISTEMA';
+  }
+};
+
+async function cargarPerfil(){
+  if(!_db||!_user)return;
+  try{
+    const snap=await _fbM.getDoc(_fbM.doc(_db,'usuarios/'+_user.uid));
+    if(snap.exists()){
+      const d=snap.data();
+      _userRol=d.rol||'vendedor';
+      _userEmpresas=d.empresas||[1,3];
+    }else{
+      _userRol='vendedor';_userEmpresas=[1,3];
+    }
+  }catch(e){_userEmpresas=[1,3];}
+}
+
+// ══════════════════════════════════════════
+// SELECTOR EMPRESA
+// ══════════════════════════════════════════
+function mostrarSelectorEmpresa(){
+  document.getElementById('sc-login').style.display='none';
+  document.getElementById('sc-empresa').style.display='block';
+  const nombre=_user.displayName||_user.email?.split('@')[0]||'Usuario';
+  document.getElementById('empHdrSub').textContent='Hola, '+nombre+' 👋';
+  const empresasPermitidas=EMPRESAS_DEF.filter(e=>_userEmpresas.includes(e.id)||_userEmpresas.includes(String(e.id)));
+  const list=document.getElementById('empList');
+  if(!empresasPermitidas.length){
+    list.innerHTML='<div class="emp-noacceso"><div style="font-size:36px;margin-bottom:12px">🔒</div><div style="font-size:14px;font-weight:700;color:var(--text)">Sin empresas asignadas</div><div style="font-size:12px;margin-top:6px">Contacta al administrador para que te asigne acceso.</div></div>';
+    return;
+  }
+  list.innerHTML=empresasPermitidas.map(e=>`
+    <div class="emp-card" onclick="elegirEmpresa(${e.id})">
+      <div class="emp-ico" style="background:rgba(${e.id===1?'201,168,76':'56,189,248'},.1)">${e.ico}</div>
+      <div class="emp-info">
+        <div class="emp-name">${e.nombre}</div>
+        <div class="emp-rut">${e.rut}</div>
+        <div class="emp-rut" style="margin-top:3px"><span class="badge b-info">${_userRol}</span></div>
+      </div>
+      <div class="emp-chevron">›</div>
+    </div>`).join('');
+}
+
+window.elegirEmpresa=async function(id){
+  const emp=EMPRESAS_DEF.find(e=>e.id===id);
+  if(!emp)return;
+  _empActual=emp;
+  sessionStorage.setItem('mss_movil_emp',JSON.stringify(emp));
+  await entrarApp();
+};
+
+window.cambiarEmpresa=function(){
+  document.getElementById('sc-app').style.display='none';
+  document.getElementById('btabs').classList.remove('on');
+  document.getElementById('sc-empresa').style.display='block';
+};
+
+// ══════════════════════════════════════════
+// ENTRAR A LA APP
+// ══════════════════════════════════════════
+async function entrarApp(){
+  document.getElementById('sc-empresa').style.display='none';
+  document.getElementById('sc-login').style.display='none';
+  document.getElementById('sc-app').style.display='flex';
+  document.getElementById('sc-app').style.flexDirection='column';
+  document.getElementById('btabs').classList.add('on');
+  document.getElementById('appEmpNombre').textContent=_empActual.nombre;
+  document.getElementById('appUserNombre').textContent=(_userRol==='superadmin'||_userRol==='admin'?'👑 ':_userRol==='vendedor'?'💼 ':'⚙ ')+(_user.displayName||_user.email?.split('@')[0]||'Usuario');
+  await cargarDatos();
+  renderInicio();
+  renderAgenda();
+  renderInventario();
+  renderPerfil();
+  inicializarCotizador();
+}
+
+// ══════════════════════════════════════════
+// CARGAR DATOS FIREBASE
+// ══════════════════════════════════════════
+async function cargarDatos(){
+  if(!_db||!_empActual)return;
+  const ep='empresas/'+_empActual.id;
+  try{
+    // Inventario — desde productos/activos
+    const invSnap=await _fbM.getDocs(_fbM.collection(_db,ep+'/activos'));
+    INVENTARIO=[];invSnap.forEach(d=>INVENTARIO.push({id:d.id,...d.data()}));
+    // Citas (solo del usuario actual)
+    const citSnap=await _fbM.getDocs(_fbM.collection(_db,ep+'/citas_movil'));
+    CITAS=[];citSnap.forEach(d=>{const r=d.data();if(r.uid===_user.uid||_userRol==='admin'||_userRol==='superadmin')CITAS.push({id:d.id,...r});});
+    // Cotizaciones del usuario
+    const cotSnap=await _fbM.getDocs(_fbM.collection(_db,ep+'/cotizaciones_movil'));
+    COTIZACIONES=[];cotSnap.forEach(d=>{const r=d.data();if(r.uid===_user.uid||_userRol==='admin'||_userRol==='superadmin')COTIZACIONES.push({id:d.id,...r});});
+    // Tiempo real citas
+    _fbM.onSnapshot(_fbM.collection(_db,ep+'/citas_movil'),snap=>{
+      CITAS=[];snap.forEach(d=>{const r=d.data();if(r.uid===_user.uid||_userRol==='admin'||_userRol==='superadmin')CITAS.push({id:d.id,...r});});
+      renderAgenda();renderInicio();
+    });
+  }catch(e){console.warn('cargarDatos:',e.message);}
+}
+
+// ══════════════════════════════════════════
+// RENDER INICIO
+// ══════════════════════════════════════════
+function renderInicio(){
+  const hoy=CITAS.filter(c=>c.fecha===HOY).length;
+  const semana=CITAS.filter(c=>c.fecha>=HOY).length;
+  const cotMes=COTIZACIONES.filter(c=>c.fecha?.startsWith(HOY.substring(0,7))).length;
+  const totalCot=COTIZACIONES.reduce((s,c)=>s+(c.total||0),0);
+  const div=document.getElementById('kpiInicio');
+  if(div)div.innerHTML=`
+    <div class="kpi"><div class="kpi-v" style="color:var(--gold)">${hoy}</div><div class="kpi-l">Citas Hoy</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--info)">${semana}</div><div class="kpi-l">Próximas</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--ok)">${cotMes}</div><div class="kpi-l">Cot. este mes</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--purple)">${clp(totalCot)}</div><div class="kpi-l">Total cotizado</div></div>`;
+  const act=document.getElementById('actividadReciente');
+  const recientes=[...CITAS,...COTIZACIONES].sort((a,b)=>String(b.fecha||b.ts||0).localeCompare(String(a.fecha||a.ts||0))).slice(0,4);
+  if(act)act.innerHTML=recientes.length?recientes.map(r=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-size:12px;font-weight:700">${r.cliente||'—'}</div>
+        <div style="font-size:10px;color:var(--muted)">${r.tipo||'Cotización'} · ${df(r.fecha)}</div>
+      </div>
+      ${r.total?`<span style="font-size:13px;font-weight:800;color:var(--gold)">${clp(r.total)}</span>`:`<span class="badge b-info">${r.tipo||'—'}</span>`}
+    </div>`).join('')
+  :'<div style="font-size:12px;color:var(--muted);padding:8px 0">Sin actividad reciente</div>';
+}
+
+// ══════════════════════════════════════════
+// AGENDA
+// ══════════════════════════════════════════
+window.abrirNuevaCita=function(){
+  document.getElementById('citaTit').textContent='Nueva Cita';
+  document.getElementById('citaCliente').value='';
+  document.getElementById('citaTel').value='';
+  document.getElementById('citaFecha').value=HOY;
+  document.getElementById('citaHora').value='09:00';
+  document.getElementById('citaTipo').value='Visita';
+  document.getElementById('citaDir').value='';
+  document.getElementById('citaNotas').value='';
+  document.getElementById('ovCita').classList.add('open');
+};
+window.guardarCita=async function(){
+  const cliente=document.getElementById('citaCliente').value.trim();
+  if(!cliente){toast('⚠ Ingresa el nombre del cliente');return;}
+  const obj={id:uid(),cliente,tel:document.getElementById('citaTel').value.trim(),fecha:document.getElementById('citaFecha').value,hora:document.getElementById('citaHora').value,tipo:document.getElementById('citaTipo').value,dir:document.getElementById('citaDir').value.trim(),notas:document.getElementById('citaNotas').value.trim(),estado:'Pendiente',uid:_user.uid,vendedor:_user.displayName||_user.email,ts:Date.now()};
+  try{
+    await _fbM.setDoc(_fbM.doc(_db,'empresas/'+_empActual.id+'/citas_movil/'+obj.id),obj);
+    cerrar('ovCita');toast('✅ Cita agendada');
+  }catch(e){toast('❌ Error: '+e.message);}
+};
+function renderAgenda(){
+  const div=document.getElementById('listaCitas');if(!div)return;
+  const ord=[...CITAS].sort((a,b)=>String(a.fecha+a.hora).localeCompare(String(b.fecha+b.hora)));
+  if(!ord.length){div.innerHTML='<div class="empty"><div class="empty-ico">📅</div><div>Sin citas agendadas</div><div style="font-size:11px;margin-top:6px">Toca el botón para agendar tu primera cita</div></div>';return;}
+  const EC={Pendiente:'b-warn',Confirmada:'b-ok',Completada:'b-info',Cancelada:'badge'};
+  div.innerHTML=ord.map(c=>`
+    <div class="item" onclick="verDetalleCita('${c.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div>
+          <div class="item-titulo">${c.cliente}</div>
+          <div class="item-sub">${c.tipo} · ${c.hora||'—'}<br>${c.dir||'Sin dirección'}</div>
+        </div>
+        <div style="text-align:right">
+          <span class="badge ${EC[c.estado]||'b-warn'}">${c.estado}</span>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">${df(c.fecha)}</div>
+        </div>
+      </div>
+      ${c.tel?`<div style="font-size:11px;color:var(--info)">📞 ${c.tel}</div>`:''}
+    </div>`).join('');
+}
+window.verDetalleCita=function(id){
+  const c=CITAS.find(x=>x.id===id);if(!c)return;
+  document.getElementById('detCitaTit').textContent=c.cliente;
+  document.getElementById('detCitaContent').innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Tipo</span><strong>${c.tipo}</strong></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Fecha</span><strong>${df(c.fecha)} ${c.hora}</strong></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Teléfono</span><strong>${c.tel||'—'}</strong></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Dirección</span><strong>${c.dir||'—'}</strong></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Estado</span><strong>${c.estado}</strong></div>
+      ${c.notas?`<div><span style="color:var(--muted)">Notas:</span><div style="margin-top:4px;color:var(--text)">${c.notas}</div></div>`:''}
+    </div>
+    <div style="display:flex;gap:8px">
+      ${c.tel?`<a href="tel:${c.tel}" class="btn btn-outline" style="text-decoration:none;flex:1">📞 Llamar</a>`:''}
+      ${c.tel?`<a href="https://wa.me/56${c.tel.replace(/\D/g,'').slice(-9)}" target="_blank" class="btn btn-outline" style="text-decoration:none;flex:1;border-color:rgba(37,211,102,.3);color:#25D366">WhatsApp</a>`:''}
+    </div>
+    <button class="btn btn-outline" onclick="cerrar('ovDetCita')" style="margin-top:8px">Cerrar</button>`;
+  document.getElementById('ovDetCita').classList.add('open');
+};
+
+// ══════════════════════════════════════════
+// COTIZADOR
+// ══════════════════════════════════════════
+let _lineas=[{desc:'',qty:1,precio:0}];
+function inicializarCotizador(){_lineas=[{desc:'',qty:1,precio:0}];renderLineas();}
+function renderLineas(){
+  document.getElementById('cotLineas').innerHTML=_lineas.map((l,i)=>`
+    <div class="cot-linea">
+      <input class="fi" value="${l.desc}" oninput="_lineas[${i}].desc=this.value" placeholder="Descripción" style="flex:2"/>
+      <input class="fi" value="${l.qty}" type="number" min="1" oninput="_lineas[${i}].qty=parseFloat(this.value)||1;calcTotal()" placeholder="Cant" style="flex:.6;text-align:center"/>
+      <input class="fi" value="${l.precio}" type="number" min="0" oninput="_lineas[${i}].precio=parseFloat(this.value)||0;calcTotal()" placeholder="Precio" style="flex:1.2"/>
+      ${_lineas.length>1?`<button class="cot-x" onclick="quitarLinea(${i})">✕</button>`:''}
+    </div>`).join('');
+  calcTotal();
+}
+function calcTotal(){
+  const tot=_lineas.reduce((s,l)=>s+(l.qty||1)*(l.precio||0),0);
+  const el=document.getElementById('cotTotal');
+  if(el)el.textContent=clp(tot);
+}
+window.agregarLinea=function(){_lineas.push({desc:'',qty:1,precio:0});renderLineas();};
+window.quitarLinea=function(i){_lineas.splice(i,1);renderLineas();};
+window.guardarCotizacion=async function(){
+  const cliente=document.getElementById('cotCliente').value.trim();
+  if(!cliente){toast('⚠ Ingresa el nombre del cliente');return;}
+  const lineasValidas=_lineas.filter(l=>l.desc&&l.precio>0);
+  if(!lineasValidas.length){toast('⚠ Agrega al menos un ítem con precio');return;}
+  const total=lineasValidas.reduce((s,l)=>s+(l.qty||1)*l.precio,0);
+  const obj={id:uid(),cliente,rut:document.getElementById('cotRut').value.trim(),tel:document.getElementById('cotTel').value.trim(),desc:document.getElementById('cotDesc').value.trim(),lineas:lineasValidas,total,validez:parseInt(document.getElementById('cotValidez').value)||15,obs:document.getElementById('cotObs').value.trim(),estado:'Emitida',fecha:HOY,uid:_user.uid,vendedor:_user.displayName||_user.email,ts:Date.now()};
+  try{
+    await _fbM.setDoc(_fbM.doc(_db,'empresas/'+_empActual.id+'/cotizaciones_movil/'+obj.id),obj);
+    COTIZACIONES.unshift(obj);
+    toast('✅ Cotización guardada');
+    // Reset
+    document.getElementById('cotCliente').value='';
+    document.getElementById('cotRut').value='';
+    document.getElementById('cotTel').value='';
+    document.getElementById('cotDesc').value='';
+    document.getElementById('cotObs').value='';
+    _lineas=[{desc:'',qty:1,precio:0}];renderLineas();
+    renderListaCotizaciones();renderInicio();
+  }catch(e){toast('❌ Error: '+e.message);}
+};
+function renderListaCotizaciones(){
+  const div=document.getElementById('listaCotizaciones');if(!div)return;
+  const ord=[...COTIZACIONES].sort((a,b)=>String(b.ts||0).localeCompare(String(a.ts||0))).slice(0,10);
+  if(!ord.length){div.innerHTML='<div class="empty" style="padding:20px"><div>Sin cotizaciones guardadas</div></div>';return;}
+  div.innerHTML=ord.map(c=>`
+    <div class="item" onclick="verDetalleCot('${c.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="item-titulo">${c.cliente}</div>
+          <div class="item-sub">${df(c.fecha)} · Válida ${c.validez} días</div>
+        </div>
+        <div class="item-monto">${clp(c.total)}</div>
+      </div>
+    </div>`).join('');
+}
+window.verDetalleCot=function(id){
+  const c=COTIZACIONES.find(x=>x.id===id);if(!c)return;
+  document.getElementById('detCotTit').textContent='Cotización — '+c.cliente;
+  document.getElementById('detCotContent').innerHTML=`
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">${df(c.fecha)} · Vendedor: ${c.vendedor||'—'}</div>
+    ${c.desc?`<div style="font-size:13px;color:var(--mutedHi);margin-bottom:12px">${c.desc}</div>`:''}
+    ${(c.lineas||[]).map(l=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px"><span>${l.desc} x${l.qty}</span><span style="font-weight:700;color:var(--gold)">${clp((l.qty||1)*l.precio)}</span></div>`).join('')}
+    <div style="display:flex;justify-content:space-between;padding:12px 0;font-size:15px;font-weight:900"><span>TOTAL</span><span style="color:var(--gold)">${clp(c.total)}</span></div>
+    ${c.obs?`<div style="font-size:11px;color:var(--muted);margin-top:4px">${c.obs}</div>`:''}`;
+  document.getElementById('ovDetCot').classList.add('open');
+};
+
+// ══════════════════════════════════════════
+// INVENTARIO
+// ══════════════════════════════════════════
+window.renderInventario=function(){
+  const div=document.getElementById('listaInventario');if(!div)return;
+  const q=(document.getElementById('invBuscar')?.value||'').toLowerCase();
+  const lista=INVENTARIO.filter(i=>!q||JSON.stringify(i).toLowerCase().includes(q));
+  if(!lista.length){
+    div.innerHTML='<div class="empty"><div class="empty-ico">📦</div><div>'+(INVENTARIO.length?'Sin resultados':'Sin inventario registrado')+'</div><div style="font-size:11px;margin-top:6px">El inventario se gestiona desde MSS-Arriendos en el ERP principal</div></div>';
+    return;
+  }
+  div.innerHTML=lista.map(i=>{
+    const stock=i.stock??i.cantidad??null;
+    const stClass=stock===null?'':stock===0?'stock-out':stock<5?'stock-warn':'stock-ok';
+    return`<div class="inv-item">
+      <div class="inv-ico">${i.tipo==='Vehículo'?'🚗':i.tipo==='Equipo'?'⚙':i.tipo==='Herramienta'?'🔧':'📦'}</div>
+      <div class="inv-info">
+        <div class="inv-name">${i.nombre||i.modelo||'—'}</div>
+        <div class="inv-det">${i.marca||''} ${i.modelo||''} · ${i.estado||i.tipo||'—'}</div>
+        ${i.patente?`<div class="inv-det">Patente: ${i.patente}</div>`:''}
+      </div>
+      ${stock!==null?`<div class="inv-stock"><div class="inv-num ${stClass}">${stock}</div><div style="font-size:9px;color:var(--muted)">stock</div></div>`:`<span class="badge ${i.estado==='Activo'?'b-ok':'b-warn'}">${i.estado||'—'}</span>`}
+    </div>`;}).join('');
+};
+
+// ══════════════════════════════════════════
+// PERFIL
+// ══════════════════════════════════════════
+function renderPerfil(){
+  const div=document.getElementById('perfilContent');
+  if(div)div.innerHTML=`
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+      <div style="width:52px;height:52px;background:linear-gradient(135deg,var(--gold),#F59E0B);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#0A0F1C;flex-shrink:0">${(_user.displayName||_user.email||'U')[0].toUpperCase()}</div>
+      <div>
+        <div style="font-size:15px;font-weight:800">${_user.displayName||_user.email?.split('@')[0]||'Usuario'}</div>
+        <div style="font-size:12px;color:var(--muted)">${_user.email}</div>
+        <span class="badge b-info" style="margin-top:4px">${_userRol}</span>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--muted)">Empresa activa: <strong style="color:var(--text)">${_empActual?.nombre||'—'}</strong></div>`;
+  const act=document.getElementById('actividadPerfil');
+  if(act)act.innerHTML=`
+    <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px">
+      <span style="color:var(--muted)">Citas agendadas</span><strong>${CITAS.length}</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px">
+      <span style="color:var(--muted)">Cotizaciones</span><strong>${COTIZACIONES.length}</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:9px 0;font-size:13px">
+      <span style="color:var(--muted)">Total cotizado</span><strong style="color:var(--gold)">${clp(COTIZACIONES.reduce((s,c)=>s+(c.total||0),0))}</strong>
+    </div>`;
+}
+
+// ══════════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════════
+window.irTab=function(id,btn){
+  document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.btab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('sc-'+id)?.classList.add('on');
+  if(btn)btn.classList.add('on');
+  if(id==='cotizar')renderListaCotizaciones();
+  if(id==='inventario')renderInventario();
+  if(id==='perfil')renderPerfil();
+};
+window.cerrar=function(id){document.getElementById(id)?.classList.remove('open');};
+window.toast=function(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);};
+window.cerrarSesion=async function(){
+  if(!confirm('¿Cerrar sesión?'))return;
+  try{const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');await fa.signOut(_auth);}catch(e){}
+  sessionStorage.clear();
+  document.getElementById('sc-app').style.display='none';
+  document.getElementById('btabs').classList.remove('on');
+  document.getElementById('sc-login').style.display='flex';
+  CITAS=[];COTIZACIONES=[];INVENTARIO=[];
+};
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+init();
+</script>
+</body>
+</html>
