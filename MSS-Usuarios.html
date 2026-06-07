@@ -139,11 +139,14 @@ const auth = getAuth(app);
 const db   = getFirestore(app);
 
 let _user = null;
+let _adminEmail = null; // email del admin que abrió la sesión — no cambia al crear usuarios
 
 // Verificar sesión
 onAuthStateChanged(auth, async u => {
   if(!u){ window.location.href='MSS-Login.html'; return; }
   _user = u;
+  // Guardar email del admin original — solo la primera vez que carga la página
+  if(!_adminEmail) _adminEmail = u.email;
   // Verificar si es admin o superadmin
   const snap = await getDoc(doc(db,'usuarios/'+u.uid));
   if(snap.exists()){
@@ -178,7 +181,7 @@ async function cargarUsuarios(){
         ${u.empresas&&u.empresas.length?`<span style="font-size:9px;color:#C9A84C">Emp: ${u.empresas.join(',')}</span>`:''}
         ${u.condominios&&u.condominios.length?`<span style="font-size:9px;color:#10B981">Condo: ${u.condominios.join(',')}</span>`:''}
       </div>
-      ${u.uid!==_user.uid?`<button class="btn btn-danger" style="padding:5px 10px;font-size:11px" onclick="eliminarUsuario('${d.id}','${u.email}')">✕</button>`:'<span style="font-size:10px;color:#6B7280">Tú</span>'}`;
+      ${(u.uid===_user.uid || u.email===_adminEmail)?`<span style="font-size:10px;color:#6B7280">Tú</span>`:`<button class="btn btn-danger" style="padding:5px 10px;font-size:11px" onclick="eliminarUsuario('${d.id}','${u.email}')">✕</button>`}`;
     lista.appendChild(div);
   });
 }
@@ -210,16 +213,18 @@ window.crearUsuario = async function(){
       uid:cred.user.uid, nombre, email, rol, tipo,
       empresas: empresasArr,
       condominios: condosArr,
-      creadoPor:_user.email, creado:new Date().toISOString()
+      creadoPor:_adminEmail||_user.email, creado:new Date().toISOString()
     });
-    // Nota: al crear vía cliente, Firebase hace login automático — volvemos a loguear al admin
-    msg.textContent='✓ Usuario '+nombre+' creado correctamente. La contraseña temporal es: '+pass;
+    // IMPORTANTE: Firebase hace login automático con el nuevo usuario al crearlo
+    // Volvemos a cargar la lista usando el UID correcto del admin original
+    msg.textContent='✓ Usuario '+nombre+' creado. Contraseña temporal: '+pass+' — Compártela con el usuario.';
     msg.className='msg ok show';
     document.getElementById('newNombre').value='';
     document.getElementById('newEmail').value='';
     document.getElementById('newPass').value='';
     document.getElementById('newEmpresas').value='';
     document.getElementById('newCondos').value='';
+    // Recargar lista — _adminEmail ya está guardado, el botón "Tú" seguirá correcto
     cargarUsuarios();
   }catch(e){
     const msgs={'auth/email-already-in-use':'Este correo ya está registrado.','auth/invalid-email':'Correo no válido.'};
