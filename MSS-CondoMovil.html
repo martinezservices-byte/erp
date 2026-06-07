@@ -594,8 +594,44 @@ window.abrirRegistro=async function(){
       alert('❌ Este correo no está registrado en las fichas del condominio.\n\nContacta al administrador para que agregue tu email a tu ficha de unidad.');
     }
   }catch(e){
-    alert('Error al verificar. Intenta de nuevo.');
-    console.error(e);
+    console.error('Error verificar:',e);
+    // Fallback: buscar en localStorage si Firebase falla
+    try{
+      let found=false;
+      const keys=['mss_ccondo_1_u','mss_c_condo_1_u'];
+      for(const k of keys){
+        const raw=localStorage.getItem(k);
+        if(raw){
+          const arr=JSON.parse(raw);
+          const match=arr.find(u=>u.email&&u.email.toLowerCase()===email.toLowerCase());
+          if(match){
+            found=true;
+            const codigo=Math.floor(100000+Math.random()*900000);
+            _veriCode=String(codigo);_veriEmail=email;_pendingTipo=_tipoSel;
+            document.getElementById('sc-login').style.display='none';
+            document.getElementById('sc-verificacion').style.display='block';
+            document.getElementById('veriEmailLabel').textContent=email;
+            document.getElementById('vc0').focus();
+            try{
+              await emailjs.send('mss_erp_service','template_ghdv7g1',{
+                to_email:email,to_name:email.split('@')[0],
+                codigo:_veriCode,condominio:_COND_NOMBRE||'Condominio Pioneros 2'
+              });
+              toast('📧 Código enviado a '+email);
+            }catch(err){
+              alert('Código de verificación: '+_veriCode+'
+(Muéstraselo al administrador si no llega el email)');
+            }
+            break;
+          }
+        }
+      }
+      if(!found){
+        alert('❌ Correo no encontrado.\n\nPosible causa: Las unidades no se han sincronizado con Firebase aún.\n\nSolución: Abre MSS-Condominio en el navegador principal → ve a Unidades → haz clic en cualquier unidad para forzar la sincronización. Luego intenta de nuevo.');
+      }
+    }catch(e2){
+      alert('Error técnico: '+e.message+'\n\nContacta al administrador.');
+    }
   }
 };
 
