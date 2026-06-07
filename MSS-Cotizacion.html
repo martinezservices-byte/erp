@@ -287,6 +287,7 @@ try{
   <div class="tabs">
     <button class="tab on" onclick="showTab('lista',this)">📋 Mis Documentos</button>
     <button class="tab" onclick="showTab('nuevo',this)" id="tabNuevo">✏ Nueva Cotización</button>
+    <button class="tab" onclick="showTab('nuevo',this);setTipoPropuesta()" id="tabPropuesta">💼 Propuesta Profesional / SaaS</button>
     <button class="tab" onclick="showTab('clientes',this)">🏢 Clientes</button>
   </div>
 
@@ -295,7 +296,7 @@ try{
     <div class="kpi-row" id="kpiLista"></div>
     <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
       <select id="filtTipoDoc" onchange="renderLista()" style="padding:7px 12px;background:var(--surf);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
-        <option value="">Todos</option><option>Cotización</option><option>Presupuesto</option>
+        <option value="">Todos</option><option>Cotización</option><option>Presupuesto</option><option>Propuesta Profesional</option><option>Propuesta SaaS / ERP</option>
       </select>
       <select id="filtEstadoDoc" onchange="renderLista()" style="padding:7px 12px;background:var(--surf);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-family:monospace;font-size:11px;outline:none">
         <option value="">Todos los estados</option><option>Enviada</option><option>Aceptada</option><option>Rechazada</option><option>Vencida</option><option>Borrador</option>
@@ -317,7 +318,11 @@ try{
       <input type="hidden" id="docTipo" value="Cotización"/>
       <input type="hidden" id="docEditId" value=""/>
 
-      <!-- EMPRESA EMISORA — se carga automáticamente desde el Hub -->
+      <!-- SELECTOR TIPO -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <button onclick="setTipoNormal()" id="btnTipoNormal" style="padding:8px 16px;border-radius:8px;border:2px solid var(--acc);background:var(--acc);color:var(--bg);font-weight:700;font-size:12px;cursor:pointer;font-family:monospace">📄 Cotización / Presupuesto</button>
+        <button onclick="setTipoPropuesta()" id="btnTipoProp" style="padding:8px 16px;border-radius:8px;border:2px solid rgba(201,168,76,0.3);background:transparent;color:var(--gold);font-weight:700;font-size:12px;cursor:pointer;font-family:monospace">💼 Propuesta Profesional / SaaS</button>
+      </div>
       <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:14px;margin-bottom:16px">
         <div style="font-size:10px;color:var(--gold);font-family:monospace;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">🏢 Empresa que Emite el Documento</div>
         <div class="fgrid">
@@ -333,6 +338,69 @@ try{
         </div>
         <div style="font-size:10px;color:var(--muted);font-family:monospace;margin-top:8px">💡 Estos datos se cargan automáticamente desde tu empresa en el Hub. Puedes editarlos si necesitas.</div>
       </div>
+
+      <!-- BLOQUE PROPUESTA PROFESIONAL / SaaS -->
+      <div id="bloquePropuesta" style="display:none;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.25);border-radius:12px;padding:16px;margin-bottom:16px">
+        <div style="font-size:11px;color:var(--gold);font-family:monospace;letter-spacing:1px;font-weight:700;margin-bottom:12px">💼 DATOS DE LA PROPUESTA PROFESIONAL</div>
+        <div class="fgrid">
+          <div class="field"><label>Tipo de Propuesta</label>
+            <select id="propSubtipo" style="width:100%;padding:10px 13px;background:var(--bg);border:1px solid var(--border2);border-radius:9px;color:var(--white);font-size:13px;font-family:monospace;outline:none">
+              <option value="Propuesta Profesional">Servicios Profesionales (Consultoría / Auditoría)</option>
+              <option value="Propuesta SaaS / ERP">Arriendo Software ERP (SaaS)</option>
+              <option value="Propuesta Integral">Propuesta Integral (Implementación + Suscripción)</option>
+            </select>
+          </div>
+          <div class="field"><label>Modalidad de Cobro</label>
+            <select id="propModalidad" style="width:100%;padding:10px 13px;background:var(--bg);border:1px solid var(--border2);border-radius:9px;color:var(--white);font-size:13px;font-family:monospace;outline:none">
+              <option value="Mensual">Suscripción Mensual</option>
+              <option value="Trimestral">Suscripción Trimestral</option>
+              <option value="Anual">Suscripción Anual</option>
+              <option value="Proyecto">Pago por Proyecto (Único)</option>
+              <option value="Por hora">Honorarios por Hora</option>
+            </select>
+          </div>
+          <div class="field"><label>Costo Implementación / Configuración Inicial ($)</label>
+            <input id="propImplementacion" type="number" min="0" placeholder="0 = Sin costo inicial" style="width:100%;padding:10px 13px;background:var(--bg);border:1px solid var(--border2);border-radius:9px;color:var(--white);font-size:13px;font-family:monospace;outline:none"/>
+          </div>
+          <div class="field"><label>Nº Usuarios Incluidos</label>
+            <input id="propUsuarios" type="number" min="1" value="1" style="width:100%;padding:10px 13px;background:var(--bg);border:1px solid var(--border2);border-radius:9px;color:var(--white);font-size:13px;font-family:monospace;outline:none"/>
+          </div>
+          <div class="field"><label>Horas de Capacitación Incluidas</label>
+            <input id="propHoras" type="number" min="0" value="2" style="width:100%;padding:10px 13px;background:var(--bg);border:1px solid var(--border2);border-radius:9px;color:var(--white);font-size:13px;font-family:monospace;outline:none"/>
+          </div>
+          <div class="field"><label>Nivel de Soporte</label>
+            <select id="propSoporte" style="width:100%;padding:10px 13px;background:var(--bg);border:1px solid var(--border2);border-radius:9px;color:var(--white);font-size:13px;font-family:monospace;outline:none">
+              <option>Soporte por Email (48 hrs)</option>
+              <option>Soporte WhatsApp Business</option>
+              <option>Soporte Prioritario (4 hrs)</option>
+              <option>Soporte 24/7 (Enterprise)</option>
+            </select>
+          </div>
+          <div class="field full"><label>Módulos Incluidos</label>
+            <div id="propModulosCheck" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px;margin-top:6px"></div>
+          </div>
+          <div class="field full"><label>Alcance del Servicio (descripción detallada)</label>
+            <textarea id="propAlcance" rows="5" placeholder="Detalla el alcance completo del servicio: qué incluye, qué no incluye, entregables, metodología, tiempos estimados..." style="width:100%;padding:10px 13px;background:var(--bg);border:1px solid var(--border2);border-radius:9px;color:var(--white);font-size:13px;font-family:monospace;outline:none;resize:vertical"></textarea>
+          </div>
+          <div class="field"><label>Vigencia de la Propuesta (días)</label>
+            <input id="propVigencia" type="number" value="30" style="width:100%;padding:10px 13px;background:var(--bg);border:1px solid var(--border2);border-radius:9px;color:var(--white);font-size:13px;font-family:monospace;outline:none"/>
+          </div>
+          <div class="field"><label>SLA — Tiempo de Respuesta</label>
+            <input id="propSLA" type="text" placeholder="Ej: 4 horas hábiles" style="width:100%;padding:10px 13px;background:var(--bg);border:1px solid var(--border2);border-radius:9px;color:var(--white);font-size:13px;font-family:monospace;outline:none"/>
+          </div>
+          <div class="field"><label>Confidencialidad / NDA</label>
+            <select id="propConfidencialidad" style="width:100%;padding:10px 13px;background:var(--bg);border:1px solid var(--border2);border-radius:9px;color:var(--white);font-size:13px;font-family:monospace;outline:none">
+              <option value="incluida">NDA incluido en propuesta</option>
+              <option value="separado">Requiere NDA por separado</option>
+              <option value="ninguno">Sin cláusula de confidencialidad</option>
+            </select>
+          </div>
+          <div class="field full"><label>Condiciones adicionales / Cláusulas legales</label>
+            <textarea id="propCondiciones" rows="3" placeholder="Ej: La propiedad intelectual del software permanece en Martinez Services Spa. El cliente obtiene licencia de uso no transferible..." style="width:100%;padding:10px 13px;background:var(--bg);border:1px solid var(--border2);border-radius:9px;color:var(--white);font-size:13px;font-family:monospace;outline:none;resize:vertical"></textarea>
+          </div>
+        </div>
+      </div>
+
         <div class="field full"><label>Cliente</label>
           <select id="docCliente" onchange="llenarDatosCliente()"><option value="">-- Seleccionar --</option></select>
         </div>
@@ -526,7 +594,204 @@ function badge(l,c){return`<span class="badge" style="background:${c}20;color:${
 function getLogo(){try{const l=JSON.parse(localStorage.getItem('mss_logos_v1')||'{}');const k=Object.keys(l)[0];return k&&l[k]?l[k]:null;}catch(e){return null;}}
 
 const ESTADO_C={Enviada:'#38BDF8',Aceptada:'#22C55E',Rechazada:'#EF4444',Vencida:'#F59E0B',Borrador:'#5A7090'};
-const TIPO_C={Cotización:'#38BDF8',Presupuesto:'#C9A84C'};
+const TIPO_C={Cotización:'#38BDF8',Presupuesto:'#C9A84C','Propuesta Profesional':'#C9A84C','Propuesta SaaS / ERP':'#C9A84C','Propuesta Integral':'#C9A84C'};
+
+// ══════════════════════════════════
+// SWITCH TIPO DOCUMENTO
+// ══════════════════════════════════
+const MODULOS_ERP=[
+  'Finanzas','Remuneraciones','Contabilidad','Facturación',
+  'Tesorería','Contratos','Cotizaciones','Proyectos',
+  'Ventas CRM','RRHH','Estrategia','Arriendos',
+  'Condominio','Auditoría','App Móvil','Portal Trabajador','Portal Residente'
+];
+
+function setTipoNormal(){
+  document.getElementById('docTipo').value='Cotización';
+  document.getElementById('formTitle').textContent='Nueva Cotización';
+  document.getElementById('bloquePropuesta').style.display='none';
+  document.getElementById('btnTipoNormal').style.cssText='padding:8px 16px;border-radius:8px;border:2px solid var(--acc);background:var(--acc);color:var(--bg);font-weight:700;font-size:12px;cursor:pointer;font-family:monospace';
+  document.getElementById('btnTipoProp').style.cssText='padding:8px 16px;border-radius:8px;border:2px solid rgba(201,168,76,0.3);background:transparent;color:var(--gold);font-weight:700;font-size:12px;cursor:pointer;font-family:monospace';
+}
+
+function setTipoPropuesta(){
+  document.getElementById('docTipo').value='Propuesta Profesional';
+  document.getElementById('formTitle').textContent='Nueva Propuesta Profesional / SaaS';
+  document.getElementById('bloquePropuesta').style.display='block';
+  document.getElementById('btnTipoProp').style.cssText='padding:8px 16px;border-radius:8px;border:2px solid var(--gold);background:var(--gold);color:var(--bg);font-weight:700;font-size:12px;cursor:pointer;font-family:monospace';
+  document.getElementById('btnTipoNormal').style.cssText='padding:8px 16px;border-radius:8px;border:2px solid rgba(56,189,248,0.3);background:transparent;color:var(--acc);font-weight:700;font-size:12px;cursor:pointer;font-family:monospace';
+  // Renderizar checkboxes de módulos
+  const cont=document.getElementById('propModulosCheck');
+  if(cont&&!cont.innerHTML){
+    cont.innerHTML=MODULOS_ERP.map(m=>`
+      <label style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--bg);border:1px solid var(--border2);border-radius:7px;cursor:pointer;font-size:10px;font-family:monospace;color:var(--mutedHi)">
+        <input type="checkbox" value="${m}" style="accent-color:var(--gold)"> ${m}
+      </label>`).join('');
+  }
+  // Cambiar tab visual
+  if(document.querySelector('#tabNuevo'))document.querySelector('#tabNuevo').click();
+}
+
+// ══════════════════════════════════
+// RENDER PDF PROPUESTA PROFESIONAL
+// ══════════════════════════════════
+function renderPreviewPropuesta(d, propData, emp, logo){
+  const logoHTML=logo
+    ?`<img src="${logo}" style="max-height:60px;max-width:120px;object-fit:contain" alt="Logo"/>`
+    :`<div style="width:70px;height:55px;background:rgba(255,255,255,0.15);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900">${emp.nombre.charAt(0)}</div>`;
+
+  const modulos=(propData.modulos||[]).length>0
+    ?propData.modulos.map(m=>`<span style="background:#f0f6ff;border:1px solid #c0d8ff;color:#1a3a5c;padding:3px 8px;border-radius:20px;font-size:9px;font-weight:700;font-family:monospace">${m}</span>`).join(' ')
+    :'<span style="color:#888;font-size:10px">No especificado</span>';
+
+  const implNum=parseFloat(propData.implementacion)||0;
+
+  const html=`
+  <div style="margin-top:20px">
+    <div style="font-size:12px;color:var(--acc);font-family:monospace;margin-bottom:10px">
+      <button class="btn-ghost no-print" style="padding:6px 14px;font-size:11px" onclick="imprimirDoc()">🖨 Imprimir / PDF</button>
+    </div>
+    <div class="doc" style="font-family:Arial,sans-serif">
+
+      <!-- HEADER CORPORATIVO -->
+      <div style="background:linear-gradient(135deg,#0f2744 0%,#1a3a5c 50%,#1e4976 100%);color:white;padding:28px 32px;display:flex;justify-content:space-between;align-items:flex-start">
+        <div style="display:flex;align-items:center;gap:16px">
+          ${logoHTML}
+          <div>
+            <div style="font-size:18px;font-weight:900;letter-spacing:-0.5px">${emp.nombre}</div>
+            <div style="font-size:10px;opacity:.8;margin-top:2px">${emp.rubro||''}</div>
+            <div style="font-size:10px;opacity:.7;margin-top:1px">${emp.direccion||''}</div>
+            <div style="font-size:10px;opacity:.7">RUT ${emp.rut||''} · ${emp.tel||''}</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:2px">${propData.subtipo||'Propuesta Profesional'}</div>
+          <div style="font-size:36px;font-weight:900;line-height:1">Nº ${String(d.num).padStart(3,'0')}</div>
+          <div style="font-size:10px;opacity:.75;margin-top:4px">Emisión: ${df(d.fecha)}</div>
+          <div style="font-size:10px;opacity:.75">Válida: ${df(d.vence)} (${propData.vigencia||30} días)</div>
+          <div style="margin-top:8px;background:rgba(255,255,255,0.2);border-radius:20px;padding:4px 12px;font-size:10px;font-weight:700">${propData.modalidad||'Mensual'}</div>
+        </div>
+      </div>
+
+      <div style="padding:24px 32px">
+
+        <!-- DATOS CLIENTE -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+          <div style="background:#f0f6ff;border-radius:10px;padding:16px;border-left:4px solid #1a3a5c">
+            <div style="font-size:9px;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">Propuesta presentada a</div>
+            <div style="font-size:14px;font-weight:900;color:#1a1a1a;margin-bottom:4px">${d.clienteNombre}</div>
+            <div style="font-size:11px;color:#444">RUT: ${d.clienteRut||'—'}</div>
+            <div style="font-size:11px;color:#444">Giro: ${d.clienteGiro||'—'}</div>
+            <div style="font-size:11px;color:#444">Dirección: ${d.clienteDir||'—'}</div>
+            ${d.contacto?`<div style="font-size:11px;color:#444;margin-top:4px">Atención: ${d.contacto}</div>`:''}
+          </div>
+          <div style="background:#f8faff;border-radius:10px;padding:16px">
+            <div style="font-size:9px;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">Presentada por</div>
+            <div style="font-size:13px;font-weight:800;color:#1a1a1a;margin-bottom:4px">${d.repLegal}</div>
+            <div style="font-size:11px;color:#444">${emp.nombre}</div>
+            <div style="font-size:11px;color:#444">RUT: ${emp.rut||'—'}</div>
+            <div style="font-size:11px;color:#444">${emp.email||''}</div>
+            <div style="font-size:11px;color:#444">${emp.tel||''}</div>
+          </div>
+        </div>
+
+        <!-- ALCANCE -->
+        ${propData.alcance?`<div style="margin-bottom:20px">
+          <div style="font-size:10px;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid #1a3a5c">Alcance del Servicio</div>
+          <div style="font-size:11px;color:#333;line-height:1.8;white-space:pre-line">${propData.alcance}</div>
+        </div>`:''}
+
+        <!-- MÓDULOS -->
+        ${(propData.modulos||[]).length?`<div style="margin-bottom:20px">
+          <div style="font-size:10px;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid #1a3a5c">Módulos Incluidos</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">${modulos}</div>
+        </div>`:''}
+
+        <!-- DETALLE ECONÓMICO -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:10px;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid #1a3a5c">Detalle Económico</div>
+          <table style="width:100%;border-collapse:collapse;font-size:11px">
+            <thead><tr style="background:#1a3a5c;color:white"><th style="padding:8px 12px;text-align:left">Ítem</th><th style="padding:8px 12px;text-align:left">Descripción</th><th style="padding:8px 12px;text-align:center">Cant.</th><th style="padding:8px 12px;text-align:right">Precio Unit.</th><th style="padding:8px 12px;text-align:right">Total</th></tr></thead>
+            <tbody>
+              ${implNum>0?`<tr style="background:#fff9e6"><td style="padding:7px 12px;font-weight:700;color:#1a3a5c">★</td><td style="padding:7px 12px"><strong>Implementación / Configuración Inicial</strong><br><span style="font-size:9px;color:#888">Pago único — incluye configuración, carga inicial y capacitación (${propData.horas||2} hrs)</span></td><td style="padding:7px 12px;text-align:center">1</td><td style="padding:7px 12px;text-align:right">${clp(implNum)}</td><td style="padding:7px 12px;text-align:right;font-weight:700">${clp(implNum)}</td></tr>`:''}
+              ${d.items.map((it,i)=>`<tr style="background:${i%2?'#f8faff':'white'}"><td style="padding:7px 12px;font-weight:700;color:#1a3a5c">${i+1}</td><td style="padding:7px 12px">${it.desc}<br><span style="font-size:9px;color:#888">${propData.modalidad||''}</span></td><td style="padding:7px 12px;text-align:center">${it.qty}</td><td style="padding:7px 12px;text-align:right">${clp(it.precio)}</td><td style="padding:7px 12px;text-align:right;font-weight:700">${clp(it.total)}</td></tr>`).join('')}
+            </tbody>
+          </table>
+          <div style="display:flex;justify-content:flex-end;margin-top:10px">
+            <div style="min-width:260px;border:1px solid #e0eaff;border-radius:8px;overflow:hidden">
+              ${implNum>0?`<div style="display:flex;justify-content:space-between;padding:7px 14px;font-size:11px;border-bottom:1px solid #e0eaff"><span>Implementación (único)</span><span>${clp(implNum)}</span></div>`:''}
+              <div style="display:flex;justify-content:space-between;padding:7px 14px;font-size:11px;border-bottom:1px solid #e0eaff"><span>Subtotal Neto</span><span>${clp(d.neto)}</span></div>
+              <div style="display:flex;justify-content:space-between;padding:7px 14px;font-size:11px;border-bottom:1px solid #e0eaff"><span>IVA 19%</span><span>${clp(d.iva+(implNum>0?Math.round(implNum*0.19):0))}</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 14px;font-size:14px;font-weight:900;background:#1a3a5c;color:white"><span>TOTAL</span><span>${clp(d.total+(implNum>0?Math.round(implNum*1.19):0))}</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONDICIONES TÉCNICAS -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+          <div style="background:#f0f6ff;border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:18px;margin-bottom:4px">👥</div>
+            <div style="font-size:10px;font-weight:700;color:#1a3a5c">Usuarios incluidos</div>
+            <div style="font-size:16px;font-weight:900;color:#1a3a5c">${propData.usuarios||1}</div>
+          </div>
+          <div style="background:#f0f6ff;border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:18px;margin-bottom:4px">🎓</div>
+            <div style="font-size:10px;font-weight:700;color:#1a3a5c">Capacitación</div>
+            <div style="font-size:16px;font-weight:900;color:#1a3a5c">${propData.horas||2} hrs</div>
+          </div>
+          <div style="background:#f0f6ff;border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:18px;margin-bottom:4px">🔧</div>
+            <div style="font-size:10px;font-weight:700;color:#1a3a5c">Soporte</div>
+            <div style="font-size:11px;font-weight:700;color:#1a3a5c">${propData.soporte||'—'}</div>
+          </div>
+        </div>
+
+        <!-- CONDICIONES Y SLA -->
+        <div style="background:#f8faff;border:1px solid #e0eaff;border-radius:8px;padding:14px;margin-bottom:20px;font-size:10px;color:#444;line-height:1.8">
+          <div style="font-weight:700;color:#1a3a5c;margin-bottom:6px">Términos y Condiciones</div>
+          • Propuesta válida por <strong>${propData.vigencia||30} días</strong> desde la fecha de emisión<br>
+          • Precios en Pesos Chilenos (CLP), incluyen IVA 19% cuando corresponda<br>
+          ${propData.sla?`• SLA: Tiempo de respuesta garantizado <strong>${propData.sla}</strong><br>`:''}
+          ${propData.confidencialidad==='incluida'?'• Cláusula de confidencialidad (NDA) incluida en esta propuesta<br>':''}
+          • La propiedad intelectual del software y metodologías permanece en <strong>${emp.nombre}</strong><br>
+          • El cliente obtiene licencia de uso no transferible por el período contratado<br>
+          ${propData.condiciones?`• ${propData.condiciones}<br>`:''}
+          • Para aceptar esta propuesta, confirmar por escrito, correo electrónico o firma del documento
+        </div>
+
+        <!-- DATOS DE PAGO -->
+        ${emp.banco||emp.cuenta?`<div style="background:#f0f6ff;border:1px solid #c0d8ff;border-radius:8px;padding:14px;margin-bottom:20px;font-size:11px">
+          <div style="font-weight:700;color:#1a3a5c;margin-bottom:6px">💳 Datos para Transferencia</div>
+          <div><strong>Empresa:</strong> ${emp.nombre.toUpperCase()}</div>
+          ${emp.banco?`<div><strong>Banco:</strong> ${emp.banco}</div>`:''}
+          ${emp.cuenta?`<div><strong>Nº Cuenta:</strong> ${emp.cuenta}</div>`:''}
+          ${emp.email?`<div><strong>Email:</strong> ${emp.email}</div>`:''}
+        </div>`:''}
+
+        <!-- FIRMAS -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:30px">
+          <div style="text-align:center;border-top:2px solid #1a3a5c;padding-top:10px">
+            <div style="font-size:12px;font-weight:700">${d.repLegal}</div>
+            <div style="font-size:10px;color:#666">${emp.nombre}</div>
+            <div style="font-size:10px;color:#666">Representante Legal / Prestador</div>
+          </div>
+          <div style="text-align:center;border-top:2px solid #1a3a5c;padding-top:10px">
+            <div style="font-size:12px;font-weight:700">${d.clienteNombre}</div>
+            <div style="font-size:10px;color:#666">Acepta Propuesta</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#1a3a5c;color:white;padding:10px 32px;display:flex;justify-content:space-between;font-size:9px;opacity:.9">
+        <span>${emp.nombre} · RUT ${emp.rut||'—'}</span>
+        <span>${propData.subtipo||'Propuesta Profesional'} Nº${String(d.num).padStart(3,'0')} · ${df(d.fecha)}</span>
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById('previewContainer').innerHTML=html;
+  document.getElementById('previewContainer').scrollIntoView({behavior:'smooth'});
+}
 
 // ════════════════════
 // TABS
@@ -719,12 +984,16 @@ function emitirDocumento(){
 
 function previewDoc(){
   const tipo=document.getElementById('docTipo')?.value||'Cotización';
+  const esPropuesta=tipo.startsWith('Propuesta')||document.getElementById('bloquePropuesta')?.style.display==='block';
+
   const clienteId=parseInt(document.getElementById('docCliente')?.value)||null;
   const cliente=CLIENTES_COT.find(c=>c.id===clienteId);
   const itemsValidos=ITEMS.filter(it=>it.total>0);
   const neto=ITEMS.reduce((s,it)=>s+it.total,0);
+  const tipoFinal=esPropuesta?(document.getElementById('propSubtipo')?.value||'Propuesta Profesional'):tipo;
+
   const doc={
-    tipo,
+    tipo:tipoFinal,
     num:document.getElementById('docNum')?.value||1,
     fecha:document.getElementById('docFecha')?.value||new Date().toISOString().split('T')[0],
     vence:document.getElementById('docVence')?.value||'',
@@ -739,6 +1008,40 @@ function previewDoc(){
     items:itemsValidos.length>0?itemsValidos:[{desc:'[Descripción del servicio]',qty:1,precio:0,total:0}],
     neto,iva:Math.round(neto*0.19),total:neto+Math.round(neto*0.19),
   };
+
+  if(esPropuesta){
+    // Leer datos específicos de propuesta
+    const modulos=[...document.querySelectorAll('#propModulosCheck input:checked')].map(i=>i.value);
+    const propData={
+      subtipo:document.getElementById('propSubtipo')?.value||'Propuesta Profesional',
+      modalidad:document.getElementById('propModalidad')?.value||'Mensual',
+      implementacion:parseFloat(document.getElementById('propImplementacion')?.value)||0,
+      usuarios:document.getElementById('propUsuarios')?.value||'1',
+      horas:document.getElementById('propHoras')?.value||'2',
+      soporte:document.getElementById('propSoporte')?.value||'',
+      alcance:document.getElementById('propAlcance')?.value||'',
+      vigencia:document.getElementById('propVigencia')?.value||'30',
+      sla:document.getElementById('propSLA')?.value||'',
+      confidencialidad:document.getElementById('propConfidencialidad')?.value||'incluida',
+      condiciones:document.getElementById('propCondiciones')?.value||'',
+      modulos,
+    };
+    const tabEmitir=document.querySelector('.tab[onclick*="nuevo"]');
+    if(tabEmitir)tabEmitir.click();
+    const emp={
+      nombre:document.getElementById('emisorNombre')?.value||getEmpresaEmisora().nombre,
+      rut:document.getElementById('emisorRut')?.value||getEmpresaEmisora().rut,
+      direccion:document.getElementById('emisorDireccion')?.value||getEmpresaEmisora().direccion,
+      tel:document.getElementById('emisorTel')?.value||getEmpresaEmisora().tel,
+      email:document.getElementById('emisorEmail')?.value||getEmpresaEmisora().email,
+      banco:document.getElementById('emisorBanco')?.value||getEmpresaEmisora().banco,
+      cuenta:document.getElementById('emisorCuenta')?.value||getEmpresaEmisora().cuenta,
+      rubro:document.getElementById('emisorGiro')?.value||getEmpresaEmisora().rubro,
+    };
+    renderPreviewPropuesta(doc, propData, emp, getLogo());
+    return;
+  }
+
   // Asegurar que la pestaña de emisión esté visible para mostrar el preview
   const tabEmitir = document.querySelector('[onclick*="showTab"][onclick*="emitir"]') ||
                     document.querySelector('.tab[onclick*="emitir"]');
