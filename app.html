@@ -1258,19 +1258,28 @@ onAuthStateChanged(auth, async user => {
 
   // SEGURIDAD: admin/user con tipo 'condominio' → espacio aislado del cliente
   if(rol !== 'superadmin' && tipo === 'condominio'){
-    // Cargar condominios propios del cliente desde Firestore
-    // NUNCA cargar CONDOMINIOS_BASE (que son los de Gaudy)
+    // Si no tiene clienteId guardado, generarlo desde su uid
+    if(!clienteId){
+      clienteId = 'cli_'+user.uid;
+      // Actualizar en Firestore para futuras sesiones
+      try{
+        const {setDoc:sd, doc:fd} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+        await sd(fd(db,'usuarios/'+user.uid),{clienteId},{merge:true});
+      }catch(e){}
+    }
+
+    // Limpiar CONDOMINIOS y EMPRESAS — cliente externo NO debe ver datos de Gaudy
+    CONDOMINIOS = [];
+    EMPRESAS = [];
+
+    // Buscar condominios propios del cliente en Firestore por uid o clienteId
     let condosCliente = [];
     try{
-      if(clienteId){
-        const espSnap = await getDoc(doc(db,'espacios_cliente/'+clienteId));
-        if(espSnap.exists()) condosCliente = espSnap.data().condominios || [];
-      }
-      // También buscar condominios creados por este cliente en Firestore
-      const condoSnap = await getDocs(collection(db,'condominios_clientes'));
+      const {getDocs:gd, collection:col} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const condoSnap = await gd(col(db,'condominios_clientes'));
       condoSnap.forEach(d=>{
         const c=d.data();
-        if(c.clienteId===clienteId||c.uid===user.uid) condosCliente.push({id:d.id,...c});
+        if(c.uid===user.uid || c.clienteId===clienteId) condosCliente.push({id:d.id,...c});
       });
     }catch(e){ console.warn('Error cargando condos cliente:',e.message); }
 
@@ -1280,13 +1289,13 @@ onAuthStateChanged(auth, async user => {
       localStorage.setItem('mss_empresa_actual', JSON.stringify(condo));
       localStorage.setItem('mss_condominio_actual', JSON.stringify(condo));
       localStorage.setItem('mss_cliente_uid', user.uid);
-      localStorage.setItem('mss_cliente_id', clienteId||'');
+      localStorage.setItem('mss_cliente_id', clienteId);
       window.location.href = 'MSS-Condominio.html'; return;
     } else {
       // No tiene condominios aún → pantalla de bienvenida para crear el primero
       localStorage.setItem('mss_cliente_uid', user.uid);
-      localStorage.setItem('mss_cliente_id', clienteId||'');
-      localStorage.setItem('mss_cliente_nombre', user.email?.split('@')[0]||'Cliente');
+      localStorage.setItem('mss_cliente_id', clienteId);
+      localStorage.setItem('mss_cliente_nombre', user.displayName||user.email?.split('@')[0]||'Cliente');
       localStorage.setItem('mss_cliente_tipo', tipo);
       window.location.href = 'MSS-BienvenidaCliente.html'; return;
     }
