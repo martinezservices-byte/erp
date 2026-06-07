@@ -1010,11 +1010,16 @@ function renderEgresosRes(){
 function renderMiPropiedad(){
   const u=_unidadRes;
   if(!u)return;
+  // DEBUG — ver todos los campos que llegan desde Firestore
+  console.log('🏠 Datos unidad Firestore:', JSON.stringify(u));
   const deuda=COBROS.filter(c=>String(c.unidadId)===String(u.id)&&c.saldo>0).reduce((s,c)=>s+c.saldo,0);
   const pagos=COBROS.filter(c=>String(c.unidadId)===String(u.id)).length;
-  // Estacionamiento: leer de todos los campos posibles de la ficha
-  const estac=u.estacionamiento||u.estac||u.parking||u.numeroEstacionamiento||'';
-  const bodega=u.bodega||u.numeroBodega||u.bodegas||'';
+  // Estacionamiento: convertir a string para evitar que el número 0 sea falsy
+  // El ERP guarda el campo como 'estacionamiento' (confirmado en MSS-Condominio.html línea 690)
+  const estacRaw = u.estacionamiento ?? u.estac ?? u.parking ?? u.numeroEstacionamiento ?? '';
+  const estac = String(estacRaw).trim();
+  const bodegaRaw = u.bodega ?? u.numeroBodega ?? u.bodegas ?? '';
+  const bodega = String(bodegaRaw).trim();
   document.getElementById('resPropInfo').innerHTML=`
     <div style="background:linear-gradient(135deg,#1a5c3a,#166534);border-radius:16px;padding:20px;color:white;margin-bottom:14px">
       <div style="font-size:18px;font-weight:900;margin-bottom:4px">${u.torre?u.torre+' — ':''} Unidad ${u.num||'—'}</div>
