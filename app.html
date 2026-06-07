@@ -112,6 +112,46 @@ body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;m
 #footer{background:var(--surf);border-top:1px solid var(--border2);padding:16px 36px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;}
 
 @media(max-width:700px){.section{padding:20px 16px;}.hero{padding:28px 16px 22px;}.emp-grid{grid-template-columns:1fr;}.kpi-row{flex-direction:column;}.hero-content{flex-direction:column;}}
+
+/* ══ PANEL SUPERADMIN ══ */
+#panelSA{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:99999;overflow-y:auto;padding:24px 20px 40px;}
+.sa-wrap{max-width:1100px;margin:0 auto;}
+.sa-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
+.sa-title{font-size:22px;font-weight:900;color:var(--gold);font-family:'Playfair Display',serif;}
+.sa-close{background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12px;}
+.sa-tabs{display:flex;gap:4px;background:var(--surf2);padding:4px;border-radius:10px;margin-bottom:20px;flex-wrap:wrap;}
+.sa-tab{padding:8px 16px;border-radius:7px;border:none;cursor:pointer;font-size:11px;font-weight:700;background:transparent;color:var(--muted);font-family:'JetBrains Mono',monospace;transition:all .15s;}
+.sa-tab.on{background:var(--gold);color:var(--bg);}
+.sa-sec{display:none;}.sa-sec.on{display:block;}
+.sa-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px;}
+.sa-kpi{background:var(--surf);border-radius:12px;padding:16px;border:1px solid var(--border2);text-align:center;}
+.sa-kpi-v{font-size:26px;font-weight:900;font-family:'Playfair Display',serif;}
+.sa-kpi-l{font-size:9px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;margin-top:4px;}
+.sa-table{width:100%;border-collapse:collapse;font-size:11px;font-family:'JetBrains Mono',monospace;}
+.sa-table th{padding:10px 12px;text-align:left;color:var(--gold);font-weight:700;border-bottom:1px solid rgba(201,168,76,0.2);white-space:nowrap;}
+.sa-table td{padding:10px 12px;border-bottom:1px solid var(--border2);vertical-align:middle;}
+.sa-table tr:hover td{background:rgba(201,168,76,0.03);}
+.sa-pill{display:inline-flex;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;}
+.sa-pill-ok{background:rgba(34,197,94,0.15);color:#22C55E;}
+.sa-pill-warn{background:rgba(245,158,11,0.15);color:#F59E0B;}
+.sa-pill-off{background:rgba(100,116,139,0.15);color:#64748B;}
+.sa-pill-demo{background:rgba(56,189,248,0.15);color:#38BDF8;}
+.sa-btn{padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.sa-btn-edit{background:rgba(201,168,76,0.1);color:var(--gold);}
+.sa-btn-pause{background:rgba(245,158,11,0.1);color:#F59E0B;}
+.sa-btn-del{background:rgba(239,68,68,0.1);color:var(--danger);}
+.sa-btn-act{background:rgba(34,197,94,0.1);color:#22C55E;}
+.sa-form{background:var(--surf);border:1px solid var(--border2);border-radius:14px;padding:22px;margin-bottom:20px;}
+.sa-form h4{font-size:14px;font-weight:800;color:var(--white);margin-bottom:16px;font-family:'Playfair Display',serif;}
+.sa-fgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.sa-fgrid .full{grid-column:1/-1;}
+.sa-field label{font-size:10px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;}
+.sa-field input,.sa-field select{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-size:12px;font-family:'JetBrains Mono',monospace;outline:none;}
+.mod-checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-top:8px;}
+.mod-check{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--bg);border:1px solid var(--border2);border-radius:7px;cursor:pointer;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--mutedHi);}
+.mod-check input{width:14px;height:14px;cursor:pointer;accent-color:var(--gold);}
+.sa-toast{position:fixed;bottom:24px;right:24px;background:var(--surf);border:1px solid rgba(34,197,94,0.4);color:#22C55E;padding:12px 20px;border-radius:10px;font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;z-index:999999;opacity:0;transition:opacity .3s;pointer-events:none;}
+.sa-toast.show{opacity:1;}
 </style>
 </head>
 <body>
@@ -195,6 +235,148 @@ body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;m
     <div class="emp-grid" id="condoGrid"></div>
   </div>
 </div>
+
+<!-- ══ PANEL SUPERADMIN ══ -->
+<div id="panelSA">
+  <div class="sa-wrap">
+    <div class="sa-hdr">
+      <div>
+        <div class="sa-title">⚡ Panel Superadministradora</div>
+        <div style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:4px">Control global · Gestión de clientes · Permisos · Demos</div>
+      </div>
+      <button class="sa-close" onclick="cerrarPanelSA()">✕ Cerrar</button>
+    </div>
+
+    <!-- TABS -->
+    <div class="sa-tabs">
+      <button class="sa-tab on" onclick="saTab('resumen')">📊 Resumen</button>
+      <button class="sa-tab" onclick="saTab('clientes')">👥 Clientes</button>
+      <button class="sa-tab" onclick="saTab('nuevo')">➕ Nuevo Cliente</button>
+      <button class="sa-tab" onclick="saTab('demos')">🧪 Demos</button>
+      <button class="sa-tab" onclick="saTab('config')">⚙ Configuración</button>
+    </div>
+
+    <!-- SECCIÓN RESUMEN -->
+    <div class="sa-sec on" id="sa-resumen">
+      <div class="sa-kpis" id="saKpis"></div>
+      <div style="background:var(--surf);border-radius:12px;padding:18px;border:1px solid var(--border2)">
+        <div style="font-size:12px;font-weight:800;color:var(--white);margin-bottom:14px;font-family:'Playfair Display',serif">Actividad Reciente</div>
+        <div id="saActividad" style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace">Cargando...</div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN CLIENTES -->
+    <div class="sa-sec" id="sa-clientes">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="font-size:13px;font-weight:800;color:var(--white);font-family:'Playfair Display',serif">Clientes Activos</div>
+        <input id="saFiltro" placeholder="Buscar cliente..." oninput="filtrarClientes()" style="padding:7px 12px;background:var(--surf2);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-size:11px;font-family:'JetBrains Mono',monospace;outline:none;width:220px"/>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="sa-table">
+          <thead>
+            <tr>
+              <th>Cliente / Empresa</th>
+              <th>Tipo</th>
+              <th>Plan</th>
+              <th>Estado</th>
+              <th>Módulos</th>
+              <th>Creado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="saClientesBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SECCIÓN NUEVO CLIENTE -->
+    <div class="sa-sec" id="sa-nuevo">
+      <div class="sa-form">
+        <h4>➕ Crear Nuevo Cliente / Demo</h4>
+        <input type="hidden" id="saEditId"/>
+        <div class="sa-fgrid">
+          <div class="sa-field full"><label>Nombre Empresa / Cliente</label><input id="saNombre" placeholder="Ej: Condominio Las Palmas / Empresa XYZ"/></div>
+          <div class="sa-field"><label>Email Administrador</label><input id="saEmail" type="email" placeholder="admin@empresa.cl"/></div>
+          <div class="sa-field"><label>Teléfono</label><input id="saTel" placeholder="+56 9..."/></div>
+          <div class="sa-field"><label>Tipo de Cliente</label>
+            <select id="saTipo">
+              <option value="comercial">🏢 Empresa Comercial</option>
+              <option value="condominio">🏘 Condominio</option>
+            </select>
+          </div>
+          <div class="sa-field"><label>Plan</label>
+            <select id="saPlan">
+              <option value="demo">🧪 Demo (30 días)</option>
+              <option value="basico">⚡ Básico</option>
+              <option value="profesional">🚀 Profesional</option>
+              <option value="enterprise">💎 Enterprise</option>
+            </select>
+          </div>
+          <div class="sa-field"><label>Estado Inicial</label>
+            <select id="saEstado">
+              <option value="activo">✅ Activo</option>
+              <option value="demo">🧪 Demo</option>
+              <option value="pausado">⏸ Pausado</option>
+            </select>
+          </div>
+          <div class="sa-field full"><label>Notas / Observaciones</label><input id="saNotas" placeholder="Ej: Cliente referido, prueba Q3..."/></div>
+          <div class="sa-field full">
+            <label>Módulos Permitidos</label>
+            <div class="mod-checks" id="saModChecks"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:16px">
+          <button class="btn-gold" style="flex:1" onclick="guardarCliente()">💾 Guardar Cliente</button>
+          <button class="btn-ghost" onclick="limpiarFormCliente()">✕ Limpiar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN DEMOS -->
+    <div class="sa-sec" id="sa-demos">
+      <div style="background:var(--surf);border-radius:12px;padding:18px;border:1px solid var(--border2);margin-bottom:16px">
+        <div style="font-size:12px;font-weight:800;color:var(--white);margin-bottom:14px;font-family:'Playfair Display',serif">🧪 Cuentas Demo Activas</div>
+        <div id="saDemosBody"></div>
+      </div>
+      <div style="background:rgba(56,189,248,0.05);border:1px solid rgba(56,189,248,0.2);border-radius:12px;padding:16px">
+        <div style="font-size:11px;color:#38BDF8;font-weight:700;margin-bottom:8px;font-family:'JetBrains Mono',monospace">ℹ POLÍTICA DE DEMOS</div>
+        <div style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;line-height:1.7">
+          • Las demos duran 30 días desde su creación<br>
+          • El cliente accede con los módulos que tú habilites<br>
+          • Al vencer, el acceso se suspende automáticamente<br>
+          • Puedes convertir una demo a plan real en cualquier momento
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN CONFIGURACIÓN -->
+    <div class="sa-sec" id="sa-config">
+      <div class="sa-form">
+        <h4>⚙ Configuración Global del Sistema</h4>
+        <div class="sa-fgrid">
+          <div class="sa-field"><label>Nombre Sistema</label><input id="cfgNombre" value="Martinez Services ERP"/></div>
+          <div class="sa-field"><label>Versión</label><input id="cfgVersion" value="v3.0 Multi-Empresa"/></div>
+          <div class="sa-field"><label>Email Soporte</label><input id="cfgSoporte" value="aybserviciosg@gmail.com"/></div>
+          <div class="sa-field full"><label>Mensaje de bienvenida</label><input id="cfgBienvenida" placeholder="Ej: Bienvenido al ERP..."/></div>
+        </div>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border2)">
+          <div style="font-size:11px;font-weight:800;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:12px">ESTRUCTURA FIRESTORE — MULTITENANT</div>
+          <div style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;line-height:2;background:var(--bg);padding:14px;border-radius:8px;border:1px solid var(--border2)">
+            /clientes/{clienteId} → {nombre, email, tipo, plan, estado, modulos[], creado}<br>
+            /usuarios/{uid} → {email, rol, clienteId, empresas[], condominios[], tipo}<br>
+            /empresas/{id}/... → datos comerciales del cliente<br>
+            /condominios/{id}/... → datos condominio del cliente<br>
+            <br>
+            <span style="color:var(--gold)">ROLES:</span> superadmin · admin · user · residente · terreno · trabajador
+          </div>
+        </div>
+        <button class="btn-gold" style="margin-top:16px" onclick="guardarConfig()">💾 Guardar Configuración</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="sa-toast" id="saToast"></div>
 
 <div id="footer">
   <span>Martinez Services Spa · ERP Profesional Multi-Empresa v3.0 · Ing. Control y Gestión · Auditora · Auditoría · Consultoría</span>
@@ -1012,13 +1194,14 @@ onAuthStateChanged(auth, async user => {
 
   // ── SUPERADMIN / ADMIN / USER → mostrar index ──
 
-  // Botón Usuarios (solo superadmin/admin)
-  if(rol === 'admin' || rol === 'superadmin'){
-    const adminBtn = document.createElement('button');
-    adminBtn.textContent = '+ Usuario';
-    adminBtn.style.cssText = 'padding:6px 12px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);color:#C9A84C;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:JetBrains Mono,monospace';
-    adminBtn.onclick = () => window.location.href = 'MSS-Usuarios.html';
-    document.getElementById('btnLogout').before(adminBtn);
+  // Botón Panel Superadmin (solo superadmin)
+  if(rol === 'superadmin'){
+    const saBtn = document.createElement('button');
+    saBtn.id = 'btnSA';
+    saBtn.textContent = '⚡ SA Panel';
+    saBtn.style.cssText = 'padding:6px 12px;background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(232,201,122,0.1));border:1px solid rgba(201,168,76,0.4);color:#E8C97A;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:JetBrains Mono,monospace';
+    saBtn.onclick = () => abrirPanelSA();
+    document.getElementById('btnLogout').before(saBtn);
   }
 
   // Filtrar empresas y condominios según permisos
@@ -1048,6 +1231,254 @@ window.cerrarSesion = async function(){
   if(!confirm('¿Cerrar sesión?')) return;
   await signOut(auth);
   window.location.href = 'MSS-Login.html';
+};
+
+// ══════════════════════════════════════════════
+// PANEL SUPERADMIN — Gestión global de clientes
+// ══════════════════════════════════════════════
+const { collection, getDocs, setDoc, deleteDoc, doc: fsDoc, serverTimestamp } =
+  await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+
+let SA_CLIENTES = [];
+
+// Abrir panel
+window.abrirPanelSA = function(){
+  document.getElementById('panelSA').style.display = 'block';
+  cargarClientesSA();
+  renderModChecks();
+};
+window.cerrarPanelSA = function(){
+  document.getElementById('panelSA').style.display = 'none';
+};
+
+// Tabs
+window.saTab = function(tab){
+  document.querySelectorAll('.sa-tab').forEach((t,i)=>t.classList.remove('on'));
+  document.querySelectorAll('.sa-sec').forEach(s=>s.classList.remove('on'));
+  document.querySelector(`.sa-tab:nth-child(${['resumen','clientes','nuevo','demos','config'].indexOf(tab)+1})`).classList.add('on');
+  document.getElementById('sa-'+tab).classList.add('on');
+  if(tab==='resumen') renderSAResumen();
+  if(tab==='clientes') renderTablaClientes();
+  if(tab==='demos') renderDemos();
+};
+
+// Toast SA
+function saToast(msg, ok=true){
+  const t = document.getElementById('saToast');
+  t.textContent = msg;
+  t.style.borderColor = ok ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)';
+  t.style.color = ok ? '#22C55E' : '#EF4444';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// Cargar clientes desde Firestore
+async function cargarClientesSA(){
+  try{
+    const snap = await getDocs(collection(db,'clientes'));
+    SA_CLIENTES = [];
+    snap.forEach(d => SA_CLIENTES.push({id:d.id,...d.data()}));
+    renderSAResumen();
+    renderTablaClientes();
+    renderDemos();
+  }catch(e){
+    console.warn('Error cargando clientes SA:', e.message);
+    SA_CLIENTES = [];
+  }
+}
+
+// Resumen KPIs
+function renderSAResumen(){
+  const total = SA_CLIENTES.length;
+  const activos = SA_CLIENTES.filter(c=>c.estado==='activo').length;
+  const demos = SA_CLIENTES.filter(c=>c.estado==='demo').length;
+  const pausados = SA_CLIENTES.filter(c=>c.estado==='pausado').length;
+  const comerciales = SA_CLIENTES.filter(c=>c.tipo==='comercial').length;
+  const condos = SA_CLIENTES.filter(c=>c.tipo==='condominio').length;
+
+  document.getElementById('saKpis').innerHTML = `
+    <div class="sa-kpi"><div class="sa-kpi-v" style="color:var(--gold)">${total}</div><div class="sa-kpi-l">Total Clientes</div></div>
+    <div class="sa-kpi"><div class="sa-kpi-v" style="color:#22C55E">${activos}</div><div class="sa-kpi-l">Activos</div></div>
+    <div class="sa-kpi"><div class="sa-kpi-v" style="color:#38BDF8">${demos}</div><div class="sa-kpi-l">Demos</div></div>
+    <div class="sa-kpi"><div class="sa-kpi-v" style="color:#F59E0B">${pausados}</div><div class="sa-kpi-l">Pausados</div></div>
+    <div class="sa-kpi"><div class="sa-kpi-v" style="color:var(--gold)">${comerciales}</div><div class="sa-kpi-l">Comerciales</div></div>
+    <div class="sa-kpi"><div class="sa-kpi-v" style="color:#10B981">${condos}</div><div class="sa-kpi-l">Condominios</div></div>
+  `;
+
+  const recientes = [...SA_CLIENTES].sort((a,b)=>(b.creado||0)-(a.creado||0)).slice(0,5);
+  document.getElementById('saActividad').innerHTML = recientes.length
+    ? recientes.map(c=>`<div style="padding:6px 0;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between">
+        <span>${c.nombre||'—'} <span class="sa-pill ${estadoPill(c.estado)}">${c.estado||'—'}</span></span>
+        <span style="color:var(--muted)">${c.creado?new Date(c.creado).toLocaleDateString('es-CL'):'—'}</span>
+      </div>`).join('')
+    : '<div style="color:var(--muted)">Sin clientes registrados aún</div>';
+}
+
+function estadoPill(e){
+  return e==='activo'?'sa-pill-ok':e==='demo'?'sa-pill-demo':e==='pausado'?'sa-pill-warn':'sa-pill-off';
+}
+
+// Tabla clientes
+window.filtrarClientes = function(){
+  const q = document.getElementById('saFiltro').value.toLowerCase();
+  const rows = document.querySelectorAll('#saClientesBody tr');
+  rows.forEach(r=>{ r.style.display = r.textContent.toLowerCase().includes(q)?'':'none'; });
+};
+
+function renderTablaClientes(){
+  const tbody = document.getElementById('saClientesBody');
+  if(!SA_CLIENTES.length){
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">Sin clientes registrados. Crea el primero en la pestaña ➕ Nuevo Cliente.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = SA_CLIENTES.map(c=>`
+    <tr>
+      <td><div style="font-weight:700;color:var(--white)">${c.nombre||'—'}</div><div style="font-size:10px;color:var(--muted)">${c.email||'—'}</div></td>
+      <td><span class="sa-pill" style="background:rgba(201,168,76,0.1);color:var(--gold)">${c.tipo==='condominio'?'🏘 Condo':'🏢 Comercial'}</span></td>
+      <td style="color:var(--mutedHi)">${c.plan||'—'}</td>
+      <td><span class="sa-pill ${estadoPill(c.estado)}">${c.estado||'—'}</span></td>
+      <td style="color:var(--muted)">${(c.modulos||[]).length} módulos</td>
+      <td style="color:var(--muted)">${c.creado?new Date(c.creado).toLocaleDateString('es-CL'):'—'}</td>
+      <td style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="sa-btn sa-btn-edit" onclick="editarCliente('${c.id}')">✏</button>
+        ${c.estado==='activo'
+          ? `<button class="sa-btn sa-btn-pause" onclick="cambiarEstado('${c.id}','pausado')">⏸</button>`
+          : `<button class="sa-btn sa-btn-act" onclick="cambiarEstado('${c.id}','activo')">▶</button>`}
+        <button class="sa-btn sa-btn-del" onclick="eliminarCliente('${c.id}')">✕</button>
+      </td>
+    </tr>`).join('');
+}
+
+// Demos
+function renderDemos(){
+  const demos = SA_CLIENTES.filter(c=>c.estado==='demo');
+  const div = document.getElementById('saDemosBody');
+  if(!demos.length){
+    div.innerHTML = '<div style="color:var(--muted);font-size:11px;font-family:JetBrains Mono,monospace">Sin demos activas.</div>';
+    return;
+  }
+  div.innerHTML = demos.map(c=>{
+    const dias = c.creado ? Math.max(0, 30 - Math.floor((Date.now()-c.creado)/86400000)) : '?';
+    const pct = c.creado ? Math.round(((30-Math.max(0,30-Math.floor((Date.now()-c.creado)/86400000)))/30)*100) : 0;
+    return `<div style="padding:12px 0;border-bottom:1px solid var(--border2)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div><span style="font-weight:700;color:var(--white);font-family:JetBrains Mono,monospace">${c.nombre||'—'}</span>
+          <span style="font-size:10px;color:var(--muted);margin-left:8px">${c.email||'—'}</span></div>
+        <div style="display:flex;gap:6px">
+          <span style="font-size:10px;color:#38BDF8;font-family:JetBrains Mono,monospace">${dias} días restantes</span>
+          <button class="sa-btn sa-btn-act" onclick="cambiarEstado('${c.id}','activo')">Activar plan</button>
+        </div>
+      </div>
+      <div style="height:4px;background:var(--border2);border-radius:2px"><div style="height:4px;background:#38BDF8;border-radius:2px;width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// Módulos checkboxes
+function renderModChecks(seleccionados=[]){
+  const MODS_ALL = [
+    {id:'finanzas',label:'Finanzas'},{id:'remuneraciones',label:'Remuneraciones'},
+    {id:'contabilidad',label:'Contabilidad'},{id:'facturacion',label:'Facturación'},
+    {id:'tesoreria',label:'Tesorería'},{id:'contratos',label:'Contratos'},
+    {id:'cotizacion',label:'Cotizaciones'},{id:'proyectos',label:'Proyectos'},
+    {id:'ventas',label:'Ventas CRM'},{id:'rrhh',label:'RRHH'},
+    {id:'estrategia',label:'Estrategia'},{id:'arriendos',label:'Arriendos'},
+    {id:'condominio',label:'Condominio'},{id:'auditoria',label:'Auditoría'},
+    {id:'movil',label:'App Móvil'},{id:'portal_trabajador',label:'Portal Trabajador'},
+  ];
+  document.getElementById('saModChecks').innerHTML = MODS_ALL.map(m=>`
+    <label class="mod-check ${seleccionados.includes(m.id)?'sel':''}" id="mc_${m.id}">
+      <input type="checkbox" value="${m.id}" ${seleccionados.includes(m.id)?'checked':''}
+        onchange="this.closest('label').classList.toggle('sel',this.checked)">
+      ${m.label}
+    </label>`).join('');
+}
+
+// Guardar cliente
+window.guardarCliente = async function(){
+  const id = document.getElementById('saEditId').value || 'cli_'+Date.now();
+  const modulos = [...document.querySelectorAll('#saModChecks input:checked')].map(i=>i.value);
+  const obj = {
+    nombre: document.getElementById('saNombre').value.trim(),
+    email: document.getElementById('saEmail').value.trim(),
+    tel: document.getElementById('saTel').value.trim(),
+    tipo: document.getElementById('saTipo').value,
+    plan: document.getElementById('saPlan').value,
+    estado: document.getElementById('saEstado').value,
+    notas: document.getElementById('saNotas').value.trim(),
+    modulos,
+    creado: document.getElementById('saEditId').value ? undefined : Date.now(),
+    actualizado: Date.now(),
+  };
+  if(!obj.nombre||!obj.email){saToast('⚠ Nombre y email son obligatorios', false);return;}
+  if(obj.creado===undefined) delete obj.creado;
+  try{
+    await setDoc(fsDoc(db,'clientes/'+id), obj, {merge:true});
+    saToast('✅ Cliente guardado correctamente');
+    limpiarFormCliente();
+    await cargarClientesSA();
+    saTab('clientes');
+  }catch(e){saToast('Error: '+e.message, false);}
+};
+
+// Editar cliente
+window.editarCliente = function(id){
+  const c = SA_CLIENTES.find(x=>x.id===id);
+  if(!c) return;
+  document.getElementById('saEditId').value = id;
+  document.getElementById('saNombre').value = c.nombre||'';
+  document.getElementById('saEmail').value = c.email||'';
+  document.getElementById('saTel').value = c.tel||'';
+  document.getElementById('saTipo').value = c.tipo||'comercial';
+  document.getElementById('saPlan').value = c.plan||'demo';
+  document.getElementById('saEstado').value = c.estado||'activo';
+  document.getElementById('saNotas').value = c.notas||'';
+  renderModChecks(c.modulos||[]);
+  saTab('nuevo');
+};
+
+// Cambiar estado
+window.cambiarEstado = async function(id, nuevoEstado){
+  try{
+    await setDoc(fsDoc(db,'clientes/'+id), {estado:nuevoEstado, actualizado:Date.now()}, {merge:true});
+    saToast(`✅ Estado cambiado a "${nuevoEstado}"`);
+    await cargarClientesSA();
+  }catch(e){saToast('Error: '+e.message, false);}
+};
+
+// Eliminar cliente
+window.eliminarCliente = async function(id){
+  const c = SA_CLIENTES.find(x=>x.id===id);
+  if(!confirm(`¿Eliminar a "${c?.nombre||id}"? Esta acción no se puede deshacer.`)) return;
+  try{
+    await deleteDoc(fsDoc(db,'clientes/'+id));
+    saToast('✅ Cliente eliminado');
+    await cargarClientesSA();
+  }catch(e){saToast('Error: '+e.message, false);}
+};
+
+// Limpiar form
+window.limpiarFormCliente = function(){
+  ['saEditId','saNombre','saEmail','saTel','saNotas'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('saTipo').value='comercial';
+  document.getElementById('saPlan').value='demo';
+  document.getElementById('saEstado').value='activo';
+  renderModChecks([]);
+};
+
+// Guardar config
+window.guardarConfig = async function(){
+  const cfg = {
+    nombre: document.getElementById('cfgNombre').value,
+    version: document.getElementById('cfgVersion').value,
+    soporte: document.getElementById('cfgSoporte').value,
+    bienvenida: document.getElementById('cfgBienvenida').value,
+    actualizado: Date.now(),
+  };
+  try{
+    await setDoc(fsDoc(db,'sistema/config'), cfg, {merge:true});
+    saToast('✅ Configuración guardada');
+  }catch(e){saToast('Error: '+e.message, false);}
 };
 </script>
 </body>
