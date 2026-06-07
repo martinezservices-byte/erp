@@ -320,7 +320,7 @@ onAuthStateChanged(auth, user => {
       email: user.email,
       nombre: user.displayName || user.email.split('@')[0]
     }));
-    window.location.href = 'index.html';
+    window.location.href = 'app.html';
   }
 });
 
@@ -362,7 +362,7 @@ window.doLogin = async function(){
         document.getElementById('screenBienvenida').style.display='block';
         document.getElementById('bvNombre').textContent = cred.user.displayName||cred.user.email.split('@')[0];
       } else {
-        window.location.href = 'index.html';
+        window.location.href = 'app.html';
       }
     }, 400);
   }catch(e){
