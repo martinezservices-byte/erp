@@ -91,10 +91,85 @@ select.fi{appearance:none;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;}
 @keyframes spin{to{transform:rotate(360deg);}}
-/* RESIDENTE */
-.res-hdr{background:linear-gradient(135deg,#0f2d1a,#1a5c3a);border-radius:14px;padding:16px;margin-bottom:12px;}
+/* RESIDENTE — diseño nuevo */
 .row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
 .row:last-child{border:none;}
+
+/* APP RESIDENTE — pantalla completa tipo Comunidad Feliz */
+#sc-res-app{display:none;flex-direction:column;min-height:100vh;background:#f4f6f8;}
+.res-topbar{background:linear-gradient(160deg,#1a5c3a 0%,#166534 100%);padding:48px 20px 24px;position:relative;}
+.res-topbar-greeting{font-size:13px;color:rgba(255,255,255,0.75);margin-bottom:2px;}
+.res-topbar-name{font-size:22px;font-weight:900;color:white;}
+.res-topbar-unit{font-size:12px;color:rgba(255,255,255,0.7);margin-top:2px;}
+.res-topbar-salir{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.15);border:none;color:white;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;}
+.res-body{flex:1;padding:0 14px 80px;margin-top:-16px;}
+
+/* TARJETA GASTO COMÚN */
+.gc-card{background:white;border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,0.08);}
+.gc-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.gc-mes-label{font-size:16px;font-weight:900;color:#1a1a2e;}
+.gc-mes-arrow{color:#1a5c3a;font-size:18px;font-weight:900;}
+.gc-amounts{display:flex;gap:20px;margin-bottom:12px;}
+.gc-amt{display:flex;align-items:center;gap:6px;}
+.gc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.gc-amt-info{}
+.gc-amt-label{font-size:10px;color:#888;font-weight:600;}
+.gc-amt-val{font-size:14px;font-weight:900;color:#1a1a2e;}
+.gc-bars{display:flex;align-items:flex-end;gap:6px;height:50px;margin-top:4px;}
+.gc-bar{flex:1;border-radius:4px 4px 0 0;min-height:8px;}
+.gc-estado-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:800;margin-top:10px;}
+
+/* ACCESOS RÁPIDOS */
+.accesos{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+.acceso-btn{background:white;border-radius:14px;padding:14px 6px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border:none;cursor:pointer;}
+.acceso-ico{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.acceso-lbl{font-size:10px;font-weight:700;color:#444;text-align:center;line-height:1.2;}
+
+/* HISTORIAL PAGOS */
+.hist-section{margin-bottom:14px;}
+.hist-title{font-size:13px;font-weight:800;color:#1a1a2e;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.hist-card{background:white;border-radius:14px;padding:14px 16px;margin-bottom:8px;box-shadow:0 1px 6px rgba(0,0,0,0.06);display:flex;justify-content:space-between;align-items:center;border-left:4px solid #e5e7eb;}
+.hist-card.pagado{border-left-color:#10B981;}
+.hist-card.moroso{border-left-color:#EF4444;}
+.hist-card.abono{border-left-color:#F59E0B;}
+.hist-card-left{}
+.hist-card-mes{font-size:13px;font-weight:800;color:#1a1a2e;}
+.hist-card-sub{font-size:10px;color:#888;margin-top:2px;}
+.hist-card-right{text-align:right;}
+.hist-card-monto{font-size:14px;font-weight:900;}
+.hist-card-saldo{font-size:10px;color:#EF4444;margin-top:2px;}
+
+/* AVISOS */
+.aviso-card{background:white;border-radius:14px;padding:14px 16px;margin-bottom:8px;box-shadow:0 1px 6px rgba(0,0,0,0.06);display:flex;gap:12px;align-items:flex-start;}
+.aviso-ico{width:36px;height:36px;background:#e8f5ee;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.aviso-txt{}
+.aviso-titulo{font-size:12px;font-weight:800;color:#1a1a2e;line-height:1.3;}
+.aviso-sub{font-size:10px;color:#888;margin-top:3px;}
+
+/* EGRESOS */
+.egreso-row{background:white;border-radius:12px;padding:12px 14px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
+.egreso-desc{font-size:12px;font-weight:700;color:#1a1a2e;}
+.egreso-cat{font-size:10px;color:#888;}
+.egreso-monto{font-size:13px;font-weight:900;color:#EF4444;}
+
+/* NAV BOTTOM */
+.res-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #e5e7eb;display:flex;z-index:100;box-shadow:0 -2px 10px rgba(0,0,0,0.08);}
+.res-nav-btn{flex:1;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:transparent;cursor:pointer;font-family:inherit;}
+.res-nav-ico{font-size:20px;}
+.res-nav-lbl{font-size:9px;font-weight:700;color:#9CA3AF;}
+.res-nav-btn.on .res-nav-lbl{color:#1a5c3a;}
+.res-nav-btn.on .res-nav-ico{filter:drop-shadow(0 0 3px rgba(26,92,58,0.4));}
+
+/* SECCIONES INTERNAS */
+.res-sec{display:none;}.res-sec.on{display:block;}
+.res-sec-title{font-size:18px;font-weight:900;color:#1a1a2e;margin:16px 0 12px;}
+
+/* SIN UNIDAD */
+.no-unit-card{background:white;border-radius:16px;padding:24px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.08);margin-top:20px;}
+.no-unit-ico{font-size:48px;margin-bottom:12px;}
+.no-unit-title{font-size:16px;font-weight:900;color:#1a1a2e;margin-bottom:6px;}
+.no-unit-sub{font-size:12px;color:#888;line-height:1.6;margin-bottom:16px;}
+.no-unit-sel{width:100%;padding:12px;background:#f4f6f8;border:1px solid #e5e7eb;border-radius:10px;font-size:13px;font-family:inherit;outline:none;color:#1a1a2e;}
 </style>
 </head>
 <body>
@@ -215,7 +290,131 @@ select.fi{appearance:none;}
   <div class="sc" id="sc-residente"><div id="resContent"></div></div>
 </div>
 
-<!-- OVERLAY PAGO -->
+<!-- APP RESIDENTE — NUEVO DISEÑO -->
+<div id="sc-res-app">
+  <!-- TOP BAR -->
+  <div class="res-topbar">
+    <div class="res-topbar-greeting">¡Hola,</div>
+    <div class="res-topbar-name" id="resNombre">Residente</div>
+    <div class="res-topbar-unit" id="resUnidad">—</div>
+    <button class="res-topbar-salir" id="btnResidenteSalir">Salir</button>
+  </div>
+
+  <!-- BODY -->
+  <div class="res-body">
+
+    <!-- SECCIÓN INICIO -->
+    <div class="res-sec on" id="rsec-inicio">
+
+      <!-- GASTO COMÚN -->
+      <div class="gc-card" id="gcCard">
+        <div class="gc-card-top">
+          <span class="gc-mes-label" id="gcMesLabel">—</span>
+          <span class="gc-mes-arrow">›</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end">
+          <div class="gc-amounts">
+            <div class="gc-amt">
+              <div class="gc-dot" style="background:#10B981"></div>
+              <div class="gc-amt-info">
+                <div class="gc-amt-label">Cobro actual</div>
+                <div class="gc-amt-val" id="gcActual">$0</div>
+              </div>
+            </div>
+            <div class="gc-amt">
+              <div class="gc-dot" style="background:#6366f1"></div>
+              <div class="gc-amt-info">
+                <div class="gc-amt-label">Mes anterior</div>
+                <div class="gc-amt-val" id="gcAnterior">$0</div>
+              </div>
+            </div>
+          </div>
+          <div class="gc-bars">
+            <div class="gc-bar" style="background:#6366f1" id="barAnterior"></div>
+            <div class="gc-bar" style="background:#10B981" id="barActual"></div>
+          </div>
+        </div>
+        <div id="gcEstado"></div>
+      </div>
+
+      <!-- ACCESOS RÁPIDOS -->
+      <div class="accesos">
+        <button class="acceso-btn" onclick="irSec('cartola')">
+          <div class="acceso-ico" style="background:#e8f5ee">📋</div>
+          <div class="acceso-lbl">Cartola</div>
+        </button>
+        <button class="acceso-btn" onclick="irSec('egresos')">
+          <div class="acceso-ico" style="background:#fff3e0">💸</div>
+          <div class="acceso-lbl">Egresos</div>
+        </button>
+        <button class="acceso-btn" onclick="irSec('mipropiedad')">
+          <div class="acceso-ico" style="background:#e8eaf6">🏠</div>
+          <div class="acceso-lbl">Mi Propiedad</div>
+        </button>
+        <button class="acceso-btn" onclick="irSec('avisos')">
+          <div class="acceso-ico" style="background:#fce4ec">📢</div>
+          <div class="acceso-lbl">Avisos</div>
+        </button>
+      </div>
+
+      <!-- ÚLTIMOS PAGOS -->
+      <div class="hist-section">
+        <div class="hist-title">Historial de Pagos <span style="font-size:10px;color:#1a5c3a;font-weight:700" onclick="irSec('cartola')">Ver todo ›</span></div>
+        <div id="resHistorial"></div>
+      </div>
+
+      <!-- AVISOS RECIENTES -->
+      <div class="hist-section">
+        <div class="hist-title">Publicaciones</div>
+        <div id="resAvisos"></div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN CARTOLA -->
+    <div class="res-sec" id="rsec-cartola">
+      <div class="res-sec-title">Cartola de Pagos</div>
+      <div id="resCartola"></div>
+    </div>
+
+    <!-- SECCIÓN EGRESOS -->
+    <div class="res-sec" id="rsec-egresos">
+      <div class="res-sec-title">Egresos del Condominio</div>
+      <div id="resEgresos"></div>
+    </div>
+
+    <!-- SECCIÓN MI PROPIEDAD -->
+    <div class="res-sec" id="rsec-mipropiedad">
+      <div class="res-sec-title">Mi Propiedad</div>
+      <div id="resPropInfo"></div>
+    </div>
+
+    <!-- SECCIÓN AVISOS -->
+    <div class="res-sec" id="rsec-avisos">
+      <div class="res-sec-title">Publicaciones</div>
+      <div id="resAvisosAll"></div>
+    </div>
+
+  </div>
+
+  <!-- NAV BOTTOM -->
+  <div class="res-nav">
+    <button class="res-nav-btn on" id="rn-inicio" onclick="irSec('inicio')">
+      <span class="res-nav-ico">🏠</span><span class="res-nav-lbl">Inicio</span>
+    </button>
+    <button class="res-nav-btn" id="rn-cartola" onclick="irSec('cartola')">
+      <span class="res-nav-ico">📋</span><span class="res-nav-lbl">Cartola</span>
+    </button>
+    <button class="res-nav-btn" id="rn-egresos" onclick="irSec('egresos')">
+      <span class="res-nav-ico">💸</span><span class="res-nav-lbl">Egresos</span>
+    </button>
+    <button class="res-nav-btn" id="rn-mipropiedad" onclick="irSec('mipropiedad')">
+      <span class="res-nav-ico">🏡</span><span class="res-nav-lbl">Mi Propiedad</span>
+    </button>
+    <button class="res-nav-btn" id="rn-avisos" onclick="irSec('avisos')">
+      <span class="res-nav-ico">📢</span><span class="res-nav-lbl">Avisos</span>
+    </button>
+  </div>
+</div>
 <div class="overlay" id="ovPago">
   <div class="sheet">
     <div class="sh-handle"></div>
@@ -312,10 +511,7 @@ document.getElementById('btnIngresar').onclick=async()=>{
     const {fa}=await initFB();
     const cred=await fa.signInWithEmailAndPassword(_auth,email,pass);
     _user=cred.user;
-    // Verificar rol real en Firestore
-    let tipoReal="residente";
-    try{const uSnap=await _fbM.getDoc(_fbM.doc(_db,"usuarios/"+_user.uid));if(uSnap.exists()){const r=uSnap.data().rol||"residente";if(r==="superadmin"||r==="admin")tipoReal="admin";}}catch(e){tipoReal=_tipoSel;}
-    await entrarApp(tipoReal);
+    await entrarApp(_tipoSel);
   }catch(e){
     const msgs={'auth/user-not-found':'Correo no registrado.','auth/wrong-password':'Contraseña incorrecta.','auth/invalid-credential':'Correo o contraseña incorrectos.','auth/too-many-requests':'Demasiados intentos. Espera unos minutos.'};
     err.textContent=msgs[e.code]||'Error al iniciar sesión.';err.style.display='block';
@@ -366,18 +562,17 @@ async function procesarLoginGoogle(tipo){
   let unidad=null;
   snap.forEach(d=>{const u=d.data();if(u.email&&u.email.toLowerCase()===email.toLowerCase())unidad={id:d.id,...u};});
   const uSnap=await _fbM.getDoc(_fbM.doc(_db,'usuarios/'+_user.uid));
-  const rolGuardado=uSnap.exists()?uSnap.data().rol:'';
-  // Siempre respetar el rol guardado en Firestore — nunca sobreescribir con el parámetro tipo
-  if(rolGuardado==='superadmin'||rolGuardado==='admin'){await entrarApp('admin');return;}
-  if(rolGuardado==='residente'||unidad){
+  const rol=uSnap.exists()?uSnap.data().rol:'';
+  if(rol==='superadmin'||rol==='admin'){await entrarApp('admin');return;}
+  if(unidad){
     if(!uSnap.exists())await _fbM.setDoc(_fbM.doc(_db,'usuarios/'+_user.uid),{email,rol:'residente',condominios:[EMP_ID],tipo:'condominio',creado:Date.now()});
-    await entrarApp('residente'); // siempre residente, ignorar parámetro tipo
-    return;
+    await entrarApp(tipo||'residente');
+  }else{
+    document.getElementById('loginErr').textContent='Tu cuenta Google ('+email+') no está en las fichas. Contacta al administrador.';
+    document.getElementById('loginErr').style.display='block';
+    const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    await fa.signOut(_auth);
   }
-  document.getElementById('loginErr').textContent='Tu cuenta Google ('+email+') no está en las fichas. Contacta al administrador.';
-  document.getElementById('loginErr').style.display='block';
-  const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-  await fa.signOut(_auth);
 }
 
 // ══════════ REGISTRARSE ══════════
@@ -480,21 +675,24 @@ async function entrarApp(tipo){
   _tipoAcceso=tipo;
   document.getElementById('sc-login').style.display='none';
   document.getElementById('sc-veri').style.display='none';
-  document.getElementById('sc-app').style.display='flex';
-  document.getElementById('sc-app').style.flexDirection='column';
-  document.getElementById('appNombre').textContent=CFG.nombre||'Condominio Pioneros 2';
-  document.getElementById('appUser').textContent=(tipo==='admin'?'👷 Administrador':'🏠 Residente')+' · '+(_user.email||'');
-  await cargarDatos();
+
   if(tipo==='admin'){
+    document.getElementById('sc-app').style.display='flex';
+    document.getElementById('sc-app').style.flexDirection='column';
+    document.getElementById('sc-res-app').style.display='none';
+    document.getElementById('appNombre').textContent=CFG.nombre||'Condominio Pioneros 2';
+    document.getElementById('appUser').textContent='👷 Administrador · '+(_user.email||'');
+    await cargarDatos();
     document.getElementById('appTabs').style.display='flex';
     renderCobros();renderResumen();
     llenarBlocks();
     document.getElementById('regMes').value=MES;
     document.getElementById('egFecha').value=HOY;
-  }else{
-    document.getElementById('appTabs').style.display='none';
-    document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));
-    document.getElementById('sc-residente').classList.add('on');
+  } else {
+    document.getElementById('sc-app').style.display='none';
+    document.getElementById('sc-res-app').style.display='flex';
+    document.getElementById('sc-res-app').style.flexDirection='column';
+    await cargarDatos();
     renderResidente();
   }
 }
@@ -515,7 +713,7 @@ async function cargarDatos(){
     EGRESOS=[];eS.forEach(d=>EGRESOS.push({id:d.id,...d.data()}));
     if(cfgS.exists())CFG={...CFG,...cfgS.data()};
     document.getElementById('appNombre').textContent=CFG.nombre||'Condominio Pioneros 2';
-    _fbM.onSnapshot(_fbM.collection(_db,ep+'/cobros'),snap=>{COBROS=[];snap.forEach(d=>COBROS.push({id:d.id,...d.data()}));if(_tipoAcceso==='admin'){renderCobros();renderResumen();}else renderResidente();});
+    _fbM.onSnapshot(_fbM.collection(_db,ep+'/cobros'),snap=>{COBROS=[];snap.forEach(d=>COBROS.push({id:d.id,...d.data()}));if(_tipoAcceso==='admin'){renderCobros();renderResumen();}else{if(_unidadRes)renderGastoComun(_unidadRes);renderHistorialHome(_unidadRes||UNIDADES[0]);}});
   }catch(e){
     // Fallback localStorage
     try{const r=localStorage.getItem('mss_ccondo_1_u');if(r)UNIDADES=JSON.parse(r);}catch(e){}
@@ -620,42 +818,222 @@ document.getElementById('btnEgreso').onclick=async()=>{
   try{await _fbM.setDoc(_fbM.doc(_db,'condominios/'+EMP_ID+'/egresos/'+obj.id),obj);toast('✅ Egreso guardado');document.getElementById('egDesc').value='';document.getElementById('egMonto').value='';}catch(e){toast('Error: '+e.message);}
 };
 
-// ══════════ RESIDENTE ══════════
+// ══════════ RESIDENTE — NUEVO DISEÑO ══════════
+let _unidadRes=null;
+
+function irSec(sec){
+  document.querySelectorAll('.res-sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.res-nav-btn').forEach(b=>b.classList.remove('on'));
+  const el=document.getElementById('rsec-'+sec);
+  const nb=document.getElementById('rn-'+sec);
+  if(el)el.classList.add('on');
+  if(nb)nb.classList.add('on');
+  if(sec==='cartola')renderCartola();
+  if(sec==='egresos')renderEgresosRes();
+  if(sec==='mipropiedad')renderMiPropiedad();
+  if(sec==='avisos')renderAvisosAll();
+}
+
 function renderResidente(){
-  const div=document.getElementById('resContent');
   const email=_user?.email?.toLowerCase()||'';
   const u=UNIDADES.find(x=>x.email&&x.email.toLowerCase()===email);
   if(!u){
-    div.innerHTML=`<div class="card"><div class="ct">🏠 Mi Unidad</div><div style="font-size:12px;color:var(--muted);margin-bottom:12px">Tu correo <strong>${email}</strong> no está vinculado a una unidad.<br>Contacta al administrador.</div>
-    <div class="fg"><label>O busca tu unidad</label><select class="fi" id="resBusca" onchange="renderResManual()"><option value="">— Selecciona —</option>${UNIDADES.map(u=>`<option value="${u.id}">${u.torre||''} — ${u.num} ${u.prop&&u.prop!=='(Por completar)'?'('+u.prop+')':''}</option>`).join('')}</select></div><div id="resManual"></div></div>`;
+    // Sin unidad vinculada — mostrar selector
+    document.getElementById('sc-res-app').style.display='flex';
+    document.getElementById('sc-res-app').style.flexDirection='column';
+    const body=document.querySelector('#sc-res-app .res-body');
+    body.innerHTML=`<div class="no-unit-card">
+      <div class="no-unit-ico">🏘</div>
+      <div class="no-unit-title">Sin unidad vinculada</div>
+      <div class="no-unit-sub">Tu correo <strong>${email}</strong> no está vinculado a ninguna unidad.<br>Contacta al administrador para que lo registre.</div>
+      <select class="no-unit-sel" onchange="seleccionarUnidadManual(this.value)">
+        <option value="">— O selecciona tu unidad manualmente —</option>
+        ${UNIDADES.map(u=>`<option value="${u.id}">${u.torre||''} — Unidad ${u.num}${u.prop&&u.prop!=='(Por completar)'?' · '+u.prop:''}</option>`).join('')}
+      </select>
+    </div>`;
     return;
   }
+  _unidadRes=u;
   mostrarPanelRes(u);
 }
-function renderResManual(){const uId=document.getElementById('resBusca')?.value;const u=UNIDADES.find(x=>String(x.id)===uId);if(u)mostrarPanelRes(u);}
+
+function seleccionarUnidadManual(uid){
+  const u=UNIDADES.find(x=>String(x.id)===uid);
+  if(u){_unidadRes=u;mostrarPanelRes(u);}
+}
+
 function mostrarPanelRes(u){
+  _unidadRes=u;
+  const nombre=(u.prop&&u.prop!=='(Por completar)')?u.prop.split(' ')[0]:_user?.email?.split('@')[0]||'Residente';
+  document.getElementById('resNombre').textContent=nombre+'!';
+  document.getElementById('resUnidad').textContent=(u.torre?u.torre+' — ':'')+'Unidad '+u.num+' · '+(CFG.nombre||'Condominio Pioneros 2');
+
+  // Mostrar pantalla residente
+  document.getElementById('sc-res-app').style.display='flex';
+  document.getElementById('sc-res-app').style.flexDirection='column';
+
+  renderGastoComun(u);
+  renderHistorialHome(u);
+  renderAvisosHome();
+}
+
+function renderGastoComun(u){
   const hist=COBROS.filter(c=>String(c.unidadId)===String(u.id)).sort((a,b)=>String(b.mes||'').localeCompare(String(a.mes||'')));
-  const deuda=hist.filter(x=>x.saldo>0).reduce((s,x)=>s+x.saldo,0);
-  document.getElementById('resContent').innerHTML=`
-    <div class="res-hdr">
-      <div style="font-size:15px;font-weight:900;color:white">${u.torre||''} — Unidad ${u.num}</div>
-      <div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:3px">${u.prop||'—'}</div>
-      ${u.rut?`<div style="font-size:11px;color:rgba(255,255,255,.6)">RUT: ${u.rut}</div>`:''}
-      ${u.estacionamiento?`<div style="font-size:11px;color:rgba(255,255,255,.7)">🚗 ${u.estacionamiento}</div>`:''}
-      ${u.bodega?`<div style="font-size:11px;color:rgba(255,255,255,.7)">📦 ${u.bodega}</div>`:''}
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
-        <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:10px;text-align:center">
-          <div style="font-size:18px;font-weight:900;color:${deuda>0?'#FCA5A5':'#6EE7B7'}">${clp(deuda)}</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.6)">Saldo Total</div>
-        </div>
-        <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:10px;text-align:center">
-          <div style="font-size:18px;font-weight:900;color:white">${hist.length}</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.6)">Pagos</div>
-        </div>
+  const actual=hist[0]||null;
+  const anterior=hist[1]||null;
+  const gcBase=u.gcCustom||CFG.gc||40000;
+
+  const montoActual=actual?actual.gcOrd||gcBase:gcBase;
+  const montoAnt=anterior?anterior.gcOrd||gcBase:gcBase;
+  const maxBar=Math.max(montoActual,montoAnt,1);
+  const hAct=Math.round((montoActual/maxBar)*48)+4;
+  const hAnt=Math.round((montoAnt/maxBar)*48)+4;
+
+  document.getElementById('gcMesLabel').textContent=actual?formatMes(actual.mes):(formatMes(MES));
+  document.getElementById('gcActual').textContent=clp(montoActual);
+  document.getElementById('gcAnterior').textContent=clp(montoAnt);
+  document.getElementById('barActual').style.height=hAct+'px';
+  document.getElementById('barAnterior').style.height=hAnt+'px';
+
+  let estadoHtml='';
+  if(actual){
+    const pagado=actual.pagado||0;
+    const saldo=actual.saldo||0;
+    const estado=actual.estado||'Pendiente';
+    const colores={Pagado:{bg:'#e8f5ee',c:'#10B981'},Moroso:{bg:'#fdecea',c:'#EF4444'},Abono:{bg:'#fff8e1',c:'#F59E0B'},Pendiente:{bg:'#fff8e1',c:'#F59E0B'}};
+    const col=colores[estado]||colores.Pendiente;
+    estadoHtml=`<div class="gc-estado-badge" style="background:${col.bg};color:${col.c}">
+      ${estado==='Pagado'?'✅':estado==='Moroso'?'⚠':'⏳'} ${estado}
+      ${pagado>0?'· Pagado: '+clp(pagado):''}
+      ${saldo>0?'· Debe: '+clp(saldo):''}
+    </div>`;
+  } else {
+    estadoHtml=`<div class="gc-estado-badge" style="background:#fff8e1;color:#F59E0B">⏳ Sin cobro registrado este mes</div>`;
+  }
+  document.getElementById('gcEstado').innerHTML=estadoHtml;
+}
+
+function renderHistorialHome(u){
+  const hist=COBROS.filter(c=>String(c.unidadId)===String(u.id)).sort((a,b)=>String(b.mes||'').localeCompare(String(a.mes||''))).slice(0,3);
+  const div=document.getElementById('resHistorial');
+  if(!hist.length){div.innerHTML='<div style="text-align:center;padding:16px;color:#888;font-size:12px">Sin registros de pago</div>';return;}
+  div.innerHTML=hist.map(x=>{
+    const cls=x.estado==='Pagado'?'pagado':x.estado==='Moroso'?'moroso':'abono';
+    const col=x.estado==='Pagado'?'#10B981':x.estado==='Moroso'?'#EF4444':'#F59E0B';
+    return `<div class="hist-card ${cls}">
+      <div class="hist-card-left">
+        <div class="hist-card-mes">${formatMes(x.mes)}</div>
+        <div class="hist-card-sub">${x.estado} · ${df(x.fechaPago)}</div>
+      </div>
+      <div class="hist-card-right">
+        <div class="hist-card-monto" style="color:${col}">${clp(x.pagado||0)}</div>
+        ${x.saldo>0?`<div class="hist-card-saldo">Debe: ${clp(x.saldo)}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderAvisosHome(){
+  const div=document.getElementById('resAvisos');
+  // Mostrar egresos recientes como "publicaciones" (datos reales del condominio)
+  const items=EGRESOS.slice(0,3);
+  if(!items.length){div.innerHTML='<div style="text-align:center;padding:16px;color:#888;font-size:12px">Sin publicaciones recientes</div>';return;}
+  div.innerHTML=items.map(e=>`<div class="aviso-card">
+    <div class="aviso-ico">📢</div>
+    <div class="aviso-txt">
+      <div class="aviso-titulo">${(e.desc||e.cat||'Egreso').toUpperCase()}</div>
+      <div class="aviso-sub">Publicado por la administración · ${df(e.fecha)}</div>
+    </div>
+  </div>`).join('');
+}
+
+function renderCartola(){
+  if(!_unidadRes)return;
+  const hist=COBROS.filter(c=>String(c.unidadId)===String(_unidadRes.id)).sort((a,b)=>String(b.mes||'').localeCompare(String(a.mes||'')));
+  const div=document.getElementById('resCartola');
+  if(!hist.length){div.innerHTML='<div style="text-align:center;padding:24px;color:#888;font-size:13px">Sin registros de pago</div>';return;}
+  div.innerHTML=hist.map(x=>{
+    const cls=x.estado==='Pagado'?'pagado':x.estado==='Moroso'?'moroso':'abono';
+    const col=x.estado==='Pagado'?'#10B981':x.estado==='Moroso'?'#EF4444':'#F59E0B';
+    return `<div class="hist-card ${cls}">
+      <div class="hist-card-left">
+        <div class="hist-card-mes">${formatMes(x.mes)}</div>
+        <div class="hist-card-sub">${x.estado} · ${df(x.fechaPago)}<br>Cuota: ${clp(x.gcOrd)} · Forma: ${x.forma||'—'}</div>
+      </div>
+      <div class="hist-card-right">
+        <div class="hist-card-monto" style="color:${col}">${clp(x.pagado||0)}</div>
+        ${x.saldo>0?`<div class="hist-card-saldo">Debe: ${clp(x.saldo)}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderEgresosRes(){
+  const div=document.getElementById('resEgresos');
+  if(!EGRESOS.length){div.innerHTML='<div style="text-align:center;padding:24px;color:#888;font-size:13px">Sin egresos registrados</div>';return;}
+  const total=EGRESOS.reduce((s,e)=>s+(e.monto||0),0);
+  div.innerHTML=`<div style="background:white;border-radius:14px;padding:14px 16px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.06);display:flex;justify-content:space-between">
+    <span style="font-size:12px;color:#888;font-weight:700">TOTAL EGRESOS</span>
+    <span style="font-size:15px;font-weight:900;color:#EF4444">${clp(total)}</span>
+  </div>`+
+  EGRESOS.sort((a,b)=>String(b.fecha||'').localeCompare(String(a.fecha||''))).map(e=>`
+    <div class="egreso-row">
+      <div><div class="egreso-desc">${e.desc||e.cat||'—'}</div><div class="egreso-cat">${e.cat||''} · ${df(e.fecha)}</div></div>
+      <div class="egreso-monto">${clp(e.monto)}</div>
+    </div>`).join('');
+}
+
+function renderMiPropiedad(){
+  const u=_unidadRes;
+  if(!u)return;
+  const deuda=COBROS.filter(c=>String(c.unidadId)===String(u.id)&&c.saldo>0).reduce((s,c)=>s+c.saldo,0);
+  const pagos=COBROS.filter(c=>String(c.unidadId)===String(u.id)).length;
+  document.getElementById('resPropInfo').innerHTML=`
+    <div style="background:linear-gradient(135deg,#1a5c3a,#166534);border-radius:16px;padding:20px;color:white;margin-bottom:14px">
+      <div style="font-size:18px;font-weight:900;margin-bottom:4px">${u.torre?u.torre+' — ':''} Unidad ${u.num}</div>
+      <div style="font-size:12px;opacity:.8">${u.prop&&u.prop!=='(Por completar)'?u.prop:'—'}</div>
+      ${u.rut?`<div style="font-size:11px;opacity:.7;margin-top:4px">RUT: ${u.rut}</div>`:''}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div style="background:white;border-radius:14px;padding:14px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.06)">
+        <div style="font-size:20px;font-weight:900;color:${deuda>0?'#EF4444':'#10B981'}">${clp(deuda)}</div>
+        <div style="font-size:10px;color:#888;margin-top:3px;font-weight:700">SALDO TOTAL</div>
+      </div>
+      <div style="background:white;border-radius:14px;padding:14px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.06)">
+        <div style="font-size:20px;font-weight:900;color:#1a5c3a">${pagos}</div>
+        <div style="font-size:10px;color:#888;margin-top:3px;font-weight:700">PAGOS REGISTRADOS</div>
       </div>
     </div>
-    ${hist.map(x=>`<div class="cobro-card"><div style="display:flex;justify-content:space-between"><div><div style="font-size:12px;font-weight:700">${x.mes}</div><div style="font-size:10px;color:var(--muted)">${x.estado} · ${df(x.fechaPago)}</div></div><div style="text-align:right"><div style="font-size:13px;font-weight:800;color:var(--ok)">${clp(x.pagado)}</div>${x.saldo>0?`<div style="font-size:10px;color:var(--danger)">Debe: ${clp(x.saldo)}</div>`:''}</div></div></div>`).join('')||'<div class="empty" style="padding:16px">Sin registros de pago</div>'}
-    <div class="card" style="margin-top:10px"><div class="ct">📊 Últimos Egresos</div>${EGRESOS.slice(0,5).map(e=>`<div class="row"><span>${e.desc||e.cat}</span><span style="color:var(--danger)">${clp(e.monto)}</span></div>`).join('')||'<div style="font-size:12px;color:var(--muted)">Sin egresos</div>'}</div>`;
+    <div style="background:white;border-radius:14px;padding:16px;box-shadow:0 1px 6px rgba(0,0,0,.06)">
+      <div style="font-size:12px;font-weight:800;color:#1a1a2e;margin-bottom:12px">DATOS DE LA UNIDAD</div>
+      ${u.estacionamiento?`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:12px"><span style="color:#888">Estacionamiento</span><span style="font-weight:700">🚗 ${u.estacionamiento}</span></div>`:''}
+      ${u.bodega?`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:12px"><span style="color:#888">Bodega</span><span style="font-weight:700">📦 ${u.bodega}</span></div>`:''}
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:12px"><span style="color:#888">Gasto Común Base</span><span style="font-weight:700;color:#1a5c3a">${clp(u.gcCustom||CFG.gc||40000)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:12px"><span style="color:#888">Condominio</span><span style="font-weight:700">${CFG.nombre||'Condominio Pioneros 2'}</span></div>
+    </div>`;
+}
+
+function renderAvisosAll(){
+  const div=document.getElementById('resAvisosAll');
+  const items=EGRESOS.sort((a,b)=>String(b.fecha||'').localeCompare(String(a.fecha||'')));
+  if(!items.length){div.innerHTML='<div style="text-align:center;padding:24px;color:#888;font-size:13px">Sin publicaciones</div>';return;}
+  div.innerHTML=items.map(e=>`<div class="aviso-card">
+    <div class="aviso-ico">📢</div>
+    <div class="aviso-txt">
+      <div class="aviso-titulo">${(e.desc||e.cat||'Egreso').toUpperCase()}</div>
+      <div class="aviso-sub">Publicado por la administración · ${df(e.fecha)}</div>
+    </div>
+  </div>`).join('');
+}
+
+// Helper formato mes
+function formatMes(m){
+  if(!m)return '—';
+  try{
+    const [y,mo]=m.split('-');
+    const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    return (meses[parseInt(mo)-1]||mo)+' '+y;
+  }catch(e){return m;}
 }
 
 // ══════════ TABS ══════════
@@ -671,7 +1049,16 @@ document.querySelectorAll('.tab').forEach(t=>{
   };
 });
 
-// ══════════ SALIR ══════════
+// ══════════ SALIR RESIDENTE ══════════
+document.getElementById('btnResidenteSalir').onclick=async()=>{
+  if(!confirm('¿Cerrar sesión?'))return;
+  try{const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');await fa.signOut(_auth);}catch(e){}
+  sessionStorage.clear();
+  document.getElementById('sc-res-app').style.display='none';
+  document.getElementById('sc-login').style.display='flex';
+};
+
+// ══════════ SALIR ADMIN ══════════
 document.getElementById('btnSalir').onclick=async()=>{
   if(!confirm('¿Cerrar sesión?'))return;
   try{const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');await fa.signOut(_auth);}catch(e){}
@@ -693,21 +1080,9 @@ document.getElementById('filEst').onchange=renderCobros;
       const result=await fa.getRedirectResult(_auth);
       if(result&&result.user){_user=result.user;const tipo=sessionStorage.getItem('mss_tipo_pending')||'residente';await procesarLoginGoogle(tipo);return;}
     }catch(e){}
-    // Verificar sesión existente — consultar rol en Firestore para determinar tipo correcto
+    // Verificar sesión existente
     fa.onAuthStateChanged(_auth,async user=>{
-      if(user&&!_user){
-        _user=user;
-        // Nunca asumir 'admin' por defecto — siempre verificar rol real
-        let tipo='residente';
-        try{
-          const uSnap=await _fbM.getDoc(_fbM.doc(_db,'usuarios/'+user.uid));
-          if(uSnap.exists()){
-            const rol=uSnap.data().rol||'residente';
-            if(rol==='superadmin'||rol==='admin')tipo='admin';
-          }
-        }catch(e){tipo='residente';} // sin permisos = es residente
-        await entrarApp(tipo);
-      }
+      if(user&&!_user){_user=user;const tipo=sessionStorage.getItem('mss_movil_tipo')||'admin';await entrarApp(tipo);}
     });
   }catch(e){console.warn('Init:',e);}
 })();
