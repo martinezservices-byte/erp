@@ -2,159 +2,116 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Mi Panel — Martinez Services ERP</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:#04080F;color:#F2EFEA;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
+:root{--bg:#04080F;--surf:#08101C;--surf2:#0E1A2C;--border:rgba(255,255,255,0.06);--white:#F0F9FF;--muted:#3D5A7A;--mutedHi:#6B8FAA;--font:'Playfair Display',serif;--body:'Inter',system-ui,sans-serif;}
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700&display=swap');
+body{background:var(--bg);color:var(--white);font-family:var(--body);min-height:100vh;}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* TOPBAR */
-#topbar{background:#08101C;border-bottom:1px solid rgba(16,185,129,0.15);padding:0 20px;height:52px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
-#tbLogo{width:34px;height:34px;background:linear-gradient(135deg,#10B981,#059669);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;font-family:monospace;}
-#tbNombre{font-size:13px;font-weight:700;color:#E2E8F0;font-family:monospace;}
-#tbSub{font-size:9px;color:#10B981;font-family:monospace;letter-spacing:1px;text-transform:uppercase;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+#topbar{background:var(--surf);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;}
+#tbLogo{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff;flex-shrink:0;overflow:hidden;}
+#tbLogo img{width:100%;height:100%;object-fit:contain;}
+.tb-empresa{font-size:14px;font-weight:700;}
+.tb-sub{font-size:10px;color:var(--mutedHi);}
 .tb-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
-#tbEmail{font-size:10px;color:#4A5568;font-family:monospace;}
-#tbDemo{font-size:10px;padding:3px 10px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);color:#38BDF8;border-radius:20px;font-family:monospace;display:none;}
-.btn-salir{padding:5px 12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#FCA5A5;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:monospace;}
-
-/* LOADING */
+.btn-salir{padding:6px 14px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#FCA5A5;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:monospace;}
 #loading{display:flex;align-items:center;justify-content:center;min-height:80vh;flex-direction:column;gap:14px;}
-#loading .spinner{width:36px;height:36px;border:3px solid rgba(16,185,129,0.15);border-top-color:#10B981;border-radius:50%;animation:spin .8s linear infinite;}
-#loading p{font-size:12px;color:#4A5568;font-family:monospace;}
-
-/* MAIN */
-#main{display:none;max-width:760px;margin:0 auto;padding:28px 20px;}
-.fecha{font-size:9px;color:#10B981;font-family:monospace;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
-.saludo{font-size:24px;font-weight:700;margin-bottom:3px;}
-.saludo span{color:#10B981;}
-.saludo-sub{font-size:12px;color:#4A5568;margin-bottom:24px;}
-
-/* CARD */
-.hub-card{background:#08101C;border:1px solid rgba(16,185,129,0.15);border-radius:16px;overflow:hidden;}
-.card-top-bar{height:3px;background:linear-gradient(90deg,#10B981,#059669);}
-.card-body{padding:20px 22px;}
-.card-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;}
-.card-avatar{width:54px;height:54px;border-radius:12px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;overflow:hidden;}
-.card-avatar img{width:100%;height:100%;object-fit:contain;}
-.card-nombre{font-size:16px;font-weight:700;color:#F2EFEA;}
-.card-meta{font-size:10px;color:#4A5568;font-family:monospace;margin-top:2px;}
-.badges{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;}
-.badge{padding:2px 9px;border-radius:20px;font-size:9px;font-weight:700;}
-.b-green{background:rgba(16,185,129,0.12);color:#10B981;border:1px solid rgba(16,185,129,0.25);}
-.b-blue{background:rgba(56,189,248,0.08);color:#38BDF8;border:1px solid rgba(56,189,248,0.2);}
-.b-warn{background:rgba(245,158,11,0.08);color:#F59E0B;border:1px solid rgba(245,158,11,0.2);}
-
-.divider{height:1px;background:rgba(255,255,255,0.05);margin:0 0 16px;}
-
-/* AREAS */
-.area{margin-bottom:16px;}
-.area-title{font-size:9px;font-family:monospace;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:7px;}
-.area-bar{width:3px;height:13px;border-radius:2px;}
-.area-green .area-bar{background:#10B981;}
-.area-purple .area-bar{background:#A78BFA;}
-.area-amber .area-bar{background:#FBBF24;}
-.area-green .area-title{color:#10B981;}
-.area-purple .area-title{color:#A78BFA;}
-.area-amber .area-title{color:#FBBF24;}
-
-.mods-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
-.mod-chip{padding:11px 6px;border-radius:9px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;border:1px solid transparent;text-decoration:none;transition:all .15s;}
-.mod-chip:hover{transform:translateY(-2px);filter:brightness(1.1);}
-.mod-icon{font-size:18px;}
-.mod-label{font-size:8px;font-weight:700;text-align:center;line-height:1.3;font-family:monospace;}
-.mod-locked{padding:11px 6px;border-radius:9px;display:flex;flex-direction:column;align-items:center;gap:5px;background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.06);}
-.mod-locked-icon{font-size:16px;opacity:.3;}
-.mod-locked-label{font-size:8px;color:#2D3748;text-align:center;font-family:monospace;line-height:1.3;}
-
-/* ACCIONES */
-.card-actions{display:flex;gap:10px;border-top:1px solid rgba(16,185,129,0.08);padding:14px 22px;background:rgba(16,185,129,0.02);}
-.btn-enter{flex:1;padding:12px;border-radius:9px;border:none;cursor:pointer;font-weight:700;font-size:13px;font-family:monospace;background:linear-gradient(135deg,#10B981,#059669);color:#fff;transition:all .15s;}
-.btn-enter:hover{opacity:.9;transform:translateY(-1px);}
-.btn-cfg{width:40px;height:40px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:#4A5568;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .15s;}
-.btn-cfg:hover{border-color:rgba(255,255,255,0.15);color:#9CA3AF;}
-
-.nota{margin-top:18px;background:rgba(16,185,129,0.04);border:1px solid rgba(16,185,129,0.1);border-radius:10px;padding:12px 16px;font-size:11px;color:#4A5568;line-height:1.7;}
-.nota strong{color:#10B981;}
-
-@media(max-width:500px){
-  .mods-grid{grid-template-columns:repeat(3,1fr);}
-  .card-body{padding:16px;}
-  .card-actions{padding:12px 16px;}
-}
+.spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,0.08);border-top-color:#10B981;border-radius:50%;animation:spin .8s linear infinite;}
+#main{display:none;max-width:1000px;margin:0 auto;padding:32px 20px 60px;animation:fadeIn .4s ease;}
+.greeting-date{font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;font-family:monospace;color:#10B981;}
+.greeting-title{font-size:26px;font-weight:700;margin-bottom:3px;}
+.greeting-sub{font-size:13px;color:var(--mutedHi);margin-bottom:28px;}
+.empresa-card{background:var(--surf);border-radius:16px;overflow:hidden;border:1px solid var(--border);margin-bottom:12px;}
+.empresa-header{display:flex;align-items:flex-start;gap:16px;padding:20px 24px 16px;}
+.empresa-avatar{width:58px;height:58px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;flex-shrink:0;overflow:hidden;}
+.empresa-avatar img{width:100%;height:100%;object-fit:contain;}
+.empresa-nombre{font-size:18px;font-weight:700;margin-bottom:3px;}
+.empresa-meta{font-size:11px;color:var(--mutedHi);font-family:monospace;margin-bottom:2px;}
+.badges{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap;}
+.badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;font-family:monospace;}
+.areas-header{padding:0 24px 14px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mutedHi);font-family:monospace;}
+.areas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1px;background:var(--border);}
+.area-card{background:var(--surf);padding:20px 22px;cursor:pointer;transition:all .18s;position:relative;}
+.area-card:hover{background:var(--surf2);}
+.area-card.bloqueada{cursor:default;}
+.area-card.bloqueada:hover{background:var(--surf);}
+.area-top-strip{height:2px;margin:-20px -22px 16px;background:var(--border);}
+.area-icon{font-size:24px;margin-bottom:10px;}
+.area-nombre{font-size:15px;font-weight:700;margin-bottom:4px;}
+.area-desc{font-size:11px;line-height:1.6;color:rgba(255,255,255,0.35);margin-bottom:14px;}
+.submodulos{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px;}
+.sub-chip{font-size:9px;padding:3px 8px;border-radius:10px;font-family:monospace;font-weight:600;}
+.area-footer{display:flex;justify-content:space-between;align-items:center;}
+.btn-entrar{padding:7px 18px;border:none;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:monospace;}
+.btn-activar{padding:7px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.3);border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:monospace;}
+.btn-activar:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.5);}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surf);border-radius:16px;padding:28px;max-width:440px;width:100%;border:1px solid var(--border);}
+.modal h3{font-size:17px;font-weight:700;margin-bottom:8px;}
+.modal p{font-size:12px;color:var(--mutedHi);margin-bottom:20px;line-height:1.7;}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.field label{font-size:10px;color:var(--mutedHi);font-weight:700;text-transform:uppercase;letter-spacing:.5px;font-family:monospace;}
+.field input,.field textarea{background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--white);font-family:monospace;font-size:12px;outline:none;width:100%;}
+.field input:focus,.field textarea:focus{border-color:#10B981;}
+.btn-enviar{width:100%;padding:12px;background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:monospace;margin-bottom:8px;}
+.btn-cancelar-m{width:100%;padding:10px;background:transparent;border:1px solid var(--border);color:var(--mutedHi);border-radius:9px;font-size:12px;cursor:pointer;font-family:monospace;}
+@media(max-width:600px){.areas-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-
 <div id="topbar">
-  <div id="tbLogo">M</div>
+  <div id="tbLogo" style="background:#10B981">M</div>
   <div>
-    <div id="tbNombre">Mi Panel</div>
-    <div id="tbSub">Portal cliente</div>
+    <div class="tb-empresa" id="tbEmpresa">Mi Panel</div>
+    <div class="tb-sub">Portal Cliente · Martinez Services ERP</div>
   </div>
   <div class="tb-right">
-    <span id="tbEmail"></span>
-    <span id="tbDemo"></span>
+    <span id="tbEmail" style="font-size:10px;color:var(--mutedHi);font-family:monospace;"></span>
+    <span id="tbDemo" class="badge" style="display:none;background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.2);color:#38BDF8;"></span>
     <button class="btn-salir" onclick="cerrarSesion()">⏻ Salir</button>
   </div>
 </div>
 
 <div id="loading">
   <div class="spinner"></div>
-  <p>Cargando tu panel...</p>
+  <div style="font-size:12px;color:var(--mutedHi);font-family:monospace;">Cargando tu panel...</div>
 </div>
 
 <div id="main">
-  <div class="fecha" id="mainFecha"></div>
-  <div class="saludo">Hola, <span id="mainNombre">Cliente</span></div>
-  <div class="saludo-sub">Bienvenido/a a tu panel. Accede a cualquier módulo contratado desde aquí.</div>
+  <div class="greeting-date" id="grDate"></div>
+  <div class="greeting-title">Hola, <span id="grNombre" style="color:#10B981">Cliente</span></div>
+  <div class="greeting-sub">Bienvenido/a a tu panel. Accede a los módulos de tu plan contratado.</div>
 
-  <div class="hub-card">
-    <div class="card-top-bar"></div>
-    <div class="card-body">
-
-      <!-- HEADER CONDOMINIO -->
-      <div class="card-header">
-        <div class="card-avatar" id="cardAvatar">🏢</div>
-        <div>
-          <div class="card-nombre" id="cardNombre">Mi Condominio</div>
-          <div class="card-meta" id="cardRut"></div>
-          <div class="card-meta" id="cardDir"></div>
-          <div class="badges" id="cardBadges"></div>
-        </div>
+  <div class="empresa-card" id="empresaCard">
+    <div id="empresaCardTop" style="height:3px;"></div>
+    <div class="empresa-header">
+      <div class="empresa-avatar" id="empAvatar">🏢</div>
+      <div>
+        <div class="empresa-nombre" id="empNombre">Mi Empresa</div>
+        <div class="empresa-meta" id="empRut"></div>
+        <div class="empresa-meta" id="empDir"></div>
+        <div class="badges" id="empBadges"></div>
       </div>
-
-      <div class="divider"></div>
-
-      <!-- ÁREA 1: CONDOMINIO -->
-      <div class="area area-green" id="areaCondominio" style="display:none">
-        <div class="area-title"><div class="area-bar"></div>Área condominio</div>
-        <div class="mods-grid" id="modsCondominio"></div>
-      </div>
-
-      <!-- ÁREA 2: RRHH Y ADMINISTRACIÓN -->
-      <div class="area area-purple" id="areaRRHH" style="display:none">
-        <div class="area-title"><div class="area-bar"></div>Área RRHH y administración</div>
-        <div class="mods-grid" id="modsRRHH"></div>
-      </div>
-
-      <!-- ÁREA 3: REPORTES -->
-      <div class="area area-amber" id="areaReportes" style="display:none">
-        <div class="area-title"><div class="area-bar"></div>Área reportes y control</div>
-        <div class="mods-grid" id="modsReportes"></div>
-      </div>
-
     </div>
-    <div class="card-actions">
-      <button class="btn-enter" id="btnEnter" onclick="entrarPanel()">▶ Entrar al Panel Principal</button>
-      <button class="btn-cfg" onclick="entrarConfig()" title="Configuración del condominio">⚙</button>
-    </div>
+    <div class="areas-header">Tus módulos contratados</div>
+    <div class="areas-grid" id="areasGrid"></div>
   </div>
+</div>
 
-  <div class="nota">
-    <strong>Tu espacio es privado.</strong> Solo tú tienes acceso a los datos de tu condominio. Los módulos marcados como "No contratado" pueden activarse contactando a Martinez Services.
-  </div>
+<div class="modal-overlay" id="modalActivar">
+<div class="modal">
+  <h3>🔓 Solicitar Activación</h3>
+  <p id="modalActivarDesc">Para activar este módulo contacta a Martinez Services.</p>
+  <div class="field"><label>Tu nombre</label><input id="actNombre" placeholder="Nombre completo"/></div>
+  <div class="field"><label>Email</label><input id="actEmail" type="email" placeholder="tu@email.com"/></div>
+  <div class="field"><label>Mensaje (opcional)</label><textarea id="actMsg" rows="3" placeholder="Cuéntanos qué necesitas..."></textarea></div>
+  <button class="btn-enviar" onclick="enviarSolicitud()">✉ Enviar Solicitud</button>
+  <button class="btn-cancelar-m" onclick="document.getElementById('modalActivar').classList.remove('open')">Cancelar</button>
+</div>
 </div>
 
 <script type="module">
@@ -163,275 +120,93 @@ import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/fi
 import { getFirestore, doc, getDoc, getDocs, setDoc, collection, query, where } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const FB={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
-const app = getApps().length ? getApps()[0] : initializeApp(FB);
-const auth = getAuth(app);
-const db   = getFirestore(app);
+const app=getApps().length?getApps()[0]:initializeApp(FB);
+const auth=getAuth(app);
+const db=getFirestore(app);
 
-// ── DEFINICIÓN DE MÓDULOS POR ÁREA ──
-// Cada área tiene sus módulos con color, ícono y archivo destino
-const AREAS = {
-  condominio: {
-    label: 'Área condominio',
-    modulos: {
-      condominio:     {icon:'🏢', label:'Panel Admin',     color:'#10B981', href:'MSS-Condominio.html'},
-      app_residentes: {icon:'📱', label:'App Residentes',  color:'#F59E0B', href:'MSS-CondoMovil.html'},
-    }
-  },
-  rrhh: {
-    label: 'Área RRHH y administración',
-    modulos: {
-      rrhh:              {icon:'👷', label:'Remuneraciones',  color:'#22C55E', href:'MSS-Remuneraciones.html'},
-      remuneraciones:    {icon:'👷', label:'Remuneraciones',  color:'#22C55E', href:'MSS-Remuneraciones.html'},
-      contratos:         {icon:'📄', label:'Contratos',       color:'#A78BFA', href:'MSS-Contratos.html'},
-      portal_trabajador: {icon:'🧑', label:'Portal Trabajador',color:'#34D399', href:'MSS-PortalTrabajador.html'},
-    }
-  },
-  reportes: {
-    label: 'Área reportes y control',
-    modulos: {
-      auditoria: {icon:'📊', label:'Auditoría',   color:'#A78BFA', href:'MSS-Auditoria.html'},
-      finanzas:  {icon:'₲',  label:'Finanzas',    color:'#C9A84C', href:'MSS-Finanzas.html'},
-      tesoreria: {icon:'🏦', label:'Tesorería',   color:'#FBBF24', href:'MSS-Tesoreria.html'},
-      estrategia:{icon:'◆',  label:'Estrategia',  color:'#10B981', href:'MSS-Estrategia.html'},
-    }
-  }
-};
+const CINCO_AREAS=[
+  {id:'rrhh',nombre:'Recursos Humanos',icon:'👥',color:'#22C55E',desc:'Remuneraciones, contratos, portal trabajador y gestión de personal.',subModulos:[{id:'rrhh',label:'Gestión de Personal',href:'MSS-RRHH.html'},{id:'remuneraciones',label:'Remuneraciones',href:'MSS-Remuneraciones.html'},{id:'contratos',label:'Contratos y Finiquitos',href:'MSS-Contratos.html'},{id:'portal_trabajador',label:'Portal Trabajador',href:'MSS-PortalTrabajador.html'}]},
+  {id:'contabilidad',nombre:'Contabilidad Automatizada',icon:'📗',color:'#10B981',desc:'Libros Diarios y Mayores, Balances, EERR. Asientos automáticos desde ventas y compras.',subModulos:[{id:'contabilidad',label:'Módulo Contable',href:'MSS-Contabilidad.html'},{id:'finanzas',label:'Finanzas y Flujo',href:'MSS-Finanzas.html'},{id:'tesoreria',label:'Tesorería Bancaria',href:'MSS-Tesoreria.html'}]},
+  {id:'facturacion',nombre:'Facturación y Administración',icon:'🧾',color:'#38BDF8',desc:'Facturación electrónica SII, compras, cotizaciones y gestión documental.',subModulos:[{id:'facturacion',label:'Facturación / Boletas',href:'MSS-Facturacion.html'},{id:'compras',label:'Compras / Proveedores',href:'MSS-Compras.html'},{id:'cotizacion',label:'Cotizaciones',href:'MSS-Cotizacion.html'}]},
+  {id:'gestion',nombre:'Control de Gestión y Logística',icon:'🚛',color:'#F59E0B',desc:'Inventario, catálogo de productos, arriendos de equipos y CRM de ventas.',subModulos:[{id:'inventario',label:'Inventario y Bodegas',href:'MSS-Inventario.html'},{id:'catalogo',label:'Catálogo / Tienda',href:'MSS-Catalogo.html'},{id:'arriendos',label:'Arriendos',href:'MSS-Arriendos.html'},{id:'ventas',label:'Ventas CRM',href:'MSS-Ventas-CRM.html'}]},
+  {id:'auditoria',nombre:'Auditoría e Inteligencia',icon:'📊',color:'#A78BFA',desc:'KPIs, reportes consolidados, estrategia y auditoría de procesos. Módulo Premium.',subModulos:[{id:'auditoria',label:'Auditoría',href:'MSS-Auditoria.html'},{id:'estrategia',label:'Estrategia y Control',href:'MSS-Estrategia.html'},{id:'proyectos',label:'Proyectos / KPI',href:'MSS-Proyectos.html'}]}
+];
 
-// Módulos que son equivalentes (no mostrar dos veces)
-const ALIAS = { remuneraciones: 'rrhh' };
+const AREA_CONDO={id:'condominio',nombre:'Administración de Condominio',icon:'🏢',color:'#10B981',desc:'Panel completo de administración comunitaria: cobros, egresos, unidades, fondo de reserva y portal residente.',subModulos:[{id:'condominio',label:'Panel Admin',href:'MSS-Condominio.html'},{id:'app_residentes',label:'App Residentes',href:'MSS-CondoMovil.html'},{id:'portal_trabajador',label:'Portal Trabajador',href:'MSS-PortalTrabajador.html'}]};
 
-let _condoActual = null;
+let _condoActual=null,_modulosUser=[];
 
-onAuthStateChanged(auth, async user => {
-  if(!user){ window.location.href='MSS-Login.html'; return; }
-
-  const email = user.email || '';
-  document.getElementById('tbEmail').textContent = email;
-
-  // Leer perfil del usuario
-  let clienteId = null, modulos = [], diasRestantes = null, nombreCliente = user.displayName || email.split('@')[0];
-
+onAuthStateChanged(auth,async user=>{
+  if(!user){window.location.href='MSS-Login.html';return;}
+  const email=user.email||'';
+  document.getElementById('tbEmail').textContent=email;
+  let clienteId=null,nombreCliente=user.displayName||email.split('@')[0],diasRestantes=null;
+  try{const p=await getDoc(doc(db,'usuarios/'+user.uid));if(p.exists()){clienteId=p.data().clienteId||null;nombreCliente=p.data().nombre||nombreCliente;}}catch(e){}
   try{
-    const perfil = await getDoc(doc(db,'usuarios/'+user.uid));
-    if(perfil.exists()){
-      clienteId = perfil.data().clienteId || null;
-      nombreCliente = perfil.data().nombre || nombreCliente;
-    }
-  }catch(e){}
-
-  // Leer datos del cliente desde /clientes
-  // Buscar por clienteId, por uid, y también por email como fallback
-  try{
-    let cliData = null;
-    // Intento 1: por clienteId del perfil
-    if(clienteId){
-      const cliId = clienteId.replace('cli_','');
-      const cs1 = await getDoc(doc(db,'clientes/'+clienteId));
-      const cs2 = await getDoc(doc(db,'clientes/'+cliId));
-      if(cs1.exists()) cliData = cs1.data();
-      else if(cs2.exists()) cliData = cs2.data();
-    }
-    // Intento 2: buscar por email en todos los clientes (SA Panel guarda por email)
-    // Fallback: buscar por email directamente en /clientes
-    if(!cliData){
-      try{
-        // Buscar por email en mayúsculas y minúsculas
-        let foundDoc = null;
-        const qLower = query(collection(db,'clientes'), where('email','==',email.toLowerCase()));
-        const qUpper = query(collection(db,'clientes'), where('email','==',email.toUpperCase()));
-        const qExact = query(collection(db,'clientes'), where('email','==',email));
-        for(const q of [qLower, qUpper, qExact]){
-          if(foundDoc) break;
-          try{
-            const qs = await getDocs(q);
-            if(!qs.empty) foundDoc = qs.docs[0];
-          }catch(e2){}
-        }
-        if(foundDoc){
-          const d = foundDoc;
-          cliData = d.data();
-          clienteId = d.id;
-          // Sincronizar clienteId en el perfil del usuario para futuros accesos
-          try{
-            await setDoc(doc(db,'usuarios/'+user.uid),{clienteId: d.id},{merge:true});
-          }catch(e2){}
-        }
-      }catch(e){ console.warn('Query email:', e.message); }
-    }
+    let cliData=null;
+    if(clienteId){const cs1=await getDoc(doc(db,'clientes/'+clienteId));const cs2=await getDoc(doc(db,'clientes/'+clienteId.replace('cli_','')));if(cs1.exists())cliData=cs1.data();else if(cs2.exists())cliData=cs2.data();}
+    if(!cliData){const qs=await getDocs(query(collection(db,'clientes'),where('email','==',email.toLowerCase())));if(!qs.empty){cliData=qs.docs[0].data();clienteId=qs.docs[0].id;}}
+    if(!cliData){const qs=await getDocs(query(collection(db,'clientes'),where('email','==',email.toUpperCase())));if(!qs.empty){cliData=qs.docs[0].data();clienteId=qs.docs[0].id;}}
     if(cliData){
-      modulos = cliData.modulos || [];
-      // Verificar demo vencida
-      if(cliData.estado==='demo'){
-        const diasDemo = cliData.diasDemo || 7;
-        const diasPasados = Math.floor((Date.now()-(cliData.creado||Date.now()))/86400000);
-        diasRestantes = diasDemo - diasPasados;
-        if(diasRestantes <= 0){
-          await signOut(auth);
-          window.location.href='MSS-DemoVencida.html'; return;
-        }
-        const tbDemo = document.getElementById('tbDemo');
-        tbDemo.textContent = `Demo · ${diasRestantes} día${diasRestantes===1?'':'s'}`;
-        tbDemo.style.display = 'block';
-      }
+      _modulosUser=cliData.modulos||[];
+      if(cliData.estado==='demo'){const dp=Math.floor((Date.now()-(cliData.creado||Date.now()))/86400000);diasRestantes=(cliData.diasDemo||7)-dp;if(diasRestantes<=0){await signOut(auth);window.location.href='MSS-DemoVencida.html';return;}const tb=document.getElementById('tbDemo');tb.textContent=`Demo · ${diasRestantes} día${diasRestantes===1?'':'s'}`;tb.style.display='block';}
+      if(clienteId)await setDoc(doc(db,'usuarios/'+user.uid),{clienteId},{merge:true}).catch(()=>{});
     }
-  }catch(e){ console.warn('Carga cliente:', e.message); }
-
-  // Guardar en localStorage para que los módulos lo lean
+  }catch(e){console.warn('Módulos:',e.message);}
   localStorage.setItem('mss_es_cliente_externo','true');
-  localStorage.setItem('mss_cliente_id', clienteId||('cli_'+user.uid));
-  localStorage.setItem('mss_modulos_permitidos', JSON.stringify(modulos));
-
-  // Buscar condominio del cliente en Firestore
-  try{
-    const snap = await getDocs(collection(db,'condominios_clientes'));
-    snap.forEach(d=>{
-      const c = d.data();
-      if((c.uid===user.uid || c.clienteId===clienteId) && !_condoActual){
-        _condoActual = {id:d.id,...c};
-      }
-    });
-  }catch(e){}
-
-  // Si no tiene condominio aún → crear uno
-  if(!_condoActual){
-    window.location.href='MSS-BienvenidaCliente.html'; return;
+  localStorage.setItem('mss_cliente_id',clienteId||('cli_'+user.uid));
+  localStorage.setItem('mss_modulos_permitidos',JSON.stringify(_modulosUser));
+  if(_modulosUser.includes('condominio')){
+    try{const s=await getDocs(collection(db,'condominios_clientes'));s.forEach(d=>{const c=d.data();if(!_condoActual&&(c.uid===user.uid||c.clienteId===clienteId))_condoActual={id:d.id,...c};});}catch(e){}
+    if(!_condoActual){window.location.href='MSS-BienvenidaCliente.html';return;}
+    localStorage.setItem('mss_empresa_actual',JSON.stringify(_condoActual));
+    localStorage.setItem('mss_condominio_actual',JSON.stringify(_condoActual));
   }
-
-  // Guardar condominio actual
-  localStorage.setItem('mss_empresa_actual',    JSON.stringify(_condoActual));
-  localStorage.setItem('mss_condominio_actual', JSON.stringify(_condoActual));
-
-  // ── RENDERIZAR EL HUB ──
-  // Fecha
-  const now = new Date();
-  document.getElementById('mainFecha').textContent =
-    now.toLocaleDateString('es-CL',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
-
-  // Saludo
-  document.getElementById('mainNombre').textContent = nombreCliente.split(' ')[0];
-
-  // Topbar
-  document.getElementById('tbNombre').textContent = _condoActual.nombre || 'Mi Condominio';
-
-  // Avatar — cargar logo si existe
-  const logo = localStorage.getItem('mss_logo_condo_'+_condoActual.id) || null;
-  const avatarEl = document.getElementById('cardAvatar');
-  if(logo){
-    avatarEl.innerHTML = `<img src="${logo}" alt="logo"/>`;
-  }
-
-  // Datos del condominio
-  document.getElementById('cardNombre').textContent = _condoActual.nombre || 'Mi Condominio';
-  if(_condoActual.rut)     document.getElementById('cardRut').textContent = _condoActual.rut;
-  if(_condoActual.direccion) document.getElementById('cardDir').textContent = '📍 '+_condoActual.direccion;
-
-  // Badges
-  const badgesEl = document.getElementById('cardBadges');
-  badgesEl.innerHTML = '<span class="badge b-green">Activo</span>';
-  if(diasRestantes !== null){
-    badgesEl.innerHTML += `<span class="badge b-blue">Demo · ${diasRestantes} día${diasRestantes===1?'':'s'} restantes</span>`;
-  }
-
-  // ── RENDERIZAR MÓDULOS POR ÁREA ──
-  renderAreas(modulos);
-
-  // Mostrar main, ocultar loading
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('main').style.display = 'block';
+  renderHub(nombreCliente,diasRestantes);
 });
 
-function renderAreas(modulos){
-  const modSet = new Set(modulos.map(m => ALIAS[m]||m));
-
-  // Definir qué módulos van en cada área
-  const CONFIG_AREAS = [
-    {
-      id: 'areaCondominio',
-      gridId: 'modsCondominio',
-      keys: ['condominio','app_residentes'],
-      // Módulos que siempre se muestran (aunque no estén en los permisos, van como bloqueados)
-      todos: ['condominio','app_residentes']
-    },
-    {
-      id: 'areaRRHH',
-      gridId: 'modsRRHH',
-      keys: ['rrhh','contratos','portal_trabajador'],
-      todos: ['rrhh','contratos','portal_trabajador']
-    },
-    {
-      id: 'areaReportes',
-      gridId: 'modsReportes',
-      keys: ['auditoria','finanzas','tesoreria','estrategia'],
-      todos: ['auditoria','finanzas','tesoreria','estrategia']
-    }
-  ];
-
-  // Buscar el mapa completo de módulos
-  const MAPA = {};
-  Object.values(AREAS).forEach(area => Object.assign(MAPA, area.modulos));
-
-  CONFIG_AREAS.forEach(cfg => {
-    // Ver si el cliente tiene AL MENOS UN módulo de esta área
-    const tieneAlguno = cfg.keys.some(k => modSet.has(k));
-
-    const areaEl = document.getElementById(cfg.id);
-    const gridEl = document.getElementById(cfg.gridId);
-    if(!areaEl || !gridEl) return;
-
-    // Renderizar los módulos de esta área
-    const vistos = new Set();
-    cfg.todos.forEach(key => {
-      if(vistos.has(key)) return;
-      vistos.add(key);
-      const m = MAPA[key];
-      if(!m) return;
-      const tieneAcceso = modSet.has(key);
-      const chip = document.createElement(tieneAcceso ? 'a' : 'div');
-      if(tieneAcceso){
-        chip.href = m.href;
-        chip.className = 'mod-chip';
-        chip.style.cssText = `background:${m.color}12;border-color:${m.color}30;`;
-        chip.innerHTML = `<span class="mod-icon">${m.icon}</span><span class="mod-label" style="color:${m.color}">${m.label}</span>`;
-      } else {
-        chip.className = 'mod-locked';
-        chip.title = 'No incluido en tu plan actual';
-        chip.innerHTML = `<span class="mod-locked-icon">🔒</span><span class="mod-locked-label">No<br>contratado</span>`;
-      }
-      gridEl.appendChild(chip);
-    });
-
-    // Mostrar el área solo si tiene módulos
-    if(gridEl.children.length > 0) areaEl.style.display = 'block';
-  });
+function renderHub(nombreCliente,diasRestantes){
+  const now=new Date();
+  document.getElementById('grDate').textContent=now.toLocaleDateString('es-CL',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
+  document.getElementById('grNombre').textContent=nombreCliente.split(' ')[0];
+  const entidad=_condoActual||{nombre:'Mi Empresa',rut:'',direccion:''};
+  const color=entidad.color||'#10B981';
+  document.getElementById('empresaCardTop').style.background=`linear-gradient(90deg,${color},${color}55)`;
+  const logo=localStorage.getItem('mss_logo_condo_'+entidad.id)||localStorage.getItem('mss_logo_url_'+entidad.id)||null;
+  const av=document.getElementById('empAvatar');
+  if(logo){av.innerHTML=`<img src="${logo}" alt="logo"/>`;}else{av.textContent=(entidad.nombre||'E').charAt(0);av.style.cssText=`background:${color}18;border:1px solid ${color}30;color:${color};`;}
+  document.getElementById('tbLogo').style.background=color;
+  document.getElementById('tbLogo').textContent=(entidad.nombre||'M').charAt(0);
+  document.getElementById('tbEmpresa').textContent=entidad.nombre||'Mi Panel';
+  document.getElementById('empNombre').textContent=entidad.nombre||'Mi Empresa';
+  if(entidad.rut)document.getElementById('empRut').textContent=entidad.rut;
+  if(entidad.direccion)document.getElementById('empDir').textContent='📍 '+entidad.direccion;
+  const be=document.getElementById('empBadges');
+  be.innerHTML='<span class="badge" style="background:rgba(34,197,94,0.12);color:#22C55E;border:1px solid rgba(34,197,94,0.2)">Activo</span>';
+  if(diasRestantes!==null)be.innerHTML+=`<span class="badge" style="background:rgba(56,189,248,0.1);color:#38BDF8;border:1px solid rgba(56,189,248,0.2)">Demo · ${diasRestantes} días</span>`;
+  renderAreas();
+  document.getElementById('loading').style.display='none';
+  document.getElementById('main').style.display='block';
 }
 
-// ── ACCIONES ──
-window.entrarPanel = function(){
-  if(_condoActual){
-    localStorage.setItem('mss_empresa_actual', JSON.stringify(_condoActual));
-    localStorage.setItem('mss_condominio_actual', JSON.stringify(_condoActual));
-  }
-  window.location.href = 'MSS-Condominio.html';
-};
+function renderAreas(){
+  const modSet=new Set(_modulosUser);
+  const esCondo=modSet.has('condominio');
+  const areas=esCondo?[AREA_CONDO,...CINCO_AREAS.filter(a=>a.id!=='gestion')]:[...CINCO_AREAS];
+  document.getElementById('areasGrid').innerHTML=areas.map(area=>{
+    const mods=area.subModulos.filter(m=>modSet.has(m.id));
+    const tiene=mods.length>0;
+    const c=area.color;
+    const chips=area.subModulos.map(m=>{const a=modSet.has(m.id);return`<span class="sub-chip" style="background:${a?c+'15':'rgba(255,255,255,0.03)'};color:${a?c:'rgba(255,255,255,0.18)'};border:1px solid ${a?c+'25':'rgba(255,255,255,0.05)'}">${a?'✓ ':''} ${m.label}</span>`;}).join('');
+    if(tiene){const href=mods[0].href;return`<div class="area-card" onclick="window.location.href='${href}'"><div class="area-top-strip" style="background:${c};margin:-20px -22px 16px;"></div><div class="area-icon">${area.icon}</div><div class="area-nombre" style="color:${c}">${area.nombre}</div><div class="area-desc">${area.desc}</div><div class="submodulos">${chips}</div><div class="area-footer"><span style="font-size:10px;color:rgba(255,255,255,0.25);font-family:monospace">${mods.length}/${area.subModulos.length} activos</span><button class="btn-entrar" style="background:${c};color:#04080F">▶ Entrar</button></div></div>`;}
+    return`<div class="area-card bloqueada"><div class="area-top-strip" style="background:rgba(255,255,255,0.06);margin:-20px -22px 16px;"></div><div class="area-icon" style="opacity:.25">${area.icon}</div><div class="area-nombre" style="color:rgba(255,255,255,0.2)">${area.nombre}</div><div class="area-desc">${area.desc}</div><div class="submodulos">${chips}</div><div class="area-footer"><span style="font-size:16px;opacity:.3">🔒</span><button class="btn-activar" onclick="solicitarActivacion('${area.nombre}')">Solicitar Activación</button></div></div>`;
+  }).join('');
+}
 
-window.entrarConfig = function(){
-  if(_condoActual){
-    localStorage.setItem('mss_empresa_actual', JSON.stringify(_condoActual));
-    localStorage.setItem('mss_condominio_actual', JSON.stringify(_condoActual));
-  }
-  window.location.href = 'MSS-Condominio.html#config';
-};
-
-window.cerrarSesion = async function(){
-  if(!confirm('¿Cerrar sesión?')) return;
-  await signOut(auth);
-  localStorage.removeItem('mss_es_cliente_externo');
-  localStorage.removeItem('mss_cliente_id');
-  localStorage.removeItem('mss_modulos_permitidos');
-  localStorage.removeItem('mss_empresa_actual');
-  localStorage.removeItem('mss_condominio_actual');
-  window.location.href = 'MSS-Login.html';
-};
+window.solicitarActivacion=function(a){document.getElementById('modalActivarDesc').textContent=`Para activar "${a}", completa el formulario y te contactaremos.`;document.getElementById('modalActivar').classList.add('open');};
+window.enviarSolicitud=async function(){const n=document.getElementById('actNombre').value.trim(),e=document.getElementById('actEmail').value.trim(),m=document.getElementById('actMsg').value.trim();if(!n||!e){alert('Completa nombre y email');return;}try{await setDoc(doc(db,'solicitudes_activacion/sol_'+Date.now()),{nombre:n,email:e,msg:m,fecha:new Date().toISOString(),clienteId:localStorage.getItem('mss_cliente_id')||''});}catch(ex){}document.getElementById('modalActivar').classList.remove('open');alert('✅ Solicitud enviada. Te contactaremos pronto a '+e);};
+window.cerrarSesion=async function(){if(!confirm('¿Cerrar sesión?'))return;await signOut(auth);['mss_es_cliente_externo','mss_cliente_id','mss_modulos_permitidos','mss_empresa_actual','mss_condominio_actual'].forEach(k=>localStorage.removeItem(k));window.location.href='MSS-Login.html';};
+document.getElementById('modalActivar').addEventListener('click',e=>{if(e.target===document.getElementById('modalActivar'))document.getElementById('modalActivar').classList.remove('open');});
 </script>
 </body>
 </html>

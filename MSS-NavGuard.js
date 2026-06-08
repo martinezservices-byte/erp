@@ -1,92 +1,102 @@
 /**
- * MSS-NavGuard.js — Control universal de navegación por módulos autorizados
- * Se ejecuta en todos los módulos del ERP para ocultar lo que el cliente no contrató.
- * 
- * Gaudy Martínez (superadmin) siempre ve todo — sin restricciones.
- * Clientes externos solo ven lo que tienen en mss_modulos_permitidos.
+ * MSS-NavGuard.js v2.0 — Control universal de navegación
+ * ========================================================
+ * - Superadmin (Gaudy): ve TODO, sin restricciones
+ * - Clientes externos: nav superior eliminado completamente
+ *   Solo navegan desde sus tarjetas en el Hub
+ * - Módulos internos: bloquean carga de datos si es cliente externo
  */
 
 (function(){
-  // Mapeo: id del módulo → archivos HTML y texto del enlace en el nav
-  const MAPA_MODULOS = {
-    finanzas:       ['MSS-Finanzas.html',      'Finanzas',    'Finanz'],
-    remuneraciones: ['MSS-Remuneraciones.html', 'Remuner',     'Remuneraciones', '👷 Remuner'],
-    contabilidad:   ['MSS-Contabilidad.html',   'Contab',      'Contabilidad'],
-    facturacion:    ['MSS-Facturacion.html',     'Factur',      'Facturación'],
-    tesoreria:      ['MSS-Tesoreria.html',       'Tesor',       'Tesorería'],
-    contratos:      ['MSS-Contratos.html',       'Contratos',   '📄 Contratos'],
-    cotizacion:     ['MSS-Cotizacion.html',      'Cotiz',       'Cotizaciones'],
-    proyectos:      ['MSS-Proyectos.html',       'Proyectos'],
-    ventas:         ['MSS-Ventas-CRM.html',      'Ventas',      'Ventas & CRM'],
-    rrhh:           ['MSS-RRHH.html',            'RRHH'],
-    estrategia:     ['MSS-Estrategia.html',      'Estrategia'],
-    arriendos:      ['MSS-Arriendos.html',       'Arriendos',   '🚛 Arriendos'],
-    condominio:     ['MSS-Condominio.html',      'Condominio',  '🏢 Condominio'],
-    auditoria:      ['MSS-Auditoria.html',       'Auditoría',   '📊 Auditoría'],
-    app_vendedores: ['MSS-Movil.html',           'App Móvil',   'Móvil'],
-    app_residentes: ['MSS-CondoMovil.html',      'App Residentes'],
-    portal_trabajador: ['MSS-PortalTrabajador.html', 'Portal Trabajador'],
+  const ADMIN_EMAIL = 'aybserviciosg@gmail.com';
+
+  // ── Detectar rol ──
+  const esClienteExt = localStorage.getItem('mss_es_cliente_externo') === 'true';
+  const sesionRaw    = sessionStorage.getItem('mss_user') || localStorage.getItem('mss_user');
+  let emailSesion    = '';
+  try{ emailSesion = JSON.parse(sesionRaw||'{}').email || ''; }catch(e){}
+  const esAdmin = emailSesion.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+
+  // Si es superadmin → no aplicar nada
+  if(esAdmin || !esClienteExt) return;
+
+  // ── ELIMINAR NAV SUPERIOR COMPLETAMENTE ──
+  function eliminarNav(){
+    const nav = document.getElementById('nav-bar');
+    if(nav){
+      nav.style.display = 'none';
+    }
+    // También ocultar nav-interno si existe (MSS-Condominio)
+    const ni = document.getElementById('nav-interno');
+    if(ni) ni.style.display = 'none';
+  }
+
+  // ── BLOQUEAR ACCESO A DATOS DE GAUDY EN MÓDULOS ──
+  // Cada módulo llama a window.mssGuardData() en su init
+  // Si retorna false → el módulo no carga datos y muestra mensaje
+  window.mssGuardData = function(){
+    if(!esClienteExt || esAdmin) return true; // puede cargar
+    // Verificar que el módulo tiene el clienteId correcto
+    const clienteId = localStorage.getItem('mss_cliente_id');
+    if(!clienteId){
+      mostrarBloqueoDatos();
+      return false;
+    }
+    return true; // cliente válido, puede cargar SUS datos
   };
 
-  function aplicarNavGuard(){
-    const esClienteExt = localStorage.getItem('mss_es_cliente_externo') === 'true';
-    const esAdmin = (sessionStorage.getItem('mss_email')||'').toLowerCase() === 'aybserviciosg@gmail.com';
-
-    // Superadmin siempre ve todo
-    if(!esClienteExt || esAdmin) return;
-
-    // Leer módulos permitidos
-    let modulosPermitidos = [];
-    try{
-      modulosPermitidos = JSON.parse(
-        localStorage.getItem('mss_modulos_permitidos') ||
-        sessionStorage.getItem('mss_modulos_permitidos') || '[]'
-      );
-    }catch(e){ modulosPermitidos = []; }
-
-    if(!modulosPermitidos.length) return; // Sin lista → no tocar nada (seguridad)
-
-    // Construir set de archivos permitidos
-    const archivosPermitidos = new Set(['app.html','MSS-BienvenidaCliente.html']);
-    modulosPermitidos.forEach(mod => {
-      const entry = MAPA_MODULOS[mod];
-      if(entry) archivosPermitidos.add(entry[0]);
-    });
-
-    // Recorrer todos los enlaces del nav y ocultar los no autorizados
-    const navLinks = document.querySelectorAll('#nav-bar a, #nav-interno a');
-    navLinks.forEach(link => {
-      const href = (link.getAttribute('href')||'').split('?')[0].split('/').pop();
-      const onclick = link.getAttribute('onclick')||'';
-      // Extraer archivo del onclick si tiene abrirModuloCondo o similar
-      const matchOnclick = onclick.match(/['"]([^'"]+\.html)['"]/);
-      const archivoLink = matchOnclick ? matchOnclick[1].split('/').pop() : href;
-
-      if(archivoLink && archivoLink.endsWith('.html') &&
-         archivoLink !== 'app.html' &&
-         !archivosPermitidos.has(archivoLink)){
-        link.style.display = 'none';
+  function mostrarBloqueoDatos(){
+    // Ocultar el contenido principal y mostrar mensaje
+    setTimeout(()=>{
+      const main = document.getElementById('content') ||
+                   document.querySelector('.main-content') ||
+                   document.querySelector('[id^="sec-"]');
+      if(main){
+        const msg = document.createElement('div');
+        msg.style.cssText = 'padding:40px;text-align:center;color:#6B7280;font-family:monospace;font-size:13px;';
+        msg.innerHTML = '<div style="font-size:32px;margin-bottom:12px">🔒</div><div>Acceso restringido. Vuelve a tu panel desde el Hub.</div><br><a href="MSS-HubCliente.html" style="color:#10B981;text-decoration:none;font-weight:700">← Ir a mi Panel</a>';
+        main.parentNode.insertBefore(msg, main);
+        main.style.display = 'none';
       }
-    });
+    }, 300);
+  }
 
-    // Para MSS-Condominio: ocultar nav-interno y mostrar nav-cliente
-    const navInterno = document.getElementById('nav-interno');
-    const navCliente = document.getElementById('nav-cliente');
-    if(navInterno && navCliente){
-      navInterno.style.display = 'none';
-      navCliente.style.display = 'contents';
-    }
+  // ── BOTÓN VOLVER AL HUB ──
+  // Agregar botón de regreso al hub en todos los módulos
+  function agregarBotonHub(){
+    const existente = document.getElementById('mss-btn-hub');
+    if(existente) return;
 
-    console.log('🔒 NavGuard activo — módulos permitidos:', modulosPermitidos);
+    const btn = document.createElement('a');
+    btn.id = 'mss-btn-hub';
+    btn.href = 'MSS-HubCliente.html';
+    btn.style.cssText = [
+      'position:fixed','top:8px','left:12px','z-index:9999',
+      'background:rgba(16,185,129,0.15)','border:1px solid rgba(16,185,129,0.3)',
+      'color:#10B981','border-radius:8px','padding:6px 12px',
+      'font-size:11px','font-weight:700','font-family:monospace',
+      'text-decoration:none','display:flex','align-items:center','gap:6px'
+    ].join(';');
+    btn.innerHTML = '← Mi Panel';
+    document.body.appendChild(btn);
   }
 
   // Ejecutar cuando el DOM esté listo
   if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', aplicarNavGuard);
+    document.addEventListener('DOMContentLoaded', ()=>{
+      eliminarNav();
+      agregarBotonHub();
+    });
   } else {
-    aplicarNavGuard();
+    eliminarNav();
+    agregarBotonHub();
   }
 
-  // También exponer función global por si se necesita llamar después del auth
-  window.mssNavGuard = aplicarNavGuard;
+  // También exponer para llamada manual post-auth
+  window.mssNavGuard = function(){
+    eliminarNav();
+    agregarBotonHub();
+  };
+
+  console.log('🔒 MSS-NavGuard v2.0 activo — modo cliente externo');
 })();
