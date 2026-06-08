@@ -191,10 +191,20 @@ onAuthStateChanged(auth, async user => {
     }
     if(!cliData){
       try{
-        const q = query(collection(db,'clientes'), where('email','==',email));
-        const qs = await getDocs(q);
-        if(!qs.empty){
-          const d = qs.docs[0];
+        // Buscar por email en mayúsculas y minúsculas
+        let foundDoc = null;
+        const qLower = query(collection(db,'clientes'), where('email','==',email.toLowerCase()));
+        const qUpper = query(collection(db,'clientes'), where('email','==',email.toUpperCase()));
+        const qExact = query(collection(db,'clientes'), where('email','==',email));
+        for(const q of [qLower, qUpper, qExact]){
+          if(foundDoc) break;
+          try{
+            const qs = await getDocs(q);
+            if(!qs.empty) foundDoc = qs.docs[0];
+          }catch(e2){}
+        }
+        if(foundDoc){
+          const d = foundDoc;
           cliData = d.data();
           clienteId = d.id;
           try{ await setDoc(doc(db,'usuarios/'+user.uid),{clienteId: d.id},{merge:true}); }catch(e2){}

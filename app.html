@@ -1695,7 +1695,7 @@ window.guardarCliente = async function(){
   const modulos = [...document.querySelectorAll('#saModChecks input:checked')].map(i=>i.value);
   const obj = {
     nombre: document.getElementById('saNombre').value.trim(),
-    email: document.getElementById('saEmail').value.trim(),
+    email: document.getElementById('saEmail').value.trim().toLowerCase(),
     tel: document.getElementById('saTel').value.trim(),
     tipo: document.getElementById('saTipo').value,
     plan: document.getElementById('saPlan').value,
