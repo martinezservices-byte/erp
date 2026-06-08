@@ -1199,7 +1199,11 @@ onAuthStateChanged(auth, async user => {
 
   // ══════════════════════════════════════════════════════
   // PASO 1: Leer perfil del usuario desde Firestore
+  // BLINDAJE: Si es el email superadmin, siempre es superadmin
+  // sin importar lo que diga (o no diga) Firestore
   // ══════════════════════════════════════════════════════
+  const esSuperAdminEmail = (user.email || '').toLowerCase() === ADMIN_EMAIL.toLowerCase();
+
   let rol='user', tipo='comercial', clienteId=null;
   let empresasPermitidas=[], condosPermitidos=[];
 
@@ -1212,8 +1216,20 @@ onAuthStateChanged(auth, async user => {
       empresasPermitidas= d.empresas    || [];
       condosPermitidos  = d.condominios || [];
       clienteId         = d.clienteId  || null;
+    } else if(esSuperAdminEmail){
+      // Primera vez o documento borrado — auto-crear perfil superadmin
+      const perfilSA = {
+        email: user.email, rol:'superadmin', tipo:'comercial',
+        nombre:'Gaudy Martínez', empresas:[], condominios:[],
+        clienteId: null, creadoAt: Date.now()
+      };
+      try{ await setDoc(doc(db,'usuarios/'+user.uid), perfilSA, {merge:true}); }catch(e){}
+      rol = 'superadmin';
     }
   }catch(e){ console.warn('Perfil Firestore:', e.message); }
+
+  // BLINDAJE FINAL: email superadmin siempre fuerza rol superadmin
+  if(esSuperAdminEmail){ rol = 'superadmin'; tipo = 'comercial'; clienteId = null; }
 
   // ── VERIFICAR VENCIMIENTO DE DEMO (7 días) ──
   if(clienteId && rol !== 'superadmin'){
@@ -1268,9 +1284,11 @@ onAuthStateChanged(auth, async user => {
 
   // 2B — CLIENTE EXTERNO tipo condominio (rol condo o admin+tipo condominio)
   // → Espacio COMPLETAMENTE aislado — JAMÁS ve datos de Gaudy
-  const esClienteCondominio = (rol==='condo') ||
+  const esClienteCondominio = rol !== 'superadmin' &&
+                              !esSuperAdminEmail &&
+                              ((rol==='condo') ||
                               (rol==='admin' && tipo==='condominio') ||
-                              (rol==='user'  && tipo==='condominio');
+                              (rol==='user'  && tipo==='condominio'));
 
   if(esClienteCondominio){
     // Asegurar clienteId único para este cliente
@@ -1316,10 +1334,11 @@ onAuthStateChanged(auth, async user => {
     }
   }
 
-  // 2C — CLIENTE EXTERNO tipo comercial (admin+tipo comercial, NO superadmin)
-  const esClienteComercial = (rol==='admin' || rol==='user') &&
-                              tipo==='comercial' &&
-                              rol!=='superadmin';
+  // 2C — CLIENTE EXTERNO tipo comercial (admin+tipo comercial, NUNCA superadmin)
+  const esClienteComercial = rol !== 'superadmin' &&
+                              !esSuperAdminEmail &&
+                              (rol==='admin' || rol==='user') &&
+                              tipo==='comercial';
 
   if(esClienteComercial){
     if(!clienteId){
