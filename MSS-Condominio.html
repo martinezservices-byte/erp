@@ -509,28 +509,102 @@ async function initFirebase(){
         if(!user){window.location.href='MSS-Login.html';return;}
         window._MSS_USER=user;_db=fb.getFirestore(app);window._fbM=fb;_fbReady=true;
 
-        // ── Control de nav según rol ──
-        const esClienteExt = localStorage.getItem('mss_es_cliente_externo')==='true';
+        // ── Control de nav: leer rol SIEMPRE desde Firestore ──
+        // No depender de localStorage — funciona en cualquier dispositivo
         const esAdmin = (user.email||'').toLowerCase()==='aybserviciosg@gmail.com';
-        if(esClienteExt && !esAdmin){
-          // Cliente externo → solo ve su condominio
-          const ni=document.getElementById('nav-interno');
-          const nc=document.getElementById('nav-cliente');
-          const ct=document.getElementById('nav-condo-tab');
-          if(ni) ni.style.display='none';
-          if(nc) nc.style.display='contents';
-          if(ct) ct.style.display='none';
-          // Botón cerrar sesión del nav cliente
-          window.cerrarSesionCliente=async function(){
-            if(!confirm('¿Cerrar sesión?'))return;
-            await fa.signOut(auth);
-            localStorage.removeItem('mss_es_cliente_externo');
-            localStorage.removeItem('mss_cliente_uid');
-            localStorage.removeItem('mss_cliente_id');
-            localStorage.removeItem('mss_empresa_actual');
-            localStorage.removeItem('mss_condominio_actual');
-            window.location.href='MSS-Login.html';
-          };
+
+        window.cerrarSesionCliente = async function(){
+          if(!confirm('¿Cerrar sesión?'))return;
+          await fa.signOut(auth);
+          localStorage.clear();
+          window.location.href='MSS-Login.html';
+        };
+
+        if(!esAdmin){
+          // Leer rol y módulos desde Firestore
+          try{
+            const perfilSnap = await fb.getDoc(fb.doc(_db,'usuarios/'+user.uid));
+            let rolUser='user', tipoUser='comercial', clienteIdUser=null, modulosUser=[];
+            if(perfilSnap.exists()){
+              const pd = perfilSnap.data();
+              rolUser      = pd.rol      || 'user';
+              tipoUser     = pd.tipo     || 'comercial';
+              clienteIdUser= pd.clienteId|| null;
+            }
+            // Leer módulos del cliente desde /clientes/{clienteId}
+            if(clienteIdUser){
+              const cliId = clienteIdUser.replace('cli_','');
+              let cliData = null;
+              try{
+                const cs1 = await fb.getDoc(fb.doc(_db,'clientes/'+clienteIdUser));
+                const cs2 = await fb.getDoc(fb.doc(_db,'clientes/'+cliId));
+                cliData = cs1.exists()?cs1.data():cs2.exists()?cs2.data():null;
+              }catch(e2){}
+              if(cliData){
+                modulosUser = cliData.modulos || [];
+                // Verificar demo vencida
+                if(cliData.estado==='demo'){
+                  const diasDemo = cliData.diasDemo||7;
+                  const diasPasados = Math.floor((Date.now()-(cliData.creado||Date.now()))/86400000);
+                  if(diasPasados >= diasDemo){
+                    await fa.signOut(auth);
+                    localStorage.clear();
+                    window.location.href='MSS-DemoVencida.html'; return;
+                  }
+                }
+                // Si el cliente no tiene módulo condominio → bloquear
+                if(!modulosUser.includes('condominio')){
+                  alert('⛔ No tienes acceso al módulo Condominio.');
+                  await fa.signOut(auth);
+                  window.location.href='MSS-Login.html'; return;
+                }
+              }
+            }
+            // Guardar en localStorage para uso offline/rápido
+            localStorage.setItem('mss_es_cliente_externo','true');
+            localStorage.setItem('mss_cliente_id', clienteIdUser||('cli_'+user.uid));
+            localStorage.setItem('mss_modulos_permitidos', JSON.stringify(modulosUser));
+
+            // Aplicar nav: ocultar módulos no autorizados
+            const ni=document.getElementById('nav-interno');
+            const nc=document.getElementById('nav-cliente');
+            const ct=document.getElementById('nav-condo-tab');
+            if(ni) ni.style.display='none';
+            if(nc) nc.style.display='contents';
+            if(ct) ct.style.display='none';
+
+            // Si tiene acceso a RRHH o Contratos, mostrar esos links en nav-cliente
+            const MODULOS_EXTRA = {
+              rrhh:           {href:'javascript:void(0)', onclick:"abrirModuloCondo('MSS-Remuneraciones.html')", label:'👷 Remuner.', color:'#22C55E'},
+              contratos:      {href:'javascript:void(0)', onclick:"abrirModuloCondo('MSS-Contratos.html')", label:'📄 Contratos', color:'#A78BFA'},
+              remuneraciones: {href:'javascript:void(0)', onclick:"abrirModuloCondo('MSS-Remuneraciones.html')", label:'👷 Remuner.', color:'#22C55E'},
+            };
+            if(nc){
+              modulosUser.forEach(mod=>{
+                const ex = MODULOS_EXTRA[mod];
+                if(ex){
+                  // Evitar duplicados
+                  if(!nc.querySelector('[data-mod="'+mod+'"]')){
+                    const a = document.createElement('a');
+                    a.href = ex.href;
+                    if(ex.onclick) a.setAttribute('onclick', ex.onclick);
+                    a.setAttribute('data-mod', mod);
+                    a.style.cssText = 'padding:5px 9px;border-radius:6px;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;color:'+ex.color;
+                    a.textContent = ex.label;
+                    // Insertar antes del botón Salir
+                    const salirBtn = nc.querySelector('button');
+                    if(salirBtn) nc.insertBefore(a, salirBtn);
+                    else nc.appendChild(a);
+                  }
+                }
+              });
+            }
+          }catch(eAuth){
+            console.warn('Auth check Condominio:', eAuth.message);
+            // Si falla la lectura de Firestore, ocultar nav por seguridad
+            const ni=document.getElementById('nav-interno');
+            if(ni) ni.style.display='none';
+          }
         }
         resolve();
       });
