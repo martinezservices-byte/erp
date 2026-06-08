@@ -32,17 +32,32 @@
   }
 
   // ── BLOQUEAR ACCESO A DATOS DE GAUDY EN MÓDULOS ──
-  // Cada módulo llama a window.mssGuardData() en su init
-  // Si retorna false → el módulo no carga datos y muestra mensaje
   window.mssGuardData = function(){
-    if(!esClienteExt || esAdmin) return true; // puede cargar
-    // Verificar que el módulo tiene el clienteId correcto
-    const clienteId = localStorage.getItem('mss_cliente_id');
-    if(!clienteId){
-      mostrarBloqueoDatos();
+    if(!esClienteExt || esAdmin) return true;
+
+    // El cliente puede acceder a módulos que tiene autorizados
+    const modulos = JSON.parse(localStorage.getItem('mss_modulos_permitidos')||'[]');
+    const paginaActual = window.location.pathname.split('/').pop().replace('.html','').replace('MSS-','').toLowerCase();
+
+    // Mapeo de archivo a id de módulo
+    const MAPA = {
+      'finanzas':'finanzas','arriendos':'arriendos','contabilidad':'contabilidad',
+      'facturacion':'facturacion','tesoreria':'tesoreria','contratos':'contratos',
+      'cotizacion':'cotizacion','proyectos':'proyectos','ventas-crm':'ventas',
+      'rrhh':'rrhh','estrategia':'estrategia','auditoria':'auditoria',
+      'inventario':'inventario','compras':'compras','catalogo':'catalogo',
+      'remuneraciones':'remuneraciones','logos':'logos','respaldo':'respaldo'
+    };
+
+    const modId = MAPA[paginaActual];
+    const tieneAcceso = !modId || modulos.includes(modId);
+
+    if(!tieneAcceso){
+      // Módulo no autorizado → redirigir al hub
+      window.location.href = 'MSS-HubCliente.html';
       return false;
     }
-    return true; // cliente válido, puede cargar SUS datos
+    return true;
   };
 
   function mostrarBloqueoDatos(){

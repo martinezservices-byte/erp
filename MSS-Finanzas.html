@@ -308,16 +308,29 @@ canvas{max-height:240px;}
 // ═══════════════════════════════════════════════════════════════
 
 // ── 1. EMPRESA (lee del Hub) ──
-// ── EMPRESA COMERCIAL — rechaza condominios ──
+// ── GUARD: Cliente externo no puede ver datos de Gaudy ──
+var _esClienteExt = localStorage.getItem('mss_es_cliente_externo') === 'true';
 var _empRaw = localStorage.getItem('mss_empresa_actual');
 var EMP = (function(){
   try{
     var o = _empRaw ? JSON.parse(_empRaw) : null;
-    if(o && o.tipo === 'condominio') return {id:3, nombre:'Martinez y Pajuelo Arriendos y Servicios SpA', rut:'78.361.479-0'};
-    return o || {id:3, nombre:'Martinez y Pajuelo Arriendos y Servicios SpA', rut:'78.361.479-0'};
-  }catch(e){ return {id:3, nombre:'Martinez y Pajuelo Arriendos y Servicios SpA', rut:'78.361.479-0'}; }
+    // Si es cliente externo y no tiene empresa asignada → bloquear
+    if(_esClienteExt && (!o || o.tipo === 'condominio')){
+      // Redirigir al hub del cliente
+      window.location.href = 'MSS-HubCliente.html';
+      return {id:'bloqueado', nombre:'', rut:''};
+    }
+    // Si NO es cliente externo y no hay empresa → usar empresa por defecto de Gaudy
+    if(!o || o.tipo === 'condominio'){
+      return {id:3, nombre:'Martinez y Pajuelo Arriendos y Servicios SpA', rut:'78.361.479-0'};
+    }
+    return o;
+  }catch(e){
+    if(_esClienteExt){ window.location.href = 'MSS-HubCliente.html'; return {id:'bloqueado',nombre:'',rut:''}; }
+    return {id:3, nombre:'Martinez y Pajuelo Arriendos y Servicios SpA', rut:'78.361.479-0'};
+  }
 })();
-if (!EMP.id) EMP.id = 3;
+if (!EMP.id || EMP.id === 'bloqueado') EMP.id = EMP.id || 3;
 window._MSS_EMP = EMP;
 
 // Actualizar nav

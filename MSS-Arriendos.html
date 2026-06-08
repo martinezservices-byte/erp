@@ -561,29 +561,39 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
 
 // ══════════════════════════════════════════════════════════════
 // MSS-ARRIENDOS — INICIALIZACIÓN ROBUSTA v6.0
-// Funciona siempre, con o sin datos previos en localStorage
 // ══════════════════════════════════════════════════════════════
+// GUARD: Clientes externos no pueden ver datos de Gaudy
 
-// ── PASO 1: Leer empresa comercial (rechaza condominios) ──
+const _esClienteExtArr = localStorage.getItem('mss_es_cliente_externo') === 'true';
+
+// ── PASO 1: Leer empresa comercial ──
 let EMP;
 try {
   const raw = localStorage.getItem('mss_empresa_actual');
   const parsed = raw ? JSON.parse(raw) : null;
-  // SEGURIDAD: si es condominio, usar empresa por defecto
   if(parsed && parsed.tipo === 'condominio') EMP = null;
   else EMP = (parsed && parsed.id && parsed.nombre) ? parsed : null;
 } catch(e) { EMP = null; }
 
-// Default siempre es M&P
-if(!EMP) {
+// ── GUARD CLIENTE EXTERNO ──
+// Si es cliente externo y no tiene empresa propia → redirigir al hub
+if(_esClienteExtArr && !EMP) {
+  window.location.href = 'MSS-HubCliente.html';
+  EMP = {id:'bloqueado', nombre:'', rut:''};
+}
+
+// Default solo para Gaudy (superadmin) — NUNCA para clientes externos
+if(!EMP && !_esClienteExtArr) {
   EMP = {"id":3,"nombre":"Martinez y Pajuelo Arriendos y Servicios SpA","rut":"78.361.479-0","direccion":"Av. Unión Europea 3175, Alto Hospicio","ciudad":"Iquique","giro":"Servicios de Arriendos, Flete y Venta de productos para Construcción y Ferretería","tel":"975157431","email":"ventas@maquinariasmyp.com","contacto":"Gaudy Martínez Yovera","rut_rep":"23.918.699-8"};
   localStorage.setItem('mss_empresa_actual', JSON.stringify(EMP));
+} else if(!EMP) {
+  EMP = {id:'bloqueado', nombre:'', rut:''};
 }
-// Detectar M&P por RUT o nombre (independiente del id)
-const _ES_MYP = EMP.rut==='78.361.479-0' || 
+
+// Detectar M&P por RUT o nombre
+const _ES_MYP = !_esClienteExtArr && (EMP.rut==='78.361.479-0' || 
                 (EMP.nombre||'').toLowerCase().includes('pajuelo') ||
-                (EMP.nombre||'').toLowerCase().includes('arriendos') ||
-                _ES_MYP;
+                (EMP.nombre||'').toLowerCase().includes('arriendos'));
 
 // ── PASO 2: Keys únicas por empresa ──
 const EID = '_arr' + EMP.id;
