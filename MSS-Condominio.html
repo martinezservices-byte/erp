@@ -81,13 +81,21 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
 <script>
 
 // ── CONDOMINIO ACTUAL — lee mss_condominio_actual (mundo separado) ──
+const _esClienteExterno = localStorage.getItem('mss_es_cliente_externo') === 'true';
 const _condoRaw = localStorage.getItem('mss_condominio_actual') || localStorage.getItem('mss_empresa_actual');
 const _condoObj = (()=>{
   try{
     const o = _condoRaw ? JSON.parse(_condoRaw) : null;
-    // Solo aceptar condominios o el Pioneros 2 por defecto
-    return o || {id:'condo_1', nombre:'Condominio Pioneros 2', rut:'65.184.252-2'};
-  }catch(e){ return {id:'condo_1', nombre:'Condominio Pioneros 2', rut:'65.184.252-2'}; }
+    // Si es cliente externo y no hay condominio → objeto vacío (nunca usar el de Gaudy)
+    if(!o || !o.id){
+      if(_esClienteExterno) return {id:'nuevo', nombre:'Mi Condominio', rut:''};
+      return {id:'condo_1', nombre:'Condominio Pioneros 2', rut:'65.184.252-2'}; // Solo para Gaudy
+    }
+    return o;
+  }catch(e){
+    if(_esClienteExterno) return {id:'nuevo', nombre:'Mi Condominio', rut:''};
+    return {id:'condo_1', nombre:'Condominio Pioneros 2', rut:'65.184.252-2'};
+  }
 })();
 const _EMP_ID    = _condoObj.id || 'condo_1';
 const _CONDO_ID  = _condoObj.id || 'condo_1';

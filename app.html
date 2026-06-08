@@ -1162,11 +1162,13 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
 });
 
 // ── INIT ──
+// IMPORTANTE: load() solo carga EMPRESAS_BASE y CONDOMINIOS_BASE (datos de Gaudy)
+// NO debe ejecutarse para clientes externos — ellos cargan desde Firestore
+// Se ejecuta aquí solo para mostrar la UI vacía mientras el auth guard verifica
+// Si el usuario es cliente externo, el auth guard limpiará estos datos
 load();
 render();
 renderCondominios();
-// Cargar logos desde Firebase en background
-setTimeout(()=>{ if(typeof cargarLogosFirebase==='function') cargarLogosFirebase(); }, 1500);
 </script>
 
 
@@ -1174,7 +1176,7 @@ setTimeout(()=>{ if(typeof cargarLogosFirebase==='function') cargarLogosFirebase
 <script type="module">
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getFirestore, doc, getDoc, getDocs, collection, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const FB = {
   apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",
@@ -1195,110 +1197,175 @@ const db = getFirestore(app);
 onAuthStateChanged(auth, async user => {
   if(!user){ window.location.href='MSS-Login.html'; return; }
 
-  // Leer perfil completo desde Firestore
-  let rol='user', empresasPermitidas=[], condosPermitidos=[], tipo='comercial', clienteId=null;
+  // ══════════════════════════════════════════════════════
+  // PASO 1: Leer perfil del usuario desde Firestore
+  // ══════════════════════════════════════════════════════
+  let rol='user', tipo='comercial', clienteId=null;
+  let empresasPermitidas=[], condosPermitidos=[];
+
   try{
     const snap = await getDoc(doc(db,'usuarios/'+user.uid));
     if(snap.exists()){
       const d = snap.data();
-      rol = d.rol || 'user';
-      tipo = d.tipo || 'comercial';
-      empresasPermitidas = d.empresas || [];
-      condosPermitidos   = d.condominios || [];
-      clienteId = d.clienteId || null;
+      rol               = d.rol    || 'user';
+      tipo              = d.tipo   || 'comercial';
+      empresasPermitidas= d.empresas    || [];
+      condosPermitidos  = d.condominios || [];
+      clienteId         = d.clienteId  || null;
     }
-  }catch(e){ console.warn('No se pudo leer perfil:', e.message); }
+  }catch(e){ console.warn('Perfil Firestore:', e.message); }
 
-  // Guardar en sessionStorage para todos los módulos
-  sessionStorage.setItem('mss_rol', rol);
-  sessionStorage.setItem('mss_uid', user.uid);
-  sessionStorage.setItem('mss_email', user.email);
-  sessionStorage.setItem('mss_tipo', tipo);
+  // ── VERIFICAR VENCIMIENTO DE DEMO (7 días) ──
+  if(clienteId && rol !== 'superadmin'){
+    try{
+      const cliSnap = await getDoc(doc(db,'clientes/'+clienteId.replace('cli_','')));
+      // También buscar por clienteId directo
+      const cliSnap2 = await getDoc(doc(db,'clientes/'+clienteId));
+      const cliData = cliSnap.exists() ? cliSnap.data() : cliSnap2.exists() ? cliSnap2.data() : null;
+      if(cliData && cliData.estado==='demo'){
+        const diasDemo = cliData.diasDemo || 7;
+        const creado   = cliData.creado   || Date.now();
+        const diasPasados = Math.floor((Date.now()-creado)/86400000);
+        if(diasPasados >= diasDemo){
+          // Demo vencida → bloquear acceso
+          await signOut(auth);
+          localStorage.clear();
+          window.location.href = 'MSS-DemoVencida.html'; return;
+        }
+        // Guardar días restantes para mostrar en el ERP
+        const diasRestantes = diasDemo - diasPasados;
+        sessionStorage.setItem('mss_demo_dias_restantes', diasRestantes);
+        sessionStorage.setItem('mss_es_demo', 'true');
+      }
+    }catch(e){ console.warn('Verificación demo:', e.message); }
+  }
+
+  // Guardar en sessionStorage para módulos
+  sessionStorage.setItem('mss_rol',      rol);
+  sessionStorage.setItem('mss_uid',      user.uid);
+  sessionStorage.setItem('mss_email',    user.email||'');
+  sessionStorage.setItem('mss_tipo',     tipo);
   sessionStorage.setItem('mss_empresas', JSON.stringify(empresasPermitidas));
-  sessionStorage.setItem('mss_condos', JSON.stringify(condosPermitidos));
+  sessionStorage.setItem('mss_condos',   JSON.stringify(condosPermitidos));
 
-  // Mostrar info usuario
+  // Mostrar email en header
   const email = user.email || '';
   document.getElementById('userAvatar').textContent = email.substring(0,2).toUpperCase();
-  document.getElementById('userBadge').textContent = email;
+  document.getElementById('userBadge').textContent  = email;
   document.getElementById('btnLogout').style.display = 'block';
 
-  // ── REDIRECCIÓN POR ROL ──
+  // ══════════════════════════════════════════════════════
+  // PASO 2: Redirección según rol — sin excepciones
+  // ══════════════════════════════════════════════════════
 
-  // SEGURIDAD: Roles que NUNCA deben ver el ERP general
-  // residente = usuario de condominio móvil (MSS-CondoMovil)
-  // condominio = alias alternativo de residente
-  if(rol === 'residente' || rol === 'condominio'){
-    window.location.href = 'MSS-CondoMovil.html'; return;
+  // 2A — Residentes y terreno → sus apps propias, NUNCA el ERP
+  if(rol==='residente' || rol==='condominio'){
+    window.location.href='MSS-CondoMovil.html'; return;
+  }
+  if(rol==='terreno'){
+    window.location.href='MSS-Movil.html'; return;
   }
 
-  if(rol === 'terreno'){
-    window.location.href = 'MSS-Terreno.html'; return;
-  }
+  // 2B — CLIENTE EXTERNO tipo condominio (rol condo o admin+tipo condominio)
+  // → Espacio COMPLETAMENTE aislado — JAMÁS ve datos de Gaudy
+  const esClienteCondominio = (rol==='condo') ||
+                              (rol==='admin' && tipo==='condominio') ||
+                              (rol==='user'  && tipo==='condominio');
 
-  // Usuario solo condominio → va directo al primer condominio asignado
-  if(rol === 'condo'){
-    const condoId = condosPermitidos[0] || 'condo_1';
-    const condo = CONDOMINIOS.find(c=>c.id===condoId) || CONDOMINIOS[0];
-    if(condo){
-      localStorage.setItem('mss_empresa_actual', JSON.stringify(condo));
-      localStorage.setItem('mss_condominio_actual', JSON.stringify(condo));
-    }
-    window.location.href = 'MSS-Condominio.html'; return;
-  }
-
-  // SEGURIDAD: Bloqueo final — cualquier rol no reconocido como staff
-  // no debe tener acceso al ERP general bajo ninguna circunstancia
-  const ROLES_STAFF = ['superadmin', 'admin', 'user'];
-  if(!ROLES_STAFF.includes(rol)){
-    console.warn('Acceso denegado. Rol no autorizado para ERP general:', rol);
-    await signOut(auth);
-    window.location.href = 'MSS-Login.html'; return;
-  }
-
-  // SEGURIDAD: admin/user con tipo 'condominio' → espacio aislado del cliente
-  if(rol !== 'superadmin' && tipo === 'condominio'){
-    // Si no tiene clienteId guardado, generarlo desde su uid
+  if(esClienteCondominio){
+    // Asegurar clienteId único para este cliente
     if(!clienteId){
       clienteId = 'cli_'+user.uid;
-      // Actualizar en Firestore para futuras sesiones
-      try{
-        const {setDoc:sd, doc:fd} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-        await sd(fd(db,'usuarios/'+user.uid),{clienteId},{merge:true});
-      }catch(e){}
+      try{ await setDoc(doc(db,'usuarios/'+user.uid),{clienteId},{merge:true}); }catch(e){}
     }
 
-    // Limpiar CONDOMINIOS y EMPRESAS — cliente externo NO debe ver datos de Gaudy
+    // CRÍTICO: Limpiar localStorage de cualquier dato previo de Gaudy
+    localStorage.removeItem('mss_empresa_actual');
+    localStorage.removeItem('mss_condominio_actual');
+    // Vaciar arrays globales — cliente no debe heredar datos de CONDOMINIOS_BASE
     CONDOMINIOS = [];
-    EMPRESAS = [];
+    EMPRESAS    = [];
 
-    // Buscar condominios propios del cliente en Firestore por uid o clienteId
+    // Guardar identidad del cliente para que MSS-Condominio use su espacio
+    localStorage.setItem('mss_cliente_uid',    user.uid);
+    localStorage.setItem('mss_cliente_id',     clienteId);
+    localStorage.setItem('mss_cliente_email',  email);
+    localStorage.setItem('mss_es_cliente_externo', 'true');
+
+    // Buscar condominios propios del cliente en Firestore
     let condosCliente = [];
     try{
-      const {getDocs:gd, collection:col} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-      const condoSnap = await gd(col(db,'condominios_clientes'));
-      condoSnap.forEach(d=>{
+      const snap2 = await getDocs(collection(db,'condominios_clientes'));
+      snap2.forEach(d=>{
         const c=d.data();
-        if(c.uid===user.uid || c.clienteId===clienteId) condosCliente.push({id:d.id,...c});
+        if(c.uid===user.uid || c.clienteId===clienteId){
+          condosCliente.push({id:d.id,...c});
+        }
       });
-    }catch(e){ console.warn('Error cargando condos cliente:',e.message); }
+    }catch(e){ console.warn('Condos cliente:', e.message); }
 
     if(condosCliente.length > 0){
-      // Tiene condominios creados → ir al primero
+      // Ya tiene condominios → ir al módulo con su primer condominio
       const condo = condosCliente[0];
-      localStorage.setItem('mss_empresa_actual', JSON.stringify(condo));
+      localStorage.setItem('mss_empresa_actual',    JSON.stringify(condo));
       localStorage.setItem('mss_condominio_actual', JSON.stringify(condo));
-      localStorage.setItem('mss_cliente_uid', user.uid);
-      localStorage.setItem('mss_cliente_id', clienteId);
       window.location.href = 'MSS-Condominio.html'; return;
     } else {
-      // No tiene condominios aún → pantalla de bienvenida para crear el primero
-      localStorage.setItem('mss_cliente_uid', user.uid);
-      localStorage.setItem('mss_cliente_id', clienteId);
-      localStorage.setItem('mss_cliente_nombre', user.displayName||user.email?.split('@')[0]||'Cliente');
-      localStorage.setItem('mss_cliente_tipo', tipo);
+      // Primera vez → pantalla de bienvenida para crear su condominio
       window.location.href = 'MSS-BienvenidaCliente.html'; return;
     }
+  }
+
+  // 2C — CLIENTE EXTERNO tipo comercial (admin+tipo comercial, NO superadmin)
+  const esClienteComercial = (rol==='admin' || rol==='user') &&
+                              tipo==='comercial' &&
+                              rol!=='superadmin';
+
+  if(esClienteComercial){
+    if(!clienteId){
+      clienteId = 'cli_'+user.uid;
+      try{ await setDoc(doc(db,'usuarios/'+user.uid),{clienteId},{merge:true}); }catch(e){}
+    }
+
+    // Limpiar datos de Gaudy
+    localStorage.removeItem('mss_empresa_actual');
+    localStorage.removeItem('mss_condominio_actual');
+    CONDOMINIOS = [];
+    EMPRESAS    = [];
+
+    localStorage.setItem('mss_cliente_uid',    user.uid);
+    localStorage.setItem('mss_cliente_id',     clienteId);
+    localStorage.setItem('mss_cliente_email',  email);
+    localStorage.setItem('mss_es_cliente_externo', 'true');
+
+    // Buscar empresas propias del cliente en Firestore
+    let empresasCliente = [];
+    try{
+      const snap3 = await getDocs(collection(db,'empresas_clientes'));
+      snap3.forEach(d=>{
+        const e=d.data();
+        if(e.uid===user.uid || e.clienteId===clienteId){
+          empresasCliente.push({id:d.id,...e});
+        }
+      });
+    }catch(e){ console.warn('Empresas cliente:', e.message); }
+
+    if(empresasCliente.length > 0){
+      // Ya tiene empresas → cargar en ERP
+      EMPRESAS = empresasCliente;
+      render();
+      // Mostrar hub con SUS empresas
+    } else {
+      // Primera vez → pantalla de bienvenida
+      window.location.href = 'MSS-BienvenidaCliente.html'; return;
+    }
+  }
+
+  // 2D — Rol no reconocido → expulsar
+  const ROLES_VALIDOS = ['superadmin','admin','user'];
+  if(!ROLES_VALIDOS.includes(rol)){
+    await signOut(auth);
+    window.location.href='MSS-Login.html'; return;
   }
 
   // ── SUPERADMIN / ADMIN / USER → mostrar index ──
