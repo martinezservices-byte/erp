@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Mi Panel Empresarial — Martinez Services ERP</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#04080F;color:#F2EFEA;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+#topbar{background:#08101C;border-bottom:1px solid rgba(201,168,76,0.15);padding:0 20px;height:52px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+#tbLogo{width:34px;height:34px;background:linear-gradient(135deg,#C9A84C,#F59E0B);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#04080F;flex-shrink:0;font-family:monospace;}
+#tbNombre{font-size:13px;font-weight:700;color:#E2E8F0;font-family:monospace;}
+#tbSub{font-size:9px;color:#C9A84C;font-family:monospace;letter-spacing:1px;text-transform:uppercase;}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+#tbEmail{font-size:10px;color:#4A5568;font-family:monospace;}
+#tbDemo{font-size:10px;padding:3px 10px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);color:#38BDF8;border-radius:20px;font-family:monospace;display:none;}
+.btn-salir{padding:5px 12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#FCA5A5;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:monospace;}
+
+#loading{display:flex;align-items:center;justify-content:center;min-height:80vh;flex-direction:column;gap:14px;}
+#loading .spinner{width:36px;height:36px;border:3px solid rgba(201,168,76,0.15);border-top-color:#C9A84C;border-radius:50%;animation:spin .8s linear infinite;}
+#loading p{font-size:12px;color:#4A5568;font-family:monospace;}
+
+#main{display:none;max-width:760px;margin:0 auto;padding:28px 20px;}
+.fecha{font-size:9px;color:#C9A84C;font-family:monospace;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+.saludo{font-size:24px;font-weight:700;margin-bottom:3px;}
+.saludo span{color:#C9A84C;}
+.saludo-sub{font-size:12px;color:#4A5568;margin-bottom:24px;}
+
+/* CARD */
+.hub-card{background:#08101C;border:1px solid rgba(201,168,76,0.15);border-radius:16px;overflow:hidden;margin-bottom:16px;}
+.card-top-bar{height:3px;}
+.card-body{padding:20px 22px;}
+.card-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;}
+.card-avatar{width:54px;height:54px;border-radius:12px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;font-family:monospace;flex-shrink:0;overflow:hidden;color:#C9A84C;}
+.card-avatar img{width:100%;height:100%;object-fit:contain;}
+.card-nombre{font-size:16px;font-weight:700;color:#F2EFEA;}
+.card-meta{font-size:10px;color:#4A5568;font-family:monospace;margin-top:2px;}
+.badges{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;}
+.badge{padding:2px 9px;border-radius:20px;font-size:9px;font-weight:700;}
+.b-gold{background:rgba(201,168,76,0.12);color:#C9A84C;border:1px solid rgba(201,168,76,0.25);}
+.b-blue{background:rgba(56,189,248,0.08);color:#38BDF8;border:1px solid rgba(56,189,248,0.2);}
+
+.divider{height:1px;background:rgba(255,255,255,0.05);margin:0 0 16px;}
+
+.area{margin-bottom:16px;}
+.area-title{font-size:9px;font-family:monospace;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.area-bar{width:3px;height:13px;border-radius:2px;}
+
+.mods-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.mod-chip{padding:11px 6px;border-radius:9px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;border:1px solid transparent;text-decoration:none;transition:all .15s;}
+.mod-chip:hover{transform:translateY(-2px);filter:brightness(1.1);}
+.mod-icon{font-size:18px;}
+.mod-label{font-size:8px;font-weight:700;text-align:center;line-height:1.3;font-family:monospace;}
+.mod-locked{padding:11px 6px;border-radius:9px;display:flex;flex-direction:column;align-items:center;gap:5px;background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.06);}
+.mod-locked-icon{font-size:14px;opacity:.25;}
+.mod-locked-label{font-size:8px;color:#2D3748;text-align:center;font-family:monospace;line-height:1.3;}
+
+.card-actions{display:flex;gap:10px;border-top:1px solid rgba(201,168,76,0.08);padding:14px 22px;background:rgba(201,168,76,0.02);}
+.btn-enter{flex:1;padding:12px;border-radius:9px;border:none;cursor:pointer;font-weight:700;font-size:13px;font-family:monospace;background:linear-gradient(135deg,#C9A84C,#F59E0B);color:#04080F;transition:all .15s;}
+.btn-enter:hover{opacity:.9;transform:translateY(-1px);}
+.btn-cfg{width:40px;height:40px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:#4A5568;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;}
+.btn-cfg:hover{border-color:rgba(255,255,255,0.15);color:#9CA3AF;}
+
+.nota{background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);border-radius:10px;padding:12px 16px;font-size:11px;color:#4A5568;line-height:1.7;}
+.nota strong{color:#C9A84C;}
+
+@media(max-width:500px){
+  .mods-grid{grid-template-columns:repeat(3,1fr);}
+  .card-body,.card-actions{padding:14px 16px;}
+}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div id="tbLogo">M</div>
+  <div>
+    <div id="tbNombre">Mi Panel</div>
+    <div id="tbSub">Portal empresarial</div>
+  </div>
+  <div class="tb-right">
+    <span id="tbEmail"></span>
+    <span id="tbDemo"></span>
+    <button class="btn-salir" onclick="cerrarSesion()">⏻ Salir</button>
+  </div>
+</div>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <p>Cargando tu panel...</p>
+</div>
+
+<div id="main">
+  <div class="fecha" id="mainFecha"></div>
+  <div class="saludo">Hola, <span id="mainNombre">Cliente</span></div>
+  <div class="saludo-sub">Bienvenido/a a tu panel empresarial. Accede a tus módulos contratados.</div>
+  <div id="empresasHub"></div>
+  <div class="nota">
+    <strong>Tu espacio es privado.</strong> Solo tú tienes acceso a los datos de tu empresa. Los módulos con 🔒 pueden activarse contactando a Martinez Services.
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, doc, getDoc, getDocs, collection } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const FB={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
+const app = getApps().length ? getApps()[0] : initializeApp(FB);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// ── MÓDULOS POR ÁREA — Mundo Comercial ──
+const AREAS_COMERCIAL = [
+  {
+    id: 'finanzas_contab',
+    label: 'Área finanzas y contabilidad',
+    color: '#C9A84C',
+    modulos: [
+      {id:'finanzas',     icon:'₲',  label:'Finanzas',      color:'#C9A84C', href:'MSS-Finanzas.html'},
+      {id:'contabilidad', icon:'📗', label:'Contabilidad',  color:'#10B981', href:'MSS-Contabilidad.html'},
+      {id:'facturacion',  icon:'🧾', label:'Facturación',   color:'#38BDF8', href:'MSS-Facturacion.html'},
+      {id:'tesoreria',    icon:'🏦', label:'Tesorería',     color:'#FBBF24', href:'MSS-Tesoreria.html'},
+    ]
+  },
+  {
+    id: 'comercial',
+    label: 'Área comercial y ventas',
+    color: '#FB923C',
+    modulos: [
+      {id:'ventas',     icon:'◎', label:'Ventas & CRM',  color:'#FB923C', href:'MSS-Ventas-CRM.html'},
+      {id:'cotizacion', icon:'📋',label:'Cotizaciones',  color:'#38BDF8', href:'MSS-Cotizacion.html'},
+      {id:'contratos',  icon:'📄',label:'Contratos',     color:'#A78BFA', href:'MSS-Contratos.html'},
+      {id:'proyectos',  icon:'◈', label:'Proyectos',     color:'#38BDF8', href:'MSS-Proyectos.html'},
+    ]
+  },
+  {
+    id: 'rrhh_admin',
+    label: 'Área RRHH y administración',
+    color: '#22C55E',
+    modulos: [
+      {id:'rrhh',              icon:'◉', label:'RRHH',              color:'#A78BFA', href:'MSS-RRHH.html'},
+      {id:'remuneraciones',    icon:'👥',label:'Remuneraciones',    color:'#22C55E', href:'MSS-Remuneraciones.html'},
+      {id:'portal_trabajador', icon:'🧑',label:'Portal Trabajador', color:'#34D399', href:'MSS-PortalTrabajador.html'},
+      {id:'arriendos',         icon:'🚛',label:'Arriendos',         color:'#F59E0B', href:'MSS-Arriendos.html'},
+    ]
+  },
+  {
+    id: 'control',
+    label: 'Área control y estrategia',
+    color: '#A78BFA',
+    modulos: [
+      {id:'auditoria',  icon:'📊',label:'Auditoría',  color:'#A78BFA', href:'MSS-Auditoria.html'},
+      {id:'estrategia', icon:'◆', label:'Estrategia', color:'#10B981', href:'MSS-Estrategia.html'},
+      {id:'app_vendedores',icon:'📱',label:'App Móvil', color:'#34D399', href:'MSS-Movil.html'},
+    ]
+  }
+];
+
+let _empresas = [];
+
+onAuthStateChanged(auth, async user => {
+  if(!user){ window.location.href='MSS-Login.html'; return; }
+
+  const email = user.email || '';
+  document.getElementById('tbEmail').textContent = email;
+
+  let clienteId = null, modulos = [], diasRestantes = null;
+  let nombreCliente = user.displayName || email.split('@')[0];
+
+  // Leer perfil
+  try{
+    const perfil = await getDoc(doc(db,'usuarios/'+user.uid));
+    if(perfil.exists()){
+      clienteId = perfil.data().clienteId || null;
+      nombreCliente = perfil.data().nombre || nombreCliente;
+    }
+  }catch(e){}
+
+  // Leer datos del cliente
+  if(clienteId){
+    try{
+      const cliId = clienteId.replace('cli_','');
+      const cs1 = await getDoc(doc(db,'clientes/'+clienteId));
+      const cs2 = await getDoc(doc(db,'clientes/'+cliId));
+      const cliData = cs1.exists()?cs1.data():cs2.exists()?cs2.data():null;
+      if(cliData){
+        modulos = cliData.modulos || [];
+        if(cliData.estado==='demo'){
+          const diasDemo = cliData.diasDemo || 7;
+          const diasPasados = Math.floor((Date.now()-(cliData.creado||Date.now()))/86400000);
+          diasRestantes = diasDemo - diasPasados;
+          if(diasRestantes <= 0){
+            await signOut(auth);
+            window.location.href='MSS-DemoVencida.html'; return;
+          }
+          const tbDemo = document.getElementById('tbDemo');
+          tbDemo.textContent = `Demo · ${diasRestantes} día${diasRestantes===1?'':'s'}`;
+          tbDemo.style.display = 'block';
+        }
+      }
+    }catch(e){}
+  }
+
+  // Guardar en localStorage
+  localStorage.setItem('mss_es_cliente_externo','true');
+  localStorage.setItem('mss_cliente_id', clienteId||('cli_'+user.uid));
+  localStorage.setItem('mss_modulos_permitidos', JSON.stringify(modulos));
+
+  // Buscar empresas del cliente
+  try{
+    const snap = await getDocs(collection(db,'empresas_clientes'));
+    snap.forEach(d=>{
+      const e = d.data();
+      if(e.uid===user.uid || e.clienteId===clienteId){
+        _empresas.push({id:d.id,...e});
+      }
+    });
+  }catch(e){}
+
+  if(_empresas.length === 0){
+    window.location.href='MSS-BienvenidaCliente.html'; return;
+  }
+
+  // Fecha y saludo
+  const now = new Date();
+  document.getElementById('mainFecha').textContent =
+    now.toLocaleDateString('es-CL',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
+  document.getElementById('mainNombre').textContent = nombreCliente.split(' ')[0];
+
+  // Renderizar tarjetas por empresa
+  const hub = document.getElementById('empresasHub');
+  _empresas.forEach((emp, idx) => {
+    hub.appendChild(crearTarjetaEmpresa(emp, modulos, diasRestantes, idx));
+  });
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('main').style.display = 'block';
+});
+
+function crearTarjetaEmpresa(emp, modulos, diasRestantes, idx){
+  const color = emp.color || '#C9A84C';
+  const modSet = new Set(modulos);
+
+  const card = document.createElement('div');
+  card.className = 'hub-card';
+
+  // Logo
+  const logoKey = 'mss_logo_emp_'+emp.id;
+  const logoUrl = localStorage.getItem('mss_logo_url_'+emp.id) || localStorage.getItem(logoKey) || null;
+  const avatarHTML = logoUrl
+    ? `<div class="card-avatar"><img src="${logoUrl}" alt="logo"/></div>`
+    : `<div class="card-avatar" style="background:${color}15;border-color:${color}30;color:${color}">${(emp.nombre||'E').charAt(0)}</div>`;
+
+  // Badges
+  let badgesHTML = `<span class="badge b-gold">Activa</span>`;
+  if(diasRestantes !== null){
+    badgesHTML += `<span class="badge b-blue">Demo · ${diasRestantes} día${diasRestantes===1?'':'s'}</span>`;
+  }
+
+  // Armar áreas
+  let areasHTML = '';
+  AREAS_COMERCIAL.forEach(area => {
+    const tieneAlguno = area.modulos.some(m => modSet.has(m.id));
+    let modsHTML = '';
+    area.modulos.forEach(m => {
+      if(modSet.has(m.id)){
+        modsHTML += `<a class="mod-chip" href="${m.href}" style="background:${m.color}12;border-color:${m.color}30" onclick="setEmpresaActual('${emp.id}')">
+          <span class="mod-icon">${m.icon}</span>
+          <span class="mod-label" style="color:${m.color}">${m.label}</span>
+        </a>`;
+      } else {
+        modsHTML += `<div class="mod-locked" title="No incluido en tu plan">
+          <span class="mod-locked-icon">🔒</span>
+          <span class="mod-locked-label">No<br>contratado</span>
+        </div>`;
+      }
+    });
+
+    areasHTML += `
+      <div class="area" style="margin-bottom:14px">
+        <div class="area-title" style="color:${area.color}">
+          <div class="area-bar" style="background:${area.color}"></div>
+          ${area.label}
+        </div>
+        <div class="mods-grid">${modsHTML}</div>
+      </div>`;
+  });
+
+  card.innerHTML = `
+    <div class="card-top-bar" style="background:linear-gradient(90deg,${color},${color}aa)"></div>
+    <div class="card-body">
+      <div class="card-header">
+        ${avatarHTML}
+        <div>
+          <div class="card-nombre">${emp.nombre||'Mi Empresa'}</div>
+          <div class="card-meta">${emp.rut||''} · ${emp.rubro||'Empresa Comercial'}</div>
+          <div class="card-meta">${emp.email ? '✉ '+emp.email : ''}</div>
+          <div class="badges">${badgesHTML}</div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      ${areasHTML}
+    </div>
+    <div class="card-actions">
+      <button class="btn-enter" onclick="entrarEmpresa('${emp.id}')">▶ Entrar al ERP Completo</button>
+      <button class="btn-cfg" onclick="entrarEmpresa('${emp.id}')" title="Configuración">⚙</button>
+    </div>`;
+
+  return card;
+}
+
+window.setEmpresaActual = function(id){
+  const emp = _empresas.find(e=>e.id===id);
+  if(emp) localStorage.setItem('mss_empresa_actual', JSON.stringify(emp));
+};
+
+window.entrarEmpresa = function(id){
+  const emp = _empresas.find(e=>e.id===id);
+  if(emp){
+    localStorage.setItem('mss_empresa_actual', JSON.stringify(emp));
+    window.location.href = 'MSS-Finanzas.html';
+  }
+};
+
+window.cerrarSesion = async function(){
+  if(!confirm('¿Cerrar sesión?')) return;
+  await signOut(auth);
+  localStorage.removeItem('mss_es_cliente_externo');
+  localStorage.removeItem('mss_cliente_id');
+  localStorage.removeItem('mss_modulos_permitidos');
+  localStorage.removeItem('mss_empresa_actual');
+  window.location.href = 'MSS-Login.html';
+};
+</script>
+</body>
+</html>

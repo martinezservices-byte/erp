@@ -329,9 +329,14 @@ body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;m
             <!-- PAQUETES RÁPIDOS -->
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
               <span style="font-size:9px;color:#6B7280;font-family:monospace;align-self:center;text-transform:uppercase;letter-spacing:1px">Paquetes:</span>
-              <button type="button" onclick="aplicarPaquete('basico')"    style="padding:4px 10px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:#10B981;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:monospace">🏢 Solo Condominio</button>
-              <button type="button" onclick="aplicarPaquete('completo')"  style="padding:4px 10px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:#22C55E;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:monospace">🏢+👷 Condo + RRHH</button>
-              <button type="button" onclick="aplicarPaquete('premium')"   style="padding:4px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);color:#C9A84C;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:monospace">⭐ Todo incluido</button>
+              <span style="font-size:9px;color:#10B981;font-family:monospace;margin-right:2px">Condo:</span>
+              <button type="button" onclick="aplicarPaquete('basico')"    style="padding:4px 10px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:#10B981;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:monospace">🏢 Básico</button>
+              <button type="button" onclick="aplicarPaquete('completo')"  style="padding:4px 10px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:#22C55E;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:monospace">🏢+👷 Completo</button>
+              <button type="button" onclick="aplicarPaquete('premium')"   style="padding:4px 10px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:#10B981;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:monospace">⭐ Premium Condo</button>
+              <span style="font-size:9px;color:#C9A84C;font-family:monospace;margin-left:4px;margin-right:2px">Comercial:</span>
+              <button type="button" onclick="aplicarPaquete('comercial_basico')"   style="padding:4px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);color:#C9A84C;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:monospace">🏭 Básico</button>
+              <button type="button" onclick="aplicarPaquete('comercial_completo')" style="padding:4px 10px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);color:#F59E0B;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:monospace">🏭+👷 Completo</button>
+              <button type="button" onclick="aplicarPaquete('comercial_premium')"  style="padding:4px 10px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);color:#C9A84C;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:monospace">⭐ Premium Comerc.</button>
               <button type="button" onclick="aplicarPaquete('ninguno')"   style="padding:4px 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#6B7280;border-radius:5px;font-size:10px;cursor:pointer;font-family:monospace">✕ Limpiar</button>
             </div>
             <div class="mod-checks" id="saModChecks"></div>
@@ -1379,10 +1384,8 @@ onAuthStateChanged(auth, async user => {
     }catch(e){ console.warn('Empresas cliente:', e.message); }
 
     if(empresasCliente.length > 0){
-      // Ya tiene empresas → cargar en ERP
-      EMPRESAS = empresasCliente;
-      render();
-      // Mostrar hub con SUS empresas
+      // Ya tiene empresas → ir al hub comercial del cliente
+      window.location.href = 'MSS-HubClienteComercial.html'; return;
     } else {
       // Primera vez → pantalla de bienvenida
       window.location.href = 'MSS-BienvenidaCliente.html'; return;
@@ -1653,10 +1656,15 @@ window.extenderDemo = async function(id){
 // ── PAQUETES PREDEFINIDOS ──
 window.aplicarPaquete = function(tipo){
   const PAQUETES = {
-    basico:   ['condominio','app_residentes','auditoria'],
-    completo: ['condominio','app_residentes','rrhh','remuneraciones','contratos','portal_trabajador','auditoria'],
-    premium:  ['condominio','app_residentes','rrhh','remuneraciones','contratos','portal_trabajador','auditoria','finanzas','tesoreria','estrategia'],
-    ninguno:  []
+    // Paquetes Condominio
+    basico:             ['condominio','app_residentes','auditoria'],
+    completo:           ['condominio','app_residentes','rrhh','remuneraciones','contratos','portal_trabajador','auditoria'],
+    premium:            ['condominio','app_residentes','rrhh','remuneraciones','contratos','portal_trabajador','auditoria','finanzas','tesoreria','estrategia'],
+    // Paquetes Comercial
+    comercial_basico:   ['finanzas','facturacion','cotizacion','auditoria'],
+    comercial_completo: ['finanzas','contabilidad','facturacion','tesoreria','cotizacion','contratos','ventas','rrhh','remuneraciones','portal_trabajador','auditoria'],
+    comercial_premium:  ['finanzas','contabilidad','facturacion','tesoreria','cotizacion','contratos','ventas','proyectos','rrhh','remuneraciones','portal_trabajador','arriendos','estrategia','auditoria','app_vendedores'],
+    ninguno:            []
   };
   renderModChecks(PAQUETES[tipo]||[]);
 };
