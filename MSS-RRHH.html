@@ -4,6 +4,23 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Martinez Services Spa — RRHH</title>
+<!-- MSS IframeGuard v1.0: oculta nav/header cuando corre dentro del Hub (iframe) -->
+<style id="mss-iframe-guard">
+  #nav-bar, #header, #topbar { display: none !important; }
+  body { padding-top: 0 !important; margin-top: 0 !important; }
+  #content, .main-content { padding-top: 0 !important; margin-top: 0 !important; }
+  #tabbar { margin-top: 8px !important; }
+</style>
+<script>
+(function(){
+  // Si abre directo (no iframe) → restaurar visibilidad normal del módulo
+  if(window === window.top){
+    var s = document.getElementById('mss-iframe-guard');
+    if(s) s.textContent = '/* modo directo */';
+  }
+  // Si corre en iframe (dentro del Hub) → el CSS ya ocultó #nav-bar y #header
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}

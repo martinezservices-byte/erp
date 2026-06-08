@@ -2,6 +2,21 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
+<!-- MSS IframeGuard v1.0: oculta nav/header cuando el módulo corre dentro del Hub (iframe) -->
+<style id="mss-iframe-guard">
+  #nav-bar, #header, #topbar { display: none !important; }
+  body { padding-top: 0 !important; margin-top: 0 !important; }
+  #content, .main-content { padding-top: 0 !important; margin-top: 0 !important; }
+  #tabbar { margin-top: 8px !important; }
+</style>
+<script>
+(function(){
+  if(window === window.top){
+    var s = document.getElementById('mss-iframe-guard');
+    if(s) s.textContent = '/* modo directo */';
+  }
+})();
+</script>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>MSS ERP — Auditoría</title>
 <style>
@@ -109,7 +124,6 @@ canvas{max-height:220px;}
   <a href="MSS-Tesoreria.html">Tesorería</a>
   <a href="MSS-Facturacion.html">Facturación</a>
   <a href="MSS-Contabilidad.html">Contabilidad</a>
-  <a href="MSS-Condominio.html">Condominio</a>
   <div id="nav-emp"></div>
 </div>
 
