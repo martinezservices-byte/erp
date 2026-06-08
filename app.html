@@ -152,6 +152,7 @@ body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;m
 .mod-check input{width:14px;height:14px;cursor:pointer;accent-color:var(--gold);}
 .sa-toast{position:fixed;bottom:24px;right:24px;background:var(--surf);border:1px solid rgba(34,197,94,0.4);color:#22C55E;padding:12px 20px;border-radius:10px;font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;z-index:999999;opacity:0;transition:opacity .3s;pointer-events:none;}
 .sa-toast.show{opacity:1;}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -175,7 +176,7 @@ body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;m
   </div>
 </div>
 
-<div class="hero">
+<div class="hero" id="hubHero" style="display:none">
   <div class="hero-content">
     <div class="hero-left">
       <div class="hero-date" id="heroDate">CARGANDO...</div>
@@ -207,7 +208,7 @@ body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;m
   </div>
 </div>
 
-<div class="section">
+<div class="section" id="hubSection" style="display:none">
   <!-- CONSOLIDADO -->
   <div class="consolidado">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
@@ -382,6 +383,10 @@ body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;m
 </div>
 <div class="sa-toast" id="saToast"></div>
 
+<div id="hubLoading" style="display:flex;align-items:center;justify-content:center;min-height:60vh;flex-direction:column;gap:16px">
+  <div style="width:40px;height:40px;border:3px solid rgba(201,168,76,0.2);border-top-color:#C9A84C;border-radius:50%;animation:spin .8s linear infinite"></div>
+  <div style="font-size:12px;color:#6B7280;font-family:monospace">Verificando acceso...</div>
+</div>
 <div id="footer">
   <span>Martinez Services Spa · ERP Profesional Multi-Empresa v3.0 · Ing. Control y Gestión · Auditora · Auditoría · Consultoría</span>
   <span id="footerDate">2025</span>
@@ -652,16 +657,16 @@ function renderEmpresas(){
         <div class="emp-mod-label">Acceso Directo a Módulos</div>
         <div class="emp-mod-grid">
           ${MODULES.map(m=>`
-            <a href="javascript:void(0)" onclick="abrirModulo('${m.file}',${emp.id})" class="mod-chip" style="background:${m.color}15;color:${m.color};border-color:${m.color}25;" title="${m.desc}">
+            <a href="javascript:void(0)" onclick="abrirModulo('${m.file}','${emp.id}')" class="mod-chip" style="background:${m.color}15;color:${m.color};border-color:${m.color}25;" title="${m.desc}">
               <div style="font-size:14px;margin-bottom:2px">${m.icon}</div>
               <div style="font-size:8px;line-height:1.2">${m.label}</div>
             </a>`).join('')}
         </div>
       </div>
       <div class="emp-actions">
-        <button class="btn-enter" onclick="enterEmpresa(${emp.id})">▶ Entrar al ERP Completo</button>
-        <button class="btn-icon" onclick="editEmpresa(${emp.id})" title="Editar empresa">⚙</button>
-        <button class="btn-icon" onclick="deleteEmpresa(${emp.id})" title="Eliminar empresa" style="color:var(--danger)">✕</button>
+        <button class="btn-enter" onclick="enterEmpresa('${emp.id}')">▶ Entrar al ERP Completo</button>
+        <button class="btn-icon" onclick="editEmpresa('${emp.id}')" title="Editar empresa">⚙</button>
+        <button class="btn-icon" onclick="deleteEmpresa('${emp.id}')" title="Eliminar empresa" style="color:var(--danger)">✕</button>
       </div>`;
     grid.appendChild(card);
   });
@@ -1029,21 +1034,28 @@ async function saveEmpresa(){
     if(idx>=0) EMPRESAS[idx]={...EMPRESAS[idx],...obj};
     else EMPRESAS.push({...obj, ingresos:0, proyectos:0, trabajadores:0, clientes:0});
   }catch(eFS){ alert('Error guardando en Firestore: '+eFS.message); return; }
-  closeModal();render();
-  // Subir logo a Firebase Storage en background
-  const empIdLogo = id || String(EMPRESAS[EMPRESAS.length-1]?.id||Date.now());
+  // Subir logo ANTES de cerrar modal — usando empId ya conocido
   if(_empLogoData === 'QUITAR'){
-    localStorage.removeItem('mss_logo_url_'+empIdLogo);
-    localStorage.removeItem('mss_logo_emp_'+empIdLogo);
+    localStorage.removeItem('mss_logo_url_'+empId);
+    localStorage.removeItem('mss_logo_emp_'+empId);
     if(window._db&&window._fbM){
-      window._fbM.deleteDoc(window._fbM.doc(window._db,'empresas/'+empIdLogo+'/config/logo')).catch(()=>{});
+      window._fbM.deleteDoc(window._fbM.doc(window._db,'empresas/'+empId+'/config/logo')).catch(()=>{});
     }
+    _empLogoData = null;
+    closeModal();render();
   } else if(_empLogoData){
-    subirLogoFirebase(empIdLogo, _empLogoData).then(()=>{
+    // Guardar logo en localStorage inmediatamente (respaldo rápido)
+    try{ localStorage.setItem('mss_logo_emp_'+empId, _empLogoData); }catch(ex){}
+    _empLogoData = null;
+    closeModal();render();
+    // Subir a Firebase Storage en background
+    subirLogoFirebase(empId, localStorage.getItem('mss_logo_emp_'+empId)||'').then(()=>{
       renderEmpresas();
     });
+  } else {
+    _empLogoData = null;
+    closeModal();render();
   }
-  _empLogoData = null;
 }
 function closeModal(){document.getElementById('modalEmp').classList.remove('open');}
 
@@ -1129,8 +1141,8 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
 // Se ejecuta aquí solo para mostrar la UI vacía mientras el auth guard verifica
 // Si el usuario es cliente externo, el auth guard limpiará estos datos
 load();
-render();
-renderCondominios();
+// Hub oculto hasta que auth confirme — evita flash de datos incorrectos
+// render() y renderCondominios() se llaman solo post-auth
 </script>
 
 
@@ -1440,9 +1452,19 @@ onAuthStateChanged(auth, async user => {
     EMPRESAS = []; CONDOMINIOS = [];
   }
 
+  // Mostrar hub y ocultar loading
+  const hubLoading = document.getElementById('hubLoading');
+  const hubHero    = document.getElementById('hubHero');
+  const hubSection = document.getElementById('hubSection');
+  if(hubLoading) hubLoading.style.display = 'none';
+  if(hubHero)    hubHero.style.display    = '';
+  if(hubSection) hubSection.style.display = '';
+
   // Renderizar con datos reales de Firestore
   render();
   renderCondominios();
+  // Cargar logos desde Firebase Storage en background
+  setTimeout(cargarLogosFirebase, 500);
 });
 
 window.cerrarSesion = async function(){
