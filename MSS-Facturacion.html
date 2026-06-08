@@ -326,6 +326,41 @@ try{
         <div class="field"><label>Moneda</label>
           <select id="newMoneda"><option value="CLP">Peso Chileno (CLP)</option><option value="UF">UF</option><option value="USD">Dólar (USD)</option></select>
         </div>
+        <!-- ════ CAMPOS DTE / SII ════ -->
+        <div class="field" id="dteCampos" style="grid-column:1/-1;background:rgba(56,189,248,0.04);border:1px solid rgba(56,189,248,0.15);border-radius:10px;padding:14px;margin-top:4px;">
+          <div style="font-size:9px;font-weight:700;color:var(--acc);font-family:var(--mono);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px">🇨🇱 Campos DTE — Facturación Electrónica SII (estructura lista)</div>
+          <div class="fgrid" style="gap:10px;">
+            <div class="field"><label>Tipo Documento SII</label>
+              <select id="dteTipoDoc">
+                <option value="33">33 — Factura Electrónica</option>
+                <option value="39">39 — Boleta Electrónica</option>
+                <option value="56">56 — Nota de Débito</option>
+                <option value="61">61 — Nota de Crédito</option>
+                <option value="52">52 — Guía de Despacho</option>
+              </select>
+            </div>
+            <div class="field"><label>Código Actividad Económica</label>
+              <input id="dteActEcon" placeholder="Ej: 741000 — Consultoría" value="741000"/>
+            </div>
+            <div class="field"><label>RUT Empresa Emisora</label>
+              <input id="dteRutEmisor" placeholder="Ej: 76.782.954-K" value="${_empObj?.rut||''}"/>
+            </div>
+            <div class="field"><label>Giro Empresa</label>
+              <input id="dteGiro" placeholder="Ej: Servicios de Consultoría" value="${_empObj?.rubro||''}"/>
+            </div>
+            <div class="field"><label>Comuna Empresa</label>
+              <input id="dteComuna" placeholder="Ej: Alto Hospicio" value="${_empObj?.comuna||''}"/>
+            </div>
+            <div class="field"><label>Resolución SII (N° y Año)</label>
+              <input id="dteResolucion" placeholder="Ej: N°80 del 22/08/2014"/>
+            </div>
+          </div>
+          <div style="margin-top:10px;padding:8px 12px;background:rgba(56,189,248,0.06);border-radius:7px;font-size:10px;color:var(--muted);font-family:var(--mono);line-height:1.8">
+            ⚡ <strong style="color:var(--acc)">Timbre Electrónico (TED):</strong> Se generará automáticamente al integrar con API SII o proveedor DTE.<br>
+            🔗 <strong style="color:var(--acc)">Próximo paso:</strong> Conectar con API DTE (Acepta, Bsale, Facturación SII) para envío automático.<br>
+            📋 Estructura de datos y campos ya mapeados — solo falta activar la integración.
+          </div>
+        </div>
       </div>
       <!-- ITEMS -->
       <div style="font-size:11px;font-weight:700;color:var(--acc);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">DETALLE DE ITEMS</div>
@@ -668,6 +703,88 @@ function emitirDocumento(){
   previewDocumento(doc);
   renderKPIs();
   document.getElementById('hInfo').textContent=`${DOCUMENTOS.length} documentos`;
+
+  // ══ ENLACE AUTOMÁTICO CON INVENTARIO ══
+  // Descontar stock de productos vendidos
+  descontarStockInventario(doc);
+
+  // ══ ENLACE AUTOMÁTICO CON CONTABILIDAD ══
+  // Generar asiento contable de la venta
+  generarAsientoVenta(doc);
+}
+
+// ── DESCONTAR STOCK EN INVENTARIO ──
+async function descontarStockInventario(doc){
+  if(!_fbReady||!window._fbM||!doc.items||!doc.items.length)return;
+  try{
+    const invSnap = await window._fbM.getDocs(
+      window._fbM.collection(_db, _ep()+'/inv_productos')
+    ).catch(()=>null);
+    if(!invSnap||invSnap.empty)return;
+    const prods = invSnap.docs.map(d=>d.data());
+    const {writeBatch} = window._fbM;
+    const batch = writeBatch(_db);
+    let cambios = 0;
+    doc.items.forEach(item=>{
+      const prod = prods.find(p=>
+        (p.nombre&&p.nombre.toLowerCase()===item.descripcion.toLowerCase())||
+        (p.sku&&p.sku===item.codigo)||
+        (p.id&&String(p.id)===String(item.prodId))
+      );
+      if(prod && (prod.stock||0) > 0){
+        const nuevoStock = Math.max(0,(prod.stock||0)-(item.cantidad||1));
+        batch.update(
+          window._fbM.doc(_db, _ep()+'/inv_productos/'+String(prod.id)),
+          {stock: nuevoStock, actualizado: new Date().toISOString()}
+        );
+        // Registrar movimiento en inventario
+        window._fbM.setDoc(
+          window._fbM.doc(_db, _ep()+'/inv_movimientos/vta_'+doc.id+'_'+prod.id),
+          {
+            id:'vta_'+doc.id+'_'+prod.id,
+            tipo:'salida', motivo:'venta',
+            prodId:prod.id, prodNombre:prod.nombre,
+            cantidadAntes:prod.stock, cantidad:item.cantidad||1,
+            cantidadDespues:nuevoStock,
+            fecha:doc.fecha, refDoc:'Doc '+doc.tipo+' N°'+doc.folio,
+            obs:'Venta automática desde Facturación'
+          }
+        ).catch(()=>{});
+        cambios++;
+      }
+    });
+    if(cambios>0) await batch.commit().catch(()=>{});
+    console.log('✅ Stock actualizado: '+cambios+' productos');
+  }catch(e){console.warn('Sync inventario desde factura:',e.message);}
+}
+
+// ── GENERAR ASIENTO CONTABLE DE VENTA ──
+async function generarAsientoVenta(doc){
+  if(!_fbReady||!window._fbM||doc.neto<=0)return;
+  try{
+    const asiento = {
+      id:        'vta_'+doc.id,
+      refId:     String(doc.id),
+      tipo:      'venta',
+      fecha:     doc.fecha,
+      descripcion: doc.tipo+' N°'+doc.folio+' — '+doc.clienteNombre,
+      debe: [
+        {cuenta:'1.1.1 - Clientes / Cuentas por Cobrar', monto: doc.total}
+      ],
+      haber: [
+        {cuenta:'4.1.1 - Ventas / Ingresos', monto: doc.neto},
+        ...(doc.iva>0?[{cuenta:'2.1.3 - IVA Débito Fiscal', monto: doc.iva}]:[])
+      ],
+      total:     doc.total,
+      automatico: true,
+      creado:    new Date().toISOString()
+    };
+    await window._fbM.setDoc(
+      window._fbM.doc(_db, _ep()+'/cont_asientos/vta_'+doc.id),
+      asiento
+    ).catch(()=>{});
+    console.log('✅ Asiento contable generado para '+doc.tipo+' N°'+doc.folio);
+  }catch(e){console.warn('Sync contabilidad desde factura:',e.message);}
 }
 
 function previewDocumento(docData){

@@ -237,6 +237,7 @@ try{
   <button class="tab" onclick="showTab('movimientos',this)">💳 Movimientos</button>
   <button class="tab" onclick="showTab('flujo',this)">📊 Flujo de Caja</button>
   <button class="tab" onclick="showTab('conciliacion',this)">✅ Conciliación</button>
+  <button class="tab" onclick="showTab('cartola',this)">📥 Importar Cartola</button>
   <button class="tab" onclick="showTab('presupuesto',this)">📋 Presupuesto</button>
 </div>
 <div id="content">
@@ -274,6 +275,88 @@ try{
     </div>
     <div id="concContent"></div>
   </div>
+  <!-- ════ IMPORTAR CARTOLA BANCARIA ════ -->
+  <div id="sec-cartola" class="section">
+    <div class="card" style="background:rgba(56,189,248,0.04);border-color:rgba(56,189,248,0.2);margin-bottom:16px;">
+      <div class="card-title" style="color:var(--blue)">📥 Importar Cartola Bancaria</div>
+      <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:16px;line-height:1.8;">
+        Sube el archivo descargado de tu banco (Excel, CSV o TXT) y el sistema cruzará los movimientos contra tu flujo de caja registrado.
+        <br>✅ Compatible con: <strong style="color:var(--blue)">BancoEstado, Santander, BCI, Scotiabank, Itaú, BICE</strong>
+        <br>🔗 <strong style="color:var(--blue)">Open Banking (Fintoc):</strong> sincronización automática disponible en plan Premium
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="field">
+          <label>Cuenta Bancaria</label>
+          <select id="cartolaCuenta"></select>
+        </div>
+        <div class="field">
+          <label>Banco</label>
+          <select id="cartolaBanco">
+            <option value="bancoestado">BancoEstado</option>
+            <option value="santander">Santander</option>
+            <option value="bci">BCI</option>
+            <option value="scotiabank">Scotiabank</option>
+            <option value="itau">Itaú</option>
+            <option value="bice">BICE</option>
+            <option value="otro">Otro banco</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ZONA DE UPLOAD -->
+      <div id="zonaUpload" style="border:2px dashed rgba(56,189,248,0.3);border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:14px;" onclick="document.getElementById('cartolaFile').click()" ondragover="event.preventDefault();this.style.borderColor='var(--blue)'" ondrop="handleCartolaDrop(event)">
+        <div style="font-size:32px;margin-bottom:8px">📂</div>
+        <div style="font-size:13px;font-weight:700;color:var(--blue)">Arrastra tu cartola aquí o haz clic para seleccionar</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:6px;font-family:var(--mono)">Formatos: CSV · TXT · XLS · XLSX · Máx. 5MB</div>
+      </div>
+      <input type="file" id="cartolaFile" accept=".csv,.txt,.xls,.xlsx" style="display:none" onchange="importarCartola(this)"/>
+
+      <!-- TAMBIÉN: PEGAR TEXTO -->
+      <div style="margin-bottom:14px;">
+        <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;">O pega el contenido directamente:</div>
+        <textarea id="cartolaTexto" rows="5" placeholder="Pega aquí el contenido de tu cartola bancaria (copiado del banco o del archivo)..." style="background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--white);font-family:monospace;font-size:11px;width:100%;resize:vertical;"></textarea>
+        <button class="btn-acc" style="margin-top:8px;padding:8px 18px;font-size:12px;" onclick="procesarTextoCartola()">📋 Procesar Texto</button>
+      </div>
+
+      <!-- FINTOC (FUTURO) -->
+      <div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px;">
+        <div style="font-size:24px">🏦</div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--gold)">Sincronización Automática con Fintoc (Open Banking)</div>
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono)">Conecta tu cuenta bancaria directamente y sincroniza movimientos en tiempo real · Disponible en Plan Premium</div>
+        </div>
+        <button style="margin-left:auto;padding:7px 16px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);color:var(--gold);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:monospace;white-space:nowrap;" onclick="alert('Funcionalidad Open Banking disponible en plan Premium.\nContacta a Martinez Services para activarla.')">Activar →</button>
+      </div>
+    </div>
+
+    <!-- RESULTADO DEL IMPORT -->
+    <div id="cartolaResultado" style="display:none">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+          <div class="card-title" style="margin:0">📊 Movimientos Importados</div>
+          <div style="display:flex;gap:8px;">
+            <span id="cartolaStats" style="font-size:10px;color:var(--muted);font-family:var(--mono);align-self:center;"></span>
+            <button class="btn-acc" style="font-size:11px;padding:7px 14px;" onclick="confirmarImport()">✓ Confirmar e Importar</button>
+            <button class="btn-ghost" style="font-size:11px;padding:7px 14px;" onclick="limpiarCartola()">✕ Cancelar</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;font-size:11px;font-family:monospace;">
+            <thead><tr>
+              <th style="padding:8px;text-align:left;color:var(--blue);border-bottom:1px solid rgba(56,189,248,0.2);">Fecha</th>
+              <th style="padding:8px;text-align:left;color:var(--blue);border-bottom:1px solid rgba(56,189,248,0.2);">Descripción</th>
+              <th style="padding:8px;text-align:right;color:var(--blue);border-bottom:1px solid rgba(56,189,248,0.2);">Cargo</th>
+              <th style="padding:8px;text-align:right;color:var(--blue);border-bottom:1px solid rgba(56,189,248,0.2);">Abono</th>
+              <th style="padding:8px;text-align:right;color:var(--blue);border-bottom:1px solid rgba(56,189,248,0.2);">Saldo</th>
+              <th style="padding:8px;text-align:left;color:var(--blue);border-bottom:1px solid rgba(56,189,248,0.2);">Estado</th>
+            </tr></thead>
+            <tbody id="tbodyCartola"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="sec-presupuesto" class="section">
     <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
       <button class="btn-acc" style="padding:8px 18px;font-size:12px" onclick="openPresupModal()">+ Agregar Línea</button>
@@ -555,6 +638,181 @@ function delPresup(id){if(!confirm('¿Eliminar?'))return;PRESUPUESTO=PRESUPUESTO
 
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
+
+// ══════════════════════════════════════════════════════════
+// IMPORTAR CARTOLA BANCARIA
+// Soporta CSV, TXT (tab-separated), y pegado de texto
+// Compatible con BancoEstado, Santander, BCI, Scotiabank, etc.
+// ══════════════════════════════════════════════════════════
+let _cartolaData = []; // movimientos parseados de la cartola
+
+function handleCartolaDrop(e){
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if(file) procesarArchivoCartola(file);
+}
+
+function importarCartola(input){
+  const file = input.files[0];
+  if(file) procesarArchivoCartola(file);
+  input.value = '';
+}
+
+function procesarArchivoCartola(file){
+  if(file.size > 5*1024*1024){ alert('Archivo muy grande. Máximo 5MB.'); return; }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const texto = e.target.result;
+    parsearCartola(texto, file.name);
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function procesarTextoCartola(){
+  const texto = document.getElementById('cartolaTexto').value.trim();
+  if(!texto){ alert('Pega el contenido de la cartola primero'); return; }
+  parsearCartola(texto, 'texto_pegado.txt');
+}
+
+function parsearCartola(texto, nombreArchivo){
+  // Detectar separador (coma, punto y coma, tab)
+  const lineas = texto.split('\n').filter(l=>l.trim());
+  const sep = texto.includes(';') ? ';' : texto.includes('\t') ? '\t' : ',';
+  const rows = lineas.map(l=>l.split(sep).map(c=>c.replace(/["']/g,'').trim()));
+
+  _cartolaData = [];
+  let saltadas = 0;
+
+  rows.forEach(cols=>{
+    // Intentar detectar columnas de fecha, descripción, cargo, abono, saldo
+    // Formato común: Fecha | Descripción | Cargo | Abono | Saldo
+    // También: Fecha | N°Op | Descripción | Cargo | Abono | Saldo
+    let fecha='', desc='', cargo=0, abono=0, saldo=0;
+
+    // Detectar si la primera columna es fecha
+    const posibleFecha = cols[0]||'';
+    const esFecha = /\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}/.test(posibleFecha) ||
+                    /\d{4}-\d{2}-\d{2}/.test(posibleFecha);
+
+    if(!esFecha){ saltadas++; return; } // cabecera o línea inválida
+
+    // Normalizar fecha
+    fecha = posibleFecha.replace(/(\d{2})[\/-](\d{2})[\/-](\d{4})/,'$3-$2-$1')
+                        .replace(/(\d{4})[\/-](\d{2})[\/-](\d{2})/,'$1-$2-$3');
+    if(fecha.length < 8){ saltadas++; return; }
+
+    // Descripción — columna 1 o 2
+    if(cols.length >= 6){
+      // 6+ columnas: probablemente Fecha | N°Op | Desc | Cargo | Abono | Saldo
+      desc  = cols[2]||'Sin descripción';
+      cargo = parseFloat((cols[3]||'0').replace(/[$.]/g,'').replace(',','.')) || 0;
+      abono = parseFloat((cols[4]||'0').replace(/[$.]/g,'').replace(',','.')) || 0;
+      saldo = parseFloat((cols[5]||'0').replace(/[$.]/g,'').replace(',','.')) || 0;
+    } else if(cols.length >= 5){
+      // 5 columnas: Fecha | Desc | Cargo | Abono | Saldo
+      desc  = cols[1]||'Sin descripción';
+      cargo = parseFloat((cols[2]||'0').replace(/[$.]/g,'').replace(',','.')) || 0;
+      abono = parseFloat((cols[3]||'0').replace(/[$.]/g,'').replace(',','.')) || 0;
+      saldo = parseFloat((cols[4]||'0').replace(/[$.]/g,'').replace(',','.')) || 0;
+    } else if(cols.length >= 3){
+      // Mínimo: Fecha | Desc | Monto
+      desc  = cols[1]||'Sin descripción';
+      const monto = parseFloat((cols[2]||'0').replace(/[$.]/g,'').replace(',','.')) || 0;
+      if(monto < 0){ cargo = Math.abs(monto); } else { abono = monto; }
+    }
+
+    // Detectar si ya existe en los movimientos registrados
+    const yaExiste = MOVIMIENTOS.some(m=>
+      m.fecha === fecha &&
+      Math.abs(m.monto - (abono||cargo)) < 100 &&
+      (m.desc||'').toLowerCase().includes((desc||'').substring(0,10).toLowerCase())
+    );
+
+    _cartolaData.push({
+      fecha, desc, cargo, abono, saldo,
+      tipo: abono > 0 ? 'Ingreso' : 'Egreso',
+      monto: abono > 0 ? abono : cargo,
+      estado: yaExiste ? '✅ Conciliado' : '⚠ Nuevo',
+      nuevo: !yaExiste
+    });
+  });
+
+  if(!_cartolaData.length){
+    alert('No se pudieron detectar movimientos en el archivo.\n\nVerifica que el formato sea: Fecha | Descripción | Cargo | Abono\nSeparado por coma, punto y coma, o tabulador.');
+    return;
+  }
+
+  renderCartolaResultado();
+}
+
+function renderCartolaResultado(){
+  document.getElementById('cartolaResultado').style.display='block';
+  const nuevos    = _cartolaData.filter(m=>m.nuevo).length;
+  const concil    = _cartolaData.filter(m=>!m.nuevo).length;
+  const totalCargo= _cartolaData.reduce((s,m)=>s+m.cargo,0);
+  const totalAbono= _cartolaData.reduce((s,m)=>s+m.abono,0);
+
+  document.getElementById('cartolaStats').innerHTML =
+    `<span style="color:#34D399">${_cartolaData.length} movimientos</span> · ` +
+    `<span style="color:#F59E0B">${nuevos} nuevos</span> · ` +
+    `<span style="color:#A78BFA">${concil} ya registrados</span> · ` +
+    `Cargos: <span style="color:#EF4444">${clp(totalCargo)}</span> · ` +
+    `Abonos: <span style="color:#22C55E">${clp(totalAbono)}</span>`;
+
+  const tbody = document.getElementById('tbodyCartola');
+  tbody.innerHTML = _cartolaData.map(m=>`
+    <tr style="${m.nuevo?'':'opacity:.5'}">
+      <td style="padding:6px 8px">${m.fecha}</td>
+      <td style="padding:6px 8px;max-width:280px;overflow:hidden;text-overflow:ellipsis">${m.desc}</td>
+      <td style="padding:6px 8px;text-align:right;color:#EF4444">${m.cargo>0?clp(m.cargo):'—'}</td>
+      <td style="padding:6px 8px;text-align:right;color:#22C55E">${m.abono>0?clp(m.abono):'—'}</td>
+      <td style="padding:6px 8px;text-align:right;color:var(--muted)">${m.saldo>0?clp(m.saldo):'—'}</td>
+      <td style="padding:6px 8px"><span style="font-size:10px;font-family:monospace;padding:2px 8px;border-radius:10px;background:${m.nuevo?'rgba(245,158,11,0.15)':'rgba(52,211,153,0.12)'};color:${m.nuevo?'#F59E0B':'#34D399'}">${m.estado}</span></td>
+    </tr>`).join('');
+}
+
+function confirmarImport(){
+  const cuentaId = parseInt(document.getElementById('cartolaCuenta').value);
+  if(!cuentaId){ alert('Selecciona una cuenta bancaria primero'); return; }
+
+  const nuevos = _cartolaData.filter(m=>m.nuevo);
+  if(!nuevos.length){ alert('No hay movimientos nuevos para importar'); return; }
+
+  nuevos.forEach(m=>{
+    MOVIMIENTOS.push({
+      id:      uid(),
+      fecha:   m.fecha,
+      tipo:    m.tipo,
+      monto:   m.monto,
+      desc:    m.desc + ' [Importado cartola]',
+      cat:     m.tipo==='Ingreso'?'Abono bancario':'Cargo bancario',
+      cuentaId,
+      estado:  'Conciliado',
+      origen:  'cartola'
+    });
+  });
+
+  saveAll();
+  alert(`✅ ${nuevos.length} movimientos importados correctamente`);
+  limpiarCartola();
+  showTab('movimientos', document.querySelector('.tab[onclick*="movimientos"]'));
+}
+
+function limpiarCartola(){
+  _cartolaData = [];
+  document.getElementById('cartolaResultado').style.display='none';
+  document.getElementById('cartolaTexto').value='';
+}
+
+// Al abrir la tab cartola, actualizar el select de cuentas
+const origShowTab = showTab;
+window.showTab = function(id, btn){
+  origShowTab(id, btn);
+  if(id==='cartola'){
+    const sel=document.getElementById('cartolaCuenta');
+    if(sel) sel.innerHTML=CUENTAS_TES.map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
+  }
+};
 
 loadAll();
 populateCuentasSelects();

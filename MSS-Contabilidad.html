@@ -517,6 +517,11 @@ async function loadAll(){
   }catch(e){ASIENTOS=DEF_ASIENTOS.map(x=>({...x}));CUENTAS=PLAN_BASE.map(x=>({...x}));}
 }
 
+// ── Indicador de asientos automáticos ──
+// Los asientos con tipo 'venta' o 'compra' vienen automáticamente
+// de Facturación y Compras respectivamente. Se muestran con badge especial.
+function esAsientoAutomatico(a){ return a.automatico || a.tipo==='venta' || a.tipo==='compra'; }
+
 // ════════════════════════════════════════
 //  HELPERS
 // ════════════════════════════════════════
@@ -593,7 +598,7 @@ function renderDiario(){
   tbody.innerHTML=asientos.map((a,i)=>`<tr>
     <td style="color:var(--muted)">${i+1}</td>
     <td>${dateF(a.fecha)}</td>
-    <td>${badge(a.tipo,TIPO_COLOR[a.tipo]||'#5A7090')}</td>
+    <td>${badge(a.tipo,TIPO_COLOR[a.tipo]||'#5A7090')} ${esAsientoAutomatico(a)?'<span style="font-size:8px;background:rgba(52,211,153,0.12);color:#34D399;border:1px solid rgba(52,211,153,0.25);border-radius:10px;padding:1px 5px;font-family:monospace">⚡Auto</span>':''}</td>
     <td style="color:var(--white);max-width:220px;overflow:hidden;text-overflow:ellipsis">${a.glosa}</td>
     <td style="color:var(--ok);font-size:10px">${cuentaNombre(a.cuentaDebito)}</td>
     <td style="color:var(--danger);font-size:10px">${cuentaNombre(a.cuentaCredito)}</td>
