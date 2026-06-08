@@ -1312,6 +1312,18 @@ onAuthStateChanged(auth, async user => {
     localStorage.setItem('mss_cliente_email',  email);
     localStorage.setItem('mss_es_cliente_externo', 'true');
 
+    // ── Leer módulos permitidos del cliente desde Firestore ──
+    // Se guardan en localStorage para que TODOS los módulos los lean
+    try{
+      const cliId = clienteId.replace('cli_','');
+      const cliSnap = await getDoc(doc(db,'clientes/'+clienteId));
+      const cliSnap2 = await getDoc(doc(db,'clientes/'+cliId));
+      const cliData = cliSnap.exists() ? cliSnap.data() : cliSnap2.exists() ? cliSnap2.data() : null;
+      const modulos = cliData?.modulos || [];
+      localStorage.setItem('mss_modulos_permitidos', JSON.stringify(modulos));
+      sessionStorage.setItem('mss_modulos_permitidos', JSON.stringify(modulos));
+    }catch(e){ console.warn('Módulos cliente:', e.message); }
+
     // Buscar condominios propios del cliente en Firestore
     let condosCliente = [];
     try{
@@ -1358,6 +1370,17 @@ onAuthStateChanged(auth, async user => {
     localStorage.setItem('mss_cliente_id',     clienteId);
     localStorage.setItem('mss_cliente_email',  email);
     localStorage.setItem('mss_es_cliente_externo', 'true');
+
+    // ── Leer módulos permitidos del cliente desde Firestore ──
+    try{
+      const cliId2 = clienteId.replace('cli_','');
+      const cliSnapC = await getDoc(doc(db,'clientes/'+clienteId));
+      const cliSnapC2 = await getDoc(doc(db,'clientes/'+cliId2));
+      const cliDataC = cliSnapC.exists() ? cliSnapC.data() : cliSnapC2.exists() ? cliSnapC2.data() : null;
+      const modulosC = cliDataC?.modulos || [];
+      localStorage.setItem('mss_modulos_permitidos', JSON.stringify(modulosC));
+      sessionStorage.setItem('mss_modulos_permitidos', JSON.stringify(modulosC));
+    }catch(e){ console.warn('Módulos cliente comercial:', e.message); }
 
     // Buscar empresas propias del cliente en Firestore
     let empresasCliente = [];
