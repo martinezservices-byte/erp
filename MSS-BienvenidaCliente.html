@@ -52,7 +52,7 @@ h1{font-size:28px;font-weight:900;margin-bottom:8px;}
   <div class="sub" id="welcomeSub">Para comenzar, crea tu primer condominio o empresa.<br>Tus datos estarán completamente aislados y seguros.</div>
 
   <div class="cards" id="cardsTipo">
-    <div class="card" onclick="abrirModalCrear('condominio')">
+    <div class="card" data-tipo="condominio" onclick="abrirModalCrear('condominio')">
       <div class="card-ico">🏘</div>
       <div class="card-title">Crear Condominio</div>
       <div class="card-desc">Administra tu comunidad, cobros y residentes.</div>
@@ -63,7 +63,7 @@ h1{font-size:28px;font-weight:900;margin-bottom:8px;}
         <div class="card-feat">Auditoría financiera</div>
       </div>
     </div>
-    <div class="card" onclick="abrirModalCrear('empresa')">
+    <div class="card" data-tipo="empresa" onclick="abrirModalCrear('empresa')">
       <div class="card-ico">🏭</div>
       <div class="card-title">Crear Empresa</div>
       <div class="card-desc">Gestiona tu empresa comercial con todos los módulos.</div>
@@ -114,6 +114,32 @@ onAuthStateChanged(auth, async u=>{
   _user=u;
   _clienteId=localStorage.getItem('mss_cliente_id')||'cli_'+u.uid;
   const nombre=u.displayName||u.email?.split('@')[0]||'Cliente';
+
+  // Leer tipo autorizado desde Firestore para mostrar solo la opción correcta
+  let tipoAutorizado = 'ambos';
+  try{
+    const {getFirestore,doc,getDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const db2 = getFirestore(app2);
+    const snap = await getDoc(doc(db2,'usuarios/'+u.uid));
+    if(snap.exists()){
+      tipoAutorizado = snap.data().tipo || 'ambos';
+    }
+  }catch(e){}
+
+  // Ocultar la tarjeta no autorizada
+  const cards = document.querySelectorAll('.card[data-tipo]');
+  cards.forEach(card => {
+    const t = card.getAttribute('data-tipo');
+    if(tipoAutorizado === 'condominio' && t === 'empresa') card.style.display='none';
+    if(tipoAutorizado === 'comercial'  && t === 'condominio') card.style.display='none';
+  });
+  // Si solo tiene acceso a uno, ajustar el grid a 1 columna
+  if(tipoAutorizado !== 'ambos'){
+    document.getElementById('cardsTipo').style.gridTemplateColumns = '1fr';
+    document.getElementById('cardsTipo').style.maxWidth = '380px';
+    document.getElementById('cardsTipo').style.margin = '0 auto 32px';
+  }
+
   document.getElementById('welcomeSub').innerHTML=`¡Hola, <strong>${nombre}</strong>! Para comenzar, crea tu primera empresa o condominio.<br>Tus datos estarán completamente aislados y seguros.`;
 });
 

@@ -59,6 +59,8 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
 </head>
 <body>
 <div id="nav-bar" style="background:#030609;border-bottom:1px solid rgba(201,168,76,0.1);padding:0 16px;display:flex;align-items:center;gap:4px;overflow-x:auto;flex-shrink:0;height:42px;position:sticky;top:0;z-index:200;">
+<!-- nav-interno: solo visible para Gaudy (superadmin) -->
+<span id="nav-interno" style="display:contents">
 <a href="app.html" style="display:flex;align-items:center;padding:5px 10px;border-radius:6px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">🏠 Hub</a>
 <div style="width:1px;height:20px;background:rgba(201,168,76,0.15);margin:0 2px;flex-shrink:0"></div>
 <a href="MSS-Finanzas.html" style="padding:5px 9px;border-radius:6px;color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Finanzas</a>
@@ -72,10 +74,16 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
 <a href="MSS-Ventas-CRM.html" style="padding:5px 9px;border-radius:6px;color:#FB923C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Ventas</a>
 <a href="MSS-RRHH.html" style="padding:5px 9px;border-radius:6px;color:#A78BFA;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">RRHH</a>
 <a href="MSS-Estrategia.html" style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Estrategia</a>
-<a href="MSS-Condominio.html" style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.4);">🏢 Condominio</a>
 <a href="MSS-Logos.html" style="padding:5px 9px;border-radius:6px;color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Logos</a>
 <a href="MSS-Respaldo.html" style="padding:5px 9px;border-radius:6px;color:#64748B;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Respaldo</a>
-<a href="MSS-Auditoria.html" style="padding:4px 10px;border-radius:6px;color:var(--mutedHi);font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;background:rgba(167,139,250,0.1);color:#A78BFA;">📊 Auditoría</a>
+<a href="MSS-Auditoria.html" style="padding:4px 10px;border-radius:6px;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;background:rgba(167,139,250,0.1);color:#A78BFA;">📊 Auditoría</a>
+</span>
+<!-- nav-cliente: solo visible para clientes externos -->
+<span id="nav-cliente" style="display:none">
+<a href="MSS-Condominio.html" style="display:flex;align-items:center;padding:5px 10px;border-radius:6px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">🏢 Mi Condominio</a>
+<button onclick="cerrarSesionCliente()" style="margin-left:auto;padding:5px 12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#FCA5A5;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:monospace;white-space:nowrap;flex-shrink:0;">⏻ Salir</button>
+</span>
+<a href="MSS-Condominio.html" id="nav-condo-tab" style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.4);">🏢 Condominio</a>
   <div id="nav-emp" style="margin-left:auto;padding:3px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;font-size:9px;color:#C9A84C;font-family:monospace;white-space:nowrap;flex-shrink:0;display:none"></div>
 </div>
 <script>
@@ -295,6 +303,19 @@ try{var _e=_condoObj;if(_e&&_e.nombre){var _nd=document.getElementById('nav-emp'
         <div class="fl" style="grid-column:1/-1"><label>Modalidad de Cobro GC</label><select id="cfgModalidad" style="width:100%;padding:7px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;color:var(--white);font-family:monospace;font-size:11px;outline:none"><option value="fija">💰 Cuota Fija — mismo monto para todas las unidades</option><option value="prorrateo">📐 Prorrateo Variable — coeficiente de copropiedad (%)</option></select></div>
         <div class="fl"><label>Tasa Mora (%)</label><input id="cfgMora" type="number" step="0.1"/></div>
       </div>
+      <!-- LOGO DEL CONDOMINIO -->
+      <div class="fl" style="grid-column:1/-1;margin-bottom:12px">
+        <label>Logo del Condominio</label>
+        <div style="display:flex;align-items:center;gap:14px;margin-top:6px;background:var(--bg);border:1px solid var(--b2);border-radius:8px;padding:12px">
+          <div id="cfgLogoPreview" style="width:72px;height:72px;border-radius:10px;background:rgba(16,185,129,0.1);border:2px dashed rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;font-size:28px">🏢</div>
+          <div>
+            <input type="file" id="cfgLogoFile" accept="image/*" style="display:none" onchange="previewLogoConfig(this)"/>
+            <button type="button" onclick="document.getElementById('cfgLogoFile').click()" style="padding:7px 14px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:var(--acc);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;font-family:monospace;display:block;margin-bottom:6px">📁 Subir Logo</button>
+            <button type="button" id="cfgLogoQuitarBtn" onclick="quitarLogoConfig()" style="display:none;padding:4px 10px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:var(--danger);border-radius:5px;cursor:pointer;font-size:10px;font-family:monospace">✕ Quitar logo</button>
+            <div style="font-size:10px;color:var(--muted);margin-top:4px">PNG, JPG o SVG · Máx. 500KB · Se guarda en tu perfil</div>
+          </div>
+        </div>
+      </div>
       <button class="bg" onclick="saveConfig()">💾 Guardar</button>
       <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--b2)">
         <div style="font-size:11px;font-weight:700;color:var(--danger);margin-bottom:8px">🗑 Limpiar Datos</div>
@@ -452,7 +473,16 @@ function cid(){try{const e=JSON.parse(localStorage.getItem('mss_condominio_actua
 const ID=cid();
 const SK={cfg:'mss'+ID+'_cfg',u:'mss'+ID+'_u',co:'mss'+ID+'_co',eg:'mss'+ID+'_eg',fo:'mss'+ID+'_fo',no:'mss'+ID+'_no',ot:'mss'+ID+'_ot',to:'mss'+ID+'_to'};
 
-let CFG={nombre:'',dir:'',rut:'',admin:'Gaudy Martínez',tel:'+569 74889039',email:'aybserviciosg@gmail.com',banco:'',cuenta:'',gc:40000,mora:1.5};
+// CFG base — para clientes externos parte vacío, para Gaudy tiene sus datos
+const _esExt = localStorage.getItem('mss_es_cliente_externo')==='true';
+let CFG={
+  nombre: _CONDO_NOMBRE||'',
+  dir:'',rut:'',
+  admin: _esExt ? '' : 'Gaudy Martínez',
+  tel:   _esExt ? '' : '+569 74889039',
+  email: _esExt ? '' : 'aybserviciosg@gmail.com',
+  banco:'',cuenta:'',gc:40000,mora:1.5
+};
 let UNIDADES=[],COBROS=[],EGRESOS=[],FONDO=[],NOVEDADES=[],OT=[],TORRES=[];
 let _id=50000; const uid=()=>++_id;
 const HOY=new Date().toISOString().split('T')[0];
@@ -473,10 +503,35 @@ async function initFirebase(){
     const app=getApps().length?getApps()[0]:initializeApp(FB);
     const auth=fa.getAuth(app);
     await new Promise((resolve)=>{
-      const unsub=fa.onAuthStateChanged(auth,user=>{
+      const unsub=fa.onAuthStateChanged(auth,async user=>{
         unsub();
-        if(!user){window.location.href='MSS-Login.html';}
-        else{window._MSS_USER=user;_db=fb.getFirestore(app);window._fbM=fb;_fbReady=true;resolve();}
+        if(!user){window.location.href='MSS-Login.html';return;}
+        window._MSS_USER=user;_db=fb.getFirestore(app);window._fbM=fb;_fbReady=true;
+
+        // ── Control de nav según rol ──
+        const esClienteExt = localStorage.getItem('mss_es_cliente_externo')==='true';
+        const esAdmin = (user.email||'').toLowerCase()==='aybserviciosg@gmail.com';
+        if(esClienteExt && !esAdmin){
+          // Cliente externo → solo ve su condominio
+          const ni=document.getElementById('nav-interno');
+          const nc=document.getElementById('nav-cliente');
+          const ct=document.getElementById('nav-condo-tab');
+          if(ni) ni.style.display='none';
+          if(nc) nc.style.display='contents';
+          if(ct) ct.style.display='none';
+          // Botón cerrar sesión del nav cliente
+          window.cerrarSesionCliente=async function(){
+            if(!confirm('¿Cerrar sesión?'))return;
+            await fa.signOut(auth);
+            localStorage.removeItem('mss_es_cliente_externo');
+            localStorage.removeItem('mss_cliente_uid');
+            localStorage.removeItem('mss_cliente_id');
+            localStorage.removeItem('mss_empresa_actual');
+            localStorage.removeItem('mss_condominio_actual');
+            window.location.href='MSS-Login.html';
+          };
+        }
+        resolve();
       });
     });
     console.log('✅ Firebase OK');
@@ -1200,10 +1255,60 @@ function rConfig(){
   document.getElementById('cfgGC').value=CFG.gc||40000;
   if(document.getElementById('cfgModalidad'))document.getElementById('cfgModalidad').value=CFG.modalidad||'fija';
   document.getElementById('cfgMora').value=CFG.mora||1.5;
+  cargarLogoConfig();
+}
+
+// ── LOGO CONFIGURACIÓN ──
+let _cfgLogoData = null;
+
+function previewLogoConfig(input){
+  const file=input.files[0];
+  if(!file)return;
+  if(file.size>600000){alert('El logo debe ser menor a 500KB');return;}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    _cfgLogoData=e.target.result;
+    const prev=document.getElementById('cfgLogoPreview');
+    prev.innerHTML=`<img src="${e.target.result}" style="width:100%;height:100%;object-fit:contain;border-radius:8px"/>`;
+    prev.style.fontSize='';
+    const qBtn=document.getElementById('cfgLogoQuitarBtn');
+    if(qBtn)qBtn.style.display='block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function quitarLogoConfig(){
+  _cfgLogoData='QUITAR';
+  const prev=document.getElementById('cfgLogoPreview');
+  prev.innerHTML='🏢';prev.style.fontSize='28px';
+  const qBtn=document.getElementById('cfgLogoQuitarBtn');
+  if(qBtn)qBtn.style.display='none';
+  // Borrar del storage
+  try{localStorage.removeItem('mss_logo_condo_'+_CONDO_ID);}catch(e){}
+}
+
+function cargarLogoConfig(){
+  const logoKey='mss_logo_condo_'+_CONDO_ID;
+  const logo=localStorage.getItem(logoKey)||null;
+  const prev=document.getElementById('cfgLogoPreview');
+  const qBtn=document.getElementById('cfgLogoQuitarBtn');
+  if(logo&&prev){
+    prev.innerHTML=`<img src="${logo}" style="width:100%;height:100%;object-fit:contain;border-radius:8px"/>`;
+    prev.style.fontSize='';
+    if(qBtn)qBtn.style.display='block';
+  }
 }
 
 function saveConfig(){
   CFG={nombre:document.getElementById('cfgNombre').value,dir:document.getElementById('cfgDir').value,rut:document.getElementById('cfgRut').value,admin:document.getElementById('cfgAdmin').value,tel:document.getElementById('cfgTel').value,email:document.getElementById('cfgEmail').value,banco:document.getElementById('cfgBanco').value,cuenta:document.getElementById('cfgCuenta').value,gc:parseFloat(document.getElementById('cfgGC').value)||40000,mora:parseFloat(document.getElementById('cfgMora').value)||1.5,modalidad:document.getElementById('cfgModalidad')?.value||'fija'};
+  // Guardar logo si se subió uno nuevo
+  if(_cfgLogoData && _cfgLogoData!=='QUITAR'){
+    try{localStorage.setItem('mss_logo_condo_'+_CONDO_ID, _cfgLogoData);}catch(e){alert('Logo muy grande para guardar localmente');}
+    _cfgLogoData=null;
+  } else if(_cfgLogoData==='QUITAR'){
+    try{localStorage.removeItem('mss_logo_condo_'+_CONDO_ID);}catch(e){}
+    _cfgLogoData=null;
+  }
   save();document.getElementById('condNombre').textContent=CFG.nombre||'Condominio';alert('✓ Guardado');
 }
 
