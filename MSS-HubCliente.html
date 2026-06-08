@@ -122,6 +122,22 @@ body{background:var(--bg);color:var(--txt);font-family:var(--body);min-height:10
   <div class="spinner"></div>
   <div style="font-size:11px;color:var(--mutedHi);font-family:var(--mono);">Cargando tu panel...</div>
 </div>
+<script>
+// Mostrar hub inmediatamente si ya hay datos en caché de sesión
+(function(){
+  try{
+    const cache = sessionStorage.getItem('mss_hub_cache');
+    if(cache){
+      const d = JSON.parse(cache);
+      // Pre-rellenar nombre y empresa para evitar flash
+      const gn = document.getElementById('gNombre');
+      const en = document.getElementById('empNm');
+      if(gn && d.nombre) gn.textContent = d.nombre.split(' ')[0];
+      if(en && d.empNombre) en.textContent = d.empNombre;
+    }
+  }catch(e){}
+})();
+</script>
 
 <div id="main">
   <div class="g-date" id="gDate"></div>
@@ -179,16 +195,16 @@ const AREAS_DEF = {
     desc: 'Panel completo de administración comunitaria.',
     mods: [
       {id:'condo_dashboard',  icon:'📊', nm:'Dashboard',        desc:'Resumen general y KPIs',           href:'MSS-Condominio.html'},
-      {id:'condo_unidades',   icon:'🏠', nm:'Unidades',         desc:'Registro de departamentos',        href:'MSS-Condominio.html#unidades'},
-      {id:'condo_gastos',     icon:'💰', nm:'Gastos Comunes',   desc:'Cobros y recaudación mensual',     href:'MSS-Condominio.html#gastos'},
-      {id:'condo_egresos',    icon:'📤', nm:'Egresos',          desc:'Gastos y pagos del condominio',    href:'MSS-Condominio.html#egresos'},
-      {id:'condo_morosidad',  icon:'⚠', nm:'Morosidad',        desc:'Control de deudas y morosos',      href:'MSS-Condominio.html#morosidad'},
-      {id:'condo_reserva',    icon:'🏦', nm:'Fondo de Reserva', desc:'Fondo de emergencia',              href:'MSS-Condominio.html#reserva'},
-      {id:'condo_novedades',  icon:'📣', nm:'Novedades',        desc:'Comunicados a residentes',         href:'MSS-Condominio.html#novedades'},
-      {id:'condo_residentes', icon:'👥', nm:'Panel Residente',  desc:'Gestión de residentes',            href:'MSS-Condominio.html#residentes'},
-      {id:'condo_mant',       icon:'🔧', nm:'Mantenimiento',    desc:'Solicitudes y órdenes de trabajo', href:'MSS-Condominio.html#mantenimiento'},
-      {id:'condo_rendicion',  icon:'📄', nm:'Rendición',        desc:'Informes financieros',             href:'MSS-Condominio.html#rendicion'},
-      {id:'condo_config',     icon:'⚙', nm:'Configuración',    desc:'Datos y logo del condominio',      href:'MSS-Condominio.html#config'},
+      {id:'condo_unidades',   icon:'🏠', nm:'Unidades',         desc:'Registro de departamentos',        href:'MSS-Condominio.html?tab=unidades'},
+      {id:'condo_gastos',     icon:'💰', nm:'Gastos Comunes',   desc:'Cobros y recaudación mensual',     href:'MSS-Condominio.html?tab=gastos'},
+      {id:'condo_egresos',    icon:'📤', nm:'Egresos',          desc:'Gastos y pagos del condominio',    href:'MSS-Condominio.html?tab=egresos'},
+      {id:'condo_morosidad',  icon:'⚠', nm:'Morosidad',        desc:'Control de deudas y morosos',      href:'MSS-Condominio.html?tab=morosidad'},
+      {id:'condo_reserva',    icon:'🏦', nm:'Fondo de Reserva', desc:'Fondo de emergencia',              href:'MSS-Condominio.html?tab=fondo'},
+      {id:'condo_novedades',  icon:'📣', nm:'Novedades',        desc:'Comunicados a residentes',         href:'MSS-Condominio.html?tab=novedades'},
+      {id:'condo_residentes', icon:'👥', nm:'Panel Residente',  desc:'Gestión de residentes',            href:'MSS-Condominio.html?tab=panel'},
+      {id:'condo_mant',       icon:'🔧', nm:'Mantenimiento',    desc:'Solicitudes y órdenes de trabajo', href:'MSS-Condominio.html?tab=mantenimiento'},
+      {id:'condo_rendicion',  icon:'📄', nm:'Rendición',        desc:'Informes financieros',             href:'MSS-Condominio.html?tab=rendicion'},
+      {id:'condo_config',     icon:'⚙', nm:'Configuración',    desc:'Datos y logo del condominio',      href:'MSS-Condominio.html?tab=config'},
     ]
   },
 
@@ -206,12 +222,12 @@ const AREAS_DEF = {
     icon: '👥', color: '#22C55E',
     desc: 'Gestión completa de personal, sueldos y contratos.',
     mods: [
-      {id:'rrhh_fichas',    icon:'👤', nm:'Fichas de Personal',  desc:'Registro y gestión de personas',      href:'MSS-RRHH.html'},
+      {id:'rrhh_fichas',    icon:'👤', nm:'Fichas de Personal',  desc:'Registro y gestión de personas',      href:'MSS-RRHH.html?tab=personas'},
       {id:'remuner',        icon:'👷', nm:'Remuneraciones',      desc:'Liquidaciones, AFP, impuesto 2ª cat.',  href:'MSS-Remuneraciones.html'},
       {id:'contratos',      icon:'📄', nm:'Contratos',           desc:'Contratos de trabajo y anexos',         href:'MSS-Contratos.html'},
-      {id:'finiquitos',     icon:'📋', nm:'Finiquitos',          desc:'Cálculo y generación de finiquitos',    href:'MSS-Remuneraciones.html#finiquitos'},
+      {id:'finiquitos',     icon:'📋', nm:'Finiquitos',          desc:'Cálculo y generación de finiquitos',    href:'MSS-Remuneraciones.html?tab=finiquitos'},
       {id:'portal_trab',    icon:'🧑', nm:'Portal Trabajador',   desc:'Acceso privado para colaboradores',     href:'MSS-PortalTrabajador.html'},
-      {id:'libro_rem',      icon:'📗', nm:'Libro de Remun.',     desc:'Libro oficial de remuneraciones',       href:'MSS-Remuneraciones.html#libro'},
+      {id:'libro_rem',      icon:'📗', nm:'Libro de Remun.',     desc:'Libro oficial de remuneraciones',       href:'MSS-Remuneraciones.html?tab=libro'},
     ]
   },
 
@@ -220,10 +236,10 @@ const AREAS_DEF = {
     icon: '📗', color: '#10B981',
     desc: 'Libros, balances y asientos automáticos.',
     mods: [
-      {id:'cont_diario',  icon:'📒', nm:'Libro Diario',        desc:'Registro cronológico de asientos',   href:'MSS-Contabilidad.html#diario'},
-      {id:'cont_mayor',   icon:'📓', nm:'Libro Mayor',         desc:'Cuentas y saldos por cuenta',        href:'MSS-Contabilidad.html#mayor'},
-      {id:'cont_balance', icon:'📊', nm:'Balance General',     desc:'Activos, pasivos y patrimonio',      href:'MSS-Contabilidad.html#balance'},
-      {id:'cont_eerr',    icon:'📈', nm:'Estado de Resultados',desc:'Ingresos, costos y utilidades',      href:'MSS-Contabilidad.html#eerr'},
+      {id:'cont_diario',  icon:'📒', nm:'Libro Diario',        desc:'Registro cronológico de asientos',   href:'MSS-Contabilidad.html?tab=diario'},
+      {id:'cont_mayor',   icon:'📓', nm:'Libro Mayor',         desc:'Cuentas y saldos por cuenta',        href:'MSS-Contabilidad.html?tab=mayor'},
+      {id:'cont_balance', icon:'📊', nm:'Balance General',     desc:'Activos, pasivos y patrimonio',      href:'MSS-Contabilidad.html?tab=balance'},
+      {id:'cont_eerr',    icon:'📈', nm:'Estado de Resultados',desc:'Ingresos, costos y utilidades',      href:'MSS-Contabilidad.html?tab=resultados'},
       {id:'finanzas',     icon:'₲',  nm:'Finanzas / Flujo',    desc:'Flujo de caja y proyección',         href:'MSS-Finanzas.html'},
       {id:'tesoreria',    icon:'🏦', nm:'Tesorería Bancaria',  desc:'Cuentas, movimientos y cartolas',    href:'MSS-Tesoreria.html'},
     ]
@@ -237,8 +253,8 @@ const AREAS_DEF = {
       {id:'facturas',    icon:'🧾', nm:'Facturas / Boletas',  desc:'Emisión de documentos tributarios',  href:'MSS-Facturacion.html'},
       {id:'compras',     icon:'🛒', nm:'Compras y Proveedores',desc:'Registro de compras y cuentas por pagar', href:'MSS-Compras.html'},
       {id:'cotizacion',  icon:'📋', nm:'Cotizaciones',        desc:'Presupuestos profesionales con logo', href:'MSS-Cotizacion.html'},
-      {id:'lib_compras', icon:'📥', nm:'Libro de Compras',    desc:'Registro IVA crédito fiscal',        href:'MSS-Facturacion.html#libros'},
-      {id:'lib_ventas',  icon:'📤', nm:'Libro de Ventas',     desc:'Registro IVA débito fiscal',         href:'MSS-Facturacion.html#libros'},
+      {id:'lib_compras', icon:'📥', nm:'Libro de Compras',    desc:'Registro IVA crédito fiscal',        href:'MSS-Facturacion.html'},
+      {id:'lib_ventas',  icon:'📤', nm:'Libro de Ventas',     desc:'Registro IVA débito fiscal',         href:'MSS-Facturacion.html'},
     ]
   },
 
@@ -346,6 +362,13 @@ function renderHub(nombre, dias){
   if(dias!==null)be.innerHTML+=`<span class="badge" style="background:rgba(56,189,248,0.1);color:#38BDF8;border:1px solid rgba(56,189,248,0.2)">Demo · ${dias} días</span>`;
 
   renderAreas();
+  // Guardar caché para retorno rápido
+  try{
+    sessionStorage.setItem('mss_hub_cache', JSON.stringify({
+      nombre: nombre,
+      empNombre: (_condo||{}).nombre||''
+    }));
+  }catch(e){}
   document.getElementById('loading').style.display='none';
   document.getElementById('main').style.display='block';
 }

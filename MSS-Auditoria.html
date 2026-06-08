@@ -292,7 +292,14 @@ let _movimientos=[], _cobros=[], _egresos=[], _unidades=[], _personal=[], _contr
 let _charts={}, _unsubs=[];
 
 // ── CATÁLOGO DE ENTIDADES ──
-const EMPRESAS=[
+// ── GUARD: Cliente externo → solo ve su empresa ──
+const _esClienteExtAud = localStorage.getItem('mss_es_cliente_externo') === 'true';
+const _empActualAud = (()=>{try{return JSON.parse(localStorage.getItem('mss_empresa_actual')||'null');}catch(e){return null;}})();
+if(_esClienteExtAud && !_empActualAud){ window.location.href='MSS-HubCliente.html'; }
+
+const EMPRESAS = _esClienteExtAud && _empActualAud
+  ? [_empActualAud]  // Cliente externo solo ve su propia empresa
+  : [
   {id:1,nombre:'Martinez Services Spa',tipo:'comercial'},
   {id:3,nombre:'M&P Arriendos y Servicios SpA',tipo:'comercial'},
 ];
@@ -795,6 +802,19 @@ window.exportarCSV=function(){
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download='auditoria_'+_entidadNombre.replace(/\s/g,'_')+'_'+new Date().toISOString().split('T')[0]+'.csv';a.click();
 };
+
+// ── Leer tab desde URL ──
+(function(){
+  const p = new URLSearchParams(window.location.search).get('tab');
+  if(p){
+    const tryTab = (n) => {
+      const btn = document.querySelector('.tab[onclick*="' + p + '"]');
+      if(btn){ showTab(p, btn); }
+      else if(n>0){ setTimeout(()=>tryTab(n-1), 400); }
+    };
+    setTimeout(()=>tryTab(8), 700);
+  }
+})();
 </script>
 </body>
 </html>

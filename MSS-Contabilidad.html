@@ -216,15 +216,22 @@ async function _fbGetDoc(path){
 // ═══════════════════════════════════════════════════
 // EMPRESA DINÁMICA — Lee empresa seleccionada en Hub
 // ═══════════════════════════════════════════════════
-// ── EMPRESA COMERCIAL — lee mss_empresa_actual, rechaza condominios ──
+// ── GUARD: Cliente externo no puede ver datos de Gaudy ──
+const _esClienteExt = localStorage.getItem('mss_es_cliente_externo') === 'true';
 const _empRaw = localStorage.getItem('mss_empresa_actual');
-const _empObj = (()=>{
+const EMP = (function(){
   try{
     const o = _empRaw ? JSON.parse(_empRaw) : null;
-    // SEGURIDAD: si es condominio, no cargar datos aquí
+    if(_esClienteExt && (!o || o.tipo === 'condominio')){
+      window.location.href = 'MSS-HubCliente.html';
+      return {id:'ext', nombre:'Mi Empresa', rut:''};
+    }
     if(o && o.tipo === 'condominio') return {id:1, nombre:'Mi Empresa'};
     return o || {id:1, nombre:'Mi Empresa'};
-  }catch(e){ return {id:1, nombre:'Mi Empresa'}; }
+  }catch(e){
+    if(localStorage.getItem('mss_es_cliente_externo')==='true'){ window.location.href='MSS-HubCliente.html'; }
+    return {id:1, nombre:'Mi Empresa'};
+  }
 })();
 window._MSS_EMP = _empObj;
 const _EMP_ID   = _empObj.id || 1;
@@ -952,6 +959,19 @@ populateCuentasSelects();
 document.getElementById('hInfo').textContent=`${ASIENTOS.length} asientos · ${CUENTAS.length} cuentas`;
 
 try{var _l=document.getElementById('_empNombreLogo');if(_l&&window._MSS_EMP)_l.textContent=window._MSS_EMP.nombre||_empObj.nombre||'Mi Empresa';}catch(e){}
+
+// ── Leer tab desde URL ──
+(function(){
+  const p = new URLSearchParams(window.location.search).get('tab');
+  if(p){
+    const tryTab = (n) => {
+      const btn = document.querySelector('.tab[onclick*="' + p + '"]');
+      if(btn){ showTab(p,btn); }
+      else if(n>0){ setTimeout(()=>tryTab(n-1), 400); }
+    };
+    setTimeout(()=>tryTab(8), 800);
+  }
+})();
 </script>
 </body>
 </html>

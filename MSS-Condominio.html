@@ -155,11 +155,6 @@ try{var _e=_condoObj;if(_e&&_e.nombre){var _nd=document.getElementById('nav-emp'
       <div class="card"><div class="ct">Últimos Movimientos</div><div id="dashMovs"></div></div>
     </div>
     <div class="card"><div class="ct">⚠ Alertas de Morosidad</div><div id="dashMora"></div></div>
-    <!-- Tarjeta acceso rápido a módulos — solo visible para clientes externos -->
-    <div class="card" id="cardModulosCliente" style="display:none">
-      <div class="ct">🚀 Acceso Rápido a Tus Módulos</div>
-      <div id="gridModulosCliente" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:12px"></div>
-    </div>
   </div>
 
   <!-- UNIDADES -->
@@ -571,7 +566,7 @@ async function initFirebase(){
             localStorage.setItem('mss_cliente_id', clienteIdUser||('cli_'+user.uid));
             localStorage.setItem('mss_modulos_permitidos', JSON.stringify(modulosUser));
 
-            // ── Aplicar nav según módulos autorizados ──
+            // Aplicar nav: ocultar módulos no autorizados
             const ni=document.getElementById('nav-interno');
             const nc=document.getElementById('nav-cliente');
             const ct=document.getElementById('nav-condo-tab');
@@ -579,46 +574,32 @@ async function initFirebase(){
             if(nc) nc.style.display='contents';
             if(ct) ct.style.display='none';
 
-            // MAPA COMPLETO de módulos para clientes condominio
-            const TODOS_MODULOS = {
-              condominio:        {href:'MSS-Condominio.html',                                    label:'🏢 Condominio',  color:'#10B981'},
-              rrhh:              {href:'javascript:void(0)', onclick:"abrirModuloCondo('MSS-Remuneraciones.html')", label:'👷 Remuner.',   color:'#22C55E'},
-              remuneraciones:    {href:'javascript:void(0)', onclick:"abrirModuloCondo('MSS-Remuneraciones.html')", label:'👷 Remuner.',   color:'#22C55E'},
-              contratos:         {href:'javascript:void(0)', onclick:"abrirModuloCondo('MSS-Contratos.html')",      label:'📄 Contratos', color:'#A78BFA'},
-              auditoria:         {href:'javascript:void(0)', onclick:"abrirModuloCondo('MSS-Auditoria.html')",      label:'📊 Auditoría', color:'#A78BFA'},
-              finanzas:          {href:'javascript:void(0)', onclick:"abrirModuloCondo('MSS-Finanzas.html')",       label:'₲ Finanzas',   color:'#C9A84C'},
-              facturacion:       {href:'javascript:void(0)', onclick:"abrirModuloCondo('MSS-Facturacion.html')",    label:'🧾 Factur.',   color:'#38BDF8'},
-              tesoreria:         {href:'javascript:void(0)', onclick:"abrirModuloCondo('MSS-Tesoreria.html')",      label:'🏦 Tesorería', color:'#FBBF24'},
-              proyectos:         {href:'javascript:void(0)', onclick:"abrirModuloCondo('MSS-Proyectos.html')",      label:'◈ Proyectos', color:'#38BDF8'},
-              app_residentes:    {href:'MSS-CondoMovil.html',                                   label:'📱 App Resid.', color:'#F59E0B'},
-              portal_trabajador: {href:'MSS-PortalTrabajador.html',                             label:'🧑 Portal Trab.', color:'#34D399'},
-              estrategia:        {href:'javascript:void(0)', onclick:"abrirModuloCondo('MSS-Estrategia.html')",     label:'◆ Estrategia',color:'#10B981'},
+            // Si tiene acceso a RRHH o Contratos, mostrar esos links en nav-cliente
+            const MODULOS_EXTRA = {
+              rrhh:           {href:'javascript:void(0)', onclick:"abrirModuloCondo('MSS-Remuneraciones.html')", label:'👷 Remuner.', color:'#22C55E'},
+              contratos:      {href:'javascript:void(0)', onclick:"abrirModuloCondo('MSS-Contratos.html')", label:'📄 Contratos', color:'#A78BFA'},
+              remuneraciones: {href:'javascript:void(0)', onclick:"abrirModuloCondo('MSS-Remuneraciones.html')", label:'👷 Remuner.', color:'#22C55E'},
             };
-
-            // El módulo condominio siempre está (ya está en el HTML fijo)
-            // Agregar el resto de módulos autorizados al nav-cliente
             if(nc){
-              const yaAgregados = new Set(['condominio']);
               modulosUser.forEach(mod=>{
-                if(yaAgregados.has(mod)) return;
-                const ex = TODOS_MODULOS[mod];
-                if(!ex) return;
-                yaAgregados.add(mod);
-                const a = document.createElement('a');
-                a.href = ex.href || 'javascript:void(0)';
-                if(ex.onclick) a.setAttribute('onclick', ex.onclick);
-                a.setAttribute('data-mod', mod);
-                a.style.cssText = 'padding:5px 9px;border-radius:6px;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;color:'+ex.color;
-                a.textContent = ex.label;
-                // Insertar antes del botón Salir
-                const salirBtn = nc.querySelector('button');
-                if(salirBtn) nc.insertBefore(a, salirBtn);
-                else nc.appendChild(a);
+                const ex = MODULOS_EXTRA[mod];
+                if(ex){
+                  // Evitar duplicados
+                  if(!nc.querySelector('[data-mod="'+mod+'"]')){
+                    const a = document.createElement('a');
+                    a.href = ex.href;
+                    if(ex.onclick) a.setAttribute('onclick', ex.onclick);
+                    a.setAttribute('data-mod', mod);
+                    a.style.cssText = 'padding:5px 9px;border-radius:6px;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;color:'+ex.color;
+                    a.textContent = ex.label;
+                    // Insertar antes del botón Salir
+                    const salirBtn = nc.querySelector('button');
+                    if(salirBtn) nc.insertBefore(a, salirBtn);
+                    else nc.appendChild(a);
+                  }
+                }
               });
             }
-          // Renderizar tarjeta de módulos en el dashboard
-          renderModulosCliente(modulosUser);
-
           }catch(eAuth){
             console.warn('Auth check Condominio:', eAuth.message);
             // Si falla la lectura de Firestore, ocultar nav por seguridad
@@ -631,48 +612,6 @@ async function initFirebase(){
     });
     console.log('✅ Firebase OK');
   }catch(e){console.warn('Firebase no disponible:',e.message);_fbReady=false;}
-}
-
-// ── TARJETA DE MÓDULOS PARA CLIENTES EXTERNOS ──
-function renderModulosCliente(modulosUser){
-  const card = document.getElementById('cardModulosCliente');
-  const grid = document.getElementById('gridModulosCliente');
-  if(!card || !grid || !modulosUser || modulosUser.length === 0) return;
-
-  const MAPA = {
-    condominio:        {label:'🏢 Condominio',     color:'#10B981', href:'MSS-Condominio.html'},
-    rrhh:              {label:'👷 Remuneraciones',  color:'#22C55E', onclick:"abrirModuloCondo('MSS-Remuneraciones.html')"},
-    remuneraciones:    {label:'👷 Remuneraciones',  color:'#22C55E', onclick:"abrirModuloCondo('MSS-Remuneraciones.html')"},
-    contratos:         {label:'📄 Contratos',       color:'#A78BFA', onclick:"abrirModuloCondo('MSS-Contratos.html')"},
-    auditoria:         {label:'📊 Auditoría',       color:'#A78BFA', onclick:"abrirModuloCondo('MSS-Auditoria.html')"},
-    finanzas:          {label:'₲ Finanzas',         color:'#C9A84C', onclick:"abrirModuloCondo('MSS-Finanzas.html')"},
-    facturacion:       {label:'🧾 Facturación',     color:'#38BDF8', onclick:"abrirModuloCondo('MSS-Facturacion.html')"},
-    tesoreria:         {label:'🏦 Tesorería',       color:'#FBBF24', onclick:"abrirModuloCondo('MSS-Tesoreria.html')"},
-    proyectos:         {label:'◈ Proyectos',        color:'#38BDF8', onclick:"abrirModuloCondo('MSS-Proyectos.html')"},
-    app_residentes:    {label:'📱 App Residentes',  color:'#F59E0B', href:'MSS-CondoMovil.html'},
-    portal_trabajador: {label:'🧑 Portal Trabajador',color:'#34D399', href:'MSS-PortalTrabajador.html'},
-    estrategia:        {label:'◆ Estrategia',       color:'#10B981', onclick:"abrirModuloCondo('MSS-Estrategia.html')"},
-  };
-
-  grid.innerHTML = '';
-  const vistos = new Set();
-  modulosUser.forEach(mod => {
-    const m = MAPA[mod];
-    if(!m || vistos.has(m.label)) return;
-    vistos.add(m.label);
-    const btn = document.createElement(m.href ? 'a' : 'button');
-    if(m.href){ btn.href = m.href; }
-    else { btn.type='button'; btn.setAttribute('onclick', m.onclick); }
-    btn.style.cssText = `display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 8px;background:${m.color}15;border:1px solid ${m.color}30;border-radius:10px;color:${m.color};cursor:pointer;font-family:monospace;font-size:11px;font-weight:700;text-align:center;text-decoration:none;transition:all .15s;`;
-    btn.onmouseover = function(){ this.style.transform='translateY(-2px)'; this.style.background=m.color+'25'; };
-    btn.onmouseout  = function(){ this.style.transform=''; this.style.background=m.color+'15'; };
-    const icon = m.label.split(' ')[0];
-    const texto = m.label.split(' ').slice(1).join(' ');
-    btn.innerHTML = `<span style="font-size:20px">${icon}</span><span>${texto}</span>`;
-    grid.appendChild(btn);
-  });
-
-  if(grid.children.length > 0) card.style.display = 'block';
 }
 
 function ep(){return 'condominios/'+_CONDO_ID;}
@@ -1757,6 +1696,19 @@ function pdfHistorialResidente(uId){
   if(!v){alert('\u26a0 Permite ventanas emergentes');return;}
   v.document.write(html);v.document.close();
 }
+
+// ── Leer tab desde URL: MSS-Condominio.html?tab=unidades ──
+(function(){
+  const p = new URLSearchParams(window.location.search).get('tab');
+  if(p){
+    const tryTab = function(intentos){
+      const btn = document.querySelector('.tab[onclick*="' + p + '"]');
+      if(btn){ T(p, btn); }
+      else if(intentos > 0){ setTimeout(function(){tryTab(intentos-1);}, 400); }
+    };
+    setTimeout(function(){tryTab(8);}, 600);
+  }
+})();
 </script>
 </body>
 </html>

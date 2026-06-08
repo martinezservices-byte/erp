@@ -218,8 +218,22 @@ async function _fbGetDoc(path){
 // ═══════════════════════════════════════════════════
 // ── MODO DUAL: Empresa Comercial O Condominio ──
 const _condoActual = (()=>{try{const r=localStorage.getItem('mss_condominio_actual');return r?JSON.parse(r):null;}catch(e){return null;}})();
+// ── GUARD: Cliente externo no puede ver datos de Gaudy ──
+const _esClienteExt = localStorage.getItem('mss_es_cliente_externo') === 'true';
 const _empRaw = localStorage.getItem('mss_empresa_actual');
-const _empObjRaw = (()=>{try{return _empRaw?JSON.parse(_empRaw):null;}catch(e){return null;}})();
+const _empObjRaw = (()=>{
+  try{
+    const o = _empRaw ? JSON.parse(_empRaw) : null;
+    if(_esClienteExt && (!o || o.tipo === 'condominio')){
+      window.location.href = 'MSS-HubCliente.html';
+      return {id:'ext', nombre:'Mi Empresa', rut:''};
+    }
+    return o;
+  }catch(e){
+    if(localStorage.getItem('mss_es_cliente_externo')==='true'){ window.location.href='MSS-HubCliente.html'; }
+    return null;
+  }
+})();
 // Detectar si venimos del condominio
 const _MODO_CONDO = !!(
   _condoActual && (
@@ -2274,6 +2288,19 @@ function exportarExcel(rows,nombre){
   const csv=rows.map(r=>r.map(c=>typeof c==='string'&&c.includes(';')?'"'+c+'"':c).join(';')).join('\n');
   descargarArchivo(nombre+'.csv',csv,'text/csv;charset=utf-8;');
 }
+
+// ── Leer tab desde URL ──
+(function(){
+  const p = new URLSearchParams(window.location.search).get('tab');
+  if(p){
+    const tryTab = (n) => {
+      const btn = document.querySelector('.tab[onclick*="' + p + '"]');
+      if(btn){ showTab(p, btn); }
+      else if(n>0){ setTimeout(()=>tryTab(n-1), 400); }
+    };
+    setTimeout(()=>tryTab(8), 700);
+  }
+})();
 </script>
 </body>
 </html>
