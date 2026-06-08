@@ -3,22 +3,23 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Mi Panel — Martinez Services ERP</title>
+<title>Portal Cliente — Martinez Services ERP</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
   --bg:#04080F;--surf:#08101C;--surf2:#0D1929;--surf3:#111f33;
-  --brd:rgba(255,255,255,0.06);--brd2:rgba(255,255,255,0.04);
+  --brd:rgba(255,255,255,0.07);--brd2:rgba(255,255,255,0.04);
   --txt:#E2E8F0;--muted:#475569;--mutedHi:#64748B;
   --body:'Segoe UI',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
 }
 body{background:var(--bg);color:var(--txt);font-family:var(--body);min-height:100vh;display:flex;flex-direction:column;}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-/* TOPBAR */
-#topbar{background:var(--surf);border-bottom:1px solid var(--brd);padding:0 20px;height:52px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;flex-shrink:0;}
-#tbLogo{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+/* ── TOPBAR ── */
+#topbar{background:var(--surf);border-bottom:1px solid var(--brd);padding:0 24px;height:54px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:200;flex-shrink:0;}
+#tbLogo{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;}
+#tbLogo img{width:100%;height:100%;object-fit:contain;}
 .tb-nm{font-size:13px;font-weight:700;}
 .tb-sub{font-size:10px;color:var(--mutedHi);}
 .tb-r{margin-left:auto;display:flex;align-items:center;gap:10px;}
@@ -26,73 +27,85 @@ body{background:var(--bg);color:var(--txt);font-family:var(--body);min-height:10
 #tbDemo{font-size:10px;padding:3px 10px;border-radius:20px;display:none;font-family:var(--mono);background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.2);color:#38BDF8;}
 .btn-salir{padding:5px 13px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#FCA5A5;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--mono);}
 
-/* LOADING */
+/* ── LOADING ── */
 #loading{display:flex;align-items:center;justify-content:center;flex:1;flex-direction:column;gap:12px;}
 .spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,0.06);border-top-color:#10B981;border-radius:50%;animation:spin .8s linear infinite;}
 
-/* LAYOUT PRINCIPAL: sidebar + content */
-#app{display:none;flex:1;overflow:hidden;}
+/* ══════════════════════════════════
+   NIVEL 1 — HOME: 7 TARJETAS
+══════════════════════════════════ */
+#nivel1{display:none;flex:1;padding:28px 24px 48px;animation:fadeIn .3s ease;}
+.home-greeting{margin-bottom:24px;}
+.home-date{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#10B981;font-family:var(--mono);margin-bottom:5px;}
+.home-title{font-size:22px;font-weight:700;margin-bottom:2px;}
+.home-title span{color:#10B981;}
+.home-sub{font-size:12px;color:var(--mutedHi);}
 
-/* SIDEBAR */
-#sidebar{width:220px;background:var(--surf);border-right:1px solid var(--brd);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
-.emp-head{padding:16px 16px 12px;border-bottom:1px solid var(--brd2);}
-.emp-av{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0;overflow:hidden;margin-bottom:8px;}
+/* TARJETA EMPRESA */
+.emp-strip{display:flex;align-items:center;gap:14px;background:var(--surf);border:1px solid var(--brd);border-radius:12px;padding:14px 18px;margin-bottom:24px;}
+.emp-av{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0;overflow:hidden;}
 .emp-av img{width:100%;height:100%;object-fit:contain;}
-.emp-nm{font-size:13px;font-weight:700;margin-bottom:2px;}
+.emp-nm{font-size:15px;font-weight:700;}
 .emp-meta{font-size:10px;color:var(--mutedHi);font-family:var(--mono);}
-.badges{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;}
-.badge{padding:2px 7px;border-radius:20px;font-size:9px;font-weight:700;font-family:var(--mono);}
+.badges{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;}
+.badge{padding:2px 9px;border-radius:20px;font-size:9px;font-weight:700;font-family:var(--mono);}
 
-/* MENU ÁREAS */
-.menu-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-family:var(--mono);padding:12px 16px 6px;}
-.area-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;border-left:2px solid transparent;transition:all .15s;}
-.area-item:hover{background:var(--surf2);}
-.area-item.active{border-left-color:var(--c,#10B981);background:rgba(16,185,129,0.06);}
-.area-item.locked{opacity:0.4;cursor:default;}
-.area-item.locked:hover{background:transparent;}
-.area-ico{font-size:16px;flex-shrink:0;width:22px;text-align:center;}
-.area-info{flex:1;min-width:0;}
-.area-nm{font-size:11px;font-weight:700;color:var(--txt);}
-.area-item.active .area-nm{color:var(--c,#10B981);}
-.area-cnt{font-size:9px;color:var(--muted);font-family:var(--mono);}
-.area-lock{font-size:11px;color:var(--muted);}
+/* GRID 7 ÁREAS */
+.areas-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mutedHi);font-family:var(--mono);margin-bottom:14px;}
+.areas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;}
 
-/* PANEL DERECHO */
-#panel{flex:1;overflow-y:auto;padding:24px 28px;}
+/* TARJETA ÁREA */
+.area-card{background:var(--surf);border:1px solid var(--brd);border-radius:12px;overflow:hidden;transition:border-color .18s;}
+.area-card.active-area:hover{border-color:var(--c,#10B981);}
+.area-card-top{height:2px;}
+.area-card-body{padding:16px 18px;}
+.area-card-ico{font-size:22px;margin-bottom:8px;}
+.area-card-nm{font-size:14px;font-weight:700;margin-bottom:4px;}
+.area-card.active-area .area-card-nm{color:var(--c,#10B981);}
+.area-card.locked-area .area-card-nm{color:rgba(255,255,255,0.25);}
+.area-card-desc{font-size:11px;color:var(--mutedHi);line-height:1.6;margin-bottom:14px;}
+.area-card-footer{display:flex;align-items:center;justify-content:space-between;}
+.btn-entrar{padding:8px 20px;border:none;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--mono);transition:all .15s;}
+.btn-entrar:hover{opacity:.85;}
+.btn-activar{padding:7px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.3);border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--mono);}
+.btn-activar:hover{background:rgba(255,255,255,0.07);}
+.lock-ico{font-size:18px;opacity:.25;}
 
-/* BIENVENIDA */
-#panelWelcome{animation:fadeIn .3s ease;}
-.g-date{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#10B981;font-family:var(--mono);margin-bottom:5px;}
-.g-title{font-size:22px;font-weight:700;margin-bottom:3px;}
-.g-title span{color:#10B981;}
-.g-sub{font-size:12px;color:var(--mutedHi);margin-bottom:20px;}
-.welcome-hint{background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:16px 18px;font-size:12px;color:var(--mutedHi);line-height:1.8;}
-.welcome-hint strong{color:var(--txt);}
+/* ══════════════════════════════════
+   NIVEL 2 — ENTORNO INTERNO
+══════════════════════════════════ */
+#nivel2{display:none;flex:1;overflow:hidden;}
 
-/* PANEL DE ÁREA */
-#panelArea{display:none;animation:fadeIn .25s ease;}
-.area-panel-top{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
-.area-strip{width:3px;height:28px;border-radius:2px;flex-shrink:0;}
-.area-panel-title{font-size:18px;font-weight:700;}
-.area-panel-desc{font-size:12px;color:var(--mutedHi);}
+/* BREADCRUMB */
+#breadcrumb{background:var(--surf2);border-bottom:1px solid var(--brd2);padding:8px 20px;display:flex;align-items:center;gap:8px;font-size:10px;color:var(--mutedHi);font-family:var(--mono);flex-shrink:0;}
+#breadcrumb .bc-home{color:#10B981;cursor:pointer;font-weight:700;}
+#breadcrumb .bc-home:hover{text-decoration:underline;}
+.bc-sep{opacity:.4;}
+#bcArea{color:var(--txt);}
+#bcMod{color:var(--mutedHi);}
 
-/* GRID DE SUB-MÓDULOS */
-.mods-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
-.mod-chip{display:flex;align-items:flex-start;gap:10px;padding:14px 14px;background:var(--surf);border-radius:10px;border:1px solid var(--brd2);text-decoration:none;cursor:pointer;transition:all .18s;}
-.mod-chip:hover{border-color:var(--c,#10B981);background:var(--surf2);transform:translateY(-1px);}
-.mod-chip-ico{font-size:20px;flex-shrink:0;margin-top:1px;}
-.mod-chip-nm{font-size:12px;font-weight:700;color:var(--txt);margin-bottom:2px;}
-.mod-chip-ds{font-size:10px;color:var(--mutedHi);line-height:1.4;}
+/* LAYOUT INTERNO */
+#nivel2Inner{display:flex;flex:1;overflow:hidden;height:calc(100vh - 54px - 34px);}
 
-/* PANEL BLOQUEADA */
-#panelLocked{display:none;animation:fadeIn .25s ease;}
-.locked-box{background:var(--surf);border:1px solid var(--brd);border-radius:14px;padding:32px;text-align:center;max-width:400px;margin:0 auto;}
-.locked-ico{font-size:40px;margin-bottom:14px;opacity:.4;}
-.locked-title{font-size:16px;font-weight:700;margin-bottom:6px;color:rgba(255,255,255,0.3);}
-.locked-desc{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.7;}
-.btn-activar{padding:11px 24px;background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--mono);}
+/* MENÚ LATERAL INTERNO */
+#innerSidebar{width:200px;background:var(--surf);border-right:1px solid var(--brd);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+.inner-area-header{padding:14px 16px 10px;border-bottom:1px solid var(--brd2);}
+.inner-area-ico{font-size:20px;margin-bottom:4px;}
+.inner-area-nm{font-size:12px;font-weight:700;}
+.inner-menu{padding:6px 0;flex:1;}
+.inner-item{display:flex;align-items:center;gap:8px;padding:8px 16px;cursor:pointer;border-left:2px solid transparent;transition:all .15s;font-size:11px;color:var(--txt);}
+.inner-item:hover{background:var(--surf2);}
+.inner-item.active{border-left-color:var(--ac,#10B981);background:rgba(16,185,129,0.06);color:var(--ac,#10B981);font-weight:700;}
+.inner-item-ico{font-size:13px;flex-shrink:0;width:18px;text-align:center;}
+.inner-footer{padding:10px 14px;border-top:1px solid var(--brd2);}
+.btn-volver{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--mutedHi);cursor:pointer;font-family:var(--mono);font-weight:700;background:none;border:none;padding:6px 8px;border-radius:6px;width:100%;}
+.btn-volver:hover{background:var(--surf2);color:var(--txt);}
 
-/* MODAL SOLICITAR */
+/* PANEL CONTENIDO IFRAME */
+#innerContent{flex:1;position:relative;background:var(--bg);}
+#moduleFrame{width:100%;height:100%;border:none;display:block;}
+
+/* MODAL ACTIVAR */
 .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;padding:20px;}
 .modal-ov.open{display:flex;}
 .modal{background:var(--surf);border-radius:14px;padding:26px;max-width:420px;width:100%;border:1px solid var(--brd);}
@@ -106,23 +119,24 @@ body{background:var(--bg);color:var(--txt);font-family:var(--body);min-height:10
 .btn-cancel{width:100%;padding:9px;background:transparent;border:1px solid var(--brd);color:var(--mutedHi);border-radius:8px;font-size:12px;cursor:pointer;font-family:var(--mono);}
 
 @media(max-width:700px){
-  #app{flex-direction:column;}
-  #sidebar{width:100%;border-right:none;border-bottom:1px solid var(--brd);}
-  .emp-head{display:flex;align-items:center;gap:10px;padding:10px 14px;}
-  .emp-av{margin-bottom:0;}
-  .menu-label{display:none;}
-  .area-item{padding:7px 14px;}
-  #panel{padding:16px;}
+  .areas-grid{grid-template-columns:1fr 1fr;}
+  #innerSidebar{width:160px;}
+}
+@media(max-width:480px){
+  .areas-grid{grid-template-columns:1fr;}
+  #nivel2Inner{flex-direction:column;}
+  #innerSidebar{width:100%;height:auto;border-right:none;border-bottom:1px solid var(--brd);}
 }
 </style>
 </head>
 <body>
 
+<!-- TOPBAR GLOBAL -->
 <div id="topbar">
   <div id="tbLogo" style="background:#10B981">M</div>
   <div>
     <div class="tb-nm" id="tbNm">Mi Panel</div>
-    <div class="tb-sub">Portal Cliente · Martinez Services ERP</div>
+    <div class="tb-sub" id="tbSub">Ecosistema Cloud ERP · Martinez Services</div>
   </div>
   <div class="tb-r">
     <span id="tbEmail"></span>
@@ -131,71 +145,74 @@ body{background:var(--bg);color:var(--txt);font-family:var(--body);min-height:10
   </div>
 </div>
 
+<!-- LOADING -->
 <div id="loading">
   <div class="spinner"></div>
-  <div style="font-size:11px;color:var(--mutedHi);font-family:var(--mono);">Cargando tu panel...</div>
+  <div style="font-size:11px;color:var(--mutedHi);font-family:var(--mono);">Verificando acceso...</div>
 </div>
 
-<!-- APP PRINCIPAL -->
-<div id="app" style="display:none;flex:1;display:none;">
-  <!-- SIDEBAR -->
-  <div id="sidebar">
-    <div class="emp-head">
-      <div class="emp-av" id="empAv">🏢</div>
+<!-- ══ NIVEL 1: HOME CON 7 ÁREAS ══ -->
+<div id="nivel1">
+  <div class="home-greeting">
+    <div class="home-date" id="homeDate"></div>
+    <div class="home-title">Hola, <span id="homeNombre">Cliente</span></div>
+    <div class="home-sub">Selecciona un área para comenzar a trabajar.</div>
+  </div>
+
+  <!-- TARJETA EMPRESA -->
+  <div class="emp-strip">
+    <div class="emp-av" id="empAv">🏢</div>
+    <div>
       <div class="emp-nm" id="empNm">Mi Empresa</div>
       <div class="emp-meta" id="empRut"></div>
       <div class="badges" id="empBadges"></div>
     </div>
-    <div class="menu-label">Módulos contratados</div>
-    <div id="menuAreas"></div>
+    <div style="margin-left:auto;font-size:11px;color:var(--mutedHi);font-family:var(--mono);text-align:right;">
+      Ecosistema Cloud ERP<br>Centralizado
+    </div>
   </div>
 
-  <!-- PANEL DERECHO -->
-  <div id="panel">
-    <!-- BIENVENIDA (estado inicial) -->
-    <div id="panelWelcome">
-      <div class="g-date" id="gDate"></div>
-      <div class="g-title">Hola, <span id="gNombre">Cliente</span></div>
-      <div class="g-sub">Selecciona un área del menú para comenzar.</div>
-      <div class="welcome-hint">
-        <strong>¿Cómo navegar?</strong><br>
-        Usa el menú lateral izquierdo para acceder a tus módulos contratados.<br>
-        Las áreas con 🔒 no están incluidas en tu plan actual — puedes solicitar activarlas.
+  <div class="areas-label">Módulos del sistema — acceso según tu plan</div>
+  <div class="areas-grid" id="areasGrid"></div>
+</div>
+
+<!-- ══ NIVEL 2: ENTORNO INTERNO ══ -->
+<div id="nivel2" style="display:none;flex-direction:column;">
+  <!-- BREADCRUMB -->
+  <div id="breadcrumb">
+    <span class="bc-home" onclick="volverHome()">🏠 Home</span>
+    <span class="bc-sep">›</span>
+    <span id="bcArea">Área</span>
+    <span class="bc-sep" id="bcSep2" style="display:none">›</span>
+    <span id="bcMod" style="display:none"></span>
+  </div>
+  <div id="nivel2Inner">
+    <!-- MENÚ LATERAL INTERNO -->
+    <div id="innerSidebar">
+      <div class="inner-area-header">
+        <div class="inner-area-ico" id="innerAreaIco">🏢</div>
+        <div class="inner-area-nm" id="innerAreaNm">Área</div>
+      </div>
+      <div class="inner-menu" id="innerMenu"></div>
+      <div class="inner-footer">
+        <button class="btn-volver" onclick="volverHome()">← Volver al Home</button>
       </div>
     </div>
-
-    <!-- PANEL ÁREA ACTIVA -->
-    <div id="panelArea">
-      <div class="area-panel-top">
-        <div class="area-strip" id="areaStrip"></div>
-        <div>
-          <div class="area-panel-title" id="areaTitle"></div>
-          <div class="area-panel-desc" id="areaDesc"></div>
-        </div>
-      </div>
-      <div class="mods-grid" id="modsGrid"></div>
-    </div>
-
-    <!-- PANEL BLOQUEADA -->
-    <div id="panelLocked">
-      <div class="locked-box">
-        <div class="locked-ico">🔒</div>
-        <div class="locked-title" id="lockedTitle">Módulo no contratado</div>
-        <div class="locked-desc" id="lockedDesc">Este módulo no está incluido en tu plan actual. Contáctanos para activarlo y ampliar tu acceso.</div>
-        <button class="btn-activar" onclick="abrirModalActivar()">Solicitar Activación</button>
-      </div>
+    <!-- IFRAME CONTENIDO -->
+    <div id="innerContent">
+      <iframe id="moduleFrame" src="about:blank" title="Módulo activo"></iframe>
     </div>
   </div>
 </div>
 
-<!-- MODAL SOLICITAR ACTIVACIÓN -->
+<!-- MODAL ACTIVAR -->
 <div class="modal-ov" id="modalAct">
 <div class="modal">
   <h3>🔓 Solicitar Activación</h3>
-  <p id="modalActDesc">Completa el formulario y te contactaremos a la brevedad.</p>
-  <div class="field"><label>Tu nombre</label><input id="actNm" placeholder="Nombre completo"/></div>
+  <p id="modalActDesc">Completa el formulario y te contactaremos a la brevedad para activar este módulo.</p>
+  <div class="field"><label>Nombre</label><input id="actNm" placeholder="Tu nombre completo"/></div>
   <div class="field"><label>Email</label><input id="actEm" type="email" placeholder="tu@email.com"/></div>
-  <div class="field"><label>Mensaje (opcional)</label><textarea id="actMsg" rows="2" placeholder="¿Qué módulo necesitas?"></textarea></div>
+  <div class="field"><label>Mensaje (opcional)</label><textarea id="actMsg" rows="2" placeholder="¿Qué necesitas?"></textarea></div>
   <button class="btn-send" onclick="enviarSolicitud()">✉ Enviar Solicitud</button>
   <button class="btn-cancel" onclick="document.getElementById('modalAct').classList.remove('open')">Cancelar</button>
 </div>
@@ -212,103 +229,103 @@ const auth=getAuth(app);
 const db=getFirestore(app);
 
 // ══════════════════════════════════════════════════════
-// DEFINICIÓN COMPLETA DE ÁREAS Y SUB-MÓDULOS
+// LAS 7 ÁREAS — SIEMPRE LAS MISMAS PARA TODOS
+// El acceso se controla por _mods del cliente
 // ══════════════════════════════════════════════════════
-const AREAS=[
+const AREAS7=[
   {
-    id:'condominio', nm:'Condominio', ico:'🏢', color:'#10B981',
-    desc:'Administración completa de tu condominio.',
+    id:'condominio', num:1, nm:'Administración de Condominio', ico:'🏢', color:'#10B981',
+    desc:'Coposesión, unidades, gastos comunes y copropietarios.',
+    requiere:['condominio'],
     mods:[
-      {ico:'📊',nm:'Dashboard',         desc:'Resumen y KPIs',              href:'MSS-Condominio.html?tab=dashboard'},
-      {ico:'🏠',nm:'Unidades',          desc:'Departamentos y residentes',   href:'MSS-Condominio.html?tab=unidades'},
-      {ico:'💰',nm:'Gastos Comunes',    desc:'Cobros y recaudación',         href:'MSS-Condominio.html?tab=gastos'},
-      {ico:'📤',nm:'Egresos',           desc:'Gastos del condominio',        href:'MSS-Condominio.html?tab=egresos'},
-      {ico:'⚠️',nm:'Morosidad',         desc:'Control de deudas',            href:'MSS-Condominio.html?tab=morosidad'},
-      {ico:'🏦',nm:'Fondo Reserva',     desc:'Fondo de emergencia',          href:'MSS-Condominio.html?tab=fondo'},
-      {ico:'📣',nm:'Novedades',         desc:'Comunicados a residentes',     href:'MSS-Condominio.html?tab=novedades'},
-      {ico:'👥',nm:'Panel Residente',   desc:'Gestión de residentes',        href:'MSS-Condominio.html?tab=panel'},
-      {ico:'🔧',nm:'Mantenimiento',     desc:'Órdenes de trabajo',           href:'MSS-Condominio.html?tab=mantenimiento'},
-      {ico:'📄',nm:'Rendición',         desc:'Informes financieros',         href:'MSS-Condominio.html?tab=rendicion'},
-      {ico:'⚙️',nm:'Configuración',     desc:'Datos y logo del condominio',  href:'MSS-Condominio.html?tab=config'},
+      {ico:'📊',nm:'Dashboard',        href:'MSS-Condominio.html?tab=dashboard'},
+      {ico:'🏠',nm:'Unidades',         href:'MSS-Condominio.html?tab=unidades'},
+      {ico:'💰',nm:'Gastos Comunes',   href:'MSS-Condominio.html?tab=gastos'},
+      {ico:'📤',nm:'Egresos',          href:'MSS-Condominio.html?tab=egresos'},
+      {ico:'⚠️',nm:'Morosidad',        href:'MSS-Condominio.html?tab=morosidad'},
+      {ico:'🏦',nm:'Fondo Reserva',    href:'MSS-Condominio.html?tab=fondo'},
+      {ico:'📣',nm:'Novedades',        href:'MSS-Condominio.html?tab=novedades'},
+      {ico:'👥',nm:'Panel Residente',  href:'MSS-Condominio.html?tab=panel'},
+      {ico:'🔧',nm:'Mantenimiento',    href:'MSS-Condominio.html?tab=mantenimiento'},
+      {ico:'📄',nm:'Rendición',        href:'MSS-Condominio.html?tab=rendicion'},
+      {ico:'⚙️',nm:'Configuración',    href:'MSS-Condominio.html?tab=config'},
     ]
   },
   {
-    id:'app_residentes', nm:'App Residentes', ico:'📱', color:'#F59E0B',
-    desc:'Portal móvil para los residentes.',
+    id:'app_residentes', num:2, nm:'App Residentes', ico:'📱', color:'#F59E0B',
+    desc:'Gastos desde el móvil, avisos de comunidad y reservas.',
+    requiere:['app_residentes'],
     mods:[
-      {ico:'📱',nm:'App Residentes', desc:'Portal para residentes',href:'MSS-CondoMovil.html'},
+      {ico:'📱',nm:'App Residentes',   href:'MSS-CondoMovil.html'},
     ]
   },
   {
-    id:'rrhh', nm:'Recursos Humanos', ico:'👥', color:'#22C55E',
-    desc:'Gestión de personal, sueldos y contratos.',
+    id:'rrhh', num:3, nm:'Recursos Humanos', ico:'👥', color:'#22C55E',
+    desc:'Asistencia, liquidaciones, haberes y contratos.',
+    requiere:['rrhh','remuneraciones','contratos','portal_trabajador'],
     mods:[
-      {ico:'👤',nm:'Fichas de Personal',    desc:'Registro de personas',       href:'MSS-RRHH.html?tab=personas'},
-      {ico:'👷',nm:'Remuneraciones',        desc:'Liquidaciones y AFP',        href:'MSS-Remuneraciones.html?tab=liquidaciones'},
-      {ico:'📄',nm:'Contratos',             desc:'Contratos y anexos',         href:'MSS-Contratos.html'},
-      {ico:'📋',nm:'Finiquitos',            desc:'Cálculo de finiquitos',      href:'MSS-Remuneraciones.html?tab=finiquitos'},
-      {ico:'🧑',nm:'Portal Trabajador',     desc:'Acceso para colaboradores',  href:'MSS-PortalTrabajador.html'},
-      {ico:'📗',nm:'Libro Remuneraciones',  desc:'Libro oficial',              href:'MSS-Remuneraciones.html?tab=libro'},
+      {ico:'👤',nm:'Fichas de Personal',   href:'MSS-RRHH.html?tab=personas'},
+      {ico:'👷',nm:'Remuneraciones',        href:'MSS-Remuneraciones.html?tab=liquidaciones'},
+      {ico:'📄',nm:'Contratos',             href:'MSS-Contratos.html'},
+      {ico:'📋',nm:'Finiquitos',            href:'MSS-Remuneraciones.html?tab=finiquitos'},
+      {ico:'🧑',nm:'Portal Trabajador',     href:'MSS-PortalTrabajador.html'},
+      {ico:'📗',nm:'Libro Remuneraciones',  href:'MSS-Remuneraciones.html?tab=libro'},
     ]
   },
   {
-    id:'contabilidad', nm:'Contabilidad', ico:'📗', color:'#10B981',
-    desc:'Libros, balances y asientos automáticos.',
+    id:'contabilidad', num:4, nm:'Contabilidad Automatizada', ico:'📗', color:'#10B981',
+    desc:'Libros diarios, balances generales y conciliaciones.',
+    requiere:['contabilidad','finanzas','tesoreria'],
     mods:[
-      {ico:'📒',nm:'Libro Diario',          desc:'Asientos cronológicos',      href:'MSS-Contabilidad.html?tab=diario'},
-      {ico:'📓',nm:'Libro Mayor',           desc:'Cuentas y saldos',           href:'MSS-Contabilidad.html?tab=mayor'},
-      {ico:'⚖️',nm:'Balance General',       desc:'Activos y pasivos',          href:'MSS-Contabilidad.html?tab=balance'},
-      {ico:'📈',nm:'Estado Resultados',     desc:'Ingresos y utilidades',      href:'MSS-Contabilidad.html?tab=resultados'},
-      {ico:'₲', nm:'Finanzas y Flujo',      desc:'Flujo de caja',              href:'MSS-Finanzas.html'},
-      {ico:'🏦',nm:'Tesorería Bancaria',    desc:'Cuentas y movimientos',      href:'MSS-Tesoreria.html'},
+      {ico:'📒',nm:'Libro Diario',         href:'MSS-Contabilidad.html?tab=diario'},
+      {ico:'📓',nm:'Libro Mayor',          href:'MSS-Contabilidad.html?tab=mayor'},
+      {ico:'⚖️',nm:'Balance General',      href:'MSS-Contabilidad.html?tab=balance'},
+      {ico:'📈',nm:'Estado Resultados',    href:'MSS-Contabilidad.html?tab=resultados'},
+      {ico:'₲', nm:'Finanzas / Flujo',     href:'MSS-Finanzas.html'},
+      {ico:'🏦',nm:'Tesorería Bancaria',   href:'MSS-Tesoreria.html'},
     ]
   },
   {
-    id:'facturacion', nm:'Facturación', ico:'🧾', color:'#38BDF8',
-    desc:'Facturación electrónica SII, compras y cotizaciones.',
+    id:'facturacion', num:5, nm:'Facturación y Administración', ico:'🧾', color:'#38BDF8',
+    desc:'Emisión de boletas, facturas y control comercial integrado.',
+    requiere:['facturacion','compras','cotizacion'],
     mods:[
-      {ico:'🧾',nm:'Facturas / Boletas',   desc:'Emisión de documentos',      href:'MSS-Facturacion.html'},
-      {ico:'🛒',nm:'Compras y Proveedores',desc:'Registro de compras',        href:'MSS-Compras.html'},
-      {ico:'📋',nm:'Cotizaciones',          desc:'Presupuestos con logo',      href:'MSS-Cotizacion.html'},
+      {ico:'🧾',nm:'Facturas / Boletas',    href:'MSS-Facturacion.html'},
+      {ico:'🛒',nm:'Compras / Proveedores', href:'MSS-Compras.html'},
+      {ico:'📋',nm:'Cotizaciones',          href:'MSS-Cotizacion.html'},
     ]
   },
   {
-    id:'gestion', nm:'Gestión y Logística', ico:'🚛', color:'#F59E0B',
-    desc:'Inventario, catálogo, arriendos y ventas.',
+    id:'gestion', num:6, nm:'Control de Gestión y Logística', ico:'🚛', color:'#F59E0B',
+    desc:'Inventario, catálogos, arriendos y ventas comerciales.',
+    requiere:['inventario','catalogo','arriendos','ventas'],
     mods:[
-      {ico:'📦',nm:'Inventario',           desc:'Productos y stock',           href:'MSS-Inventario.html'},
-      {ico:'🏪',nm:'Catálogo / Tienda',    desc:'Tienda online',               href:'MSS-Catalogo.html'},
-      {ico:'🚛',nm:'Arriendos',            desc:'Equipos y fletes',            href:'MSS-Arriendos.html'},
-      {ico:'◎', nm:'Ventas CRM',           desc:'Pipeline y clientes',         href:'MSS-Ventas-CRM.html'},
+      {ico:'📦',nm:'Inventario',           href:'MSS-Inventario.html'},
+      {ico:'🏪',nm:'Catálogo / Tienda',    href:'MSS-Catalogo.html'},
+      {ico:'🚛',nm:'Arriendos',            href:'MSS-Arriendos.html'},
+      {ico:'◎', nm:'Ventas CRM',           href:'MSS-Ventas-CRM.html'},
     ]
   },
   {
-    id:'auditoria', nm:'Auditoría e Inteligencia', ico:'📊', color:'#A78BFA',
-    desc:'KPIs, reportes y estrategia. Módulo Premium.',
+    id:'auditoria', num:7, nm:'Auditoría e Inteligencia', ico:'📊', color:'#A78BFA',
+    desc:'Módulo Premium estratégico de analítica, reportes avanzados y KPIs.',
+    requiere:['auditoria','estrategia','proyectos'],
     mods:[
-      {ico:'📊',nm:'Auditoría',            desc:'Panel financiero',            href:'MSS-Auditoria.html'},
-      {ico:'◆', nm:'Estrategia',           desc:'KPI, FODA, PESTEL',           href:'MSS-Estrategia.html'},
-      {ico:'◈', nm:'Proyectos / KPI',      desc:'Control de proyectos',        href:'MSS-Proyectos.html'},
+      {ico:'📊',nm:'Auditoría',    href:'MSS-Auditoria.html'},
+      {ico:'◆', nm:'Estrategia',   href:'MSS-Estrategia.html'},
+      {ico:'◈', nm:'Proyectos KPI',href:'MSS-Proyectos.html'},
     ]
   }
 ];
 
-const MOD_A_AREA={
-  condominio:'condominio',app_residentes:'app_residentes',
-  rrhh:'rrhh',remuneraciones:'rrhh',contratos:'rrhh',portal_trabajador:'rrhh',
-  contabilidad:'contabilidad',finanzas:'contabilidad',tesoreria:'contabilidad',
-  facturacion:'facturacion',compras:'facturacion',cotizacion:'facturacion',
-  inventario:'gestion',catalogo:'gestion',arriendos:'gestion',ventas:'gestion',
-  auditoria:'auditoria',estrategia:'auditoria',proyectos:'auditoria'
-};
+let _condo=null, _mods=[], _areaActual=null;
 
-let _condo=null,_mods=[],_areaActual=null;
-
-onAuthStateChanged(auth,async user=>{
+// ── AUTH ──
+onAuthStateChanged(auth, async user=>{
   if(!user){window.location.href='MSS-Login.html';return;}
   const email=user.email||'';
   document.getElementById('tbEmail').textContent=email;
-  let clienteId=null,nombre=user.displayName||email.split('@')[0],dias=null;
+  let clienteId=null, nombre=user.displayName||email.split('@')[0], dias=null;
 
   try{const p=await getDoc(doc(db,'usuarios/'+user.uid));if(p.exists()){clienteId=p.data().clienteId||null;nombre=p.data().nombre||nombre;}}catch(e){}
 
@@ -327,9 +344,7 @@ onAuthStateChanged(auth,async user=>{
         const dp=Math.floor((Date.now()-(cd.creado||Date.now()))/86400000);
         dias=(cd.diasDemo||7)-dp;
         if(dias<=0){await signOut(auth);window.location.href='MSS-DemoVencida.html';return;}
-        const td=document.getElementById('tbDemo');
-        td.textContent=`Demo · ${dias} día${dias===1?'':'s'}`;
-        td.style.display='block';
+        const td=document.getElementById('tbDemo');td.textContent=`Demo · ${dias} día${dias===1?'':'s'}`;td.style.display='block';
       }
       if(clienteId)await setDoc(doc(db,'usuarios/'+user.uid),{clienteId},{merge:true}).catch(()=>{});
     }
@@ -344,107 +359,146 @@ onAuthStateChanged(auth,async user=>{
     if(!_condo){window.location.href='MSS-BienvenidaCliente.html';return;}
     localStorage.setItem('mss_empresa_actual',JSON.stringify(_condo));
     localStorage.setItem('mss_condominio_actual',JSON.stringify(_condo));
+  } else {
+    // Cliente comercial: buscar empresa
+    try{const s=await getDocs(collection(db,'empresas_clientes'));s.forEach(d=>{const e=d.data();if(!_condo&&(e.uid===user.uid||e.clienteId===clienteId))_condo={id:d.id,...e};});}catch(e){}
+    if(!_condo){window.location.href='MSS-BienvenidaCliente.html';return;}
+    localStorage.setItem('mss_empresa_actual',JSON.stringify(_condo));
   }
 
-  renderApp(nombre,dias);
+  mostrarHome(nombre, dias);
 });
 
-function renderApp(nombre,dias){
+// ── NIVEL 1: HOME ──
+function mostrarHome(nombre, dias){
   const now=new Date();
-  document.getElementById('gDate').textContent=now.toLocaleDateString('es-CL',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
-  document.getElementById('gNombre').textContent=nombre.split(' ')[0];
+  document.getElementById('homeDate').textContent=now.toLocaleDateString('es-CL',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
+  document.getElementById('homeNombre').textContent=nombre.split(' ')[0];
 
-  const entidad=_condo||{nombre:'Mi Empresa',rut:'',direccion:''};
+  const entidad=_condo||{nombre:'Mi Empresa',rut:'',color:'#10B981'};
   const color=entidad.color||'#10B981';
 
   document.getElementById('tbLogo').style.background=color;
   document.getElementById('tbLogo').textContent=(entidad.nombre||'M').charAt(0);
   document.getElementById('tbNm').textContent=entidad.nombre||'Mi Panel';
-  document.getElementById('empNm').textContent=entidad.nombre||'Mi Empresa';
 
   const logo=localStorage.getItem('mss_logo_condo_'+entidad.id)||localStorage.getItem('mss_logo_url_'+entidad.id)||null;
   const av=document.getElementById('empAv');
   if(logo){av.innerHTML=`<img src="${logo}" alt="logo"/>`;}
   else{av.textContent=(entidad.nombre||'E').charAt(0);av.style.cssText=`background:${color}18;border:1px solid ${color}30;color:${color};`;}
 
+  document.getElementById('empNm').textContent=entidad.nombre||'Mi Empresa';
   if(entidad.rut)document.getElementById('empRut').textContent=entidad.rut;
+  if(entidad.direccion)document.getElementById('empRut').textContent+=' · '+entidad.direccion;
 
   const be=document.getElementById('empBadges');
   be.innerHTML='<span class="badge" style="background:rgba(34,197,94,0.12);color:#22C55E;border:1px solid rgba(34,197,94,0.2)">Activo</span>';
   if(dias!==null)be.innerHTML+=`<span class="badge" style="background:rgba(56,189,248,0.1);color:#38BDF8;border:1px solid rgba(56,189,248,0.2)">Demo · ${dias} días</span>`;
 
-  renderMenu();
+  renderAreas7();
+
   document.getElementById('loading').style.display='none';
-  const appEl=document.getElementById('app');
-  appEl.style.display='flex';
+  document.getElementById('nivel1').style.display='block';
+  document.getElementById('nivel2').style.display='none';
 }
 
-function renderMenu(){
+// ── RENDER 7 TARJETAS ──
+function renderAreas7(){
   const modSet=new Set(_mods);
-  const areasConAcceso=new Set();
-  _mods.forEach(m=>{const a=MOD_A_AREA[m];if(a)areasConAcceso.add(a);});
-
-  // Filtrar áreas según tipo de cliente
-  const esCondo=modSet.has('condominio');
-  const areas=esCondo
-    ? AREAS.filter(a=>!['gestion','facturacion'].includes(a.id)||areasConAcceso.has(a.id))
-    : AREAS.filter(a=>!['condominio','app_residentes'].includes(a.id)||areasConAcceso.has(a.id));
-
-  document.getElementById('menuAreas').innerHTML=areas.map(a=>{
-    const tiene=areasConAcceso.has(a.id);
-    return`<div class="area-item${tiene?'':' locked'}" 
-               style="--c:${a.color}"
-               onclick="${tiene?`seleccionarArea('${a.id}')`:''}"
-               id="menu-${a.id}">
-      <span class="area-ico">${a.ico}</span>
-      <div class="area-info">
-        <div class="area-nm">${a.nm}</div>
-        <div class="area-cnt">${tiene?a.mods.length+' módulos':'No contratado'}</div>
-      </div>
-      ${!tiene?'<span class="area-lock">🔒</span>':''}
-    </div>`;
+  document.getElementById('areasGrid').innerHTML=AREAS7.map(area=>{
+    const tieneAcceso=area.requiere.some(r=>modSet.has(r));
+    const c=area.color;
+    if(tieneAcceso){
+      return`<div class="area-card active-area" style="--c:${c}">
+        <div class="area-card-top" style="background:${c}"></div>
+        <div class="area-card-body">
+          <div class="area-card-ico">${area.ico}</div>
+          <div class="area-card-nm">${area.num}. ${area.nm}</div>
+          <div class="area-card-desc">${area.desc}</div>
+          <div class="area-card-footer">
+            <span style="font-size:10px;color:var(--mutedHi);font-family:var(--mono)">${area.mods.length} herramientas</span>
+            <button class="btn-entrar" style="background:${c};color:#04080F" onclick="entrarArea('${area.id}')">▶ Entrar</button>
+          </div>
+        </div>
+      </div>`;
+    } else {
+      return`<div class="area-card locked-area">
+        <div class="area-card-top" style="background:rgba(255,255,255,0.06)"></div>
+        <div class="area-card-body">
+          <div class="area-card-ico" style="opacity:.2">${area.ico}</div>
+          <div class="area-card-nm">${area.num}. ${area.nm}</div>
+          <div class="area-card-desc" style="color:rgba(255,255,255,0.2)">${area.desc}</div>
+          <div class="area-card-footer">
+            <span class="lock-ico">🔒</span>
+            <button class="btn-activar" onclick="solicitarActivacion('${area.nm}')">Activar</button>
+          </div>
+        </div>
+      </div>`;
+    }
   }).join('');
 }
 
-window.seleccionarArea=function(areaId){
-  const area=AREAS.find(a=>a.id===areaId);
+// ── ENTRAR A UN ÁREA ──
+window.entrarArea=function(areaId){
+  const area=AREAS7.find(a=>a.id===areaId);
   if(!area)return;
+  _areaActual=area;
 
-  // Marcar activo en menú
-  document.querySelectorAll('.area-item').forEach(el=>el.classList.remove('active'));
-  const menuItem=document.getElementById('menu-'+areaId);
-  if(menuItem)menuItem.classList.add('active');
+  // Guardar empresa actual para que los módulos la lean
+  if(_condo) localStorage.setItem('mss_empresa_actual',JSON.stringify(_condo));
 
-  _areaActual=areaId;
+  // Configurar nivel 2
+  document.getElementById('bcArea').textContent=area.nm;
+  document.getElementById('bcSep2').style.display='none';
+  document.getElementById('bcMod').style.display='none';
+  document.getElementById('innerAreaIco').textContent=area.ico;
+  document.getElementById('innerAreaNm').textContent=area.nm;
+  document.getElementById('innerAreaNm').style.color=area.color;
 
-  // Ocultar paneles
-  document.getElementById('panelWelcome').style.display='none';
-  document.getElementById('panelLocked').style.display='none';
+  // Renderizar menú lateral interno
+  document.getElementById('innerMenu').innerHTML=area.mods.map((m,i)=>`
+    <div class="inner-item" id="inner-${i}" 
+         style="--ac:${area.color}"
+         onclick="cargarModulo('${m.href}','${m.nm}',${i},'${area.color}')">
+      <span class="inner-item-ico">${m.ico}</span>
+      <span>${m.nm}</span>
+    </div>`).join('');
 
-  // Mostrar panel área
-  const pa=document.getElementById('panelArea');
-  pa.style.display='block';
-  document.getElementById('areaStrip').style.background=area.color;
-  document.getElementById('areaTitle').textContent=area.ico+' '+area.nm;
-  document.getElementById('areaTitle').style.color=area.color;
-  document.getElementById('areaDesc').textContent=area.desc;
+  // Cargar primer módulo automáticamente
+  cargarModulo(area.mods[0].href, area.mods[0].nm, 0, area.color);
 
-  // Renderizar módulos
-  document.getElementById('modsGrid').innerHTML=area.mods.map(m=>`
-    <a class="mod-chip" href="${m.href}" style="--c:${area.color}" onclick="guardarEmpresa()">
-      <span class="mod-chip-ico">${m.ico}</span>
-      <div>
-        <div class="mod-chip-nm">${m.nm}</div>
-        <div class="mod-chip-ds">${m.desc}</div>
-      </div>
-    </a>`).join('');
+  // Mostrar nivel 2
+  document.getElementById('nivel1').style.display='none';
+  document.getElementById('nivel2').style.display='flex';
 };
 
-window.guardarEmpresa=function(){
-  if(_condo)localStorage.setItem('mss_empresa_actual',JSON.stringify(_condo));
+// ── CARGAR MÓDULO EN IFRAME ──
+window.cargarModulo=function(href, nmMod, idx, color){
+  // Actualizar menú activo
+  document.querySelectorAll('.inner-item').forEach(el=>el.classList.remove('active'));
+  const itemEl=document.getElementById('inner-'+idx);
+  if(itemEl)itemEl.classList.add('active');
+
+  // Actualizar breadcrumb
+  document.getElementById('bcSep2').style.display='inline';
+  document.getElementById('bcMod').style.display='inline';
+  document.getElementById('bcMod').textContent=nmMod;
+
+  // Cargar en iframe
+  const frame=document.getElementById('moduleFrame');
+  frame.src=href;
 };
 
-window.abrirModalActivar=function(){
+// ── VOLVER AL HOME ──
+window.volverHome=function(){
+  document.getElementById('moduleFrame').src='about:blank';
+  document.getElementById('nivel2').style.display='none';
+  document.getElementById('nivel1').style.display='block';
+};
+
+// ── SOLICITAR ACTIVACIÓN ──
+window.solicitarActivacion=function(areaNm){
+  document.getElementById('modalActDesc').textContent=`Para activar "${areaNm}", completa el formulario y te contactaremos a la brevedad.`;
   document.getElementById('modalAct').classList.add('open');
 };
 
