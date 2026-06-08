@@ -326,6 +326,14 @@ body{background:var(--bg);color:var(--white);font-family:'Segoe UI',sans-serif;m
           <div class="sa-field full"><label>Notas / Observaciones</label><input id="saNotas" placeholder="Ej: Cliente referido, prueba Q3..."/></div>
           <div class="sa-field full">
             <label>Módulos Permitidos</label>
+            <!-- PAQUETES RÁPIDOS -->
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+              <span style="font-size:9px;color:#6B7280;font-family:monospace;align-self:center;text-transform:uppercase;letter-spacing:1px">Paquetes:</span>
+              <button type="button" onclick="aplicarPaquete('basico')"    style="padding:4px 10px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:#10B981;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:monospace">🏢 Solo Condominio</button>
+              <button type="button" onclick="aplicarPaquete('completo')"  style="padding:4px 10px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:#22C55E;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:monospace">🏢+👷 Condo + RRHH</button>
+              <button type="button" onclick="aplicarPaquete('premium')"   style="padding:4px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);color:#C9A84C;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:monospace">⭐ Todo incluido</button>
+              <button type="button" onclick="aplicarPaquete('ninguno')"   style="padding:4px 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#6B7280;border-radius:5px;font-size:10px;cursor:pointer;font-family:monospace">✕ Limpiar</button>
+            </div>
             <div class="mod-checks" id="saModChecks"></div>
           </div>
         </div>
@@ -1317,7 +1325,7 @@ onAuthStateChanged(auth, async user => {
       const condo = condosCliente[0];
       localStorage.setItem('mss_empresa_actual',    JSON.stringify(condo));
       localStorage.setItem('mss_condominio_actual', JSON.stringify(condo));
-      window.location.href = 'MSS-Condominio.html'; return;
+      window.location.href = 'MSS-HubCliente.html'; return;
     } else {
       // Primera vez → pantalla de bienvenida para crear su condominio
       window.location.href = 'MSS-BienvenidaCliente.html'; return;
@@ -1642,6 +1650,17 @@ window.extenderDemo = async function(id){
 };
 
 // Módulos checkboxes
+// ── PAQUETES PREDEFINIDOS ──
+window.aplicarPaquete = function(tipo){
+  const PAQUETES = {
+    basico:   ['condominio','app_residentes','auditoria'],
+    completo: ['condominio','app_residentes','rrhh','remuneraciones','contratos','portal_trabajador','auditoria'],
+    premium:  ['condominio','app_residentes','rrhh','remuneraciones','contratos','portal_trabajador','auditoria','finanzas','tesoreria','estrategia'],
+    ninguno:  []
+  };
+  renderModChecks(PAQUETES[tipo]||[]);
+};
+
 function renderModChecks(seleccionados=[]){
   const MODS_ALL = [
     {id:'finanzas',label:'Finanzas'},{id:'remuneraciones',label:'Remuneraciones'},
