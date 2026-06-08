@@ -179,30 +179,42 @@ onAuthStateChanged(auth, async user => {
     }
   }catch(e){}
 
-  // Leer datos del cliente
-  if(clienteId){
-    try{
+  // Leer datos del cliente — buscar por clienteId, uid y email como fallback
+  try{
+    let cliData = null;
+    if(clienteId){
       const cliId = clienteId.replace('cli_','');
       const cs1 = await getDoc(doc(db,'clientes/'+clienteId));
       const cs2 = await getDoc(doc(db,'clientes/'+cliId));
-      const cliData = cs1.exists()?cs1.data():cs2.exists()?cs2.data():null;
-      if(cliData){
-        modulos = cliData.modulos || [];
-        if(cliData.estado==='demo'){
-          const diasDemo = cliData.diasDemo || 7;
-          const diasPasados = Math.floor((Date.now()-(cliData.creado||Date.now()))/86400000);
-          diasRestantes = diasDemo - diasPasados;
-          if(diasRestantes <= 0){
-            await signOut(auth);
-            window.location.href='MSS-DemoVencida.html'; return;
-          }
-          const tbDemo = document.getElementById('tbDemo');
-          tbDemo.textContent = `Demo · ${diasRestantes} día${diasRestantes===1?'':'s'}`;
-          tbDemo.style.display = 'block';
+      if(cs1.exists()) cliData = cs1.data();
+      else if(cs2.exists()) cliData = cs2.data();
+    }
+    if(!cliData){
+      const todosClientes = await getDocs(collection(db,'clientes'));
+      todosClientes.forEach(d=>{
+        const c = d.data();
+        if(!cliData && (c.email===email || c.uid===user.uid)){
+          cliData = c;
+          clienteId = d.id;
         }
+      });
+    }
+    if(cliData){
+      modulos = cliData.modulos || [];
+      if(cliData.estado==='demo'){
+        const diasDemo = cliData.diasDemo || 7;
+        const diasPasados = Math.floor((Date.now()-(cliData.creado||Date.now()))/86400000);
+        diasRestantes = diasDemo - diasPasados;
+        if(diasRestantes <= 0){
+          await signOut(auth);
+          window.location.href='MSS-DemoVencida.html'; return;
+        }
+        const tbDemo = document.getElementById('tbDemo');
+        tbDemo.textContent = `Demo · ${diasRestantes} día${diasRestantes===1?'':'s'}`;
+        tbDemo.style.display = 'block';
       }
-    }catch(e){}
-  }
+    }
+  }catch(e){ console.warn('Carga cliente comercial:', e.message); }
 
   // Guardar en localStorage
   localStorage.setItem('mss_es_cliente_externo','true');

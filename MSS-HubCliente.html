@@ -220,30 +220,51 @@ onAuthStateChanged(auth, async user => {
   }catch(e){}
 
   // Leer datos del cliente desde /clientes
-  if(clienteId){
-    try{
+  // Buscar por clienteId, por uid, y también por email como fallback
+  try{
+    let cliData = null;
+    // Intento 1: por clienteId del perfil
+    if(clienteId){
       const cliId = clienteId.replace('cli_','');
       const cs1 = await getDoc(doc(db,'clientes/'+clienteId));
       const cs2 = await getDoc(doc(db,'clientes/'+cliId));
-      const cliData = cs1.exists()?cs1.data():cs2.exists()?cs2.data():null;
-      if(cliData){
-        modulos = cliData.modulos || [];
-        // Verificar demo vencida
-        if(cliData.estado==='demo'){
-          const diasDemo = cliData.diasDemo || 7;
-          const diasPasados = Math.floor((Date.now()-(cliData.creado||Date.now()))/86400000);
-          diasRestantes = diasDemo - diasPasados;
-          if(diasRestantes <= 0){
-            await signOut(auth);
-            window.location.href='MSS-DemoVencida.html'; return;
-          }
-          const tbDemo = document.getElementById('tbDemo');
-          tbDemo.textContent = `Demo · ${diasRestantes} día${diasRestantes===1?'':'s'}`;
-          tbDemo.style.display = 'block';
+      if(cs1.exists()) cliData = cs1.data();
+      else if(cs2.exists()) cliData = cs2.data();
+    }
+    // Intento 2: buscar por email en todos los clientes (SA Panel guarda por email)
+    if(!cliData){
+      const todosClientes = await getDocs(collection(db,'clientes'));
+      todosClientes.forEach(d=>{
+        const c = d.data();
+        if(!cliData && (c.email===email || c.uid===user.uid)){
+          cliData = c;
+          clienteId = d.id; // actualizar clienteId con el real
         }
+      });
+    }
+    if(cliData){
+      modulos = cliData.modulos || [];
+      // Actualizar clienteId en el perfil del usuario si no coincidía
+      if(clienteId && cliData.email===email){
+        try{
+          const {setDoc:sd} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+        }catch(e){}
       }
-    }catch(e){}
-  }
+      // Verificar demo vencida
+      if(cliData.estado==='demo'){
+        const diasDemo = cliData.diasDemo || 7;
+        const diasPasados = Math.floor((Date.now()-(cliData.creado||Date.now()))/86400000);
+        diasRestantes = diasDemo - diasPasados;
+        if(diasRestantes <= 0){
+          await signOut(auth);
+          window.location.href='MSS-DemoVencida.html'; return;
+        }
+        const tbDemo = document.getElementById('tbDemo');
+        tbDemo.textContent = `Demo · ${diasRestantes} día${diasRestantes===1?'':'s'}`;
+        tbDemo.style.display = 'block';
+      }
+    }
+  }catch(e){ console.warn('Carga cliente:', e.message); }
 
   // Guardar en localStorage para que los módulos lo lean
   localStorage.setItem('mss_es_cliente_externo','true');
