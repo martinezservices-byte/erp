@@ -90,7 +90,7 @@ tfoot td{border-top:2px solid var(--b1);font-weight:800;}
 <script>
 
 // ── CONDOMINIO ACTUAL — lee mss_condominio_actual (mundo separado) ──
-const _esClienteExterno = localStorage.getItem('mss_es_cliente_externo') === 'true';
+let _esClienteExterno = false; // Se calcula post-auth desde Firestore
 const _condoRaw = localStorage.getItem('mss_condominio_actual') || localStorage.getItem('mss_empresa_actual');
 const _condoObj = (()=>{
   try{
@@ -475,7 +475,7 @@ const ID=cid();
 const SK={cfg:'mss'+ID+'_cfg',u:'mss'+ID+'_u',co:'mss'+ID+'_co',eg:'mss'+ID+'_eg',fo:'mss'+ID+'_fo',no:'mss'+ID+'_no',ot:'mss'+ID+'_ot',to:'mss'+ID+'_to'};
 
 // CFG base — para clientes externos parte vacío, para Gaudy tiene sus datos
-const _esExt = localStorage.getItem('mss_es_cliente_externo')==='true';
+const _esExt = _esClienteExterno; // viene del auth guard post-Firestore
 let CFG={
   nombre: _CONDO_NOMBRE||'',
   dir:'',rut:'',
@@ -561,6 +561,7 @@ async function initFirebase(){
               }
             }
             // Guardar en localStorage para uso offline/rápido
+            _esClienteExterno = true;
             localStorage.setItem('mss_es_cliente_externo','true');
             localStorage.setItem('mss_cliente_id', clienteIdUser||('cli_'+user.uid));
             localStorage.setItem('mss_modulos_permitidos', JSON.stringify(modulosUser));
