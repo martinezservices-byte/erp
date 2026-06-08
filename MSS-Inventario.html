@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Martinez Services — Inventario</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#050A12;--surf:#091424;--surf2:#0E1C30;--surf3:#132438;
+  --border:rgba(52,211,153,0.15);--border2:rgba(52,211,153,0.08);
+  --acc:#34D399;--accHi:#A7F3D0;
+  --white:#F0FDF8;--muted:#3D5A52;--mutedHi:#6B8F84;
+  --ok:#22C55E;--danger:#EF4444;--warn:#F59E0B;--gold:#C9A84C;--blue:#38BDF8;--purple:#A78BFA;
+  --font:'Playfair Display',serif;--mono:'JetBrains Mono',monospace;--body:'Segoe UI',system-ui,sans-serif;
+}
+body{background:var(--bg);color:var(--white);font-family:var(--body);min-height:100vh;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-thumb{background:rgba(52,211,153,0.2);border-radius:3px;}
+#header{background:var(--surf);border-bottom:1px solid var(--border2);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:14px;}
+.logo-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--acc),var(--accHi));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--bg);font-family:var(--font);}
+.logo-name{font-size:15px;font-weight:800;font-family:var(--font);}
+.logo-mod{font-size:10px;color:var(--acc);font-weight:700;letter-spacing:2px;font-family:var(--mono);}
+#tabbar{display:flex;gap:3px;background:var(--bg);padding:4px;border-radius:10px;width:fit-content;margin:22px 24px 0;flex-wrap:wrap;}
+.tab{padding:7px 15px;border-radius:7px;border:none;cursor:pointer;font-size:11px;font-weight:700;transition:all .18s;background:transparent;color:var(--muted);font-family:var(--mono);}
+.tab.active{background:var(--acc);color:var(--bg);}
+#content{max-width:1280px;margin:0 auto;padding:20px 24px 40px;}
+.section{display:none;}.section.active{display:block;}
+.kpi-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
+.kpi{flex:1;min-width:145px;background:var(--surf);border-radius:12px;padding:16px 18px;border:1px solid var(--border2);position:relative;overflow:hidden;}
+.kpi::before{content:'';position:absolute;top:0;right:0;width:55px;height:55px;background:radial-gradient(circle at top right,var(--kc,rgba(52,211,153,0.08)),transparent 70%);}
+.kpi-label{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;font-family:var(--mono);}
+.kpi-value{font-size:22px;font-weight:900;font-family:var(--font);}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.card{background:var(--surf);border-radius:12px;padding:18px;border:1px solid var(--border2);margin-bottom:16px;}
+.card-title{font-size:13px;font-weight:700;color:var(--white);margin-bottom:14px;font-family:var(--font);}
+.badge{display:inline-flex;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;font-family:var(--mono);white-space:nowrap;}
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono);}
+th{padding:9px 11px;text-align:left;color:var(--acc);font-weight:700;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:8px 11px;border-bottom:1px solid rgba(52,211,153,0.05);}
+tr:nth-child(even) td{background:rgba(255,255,255,0.012);}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surf);border-radius:16px;padding:28px;border:1px solid rgba(52,211,153,0.3);width:680px;max-height:92vh;overflow-y:auto;}
+.modal h3{font-size:18px;font-weight:900;color:var(--white);margin-bottom:20px;font-family:var(--font);}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field.full{grid-column:1/-1;}
+label{font-size:10px;color:var(--mutedHi);font-weight:700;text-transform:uppercase;letter-spacing:.8px;font-family:var(--mono);}
+input,select,textarea{background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--white);font-family:var(--mono);font-size:12px;outline:none;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--acc);}
+.btn-acc{background:var(--acc);color:var(--bg);border:none;border-radius:8px;padding:10px 18px;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--mono);transition:all .15s;}
+.btn-acc:hover{opacity:.85;}
+.btn-ghost{background:transparent;color:var(--mutedHi);border:1px solid var(--border);border-radius:8px;padding:10px 18px;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--mono);}
+.btn-danger{background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:8px 14px;font-size:11px;cursor:pointer;font-family:var(--mono);}
+.btn-sm{padding:5px 10px;font-size:10px;border-radius:6px;}
+.stock-ok{color:var(--ok);}
+.stock-low{color:var(--warn);}
+.stock-zero{color:var(--danger);}
+.prod-img{width:48px;height:48px;border-radius:8px;object-fit:cover;background:var(--surf2);border:1px solid var(--border2);}
+.search-bar{display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap;}
+.search-bar input{max-width:280px;}
+.filtro-select{width:160px;}
+.alerta-stock{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--warn);font-family:var(--mono);}
+.sync-badge{background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);color:var(--acc);padding:3px 10px;border-radius:20px;font-size:9px;font-family:var(--mono);font-weight:700;}
+/* IMAGEN UPLOAD */
+.img-upload-area{border:2px dashed rgba(52,211,153,0.25);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;}
+.img-upload-area:hover{border-color:var(--acc);background:rgba(52,211,153,0.04);}
+.img-preview-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px;}
+.img-preview-item{position:relative;}
+.img-preview-item img{width:100%;height:70px;object-fit:cover;border-radius:6px;border:1px solid var(--border2);}
+.img-preview-item .del-img{position:absolute;top:2px;right:2px;background:rgba(239,68,68,0.8);color:white;border:none;border-radius:4px;padding:1px 5px;font-size:10px;cursor:pointer;}
+/* BODEGAS */
+.bodega-chip{display:inline-flex;align-items:center;gap:6px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:11px;font-family:var(--mono);}
+.bodega-stock{font-weight:700;color:var(--acc);}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner-sm{width:14px;height:14px;border:2px solid rgba(52,211,153,0.2);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px;}
+</style>
+</head>
+<body>
+
+<!-- NAV BAR -->
+<div id="nav-bar" style="background:#030609;border-bottom:1px solid rgba(201,168,76,0.1);padding:0 16px;display:flex;align-items:center;gap:4px;overflow-x:auto;flex-shrink:0;height:42px;position:sticky;top:0;z-index:200;">
+<a href="app.html" style="display:flex;align-items:center;padding:5px 10px;border-radius:6px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">🏠 Hub</a>
+<div style="width:1px;height:20px;background:rgba(201,168,76,0.15);margin:0 2px;flex-shrink:0"></div>
+<a href="MSS-Finanzas.html"    style="padding:5px 9px;border-radius:6px;color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Finanzas</a>
+<a href="MSS-Contabilidad.html" style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Contab.</a>
+<a href="MSS-Facturacion.html"  style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Factur.</a>
+<a href="MSS-Inventario.html"   style="padding:5px 9px;border-radius:6px;color:#34D399;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.35);">📦 Inventario</a>
+<a href="MSS-Compras.html"      style="padding:5px 9px;border-radius:6px;color:#FB923C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">🛒 Compras</a>
+<a href="MSS-Cotizacion.html"   style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Cotiz.</a>
+<a href="MSS-Tesoreria.html"    style="padding:5px 9px;border-radius:6px;color:#FBBF24;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Tesor.</a>
+<a href="MSS-Contratos.html"    style="padding:5px 9px;border-radius:6px;color:#A78BFA;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Contratos</a>
+<a href="MSS-Ventas-CRM.html"   style="padding:5px 9px;border-radius:6px;color:#FB923C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Ventas</a>
+<a href="MSS-RRHH.html"         style="padding:5px 9px;border-radius:6px;color:#A78BFA;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">RRHH</a>
+<a href="MSS-Estrategia.html"   style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Estrategia</a>
+<a href="MSS-Arriendos.html"    style="padding:5px 9px;border-radius:6px;color:#F59E0B;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">🚛 Arriendos</a>
+<a href="MSS-Auditoria.html"    style="padding:4px 10px;border-radius:6px;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;background:rgba(167,139,250,0.1);color:#A78BFA;">📊 Auditoría</a>
+<div id="nav-emp" style="margin-left:auto;padding:3px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;font-size:9px;color:#C9A84C;font-family:monospace;white-space:nowrap;flex-shrink:0;display:none"></div>
+</div>
+
+<script>
+// ── FIREBASE ──
+let _db=null,_fbReady=false;
+async function _initFB(){
+  if(_fbReady)return;
+  try{
+    const m1=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const m2=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const m3=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const FB={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
+    const app=m1.getApps().length?m1.getApps()[0]:m1.initializeApp(FB);
+    const auth=m3.getAuth(app);
+    await new Promise((resolve)=>{
+      const unsub=m3.onAuthStateChanged(auth,user=>{
+        unsub();
+        if(!user){window.location.href='MSS-Login.html';}
+        else{window._MSS_USER=user;_db=m2.getFirestore(app);window._fbM=m2;_fbReady=true;resolve();}
+      });
+    });
+  }catch(e){_fbReady=false;console.warn('Firebase:',e.message);}
+}
+
+// ── FIREBASE BATCH SYNC ──
+async function _fbBatch(col,arr){
+  if(!_fbReady||!window._fbM)return;
+  const {writeBatch,doc,collection,setDoc}=window._fbM;
+  const ep=_ep()+'/'+col;
+  const snap=await window._fbM.getDocs(window._fbM.collection(_db,ep)).catch(()=>null);
+  if(snap){
+    const existing=snap.docs.map(d=>d.id);
+    const newIds=arr.map(x=>String(x.id||Date.now()));
+    const toDelete=existing.filter(id=>!newIds.includes(id));
+    for(let i=0;i<toDelete.length;i+=400){
+      const b=writeBatch(_db);
+      toDelete.slice(i,i+400).forEach(id=>b.delete(window._fbM.doc(_db,ep+'/'+id)));
+      await b.commit().catch(()=>{});
+    }
+  }
+  for(let i=0;i<arr.length;i+=400){
+    const b=writeBatch(_db);
+    arr.slice(i,i+400).forEach(item=>b.set(window._fbM.doc(_db,ep+'/'+String(item.id||Date.now())),{...item}));
+    await b.commit().catch(()=>{});
+  }
+}
+async function _fbGetAll(col){
+  if(!_fbReady||!window._fbM)return[];
+  const snap=await window._fbM.getDocs(window._fbM.collection(_db,_ep()+'/'+col)).catch(()=>null);
+  if(!snap||snap.empty)return[];
+  return snap.docs.map(d=>d.data());
+}
+async function _fbSet(path,data){
+  if(!_fbReady||!window._fbM)return;
+  await window._fbM.setDoc(window._fbM.doc(_db,path),{...data}).catch(e=>console.warn('fbSet:',e.message));
+}
+
+// ── EMPRESA DINÁMICA ──
+const _empRaw=localStorage.getItem('mss_empresa_actual');
+const _empObj=(()=>{
+  try{
+    const o=_empRaw?JSON.parse(_empRaw):null;
+    if(o&&o.tipo==='condominio')return{id:1,nombre:'Mi Empresa'};
+    return o||{id:1,nombre:'Mi Empresa'};
+  }catch(e){return{id:1,nombre:'Mi Empresa'};}
+})();
+window._MSS_EMP=_empObj;
+const _EMP_ID=_empObj.id||1;
+const _EMP_NOMBRE=_empObj.nombre||'Mi Empresa';
+function _ep(){return 'empresas/'+_EMP_ID;}
+
+// Mostrar empresa en nav
+(function(){
+  try{
+    if(_empObj&&_empObj.nombre){
+      const nd=document.getElementById('nav-emp');
+      if(nd){nd.textContent='Empresa: '+_empObj.nombre;nd.style.display='block';}
+    }
+  }catch(ex){}
+})();
+</script>
+
+<!-- HEADER -->
+<div id="header">
+  <div class="logo">
+    <div class="logo-icon">📦</div>
+    <div>
+      <div class="logo-name" id="invHeaderEmp"><span id="_empNombreLogo">Mi Empresa</span></div>
+      <div class="logo-mod">MÓDULO INVENTARIO</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <span class="sync-badge" id="syncBadge">⚡ Sincronizado</span>
+    <span style="font-size:11px;color:var(--muted);font-family:var(--mono)" id="hInfo">Cargando...</span>
+    <button class="btn-acc" onclick="openProdModal(null)">+ Producto</button>
+    <button class="btn-ghost btn-sm" onclick="openBodegaModal()">+ Bodega</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div id="tabbar">
+  <button class="tab active" onclick="showTab('productos',this)">📦 Productos</button>
+  <button class="tab" onclick="showTab('bodegas',this)">🏭 Bodegas</button>
+  <button class="tab" onclick="showTab('alertas',this)">⚠ Alertas Stock</button>
+  <button class="tab" onclick="showTab('catalogo',this)">🛒 Vista Catálogo</button>
+</div>
+
+<div id="content">
+
+  <!-- TAB PRODUCTOS -->
+  <div class="section active" id="sec-productos">
+    <div class="kpi-row" id="kpiInv"></div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+        <div class="card-title" style="margin:0">📦 Catálogo de Productos</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <input id="buscarProd" placeholder="Buscar por nombre, SKU..." style="width:220px;font-size:11px;padding:7px 10px;" oninput="renderTablaProductos()"/>
+          <select id="filtroCategoria" class="filtro-select" style="font-size:11px;padding:7px 10px;" onchange="renderTablaProductos()">
+            <option value="">Todas las categorías</option>
+          </select>
+          <select id="filtroBodega" class="filtro-select" style="font-size:11px;padding:7px 10px;" onchange="renderTablaProductos()">
+            <option value="">Todas las bodegas</option>
+          </select>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table id="tblProductos">
+          <thead><tr>
+            <th>Foto</th><th>SKU</th><th>Producto</th><th>Categoría</th>
+            <th>Bodega</th><th>Stock</th><th>Mín.</th><th>Costo</th><th>P.Venta</th><th>Margen</th><th></th>
+          </tr></thead>
+          <tbody id="tbodyProductos"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB BODEGAS -->
+  <div class="section" id="sec-bodegas">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div class="card-title" style="margin:0">🏭 Bodegas y Ubicaciones</div>
+        <button class="btn-acc btn-sm" onclick="openBodegaModal()">+ Nueva Bodega</button>
+      </div>
+      <div id="gridBodegas" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Stock por Bodega</div>
+      <div id="stockPorBodega"></div>
+    </div>
+  </div>
+
+  <!-- TAB ALERTAS -->
+  <div class="section" id="sec-alertas">
+    <div class="card">
+      <div class="card-title">⚠ Productos con Stock Bajo o Agotado</div>
+      <div id="listaAlertas"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">✅ Resumen de Estado del Inventario</div>
+      <div id="resumenEstado"></div>
+    </div>
+  </div>
+
+  <!-- TAB CATÁLOGO VISTA PREVIA -->
+  <div class="section" id="sec-catalogo">
+    <div class="card" style="background:rgba(52,211,153,0.04);border-color:rgba(52,211,153,0.2);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <div class="card-title" style="margin:0;color:var(--acc)">🛒 Vista Previa Catálogo Público</div>
+        <a href="MSS-Catalogo.html" target="_blank" class="btn-acc btn-sm">Abrir Tienda →</a>
+      </div>
+      <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-bottom:16px;">Así ven tus clientes los productos en la tienda online. Solo se muestran productos activos con stock > 0.</div>
+      <div id="catalogo-preview" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;"></div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- MODAL PRODUCTO -->
+<div class="modal-overlay" id="modalProd">
+<div class="modal" style="width:720px;">
+  <h3 id="prodModalTitle">Nuevo Producto</h3>
+  <input type="hidden" id="pId"/>
+  <div class="fgrid">
+    <div class="field full">
+      <label>Fotos del Producto (máx. 4)</label>
+      <div class="img-upload-area" onclick="document.getElementById('pFotos').click()">
+        <div style="font-size:24px;margin-bottom:6px">📷</div>
+        <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">Haz clic para subir fotos · PNG, JPG · Máx. 400KB c/u</div>
+      </div>
+      <input type="file" id="pFotos" accept="image/*" multiple style="display:none" onchange="previewFotos(this)"/>
+      <div class="img-preview-grid" id="fotosPreview"></div>
+    </div>
+    <div class="field"><label>SKU / Código *</label><input id="pSku" placeholder="Ej: PROD-001"/></div>
+    <div class="field"><label>Nombre del Producto *</label><input id="pNombre" placeholder="Ej: Bolsa Estampada 30x40"/></div>
+    <div class="field"><label>Categoría</label>
+      <input id="pCategoria" placeholder="Ej: Estampados, Papelería, Insumos..." list="catList"/>
+      <datalist id="catList"></datalist>
+    </div>
+    <div class="field"><label>Marca / Proveedor</label><input id="pMarca" placeholder="Ej: Propia, Importado..."/></div>
+    <div class="field"><label>Precio de Costo ($)</label><input id="pCosto" type="number" placeholder="0" min="0"/></div>
+    <div class="field"><label>Precio de Venta ($)</label><input id="pVenta" type="number" placeholder="0" min="0" oninput="calcMargen()"/></div>
+    <div class="field"><label>Margen Calculado</label>
+      <div id="margenCalc" style="padding:9px 12px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:12px;color:var(--acc)">— %</div>
+    </div>
+    <div class="field"><label>Bodega Principal</label>
+      <select id="pBodega"></select>
+    </div>
+    <div class="field"><label>Stock Actual</label><input id="pStock" type="number" placeholder="0" min="0"/></div>
+    <div class="field"><label>Stock Mínimo (alerta)</label><input id="pStockMin" type="number" placeholder="5" min="0"/></div>
+    <div class="field"><label>Unidad de Medida</label>
+      <select id="pUnidad">
+        <option value="unidad">Unidad</option>
+        <option value="kg">Kilogramo</option>
+        <option value="litro">Litro</option>
+        <option value="metro">Metro</option>
+        <option value="caja">Caja</option>
+        <option value="rollo">Rollo</option>
+        <option value="paquete">Paquete</option>
+      </select>
+    </div>
+    <div class="field full"><label>Descripción para Catálogo</label>
+      <textarea id="pDesc" rows="2" placeholder="Descripción que verán tus clientes en la tienda online..."></textarea>
+    </div>
+    <div class="field"><label>Estado</label>
+      <select id="pEstado">
+        <option value="activo">✅ Activo — visible en catálogo</option>
+        <option value="inactivo">⏸ Inactivo — oculto en catálogo</option>
+        <option value="descontinuado">🚫 Descontinuado</option>
+      </select>
+    </div>
+    <div class="field"><label>Mostrar en Catálogo Público</label>
+      <select id="pPublico">
+        <option value="1">Sí — visible en tienda online</option>
+        <option value="0">No — solo uso interno</option>
+      </select>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:20px;">
+    <button class="btn-acc" style="flex:1" onclick="saveProd()">💾 Guardar Producto</button>
+    <button class="btn-ghost" onclick="closeProdModal()">Cancelar</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL BODEGA -->
+<div class="modal-overlay" id="modalBodega">
+<div class="modal" style="width:480px;">
+  <h3>🏭 Nueva Bodega</h3>
+  <input type="hidden" id="bId"/>
+  <div class="fgrid">
+    <div class="field full"><label>Nombre de la Bodega *</label><input id="bNombre" placeholder="Ej: Bodega Principal, Depósito Norte..."/></div>
+    <div class="field"><label>Ubicación</label><input id="bUbicacion" placeholder="Ej: Calle 123, Piso 2..."/></div>
+    <div class="field"><label>Responsable</label><input id="bResponsable" placeholder="Nombre del encargado"/></div>
+    <div class="field full"><label>Descripción</label><textarea id="bDesc" rows="2" placeholder="Descripción opcional..."></textarea></div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:20px;">
+    <button class="btn-acc" style="flex:1" onclick="saveBodega()">💾 Guardar Bodega</button>
+    <button class="btn-ghost" onclick="document.getElementById('modalBodega').classList.remove('open')">Cancelar</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL AJUSTE STOCK -->
+<div class="modal-overlay" id="modalAjuste">
+<div class="modal" style="width:420px;">
+  <h3 id="ajusteTitle">Ajuste de Stock</h3>
+  <input type="hidden" id="ajusteProdId"/>
+  <div class="fgrid">
+    <div class="field full"><label>Tipo de Movimiento</label>
+      <select id="ajusteTipo">
+        <option value="entrada">📥 Entrada — aumentar stock</option>
+        <option value="salida">📤 Salida — disminuir stock</option>
+        <option value="ajuste">⚖ Ajuste — establecer cantidad exacta</option>
+        <option value="traslado">🔄 Traslado entre bodegas</option>
+      </select>
+    </div>
+    <div class="field"><label>Cantidad</label><input id="ajusteCantidad" type="number" min="1" placeholder="0"/></div>
+    <div class="field"><label>Motivo</label>
+      <select id="ajusteMotivo">
+        <option value="compra">Compra a proveedor</option>
+        <option value="venta">Venta a cliente</option>
+        <option value="devolucion">Devolución</option>
+        <option value="merma">Merma / pérdida</option>
+        <option value="inventario">Inventario físico</option>
+        <option value="otro">Otro</option>
+      </select>
+    </div>
+    <div class="field full"><label>Observación</label><input id="ajusteObs" placeholder="Detalle opcional..."/></div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:20px;">
+    <button class="btn-acc" style="flex:1" onclick="saveAjuste()">✓ Aplicar Movimiento</button>
+    <button class="btn-ghost" onclick="document.getElementById('modalAjuste').classList.remove('open')">Cancelar</button>
+  </div>
+</div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// MSS INVENTARIO v1.0 — Motor completo
+// Firestore: empresas/{empId}/inv_productos/
+//            empresas/{empId}/inv_bodegas/
+//            empresas/{empId}/inv_movimientos/
+// Sincroniza con: fac_productos (Facturación)
+// ══════════════════════════════════════════════════════════
+
+const SK_PRODS = 'mss_inv_prods_v1_'+_EMP_ID;
+const SK_BODS  = 'mss_inv_bodegas_v1_'+_EMP_ID;
+const SK_MOVS  = 'mss_inv_movs_v1_'+_EMP_ID;
+
+const DEF_BODEGAS = [{id:1,nombre:'Bodega Principal',ubicacion:'',responsable:'',desc:''}];
+
+let PRODUCTOS=[], BODEGAS=[], MOVIMIENTOS=[];
+let _fotosNuevas=[]; // fotos en edición actual
+
+const clp=n=>new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(n||0);
+
+// ── SAVE/LOAD ──
+function saveAll(){
+  try{
+    localStorage.setItem(SK_PRODS,JSON.stringify(PRODUCTOS));
+    localStorage.setItem(SK_BODS, JSON.stringify(BODEGAS));
+    localStorage.setItem(SK_MOVS, JSON.stringify(MOVIMIENTOS));
+  }catch(e){}
+  // Firestore async
+  Promise.all([
+    _fbBatch('inv_productos',PRODUCTOS),
+    _fbBatch('inv_bodegas',BODEGAS),
+    _fbBatch('inv_movimientos',MOVIMIENTOS.slice(-500)), // últimos 500 movimientos
+  ]).then(()=>{
+    // Sincronizar con fac_productos para que Facturación vea el inventario
+    sincronizarConFacturacion();
+  }).catch(e=>console.warn('FB save inv:',e.message));
+}
+
+async function loadAll(){
+  try{
+    const [pArr,bArr,mArr]=await Promise.all([
+      _fbGetAll('inv_productos'),
+      _fbGetAll('inv_bodegas'),
+      _fbGetAll('inv_movimientos')
+    ]);
+    PRODUCTOS  = pArr.length ? pArr : (JSON.parse(localStorage.getItem(SK_PRODS))||[]);
+    BODEGAS    = bArr.length ? bArr : (JSON.parse(localStorage.getItem(SK_BODS)) ||DEF_BODEGAS.map(x=>({...x})));
+    MOVIMIENTOS= mArr.length ? mArr : (JSON.parse(localStorage.getItem(SK_MOVS))||[]);
+  }catch(e){
+    PRODUCTOS  = JSON.parse(localStorage.getItem(SK_PRODS))||[];
+    BODEGAS    = JSON.parse(localStorage.getItem(SK_BODS)) ||DEF_BODEGAS.map(x=>({...x}));
+    MOVIMIENTOS= JSON.parse(localStorage.getItem(SK_MOVS))||[];
+  }
+}
+
+// ── SINCRONIZACIÓN CON FACTURACIÓN ──
+// Cuando se actualiza el inventario, sincroniza los productos
+// en fac_productos para que Facturación los vea directamente
+async function sincronizarConFacturacion(){
+  try{
+    const prodsParaFac = PRODUCTOS
+      .filter(p=>p.estado==='activo')
+      .map(p=>({
+        id: p.id,
+        sku: p.sku||'',
+        descripcion: p.nombre,
+        precio: p.precioVenta||0,
+        costo: p.costo||0,
+        stock: p.stock||0,
+        unidad: p.unidad||'unidad',
+        categoria: p.categoria||'',
+        _syncInv: true // marca que viene del inventario
+      }));
+    await _fbBatch('fac_productos', prodsParaFac);
+    // También localStorage para Facturación offline
+    localStorage.setItem('mss_fact_prods_v1_'+_EMP_ID, JSON.stringify(prodsParaFac));
+  }catch(e){ console.warn('Sync Facturación:', e.message); }
+}
+
+// ── DESCUENTO DE STOCK AUTOMÁTICO ──
+// Llamada desde Facturación cuando se emite una boleta/factura
+// Se expone globalmente para que MSS-Facturacion.html la use
+window.mssInvDescontarStock = async function(items){
+  // items = [{prodId, cantidad, nombre}]
+  if(!items||!items.length) return;
+  await _initFB();
+  await loadAll();
+  let huboDescuento = false;
+  items.forEach(item=>{
+    const p = PRODUCTOS.find(x=>String(x.id)===String(item.prodId||item.id));
+    if(p && p.stock > 0){
+      const antes = p.stock;
+      p.stock = Math.max(0, p.stock - (item.cantidad||1));
+      // Registrar movimiento
+      MOVIMIENTOS.push({
+        id: Date.now()+'_'+Math.random().toString(36).substr(2,5),
+        tipo:'salida', motivo:'venta',
+        prodId:p.id, prodNombre:p.nombre,
+        cantidadAntes:antes, cantidad:item.cantidad||1,
+        cantidadDespues:p.stock,
+        fecha:new Date().toISOString(),
+        obs:'Venta automática desde Facturación'
+      });
+      huboDescuento = true;
+    }
+  });
+  if(huboDescuento) saveAll();
+};
+
+// ── RENDER PRINCIPAL ──
+function renderAll(){
+  renderKPIs();
+  renderTablaProductos();
+  renderBodegas();
+  renderAlertas();
+  renderCatalogoPreview();
+  actualizarFiltros();
+  document.getElementById('_empNombreLogo').textContent = _EMP_NOMBRE;
+  document.getElementById('hInfo').textContent = PRODUCTOS.length+' productos · '+BODEGAS.length+' bodegas';
+}
+
+function renderKPIs(){
+  const totalProds = PRODUCTOS.length;
+  const valorCosto = PRODUCTOS.reduce((s,p)=>s+(p.costo||0)*(p.stock||0),0);
+  const valorVenta = PRODUCTOS.reduce((s,p)=>s+(p.precioVenta||0)*(p.stock||0),0);
+  const bajoStock  = PRODUCTOS.filter(p=>p.stock<=p.stockMin&&p.stock>0).length;
+  const agotados   = PRODUCTOS.filter(p=>p.stock<=0).length;
+  document.getElementById('kpiInv').innerHTML=`
+    <div class="kpi" style="--kc:rgba(52,211,153,0.08)"><div class="kpi-label">Total Productos</div><div class="kpi-value" style="color:var(--acc)">${totalProds}</div><div class="kpi-sub">en inventario</div></div>
+    <div class="kpi" style="--kc:rgba(201,168,76,0.08)"><div class="kpi-label">Valor en Costo</div><div class="kpi-value" style="color:var(--gold)">${clp(valorCosto)}</div><div class="kpi-sub">stock actual</div></div>
+    <div class="kpi" style="--kc:rgba(34,197,94,0.08)"><div class="kpi-label">Valor en Venta</div><div class="kpi-value" style="color:var(--ok)">${clp(valorVenta)}</div><div class="kpi-sub">precio de venta</div></div>
+    <div class="kpi" style="--kc:rgba(245,158,11,0.08)"><div class="kpi-label">Stock Bajo</div><div class="kpi-value" style="color:var(--warn)">${bajoStock}</div><div class="kpi-sub">bajo mínimo</div></div>
+    <div class="kpi" style="--kc:rgba(239,68,68,0.08)"><div class="kpi-label">Agotados</div><div class="kpi-value" style="color:var(--danger)">${agotados}</div><div class="kpi-sub">sin stock</div></div>
+  `;
+}
+
+function actualizarFiltros(){
+  const categorias=[...new Set(PRODUCTOS.map(p=>p.categoria).filter(Boolean))];
+  const catSel=document.getElementById('filtroCategoria');
+  const valCat=catSel.value;
+  catSel.innerHTML='<option value="">Todas las categorías</option>'+categorias.map(c=>`<option value="${c}">${c}</option>`).join('');
+  catSel.value=valCat;
+
+  const bodSel=document.getElementById('filtroBodega');
+  const valBod=bodSel.value;
+  bodSel.innerHTML='<option value="">Todas las bodegas</option>'+BODEGAS.map(b=>`<option value="${b.id}">${b.nombre}</option>`).join('');
+  bodSel.value=valBod;
+
+  const catList=document.getElementById('catList');
+  if(catList) catList.innerHTML=categorias.map(c=>`<option value="${c}">`).join('');
+
+  const pBodSel=document.getElementById('pBodega');
+  if(pBodSel) pBodSel.innerHTML=BODEGAS.map(b=>`<option value="${b.id}">${b.nombre}</option>`).join('');
+}
+
+function renderTablaProductos(){
+  const buscar=(document.getElementById('buscarProd').value||'').toLowerCase();
+  const catF=document.getElementById('filtroCategoria').value;
+  const bodF=document.getElementById('filtroBodega').value;
+
+  let prods=[...PRODUCTOS];
+  if(buscar) prods=prods.filter(p=>(p.nombre||'').toLowerCase().includes(buscar)||(p.sku||'').toLowerCase().includes(buscar));
+  if(catF)   prods=prods.filter(p=>p.categoria===catF);
+  if(bodF)   prods=prods.filter(p=>String(p.bodegaId)===String(bodF));
+
+  const tbody=document.getElementById('tbodyProductos');
+  if(!prods.length){tbody.innerHTML='<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:24px">Sin productos registrados</td></tr>';return;}
+
+  tbody.innerHTML=prods.map(p=>{
+    const bodega=BODEGAS.find(b=>String(b.id)===String(p.bodegaId));
+    const margen=p.precioVenta&&p.costo?Math.round((p.precioVenta-p.costo)/p.precioVenta*100):0;
+    const stockClass=p.stock<=0?'stock-zero':p.stock<=(p.stockMin||5)?'stock-low':'stock-ok';
+    const foto=p.fotos&&p.fotos[0]?`<img src="${p.fotos[0]}" class="prod-img" alt="${p.nombre}"/>`:'<div class="prod-img" style="display:flex;align-items:center;justify-content:center;font-size:20px;">📦</div>';
+    const estadoBadge=p.stock<=0
+      ?`<span class="badge" style="background:rgba(239,68,68,0.15);color:#EF4444">AGOTADO</span>`
+      :p.stock<=(p.stockMin||5)
+      ?`<span class="badge" style="background:rgba(245,158,11,0.15);color:#F59E0B">STOCK BAJO</span>`
+      :`<span class="badge" style="background:rgba(52,211,153,0.15);color:#34D399">OK</span>`;
+    return `<tr>
+      <td>${foto}</td>
+      <td><span style="color:var(--acc)">${p.sku||'—'}</span></td>
+      <td><div style="font-weight:700">${p.nombre}</div><div style="font-size:9px;color:var(--muted)">${p.marca||''}</div></td>
+      <td>${p.categoria||'—'}</td>
+      <td>${bodega?bodega.nombre:'Principal'}</td>
+      <td><span class="${stockClass}" style="font-weight:700;font-size:13px">${p.stock||0}</span> ${p.unidad||'u.'}<br>${estadoBadge}</td>
+      <td style="color:var(--muted)">${p.stockMin||5}</td>
+      <td>${clp(p.costo)}</td>
+      <td style="color:var(--ok);font-weight:700">${clp(p.precioVenta)}</td>
+      <td style="color:${margen>=30?'var(--ok)':margen>=15?'var(--warn)':'var(--danger)'}">${margen}%</td>
+      <td style="white-space:nowrap">
+        <button class="btn-ghost btn-sm" onclick="openProdModal(${p.id})" title="Editar">✏</button>
+        <button class="btn-ghost btn-sm" onclick="openAjusteModal(${p.id})" title="Ajustar stock" style="color:var(--acc)">±</button>
+        <button class="btn-danger btn-sm" onclick="deleteProd(${p.id})" title="Eliminar">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderBodegas(){
+  const grid=document.getElementById('gridBodegas');
+  grid.innerHTML=BODEGAS.map(b=>{
+    const prodsEnBodega=PRODUCTOS.filter(p=>String(p.bodegaId)===String(b.id));
+    const totalStock=prodsEnBodega.reduce((s,p)=>s+(p.stock||0),0);
+    const valorTotal=prodsEnBodega.reduce((s,p)=>s+(p.precioVenta||0)*(p.stock||0),0);
+    return `<div class="card" style="margin:0">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-size:13px;font-weight:700;font-family:var(--font)">${b.nombre}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">${b.ubicacion||'Sin ubicación'}</div>
+          <div style="font-size:10px;color:var(--muted)">${b.responsable?'👤 '+b.responsable:''}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:18px;font-weight:900;color:var(--acc)">${prodsEnBodega.length}</div>
+          <div style="font-size:9px;color:var(--muted)">PRODUCTOS</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);display:flex;justify-content:space-between;">
+        <span style="font-size:10px;color:var(--muted)">Stock total: <strong style="color:var(--white)">${totalStock}</strong></span>
+        <span style="font-size:10px;color:var(--muted)">Valor: <strong style="color:var(--ok)">${clp(valorTotal)}</strong></span>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn-ghost btn-sm" onclick="editBodega(${b.id})">✏ Editar</button>
+        ${b.id!==1?`<button class="btn-danger btn-sm" onclick="deleteBodega(${b.id})">✕ Eliminar</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Stock por bodega detallado
+  const sbp=document.getElementById('stockPorBodega');
+  sbp.innerHTML=BODEGAS.map(b=>{
+    const prods=PRODUCTOS.filter(p=>String(p.bodegaId)===String(b.id));
+    if(!prods.length)return`<div style="margin-bottom:12px"><div style="font-weight:700;margin-bottom:6px">${b.nombre}</div><div style="font-size:11px;color:var(--muted)">Sin productos</div></div>`;
+    return`<div style="margin-bottom:16px">
+      <div style="font-weight:700;margin-bottom:8px;color:var(--acc)">${b.nombre}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${prods.map(p=>`<span class="bodega-chip">${p.nombre} <span class="bodega-stock">${p.stock||0}</span></span>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderAlertas(){
+  const agotados=PRODUCTOS.filter(p=>(p.stock||0)<=0);
+  const bajos=PRODUCTOS.filter(p=>(p.stock||0)>0&&(p.stock||0)<=(p.stockMin||5));
+  const ok=PRODUCTOS.filter(p=>(p.stock||0)>(p.stockMin||5));
+
+  const lista=document.getElementById('listaAlertas');
+  if(!agotados.length&&!bajos.length){
+    lista.innerHTML='<div style="color:var(--ok);font-family:var(--mono);font-size:12px;padding:16px">✅ Todos los productos tienen stock suficiente</div>';
+  } else {
+    lista.innerHTML='';
+    if(agotados.length){
+      lista.innerHTML+=`<div style="font-weight:700;color:var(--danger);margin-bottom:8px;font-family:var(--mono)">🚫 AGOTADOS (${agotados.length})</div>`;
+      lista.innerHTML+=agotados.map(p=>`<div class="alerta-stock" style="background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.2);color:var(--danger);margin-bottom:6px">
+        <strong>${p.nombre}</strong> — SKU: ${p.sku||'—'} — Stock: <strong>0</strong>
+        <button class="btn-acc btn-sm" style="margin-left:10px;background:rgba(239,68,68,0.2);color:var(--danger);border:1px solid rgba(239,68,68,0.3)" onclick="openAjusteModal(${p.id})">+ Reponer</button>
+      </div>`).join('');
+    }
+    if(bajos.length){
+      lista.innerHTML+=`<div style="font-weight:700;color:var(--warn);margin:12px 0 8px;font-family:var(--mono)">⚠ STOCK BAJO (${bajos.length})</div>`;
+      lista.innerHTML+=bajos.map(p=>`<div class="alerta-stock" style="margin-bottom:6px">
+        <strong>${p.nombre}</strong> — SKU: ${p.sku||'—'} — Stock: <strong>${p.stock}</strong> / Mínimo: ${p.stockMin||5}
+        <button class="btn-acc btn-sm" style="margin-left:10px" onclick="openAjusteModal(${p.id})">+ Reponer</button>
+      </div>`).join('');
+    }
+  }
+
+  // Resumen estado
+  document.getElementById('resumenEstado').innerHTML=`
+    <div style="display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:12px">
+      <div style="color:var(--ok)">✅ Stock OK: <strong>${ok.length}</strong></div>
+      <div style="color:var(--warn)">⚠ Stock bajo: <strong>${bajos.length}</strong></div>
+      <div style="color:var(--danger)">🚫 Agotados: <strong>${agotados.length}</strong></div>
+    </div>`;
+}
+
+function renderCatalogoPreview(){
+  const activos=PRODUCTOS.filter(p=>p.estado==='activo'&&parseInt(p.publico||0)===1);
+  const div=document.getElementById('catalogo-preview');
+  if(!activos.length){div.innerHTML='<div style="color:var(--muted);font-family:var(--mono);font-size:11px;grid-column:1/-1">No hay productos activos y públicos aún</div>';return;}
+  div.innerHTML=activos.map(p=>{
+    const foto=p.fotos&&p.fotos[0]?`<img src="${p.fotos[0]}" style="width:100%;height:120px;object-fit:cover;border-radius:8px 8px 0 0" alt="${p.nombre}"/>`:'<div style="width:100%;height:120px;background:var(--surf2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;font-size:36px">📦</div>';
+    const agotado=p.stock<=0;
+    return`<div style="background:var(--surf2);border:1px solid var(--border2);border-radius:10px;overflow:hidden;${agotado?'opacity:.6':''}">
+      ${foto}
+      <div style="padding:10px">
+        <div style="font-size:11px;font-weight:700">${p.nombre}</div>
+        <div style="font-size:10px;color:var(--muted)">${p.categoria||''}</div>
+        <div style="font-size:13px;font-weight:900;color:var(--ok);margin-top:4px">${clp(p.precioVenta)}</div>
+        ${agotado?'<span class="badge" style="background:rgba(239,68,68,0.15);color:#EF4444;margin-top:4px">AGOTADO</span>':
+          `<span class="badge" style="background:rgba(52,211,153,0.1);color:var(--acc);margin-top:4px">Stock: ${p.stock}</span>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── MODAL PRODUCTO ──
+function openProdModal(id){
+  _fotosNuevas=[];
+  document.getElementById('fotosPreview').innerHTML='';
+  const p=id?PRODUCTOS.find(x=>x.id===id):null;
+  document.getElementById('prodModalTitle').textContent=p?'Editar Producto':'Nuevo Producto';
+  document.getElementById('pId').value=id||'';
+  document.getElementById('pSku').value=p?.sku||'';
+  document.getElementById('pNombre').value=p?.nombre||'';
+  document.getElementById('pCategoria').value=p?.categoria||'';
+  document.getElementById('pMarca').value=p?.marca||'';
+  document.getElementById('pCosto').value=p?.costo||'';
+  document.getElementById('pVenta').value=p?.precioVenta||'';
+  document.getElementById('pStock').value=p?.stock||'';
+  document.getElementById('pStockMin').value=p?.stockMin||5;
+  document.getElementById('pUnidad').value=p?.unidad||'unidad';
+  document.getElementById('pDesc').value=p?.desc||'';
+  document.getElementById('pEstado').value=p?.estado||'activo';
+  document.getElementById('pPublico').value=p?.publico!==undefined?String(p.publico):'1';
+  // Bodegas
+  actualizarFiltros();
+  if(p?.bodegaId) document.getElementById('pBodega').value=String(p.bodegaId);
+  // Fotos existentes
+  if(p?.fotos&&p.fotos.length){
+    _fotosNuevas=[...p.fotos];
+    document.getElementById('fotosPreview').innerHTML=_fotosNuevas.map((f,i)=>`
+      <div class="img-preview-item">
+        <img src="${f}" alt="foto${i}"/>
+        <button class="del-img" onclick="deleteFoto(${i})">✕</button>
+      </div>`).join('');
+  }
+  calcMargen();
+  document.getElementById('modalProd').classList.add('open');
+}
+function closeProdModal(){document.getElementById('modalProd').classList.remove('open');}
+
+function calcMargen(){
+  const c=parseFloat(document.getElementById('pCosto').value)||0;
+  const v=parseFloat(document.getElementById('pVenta').value)||0;
+  const el=document.getElementById('margenCalc');
+  if(v>0&&c>0){
+    const m=Math.round((v-c)/v*100);
+    el.textContent=m+'% — Ganancia: '+clp(v-c);
+    el.style.color=m>=30?'var(--ok)':m>=15?'var(--warn)':'var(--danger)';
+  } else {el.textContent='— %';el.style.color='var(--acc)';}
+}
+
+function previewFotos(input){
+  const files=Array.from(input.files);
+  const maxFotos=4;
+  files.slice(0,maxFotos-_fotosNuevas.length).forEach(file=>{
+    if(file.size>450000){alert('Foto muy grande: '+file.name+'. Máx 400KB');return;}
+    const r=new FileReader();
+    r.onload=e=>{
+      if(_fotosNuevas.length>=maxFotos)return;
+      _fotosNuevas.push(e.target.result);
+      document.getElementById('fotosPreview').innerHTML=_fotosNuevas.map((f,i)=>`
+        <div class="img-preview-item">
+          <img src="${f}" alt="foto${i}"/>
+          <button class="del-img" onclick="deleteFoto(${i})">✕</button>
+        </div>`).join('');
+    };
+    r.readAsDataURL(file);
+  });
+  input.value='';
+}
+function deleteFoto(i){
+  _fotosNuevas.splice(i,1);
+  document.getElementById('fotosPreview').innerHTML=_fotosNuevas.map((f,idx)=>`
+    <div class="img-preview-item">
+      <img src="${f}" alt="foto${idx}"/>
+      <button class="del-img" onclick="deleteFoto(${idx})">✕</button>
+    </div>`).join('');
+}
+
+function saveProd(){
+  const nombre=document.getElementById('pNombre').value.trim();
+  if(!nombre){alert('El nombre es obligatorio');return;}
+  const id=document.getElementById('pId').value;
+  const obj={
+    id:        id?parseInt(id)||id:Date.now(),
+    sku:       document.getElementById('pSku').value.trim(),
+    nombre,
+    categoria: document.getElementById('pCategoria').value.trim(),
+    marca:     document.getElementById('pMarca').value.trim(),
+    costo:     parseFloat(document.getElementById('pCosto').value)||0,
+    precioVenta:parseFloat(document.getElementById('pVenta').value)||0,
+    bodegaId:  document.getElementById('pBodega').value,
+    stock:     parseInt(document.getElementById('pStock').value)||0,
+    stockMin:  parseInt(document.getElementById('pStockMin').value)||5,
+    unidad:    document.getElementById('pUnidad').value,
+    desc:      document.getElementById('pDesc').value.trim(),
+    estado:    document.getElementById('pEstado').value,
+    publico:   parseInt(document.getElementById('pPublico').value),
+    fotos:     _fotosNuevas,
+    actualizado:new Date().toISOString(),
+  };
+  if(id){
+    const i=PRODUCTOS.findIndex(p=>String(p.id)===String(id));
+    if(i>=0) PRODUCTOS[i]={...PRODUCTOS[i],...obj};
+    else PRODUCTOS.push(obj);
+  } else {
+    // Registrar movimiento de entrada inicial
+    if(obj.stock>0){
+      MOVIMIENTOS.push({
+        id:Date.now()+'_init',tipo:'entrada',motivo:'inventario',
+        prodId:obj.id,prodNombre:obj.nombre,
+        cantidadAntes:0,cantidad:obj.stock,cantidadDespues:obj.stock,
+        fecha:new Date().toISOString(),obs:'Stock inicial'
+      });
+    }
+    PRODUCTOS.push(obj);
+  }
+  saveAll();
+  closeProdModal();
+  renderAll();
+}
+
+function deleteProd(id){
+  const p=PRODUCTOS.find(x=>x.id===id);
+  if(!confirm('¿Eliminar "'+p?.nombre+'" del inventario?'))return;
+  PRODUCTOS=PRODUCTOS.filter(x=>x.id!==id);
+  saveAll();renderAll();
+}
+
+// ── MODAL BODEGA ──
+function openBodegaModal(){
+  document.getElementById('bId').value='';
+  document.getElementById('bNombre').value='';
+  document.getElementById('bUbicacion').value='';
+  document.getElementById('bResponsable').value='';
+  document.getElementById('bDesc').value='';
+  document.getElementById('modalBodega').classList.add('open');
+}
+function editBodega(id){
+  const b=BODEGAS.find(x=>x.id===id);
+  if(!b)return;
+  document.getElementById('bId').value=id;
+  document.getElementById('bNombre').value=b.nombre||'';
+  document.getElementById('bUbicacion').value=b.ubicacion||'';
+  document.getElementById('bResponsable').value=b.responsable||'';
+  document.getElementById('bDesc').value=b.desc||'';
+  document.getElementById('modalBodega').classList.add('open');
+}
+function saveBodega(){
+  const nombre=document.getElementById('bNombre').value.trim();
+  if(!nombre){alert('El nombre es obligatorio');return;}
+  const id=document.getElementById('bId').value;
+  const obj={id:id?parseInt(id)||id:Date.now(),nombre,ubicacion:document.getElementById('bUbicacion').value.trim(),responsable:document.getElementById('bResponsable').value.trim(),desc:document.getElementById('bDesc').value.trim()};
+  if(id){const i=BODEGAS.findIndex(b=>String(b.id)===String(id));if(i>=0)BODEGAS[i]={...obj};}
+  else BODEGAS.push(obj);
+  saveAll();
+  document.getElementById('modalBodega').classList.remove('open');
+  actualizarFiltros();renderBodegas();
+}
+function deleteBodega(id){
+  if(!confirm('¿Eliminar esta bodega? Los productos quedarán sin bodega asignada.'))return;
+  BODEGAS=BODEGAS.filter(b=>b.id!==id);
+  PRODUCTOS.forEach(p=>{if(String(p.bodegaId)===String(id))p.bodegaId=1;});
+  saveAll();renderAll();
+}
+
+// ── MODAL AJUSTE STOCK ──
+function openAjusteModal(prodId){
+  const p=PRODUCTOS.find(x=>x.id===prodId||x.id===parseInt(prodId));
+  if(!p)return;
+  document.getElementById('ajusteProdId').value=p.id;
+  document.getElementById('ajusteTitle').textContent='Ajuste de Stock — '+p.nombre+' (actual: '+p.stock+')';
+  document.getElementById('ajusteCantidad').value='';
+  document.getElementById('ajusteObs').value='';
+  document.getElementById('modalAjuste').classList.add('open');
+}
+function saveAjuste(){
+  const id=document.getElementById('ajusteProdId').value;
+  const p=PRODUCTOS.find(x=>String(x.id)===String(id));
+  if(!p)return;
+  const tipo=document.getElementById('ajusteTipo').value;
+  const cantidad=parseInt(document.getElementById('ajusteCantidad').value)||0;
+  if(!cantidad){alert('Ingresa una cantidad');return;}
+  const antes=p.stock||0;
+  if(tipo==='entrada')p.stock=antes+cantidad;
+  else if(tipo==='salida')p.stock=Math.max(0,antes-cantidad);
+  else if(tipo==='ajuste')p.stock=cantidad;
+  else if(tipo==='traslado')p.stock=Math.max(0,antes-cantidad);
+  MOVIMIENTOS.push({
+    id:Date.now()+'_'+Math.random().toString(36).substr(2,5),
+    tipo,motivo:document.getElementById('ajusteMotivo').value,
+    prodId:p.id,prodNombre:p.nombre,
+    cantidadAntes:antes,cantidad,cantidadDespues:p.stock,
+    fecha:new Date().toISOString(),
+    obs:document.getElementById('ajusteObs').value
+  });
+  saveAll();
+  document.getElementById('modalAjuste').classList.remove('open');
+  renderAll();
+}
+
+// ── TABS ──
+function showTab(tab,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('sec-'+tab).classList.add('active');
+  if(btn)btn.classList.add('active');
+}
+
+// ── CERRAR MODALS ──
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});
+});
+
+// ── INIT ──
+(async function(){
+  await _initFB();
+  await loadAll();
+  renderAll();
+})();
+</script>
+</body>
+</html>

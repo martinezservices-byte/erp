@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Martinez Services — Compras</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#050A12;--surf:#091424;--surf2:#0E1C30;--surf3:#132438;
+  --border:rgba(251,146,60,0.15);--border2:rgba(251,146,60,0.08);
+  --acc:#FB923C;--accHi:#FED7AA;
+  --white:#FFF7ED;--muted:#5A3D2B;--mutedHi:#8F6A52;
+  --ok:#22C55E;--danger:#EF4444;--warn:#F59E0B;--gold:#C9A84C;--blue:#38BDF8;--teal:#34D399;
+  --font:'Playfair Display',serif;--mono:'JetBrains Mono',monospace;--body:'Segoe UI',system-ui,sans-serif;
+}
+body{background:var(--bg);color:var(--white);font-family:var(--body);min-height:100vh;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-thumb{background:rgba(251,146,60,0.2);border-radius:3px;}
+#header{background:var(--surf);border-bottom:1px solid var(--border2);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:14px;}
+.logo-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--acc),var(--accHi));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--bg);font-family:var(--font);}
+.logo-name{font-size:15px;font-weight:800;font-family:var(--font);}
+.logo-mod{font-size:10px;color:var(--acc);font-weight:700;letter-spacing:2px;font-family:var(--mono);}
+#tabbar{display:flex;gap:3px;background:var(--bg);padding:4px;border-radius:10px;width:fit-content;margin:22px 24px 0;flex-wrap:wrap;}
+.tab{padding:7px 15px;border-radius:7px;border:none;cursor:pointer;font-size:11px;font-weight:700;transition:all .18s;background:transparent;color:var(--muted);font-family:var(--mono);}
+.tab.active{background:var(--acc);color:var(--bg);}
+#content{max-width:1280px;margin:0 auto;padding:20px 24px 40px;}
+.section{display:none;}.section.active{display:block;}
+.kpi-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
+.kpi{flex:1;min-width:145px;background:var(--surf);border-radius:12px;padding:16px 18px;border:1px solid var(--border2);position:relative;overflow:hidden;}
+.kpi::before{content:'';position:absolute;top:0;right:0;width:55px;height:55px;background:radial-gradient(circle at top right,var(--kc,rgba(251,146,60,0.08)),transparent 70%);}
+.kpi-label{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;font-family:var(--mono);}
+.kpi-value{font-size:22px;font-weight:900;font-family:var(--font);}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.card{background:var(--surf);border-radius:12px;padding:18px;border:1px solid var(--border2);margin-bottom:16px;}
+.card-title{font-size:13px;font-weight:700;color:var(--white);margin-bottom:14px;font-family:var(--font);}
+.badge{display:inline-flex;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;font-family:var(--mono);white-space:nowrap;}
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono);}
+th{padding:9px 11px;text-align:left;color:var(--acc);font-weight:700;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:8px 11px;border-bottom:1px solid rgba(251,146,60,0.05);}
+tr:nth-child(even) td{background:rgba(255,255,255,0.012);}
+tfoot td{border-top:2px solid rgba(251,146,60,0.25);font-weight:800;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surf);border-radius:16px;padding:28px;border:1px solid rgba(251,146,60,0.3);width:720px;max-height:92vh;overflow-y:auto;}
+.modal h3{font-size:18px;font-weight:900;color:var(--white);margin-bottom:20px;font-family:var(--font);}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field.full{grid-column:1/-1;}
+label{font-size:10px;color:var(--mutedHi);font-weight:700;text-transform:uppercase;letter-spacing:.8px;font-family:var(--mono);}
+input,select,textarea{background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--white);font-family:var(--mono);font-size:12px;outline:none;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--acc);}
+.btn-acc{background:var(--acc);color:var(--bg);border:none;border-radius:8px;padding:10px 18px;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--mono);transition:all .15s;}
+.btn-acc:hover{opacity:.85;}
+.btn-ghost{background:transparent;color:var(--mutedHi);border:1px solid var(--border);border-radius:8px;padding:10px 18px;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--mono);}
+.btn-danger{background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:8px 14px;font-size:11px;cursor:pointer;font-family:var(--mono);}
+.btn-sm{padding:5px 10px;font-size:10px;border-radius:6px;}
+.prov-card{background:var(--surf2);border:1px solid var(--border2);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px;}
+.prov-nombre{font-size:13px;font-weight:700;font-family:var(--font);}
+.prov-meta{font-size:10px;color:var(--muted);font-family:var(--mono);}
+.estado-pagado{background:rgba(34,197,94,0.15);color:#22C55E;}
+.estado-pendiente{background:rgba(245,158,11,0.15);color:#F59E0B;}
+.estado-vencido{background:rgba(239,68,68,0.15);color:#EF4444;}
+.estado-parcial{background:rgba(56,189,248,0.15);color:#38BDF8;}
+/* Items de compra */
+.items-list{border:1px solid var(--border2);border-radius:8px;overflow:hidden;margin-bottom:10px;}
+.item-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border2);align-items:center;}
+.item-row:last-child{border-bottom:none;}
+.item-header{background:var(--surf3);font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+</style>
+</head>
+<body>
+
+<!-- NAV BAR -->
+<div id="nav-bar" style="background:#030609;border-bottom:1px solid rgba(201,168,76,0.1);padding:0 16px;display:flex;align-items:center;gap:4px;overflow-x:auto;flex-shrink:0;height:42px;position:sticky;top:0;z-index:200;">
+<a href="app.html" style="display:flex;align-items:center;padding:5px 10px;border-radius:6px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">🏠 Hub</a>
+<div style="width:1px;height:20px;background:rgba(201,168,76,0.15);margin:0 2px;flex-shrink:0"></div>
+<a href="MSS-Finanzas.html"    style="padding:5px 9px;border-radius:6px;color:#C9A84C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Finanzas</a>
+<a href="MSS-Contabilidad.html" style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Contab.</a>
+<a href="MSS-Facturacion.html"  style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Factur.</a>
+<a href="MSS-Inventario.html"   style="padding:5px 9px;border-radius:6px;color:#34D399;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">📦 Inventario</a>
+<a href="MSS-Compras.html"      style="padding:5px 9px;border-radius:6px;color:#FB923C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;background:rgba(251,146,60,0.15);border:1px solid rgba(251,146,60,0.35);">🛒 Compras</a>
+<a href="MSS-Cotizacion.html"   style="padding:5px 9px;border-radius:6px;color:#38BDF8;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Cotiz.</a>
+<a href="MSS-Tesoreria.html"    style="padding:5px 9px;border-radius:6px;color:#FBBF24;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Tesor.</a>
+<a href="MSS-Contratos.html"    style="padding:5px 9px;border-radius:6px;color:#A78BFA;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Contratos</a>
+<a href="MSS-Ventas-CRM.html"   style="padding:5px 9px;border-radius:6px;color:#FB923C;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Ventas</a>
+<a href="MSS-RRHH.html"         style="padding:5px 9px;border-radius:6px;color:#A78BFA;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">RRHH</a>
+<a href="MSS-Estrategia.html"   style="padding:5px 9px;border-radius:6px;color:#10B981;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">Estrategia</a>
+<a href="MSS-Arriendos.html"    style="padding:5px 9px;border-radius:6px;color:#F59E0B;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;flex-shrink:0;">🚛 Arriendos</a>
+<a href="MSS-Auditoria.html"    style="padding:4px 10px;border-radius:6px;font-size:10px;font-weight:700;font-family:monospace;text-decoration:none;white-space:nowrap;background:rgba(167,139,250,0.1);color:#A78BFA;">📊 Auditoría</a>
+<div id="nav-emp" style="margin-left:auto;padding:3px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;font-size:9px;color:#C9A84C;font-family:monospace;white-space:nowrap;flex-shrink:0;display:none"></div>
+</div>
+
+<script>
+let _db=null,_fbReady=false;
+async function _initFB(){
+  if(_fbReady)return;
+  try{
+    const m1=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const m2=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const m3=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const FB={apiKey:"AIzaSyDH517EzBb4MColYbIzfPW215kl3H6hUjI",authDomain:"mss-erp.firebaseapp.com",projectId:"mss-erp",storageBucket:"mss-erp.firebasestorage.app",messagingSenderId:"546891085564",appId:"1:546891085564:web:82a24fb40941e6a54a0979"};
+    const app=m1.getApps().length?m1.getApps()[0]:m1.initializeApp(FB);
+    const auth=m3.getAuth(app);
+    await new Promise((resolve)=>{
+      const unsub=m3.onAuthStateChanged(auth,user=>{
+        unsub();
+        if(!user){window.location.href='MSS-Login.html';}
+        else{window._MSS_USER=user;_db=m2.getFirestore(app);window._fbM=m2;_fbReady=true;resolve();}
+      });
+    });
+  }catch(e){_fbReady=false;console.warn('Firebase:',e.message);}
+}
+async function _fbBatch(col,arr){
+  if(!_fbReady||!window._fbM)return;
+  const {writeBatch}=window._fbM;
+  const ep=_ep()+'/'+col;
+  const snap=await window._fbM.getDocs(window._fbM.collection(_db,ep)).catch(()=>null);
+  if(snap){
+    const existing=snap.docs.map(d=>d.id);
+    const newIds=arr.map(x=>String(x.id||Date.now()));
+    const toDelete=existing.filter(id=>!newIds.includes(id));
+    for(let i=0;i<toDelete.length;i+=400){
+      const b=writeBatch(_db);
+      toDelete.slice(i,i+400).forEach(id=>b.delete(window._fbM.doc(_db,ep+'/'+id)));
+      await b.commit().catch(()=>{});
+    }
+  }
+  for(let i=0;i<arr.length;i+=400){
+    const b=writeBatch(_db);
+    arr.slice(i,i+400).forEach(item=>b.set(window._fbM.doc(_db,ep+'/'+String(item.id||Date.now())),{...item}));
+    await b.commit().catch(()=>{});
+  }
+}
+async function _fbGetAll(col){
+  if(!_fbReady||!window._fbM)return[];
+  const snap=await window._fbM.getDocs(window._fbM.collection(_db,_ep()+'/'+col)).catch(()=>null);
+  if(!snap||snap.empty)return[];
+  return snap.docs.map(d=>d.data());
+}
+
+const _empRaw=localStorage.getItem('mss_empresa_actual');
+const _empObj=(()=>{try{const o=_empRaw?JSON.parse(_empRaw):null;if(o&&o.tipo==='condominio')return{id:1,nombre:'Mi Empresa'};return o||{id:1,nombre:'Mi Empresa'};}catch(e){return{id:1,nombre:'Mi Empresa'};}})();
+window._MSS_EMP=_empObj;
+const _EMP_ID=_empObj.id||1;
+const _EMP_NOMBRE=_empObj.nombre||'Mi Empresa';
+function _ep(){return 'empresas/'+_EMP_ID;}
+(function(){try{if(_empObj&&_empObj.nombre){const nd=document.getElementById('nav-emp');if(nd){nd.textContent='Empresa: '+_empObj.nombre;nd.style.display='block';}}}catch(ex){}})();
+</script>
+
+<!-- HEADER -->
+<div id="header">
+  <div class="logo">
+    <div class="logo-icon">🛒</div>
+    <div>
+      <div class="logo-name">MÓDULO COMPRAS</div>
+      <div class="logo-mod">PROVEEDORES & CUENTAS POR PAGAR</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <span style="font-size:11px;color:var(--muted);font-family:var(--mono)" id="hInfo">Cargando...</span>
+    <button class="btn-acc" onclick="openCompraModal(null)">+ Nueva Compra</button>
+    <button class="btn-ghost btn-sm" onclick="showTab('proveedores',document.querySelector('.tab[data-t=proveedores]'))">+ Proveedor</button>
+  </div>
+</div>
+
+<div id="tabbar">
+  <button class="tab active" data-t="compras"    onclick="showTab('compras',this)">🛒 Compras</button>
+  <button class="tab"        data-t="proveedores" onclick="showTab('proveedores',this)">🏭 Proveedores</button>
+  <button class="tab"        data-t="porPagar"   onclick="showTab('porPagar',this)">⏳ Por Pagar</button>
+  <button class="tab"        data-t="resumen"    onclick="showTab('resumen',this)">📊 Resumen</button>
+</div>
+
+<div id="content">
+
+  <!-- COMPRAS -->
+  <div class="section active" id="sec-compras">
+    <div class="kpi-row" id="kpiCompras"></div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+        <div class="card-title" style="margin:0">📄 Registro de Compras</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <input id="buscarCompra" placeholder="Buscar proveedor, N° factura..." style="width:220px;font-size:11px;padding:7px 10px;" oninput="renderTablaCompras()"/>
+          <select id="filtroEstadoCompra" style="font-size:11px;padding:7px 10px;width:140px;" onchange="renderTablaCompras()">
+            <option value="">Todos los estados</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="pagado">Pagado</option>
+            <option value="parcial">Parcial</option>
+            <option value="vencido">Vencido</option>
+          </select>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>Fecha</th><th>N° Doc.</th><th>Proveedor</th><th>Categoría</th>
+            <th>Items</th><th>Neto</th><th>IVA</th><th>Total</th><th>Vence</th><th>Estado</th><th></th>
+          </tr></thead>
+          <tbody id="tbodyCompras"></tbody>
+          <tfoot><tr>
+            <td colspan="5" style="color:var(--muted)">TOTALES</td>
+            <td id="totNeto" style="color:var(--acc)">$0</td>
+            <td id="totIva"  style="color:var(--muted)">$0</td>
+            <td id="totTotal" style="color:var(--ok)">$0</td>
+            <td colspan="3"></td>
+          </tr></tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROVEEDORES -->
+  <div class="section" id="sec-proveedores">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div style="font-size:15px;font-weight:700;font-family:var(--font)">🏭 Proveedores Registrados</div>
+      <button class="btn-acc btn-sm" onclick="openProvModal(null)">+ Nuevo Proveedor</button>
+    </div>
+    <div id="gridProveedores" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;"></div>
+  </div>
+
+  <!-- POR PAGAR -->
+  <div class="section" id="sec-porPagar">
+    <div class="kpi-row" id="kpiPorPagar"></div>
+    <div class="card">
+      <div class="card-title">⏳ Cuentas Por Pagar</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>Proveedor</th><th>N° Doc.</th><th>Emisión</th><th>Vencimiento</th>
+            <th>Total</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th></th>
+          </tr></thead>
+          <tbody id="tbodyPorPagar"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESUMEN -->
+  <div class="section" id="sec-resumen">
+    <div class="kpi-row" id="kpiResumen"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="card">
+        <div class="card-title">📊 Compras por Categoría</div>
+        <div id="resumenCategorias"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🏭 Compras por Proveedor</div>
+        <div id="resumenProveedores"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📅 Últimas Compras del Mes</div>
+      <div id="resumenMes"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL COMPRA -->
+<div class="modal-overlay" id="modalCompra">
+<div class="modal" style="width:760px;">
+  <h3 id="compraModalTitle">Nueva Compra</h3>
+  <input type="hidden" id="cId"/>
+  <div class="fgrid">
+    <div class="field"><label>Tipo de Documento</label>
+      <select id="cTipoDoc">
+        <option value="factura">Factura (33)</option>
+        <option value="boleta">Boleta (39)</option>
+        <option value="nota_debito">Nota de Débito (56)</option>
+        <option value="nota_credito">Nota de Crédito (61)</option>
+        <option value="otro">Otro documento</option>
+      </select>
+    </div>
+    <div class="field"><label>N° de Documento</label><input id="cNroDoc" placeholder="Ej: 001234"/></div>
+    <div class="field"><label>Proveedor *</label>
+      <select id="cProveedor"><option value="">Seleccionar proveedor...</option></select>
+    </div>
+    <div class="field"><label>Fecha Emisión *</label><input id="cFecha" type="date"/></div>
+    <div class="field"><label>Fecha Vencimiento</label><input id="cVence" type="date"/></div>
+    <div class="field"><label>Categoría</label>
+      <select id="cCategoria">
+        <option value="mercaderia">Mercadería / Insumos</option>
+        <option value="servicios">Servicios</option>
+        <option value="activo">Activo Fijo</option>
+        <option value="remuneraciones">Remuneraciones</option>
+        <option value="gastos_gral">Gastos Generales</option>
+        <option value="transporte">Transporte / Flete</option>
+        <option value="otro">Otro</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ITEMS DE COMPRA -->
+  <div style="margin:16px 0 10px;font-size:11px;font-weight:700;color:var(--acc);font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;">Items / Detalle</div>
+  <div class="items-list" id="itemsCompraList">
+    <div class="item-row item-header">
+      <span>Descripción</span><span>Cantidad</span><span>Precio Unit.</span><span>Subtotal</span><span></span>
+    </div>
+  </div>
+  <button class="btn-ghost btn-sm" onclick="addItemCompra()" style="margin-bottom:14px">+ Agregar ítem</button>
+
+  <div class="fgrid">
+    <div class="field"><label>Neto ($)</label>
+      <div id="cNetoCalc" style="padding:9px 12px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:12px;color:var(--white)">$0</div>
+    </div>
+    <div class="field"><label>IVA 19% ($)</label>
+      <div id="cIvaCalc" style="padding:9px 12px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:12px;color:var(--muted)">$0</div>
+    </div>
+    <div class="field"><label>Total ($)</label>
+      <div id="cTotalCalc" style="padding:9px 12px;background:var(--surf2);border:1px solid rgba(251,146,60,0.3);border-radius:8px;font-family:var(--mono);font-size:14px;font-weight:900;color:var(--acc)">$0</div>
+    </div>
+    <div class="field"><label>Incluye IVA</label>
+      <select id="cConIva" onchange="recalcCompra()">
+        <option value="1">Sí — precio con IVA incluido</option>
+        <option value="0">No — precio neto sin IVA</option>
+        <option value="exento">Exento de IVA</option>
+      </select>
+    </div>
+    <div class="field"><label>Estado de Pago</label>
+      <select id="cEstadoPago">
+        <option value="pendiente">⏳ Pendiente</option>
+        <option value="parcial">💸 Pago Parcial</option>
+        <option value="pagado">✅ Pagado</option>
+      </select>
+    </div>
+    <div class="field"><label>Monto Pagado ($)</label><input id="cMontoPagado" type="number" placeholder="0" min="0"/></div>
+    <div class="field full"><label>Observaciones</label><textarea id="cObs" rows="2" placeholder="Notas internas sobre esta compra..."></textarea></div>
+    <div class="field full">
+      <label>Actualizar Stock en Inventario</label>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(52,211,153,0.04);border:1px solid rgba(52,211,153,0.15);border-radius:8px;">
+        <input type="checkbox" id="cActualizarInv" style="width:auto;margin:0" checked/>
+        <span style="font-size:11px;color:var(--teal);font-family:var(--mono)">Aumentar stock automáticamente en MSS-Inventario</span>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:20px;">
+    <button class="btn-acc" style="flex:1" onclick="saveCompra()">💾 Guardar Compra</button>
+    <button class="btn-ghost" onclick="closeCompraModal()">Cancelar</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL PROVEEDOR -->
+<div class="modal-overlay" id="modalProv">
+<div class="modal" style="width:560px;">
+  <h3 id="provModalTitle">Nuevo Proveedor</h3>
+  <input type="hidden" id="pvId"/>
+  <div class="fgrid">
+    <div class="field full"><label>Nombre / Razón Social *</label><input id="pvNombre" placeholder="Ej: Distribuidora Los Andes SpA"/></div>
+    <div class="field"><label>RUT</label><input id="pvRut" placeholder="76.123.456-7"/></div>
+    <div class="field"><label>Giro / Rubro</label><input id="pvGiro" placeholder="Ej: Insumos imprenta"/></div>
+    <div class="field"><label>Contacto Principal</label><input id="pvContacto" placeholder="Nombre del contacto"/></div>
+    <div class="field"><label>Teléfono</label><input id="pvTel" placeholder="+56 9..."/></div>
+    <div class="field"><label>Email</label><input id="pvEmail" type="email" placeholder="proveedor@mail.cl"/></div>
+    <div class="field full"><label>Dirección</label><input id="pvDireccion" placeholder="Calle y ciudad"/></div>
+    <div class="field"><label>Banco</label><input id="pvBanco" placeholder="Ej: BCI, Santander..."/></div>
+    <div class="field"><label>N° Cuenta</label><input id="pvCuenta" placeholder="Número de cuenta"/></div>
+    <div class="field"><label>Tipo de Cuenta</label>
+      <select id="pvTipoCuenta">
+        <option value="corriente">Cuenta Corriente</option>
+        <option value="vista">Cuenta Vista / RUT</option>
+        <option value="ahorro">Cuenta de Ahorro</option>
+      </select>
+    </div>
+    <div class="field"><label>Plazo de Pago</label>
+      <select id="pvPlazo">
+        <option value="0">Contado inmediato</option>
+        <option value="15">15 días</option>
+        <option value="30">30 días</option>
+        <option value="60">60 días</option>
+        <option value="90">90 días</option>
+      </select>
+    </div>
+    <div class="field full"><label>Notas</label><textarea id="pvNotas" rows="2" placeholder="Condiciones especiales, descuentos, etc."></textarea></div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:20px;">
+    <button class="btn-acc" style="flex:1" onclick="saveProv()">💾 Guardar Proveedor</button>
+    <button class="btn-ghost" onclick="document.getElementById('modalProv').classList.remove('open')">Cancelar</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL PAGO -->
+<div class="modal-overlay" id="modalPago">
+<div class="modal" style="width:420px;">
+  <h3>💸 Registrar Pago</h3>
+  <input type="hidden" id="pagoCompraId"/>
+  <div class="fgrid">
+    <div class="field full"><label>Monto a Pagar ($)</label><input id="pagoMonto" type="number" min="0" placeholder="0"/></div>
+    <div class="field"><label>Fecha de Pago</label><input id="pagoFecha" type="date"/></div>
+    <div class="field"><label>Forma de Pago</label>
+      <select id="pagoForma">
+        <option value="transferencia">Transferencia</option>
+        <option value="cheque">Cheque</option>
+        <option value="efectivo">Efectivo</option>
+        <option value="tarjeta">Tarjeta</option>
+      </select>
+    </div>
+    <div class="field full"><label>Observación</label><input id="pagoObs" placeholder="Número de transferencia, etc."/></div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:20px;">
+    <button class="btn-acc" style="flex:1" onclick="savePago()">✓ Confirmar Pago</button>
+    <button class="btn-ghost" onclick="document.getElementById('modalPago').classList.remove('open')">Cancelar</button>
+  </div>
+</div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// MSS COMPRAS v1.0
+// Firestore: empresas/{empId}/com_compras/
+//            empresas/{empId}/com_proveedores/
+// Sincroniza con: inv_productos (Inventario)
+//                 cont_asientos (Contabilidad)
+// ══════════════════════════════════════════════════════════
+
+const SK_COMPRAS = 'mss_comp_compras_v1_'+_EMP_ID;
+const SK_PROVS   = 'mss_comp_provs_v1_'+_EMP_ID;
+
+let COMPRAS=[], PROVEEDORES=[];
+let _itemsCompra=[]; // items en edición
+
+const clp=n=>new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(n||0);
+const hoy=()=>new Date().toISOString().split('T')[0];
+
+function saveAll(){
+  try{
+    localStorage.setItem(SK_COMPRAS,JSON.stringify(COMPRAS));
+    localStorage.setItem(SK_PROVS,JSON.stringify(PROVEEDORES));
+  }catch(e){}
+  Promise.all([
+    _fbBatch('com_compras',COMPRAS),
+    _fbBatch('com_proveedores',PROVEEDORES)
+  ]).then(()=>{
+    // Generar asiento contable automático en Contabilidad
+    sincronizarContabilidad();
+  }).catch(e=>console.warn('FB save compras:',e.message));
+}
+
+async function loadAll(){
+  try{
+    const [cArr,pArr]=await Promise.all([_fbGetAll('com_compras'),_fbGetAll('com_proveedores')]);
+    COMPRAS    = cArr.length ? cArr : (JSON.parse(localStorage.getItem(SK_COMPRAS))||[]);
+    PROVEEDORES= pArr.length ? pArr : (JSON.parse(localStorage.getItem(SK_PROVS)) ||[]);
+  }catch(e){
+    COMPRAS    = JSON.parse(localStorage.getItem(SK_COMPRAS))||[];
+    PROVEEDORES= JSON.parse(localStorage.getItem(SK_PROVS)) ||[];
+  }
+}
+
+// ── SINCRONIZACIÓN CONTABILIDAD ──
+// Genera asiento contable automático para cada compra registrada
+async function sincronizarContabilidad(){
+  if(!_fbReady||!window._fbM)return;
+  try{
+    // Leer asientos actuales
+    const asientosSnap=await window._fbM.getDocs(window._fbM.collection(_db,_ep()+'/cont_asientos')).catch(()=>null);
+    const asientosExistentes=asientosSnap?asientosSnap.docs.map(d=>d.data()):[];
+
+    // Para cada compra sin asiento → crear asiento
+    for(const c of COMPRAS){
+      const yaExiste=asientosExistentes.some(a=>a.refId===String(c.id)&&a.tipo==='compra');
+      if(!yaExiste&&c.total>0){
+        const asiento={
+          id:'comp_'+c.id,
+          refId:String(c.id),tipo:'compra',
+          fecha:c.fecha,
+          descripcion:'Compra '+c.tipoDoc+' N°'+c.nroDoc+' — '+(c.proveedorNombre||'Proveedor'),
+          debe:[
+            {cuenta:'4.1.1 - Costo de Ventas / Compras', monto:c.neto||c.total},
+            ...(c.iva>0?[{cuenta:'1.1.4 - IVA Crédito Fiscal',monto:c.iva}]:[])
+          ],
+          haber:[
+            {cuenta:'2.1.1 - Cuentas por Pagar', monto:c.total}
+          ],
+          total:c.total,
+          automatico:true,
+          creado:new Date().toISOString()
+        };
+        await window._fbM.setDoc(
+          window._fbM.doc(_db,_ep()+'/cont_asientos/comp_'+c.id),asiento
+        ).catch(()=>{});
+      }
+    }
+  }catch(e){console.warn('Sync contabilidad compras:',e.message);}
+}
+
+// ── ACTUALIZAR STOCK EN INVENTARIO TRAS COMPRA ──
+async function actualizarStockInventario(compra){
+  if(!compra.actualizarInv||!compra.items||!compra.items.length)return;
+  try{
+    // Leer productos del inventario
+    const invSnap=await window._fbM.getDocs(window._fbM.collection(_db,_ep()+'/inv_productos')).catch(()=>null);
+    if(!invSnap)return;
+    const prods=invSnap.docs.map(d=>d.data());
+    const {writeBatch}=window._fbM;
+    const batch=writeBatch(_db);
+    let cambios=0;
+    compra.items.forEach(item=>{
+      // Buscar por nombre aproximado o SKU
+      const prod=prods.find(p=>
+        p.nombre&&p.nombre.toLowerCase()===item.descripcion.toLowerCase()||
+        p.sku&&p.sku===item.sku
+      );
+      if(prod){
+        const nuevoStock=(prod.stock||0)+(item.cantidad||1);
+        batch.update(window._fbM.doc(_db,_ep()+'/inv_productos/'+String(prod.id)),{stock:nuevoStock});
+        cambios++;
+      }
+    });
+    if(cambios>0) await batch.commit().catch(()=>{});
+  }catch(e){console.warn('Update stock desde compra:',e.message);}
+}
+
+// ── RENDER ──
+function renderAll(){
+  renderKPIsCompras();
+  renderTablaCompras();
+  renderProveedores();
+  renderPorPagar();
+  renderResumen();
+  actualizarSelectProv();
+  document.getElementById('hInfo').textContent=COMPRAS.length+' compras · '+PROVEEDORES.length+' proveedores';
+}
+
+function renderKPIsCompras(){
+  const mes=new Date().toISOString().substr(0,7);
+  const comprasMes=COMPRAS.filter(c=>c.fecha&&c.fecha.startsWith(mes));
+  const totalMes=comprasMes.reduce((s,c)=>s+(c.total||0),0);
+  const pendiente=COMPRAS.filter(c=>c.estadoPago==='pendiente'||c.estadoPago==='parcial').reduce((s,c)=>s+(c.total||0)-(c.montoPagado||0),0);
+  const vencidos=COMPRAS.filter(c=>c.estadoPago!=='pagado'&&c.vence&&c.vence<hoy()).length;
+  document.getElementById('kpiCompras').innerHTML=`
+    <div class="kpi" style="--kc:rgba(251,146,60,0.08)"><div class="kpi-label">Compras Este Mes</div><div class="kpi-value" style="color:var(--acc)">${clp(totalMes)}</div><div class="kpi-sub">${comprasMes.length} documentos</div></div>
+    <div class="kpi" style="--kc:rgba(245,158,11,0.08)"><div class="kpi-label">Por Pagar</div><div class="kpi-value" style="color:var(--warn)">${clp(pendiente)}</div><div class="kpi-sub">saldo pendiente</div></div>
+    <div class="kpi" style="--kc:rgba(239,68,68,0.08)"><div class="kpi-label">Vencidos</div><div class="kpi-value" style="color:var(--danger)">${vencidos}</div><div class="kpi-sub">documentos vencidos</div></div>
+    <div class="kpi" style="--kc:rgba(34,197,94,0.08)"><div class="kpi-label">Total Histórico</div><div class="kpi-value" style="color:var(--ok)">${clp(COMPRAS.reduce((s,c)=>s+(c.total||0),0))}</div><div class="kpi-sub">${COMPRAS.length} compras totales</div></div>
+  `;
+}
+
+function renderTablaCompras(){
+  const buscar=(document.getElementById('buscarCompra').value||'').toLowerCase();
+  const estF=document.getElementById('filtroEstadoCompra').value;
+  let lista=[...COMPRAS].sort((a,b)=>b.fecha>a.fecha?1:-1);
+  if(buscar) lista=lista.filter(c=>(c.proveedorNombre||'').toLowerCase().includes(buscar)||(c.nroDoc||'').includes(buscar));
+  if(estF)   lista=lista.filter(c=>c.estadoPago===estF);
+
+  const tbody=document.getElementById('tbodyCompras');
+  if(!lista.length){tbody.innerHTML='<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:24px">Sin compras registradas</td></tr>';return;}
+
+  const estadoClases={pagado:'estado-pagado',pendiente:'estado-pendiente',vencido:'estado-vencido',parcial:'estado-parcial'};
+  const estadoLabels={pagado:'✅ Pagado',pendiente:'⏳ Pendiente',vencido:'🚫 Vencido',parcial:'💸 Parcial'};
+
+  tbody.innerHTML=lista.map(c=>{
+    const vencido=c.estadoPago!=='pagado'&&c.vence&&c.vence<hoy();
+    const estado=vencido?'vencido':c.estadoPago||'pendiente';
+    return`<tr>
+      <td>${c.fecha||'—'}</td>
+      <td><span style="color:var(--acc)">${c.tipoDoc||'Doc'}</span><br><span style="font-size:9px;color:var(--muted)">N°${c.nroDoc||'—'}</span></td>
+      <td><div style="font-weight:700">${c.proveedorNombre||'—'}</div><div style="font-size:9px;color:var(--muted)">${c.categoria||''}</div></td>
+      <td>${c.categoria||'—'}</td>
+      <td style="color:var(--muted)">${(c.items||[]).length} items</td>
+      <td>${clp(c.neto)}</td>
+      <td style="color:var(--muted)">${clp(c.iva)}</td>
+      <td style="color:var(--ok);font-weight:700">${clp(c.total)}</td>
+      <td style="color:${vencido?'var(--danger)':'var(--muted)'}">${c.vence||'—'}</td>
+      <td><span class="badge ${estadoClases[estado]}">${estadoLabels[estado]}</span></td>
+      <td style="white-space:nowrap">
+        <button class="btn-ghost btn-sm" onclick="openCompraModal('${c.id}')" title="Ver/Editar">✏</button>
+        ${c.estadoPago!=='pagado'?`<button class="btn-acc btn-sm" onclick="openPagoModal('${c.id}')" title="Registrar pago">💸</button>`:''}
+        <button class="btn-danger btn-sm" onclick="deleteCompra('${c.id}')" title="Eliminar">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  // Totales
+  const visibles=lista;
+  document.getElementById('totNeto').textContent=clp(visibles.reduce((s,c)=>s+(c.neto||0),0));
+  document.getElementById('totIva').textContent=clp(visibles.reduce((s,c)=>s+(c.iva||0),0));
+  document.getElementById('totTotal').textContent=clp(visibles.reduce((s,c)=>s+(c.total||0),0));
+}
+
+function renderProveedores(){
+  const grid=document.getElementById('gridProveedores');
+  if(!PROVEEDORES.length){grid.innerHTML='<div style="color:var(--muted);font-family:var(--mono);font-size:11px">Sin proveedores registrados</div>';return;}
+  const comprasPorProv={};
+  COMPRAS.forEach(c=>{if(c.proveedorId)comprasPorProv[c.proveedorId]=(comprasPorProv[c.proveedorId]||0)+(c.total||0);});
+  grid.innerHTML=PROVEEDORES.map(p=>`
+    <div class="prov-card">
+      <div class="prov-nombre">${p.nombre}</div>
+      <div class="prov-meta">${p.rut||''} ${p.giro?'· '+p.giro:''}</div>
+      ${p.contacto?`<div class="prov-meta">👤 ${p.contacto} ${p.tel?'· '+p.tel:''}</div>`:''}
+      ${p.email?`<div class="prov-meta">✉ ${p.email}</div>`:''}
+      ${p.banco?`<div class="prov-meta">🏦 ${p.banco} — Cta ${p.tipoCuenta||''}: ${p.cuenta||'—'}</div>`:''}
+      <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:10px;color:var(--muted)">Total compras: <strong style="color:var(--acc)">${clp(comprasPorProv[p.id]||0)}</strong></span>
+        <div style="display:flex;gap:5px;">
+          <button class="btn-ghost btn-sm" onclick="openProvModal('${p.id}')">✏</button>
+          <button class="btn-danger btn-sm" onclick="deleteProv('${p.id}')">✕</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderPorPagar(){
+  const pendientes=COMPRAS.filter(c=>c.estadoPago!=='pagado').sort((a,b)=>a.vence>b.vence?1:-1);
+  const totalPend=pendientes.reduce((s,c)=>s+(c.total||0)-(c.montoPagado||0),0);
+  const vencidos=pendientes.filter(c=>c.vence&&c.vence<hoy());
+  document.getElementById('kpiPorPagar').innerHTML=`
+    <div class="kpi" style="--kc:rgba(245,158,11,0.08)"><div class="kpi-label">Total Por Pagar</div><div class="kpi-value" style="color:var(--warn)">${clp(totalPend)}</div><div class="kpi-sub">${pendientes.length} documentos</div></div>
+    <div class="kpi" style="--kc:rgba(239,68,68,0.08)"><div class="kpi-label">Vencidos</div><div class="kpi-value" style="color:var(--danger)">${vencidos.length}</div><div class="kpi-sub">requieren pago urgente</div></div>
+  `;
+  const tbody=document.getElementById('tbodyPorPagar');
+  if(!pendientes.length){tbody.innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--ok);padding:24px">✅ Sin deudas pendientes</td></tr>';return;}
+  tbody.innerHTML=pendientes.map(c=>{
+    const saldo=(c.total||0)-(c.montoPagado||0);
+    const vencido=c.vence&&c.vence<hoy();
+    return`<tr>
+      <td style="font-weight:700">${c.proveedorNombre||'—'}</td>
+      <td style="color:var(--acc)">N°${c.nroDoc||'—'}</td>
+      <td>${c.fecha||'—'}</td>
+      <td style="color:${vencido?'var(--danger)':'var(--muted)'}">${c.vence||'Sin vencimiento'}</td>
+      <td>${clp(c.total)}</td>
+      <td style="color:var(--ok)">${clp(c.montoPagado||0)}</td>
+      <td style="color:${vencido?'var(--danger)':'var(--warn)'};font-weight:700">${clp(saldo)}</td>
+      <td><span class="badge ${vencido?'estado-vencido':c.estadoPago==='parcial'?'estado-parcial':'estado-pendiente'}">${vencido?'🚫 Vencido':c.estadoPago==='parcial'?'💸 Parcial':'⏳ Pendiente'}</span></td>
+      <td><button class="btn-acc btn-sm" onclick="openPagoModal('${c.id}')">💸 Pagar</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderResumen(){
+  const porCat={};
+  const porProv={};
+  COMPRAS.forEach(c=>{
+    const cat=c.categoria||'otro';
+    const prov=c.proveedorNombre||'Sin proveedor';
+    porCat[cat]=(porCat[cat]||0)+(c.total||0);
+    porProv[prov]=(porProv[prov]||0)+(c.total||0);
+  });
+  const totalGlobal=COMPRAS.reduce((s,c)=>s+(c.total||0),0)||1;
+  const renderBar=(label,monto,total,color)=>{
+    const pct=Math.round(monto/total*100);
+    return`<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;font-family:var(--mono);margin-bottom:3px">
+        <span>${label}</span><span style="color:${color}">${clp(monto)} (${pct}%)</span>
+      </div>
+      <div style="background:var(--surf2);border-radius:4px;height:6px;overflow:hidden">
+        <div style="width:${pct}%;height:100%;background:${color};border-radius:4px"></div>
+      </div>
+    </div>`;
+  };
+  document.getElementById('resumenCategorias').innerHTML=Object.entries(porCat).sort((a,b)=>b[1]-a[1]).map(([k,v])=>renderBar(k,v,totalGlobal,'var(--acc)')).join('')||'<div style="color:var(--muted);font-size:11px">Sin datos</div>';
+  document.getElementById('resumenProveedores').innerHTML=Object.entries(porProv).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,v])=>renderBar(k,v,totalGlobal,'var(--ok)')).join('')||'<div style="color:var(--muted);font-size:11px">Sin datos</div>';
+
+  const mes=new Date().toISOString().substr(0,7);
+  const comprasMes=COMPRAS.filter(c=>c.fecha&&c.fecha.startsWith(mes)).sort((a,b)=>b.fecha>a.fecha?1:-1).slice(0,10);
+  document.getElementById('resumenMes').innerHTML=comprasMes.length
+    ?'<div style="font-family:var(--mono);font-size:11px">'+comprasMes.map(c=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border2)"><span>${c.fecha} · ${c.proveedorNombre||'—'}</span><span style="color:var(--acc)">${clp(c.total)}</span></div>`).join('')+'</div>'
+    :'<div style="color:var(--muted);font-size:11px">Sin compras este mes</div>';
+}
+
+function actualizarSelectProv(){
+  const sel=document.getElementById('cProveedor');
+  if(!sel)return;
+  const val=sel.value;
+  sel.innerHTML='<option value="">Seleccionar proveedor...</option>'+PROVEEDORES.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('');
+  if(val)sel.value=val;
+}
+
+// ── ITEMS DE COMPRA ──
+function addItemCompra(item){
+  const id=Date.now();
+  const div=document.createElement('div');
+  div.className='item-row';
+  div.id='item_'+id;
+  div.innerHTML=`
+    <input placeholder="Descripción del ítem" style="font-size:11px" oninput="recalcCompra()" data-field="desc"/>
+    <input type="number" placeholder="1" min="1" style="font-size:11px" oninput="recalcCompra()" data-field="cant" value="${item?.cantidad||1}"/>
+    <input type="number" placeholder="0" min="0" style="font-size:11px" oninput="recalcCompra()" data-field="precio" value="${item?.precio||''}"/>
+    <div data-subtotal style="padding:9px 12px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:11px;color:var(--acc)">$0</div>
+    <button onclick="this.closest('.item-row').remove();recalcCompra()" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:var(--danger);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px">✕</button>`;
+  if(item){
+    div.querySelector('[data-field=desc]').value=item.descripcion||'';
+  }
+  document.getElementById('itemsCompraList').appendChild(div);
+  recalcCompra();
+}
+
+function recalcCompra(){
+  let subtotalTotal=0;
+  document.querySelectorAll('#itemsCompraList .item-row:not(.item-header)').forEach(row=>{
+    const cant=parseFloat(row.querySelector('[data-field=cant]')?.value)||0;
+    const precio=parseFloat(row.querySelector('[data-field=precio]')?.value)||0;
+    const sub=cant*precio;
+    const subtotalEl=row.querySelector('[data-subtotal]');
+    if(subtotalEl)subtotalEl.textContent=clp(sub);
+    subtotalTotal+=sub;
+  });
+  const conIva=document.getElementById('cConIva').value;
+  let neto,iva,total;
+  if(conIva==='1'){neto=Math.round(subtotalTotal/1.19);iva=subtotalTotal-neto;total=subtotalTotal;}
+  else if(conIva==='0'){neto=subtotalTotal;iva=Math.round(subtotalTotal*0.19);total=neto+iva;}
+  else{neto=subtotalTotal;iva=0;total=subtotalTotal;}
+  document.getElementById('cNetoCalc').textContent=clp(neto);
+  document.getElementById('cIvaCalc').textContent=clp(iva);
+  document.getElementById('cTotalCalc').textContent=clp(total);
+}
+
+// ── MODAL COMPRA ──
+function openCompraModal(id){
+  _itemsCompra=[];
+  document.getElementById('itemsCompraList').innerHTML=`
+    <div class="item-row item-header">
+      <span>Descripción</span><span>Cantidad</span><span>Precio Unit.</span><span>Subtotal</span><span></span>
+    </div>`;
+  const c=id?COMPRAS.find(x=>String(x.id)===String(id)):null;
+  document.getElementById('compraModalTitle').textContent=c?'Editar Compra':'Nueva Compra';
+  document.getElementById('cId').value=id||'';
+  document.getElementById('cTipoDoc').value=c?.tipoDoc||'factura';
+  document.getElementById('cNroDoc').value=c?.nroDoc||'';
+  document.getElementById('cFecha').value=c?.fecha||hoy();
+  document.getElementById('cVence').value=c?.vence||'';
+  document.getElementById('cCategoria').value=c?.categoria||'mercaderia';
+  document.getElementById('cEstadoPago').value=c?.estadoPago||'pendiente';
+  document.getElementById('cMontoPagado').value=c?.montoPagado||'';
+  document.getElementById('cObs').value=c?.obs||'';
+  document.getElementById('cActualizarInv').checked=c?.actualizarInv!==false;
+  actualizarSelectProv();
+  if(c?.proveedorId) document.getElementById('cProveedor').value=c.proveedorId;
+  if(c?.items&&c.items.length) c.items.forEach(i=>addItemCompra(i));
+  else addItemCompra();
+  recalcCompra();
+  document.getElementById('modalCompra').classList.add('open');
+}
+function closeCompraModal(){document.getElementById('modalCompra').classList.remove('open');}
+
+function saveCompra(){
+  const provId=document.getElementById('cProveedor').value;
+  const prov=PROVEEDORES.find(p=>String(p.id)===String(provId));
+  const fecha=document.getElementById('cFecha').value;
+  if(!fecha){alert('La fecha es obligatoria');return;}
+
+  // Recoger items
+  const items=[];
+  document.querySelectorAll('#itemsCompraList .item-row:not(.item-header)').forEach(row=>{
+    const desc=row.querySelector('[data-field=desc]')?.value.trim();
+    const cant=parseFloat(row.querySelector('[data-field=cant]')?.value)||0;
+    const precio=parseFloat(row.querySelector('[data-field=precio]')?.value)||0;
+    if(desc) items.push({descripcion:desc,cantidad:cant,precio,subtotal:cant*precio});
+  });
+
+  const conIva=document.getElementById('cConIva').value;
+  const subtotalTotal=items.reduce((s,i)=>s+i.subtotal,0);
+  let neto,iva,total;
+  if(conIva==='1'){neto=Math.round(subtotalTotal/1.19);iva=subtotalTotal-neto;total=subtotalTotal;}
+  else if(conIva==='0'){neto=subtotalTotal;iva=Math.round(subtotalTotal*0.19);total=neto+iva;}
+  else{neto=subtotalTotal;iva=0;total=subtotalTotal;}
+
+  const id=document.getElementById('cId').value;
+  const obj={
+    id:      id||Date.now(),
+    tipoDoc: document.getElementById('cTipoDoc').value,
+    nroDoc:  document.getElementById('cNroDoc').value.trim(),
+    proveedorId: provId,
+    proveedorNombre: prov?.nombre||'Sin proveedor',
+    fecha, vence: document.getElementById('cVence').value,
+    categoria: document.getElementById('cCategoria').value,
+    items, neto, iva, total,
+    estadoPago: document.getElementById('cEstadoPago').value,
+    montoPagado: parseFloat(document.getElementById('cMontoPagado').value)||0,
+    obs: document.getElementById('cObs').value.trim(),
+    actualizarInv: document.getElementById('cActualizarInv').checked,
+    actualizado:new Date().toISOString(),
+  };
+
+  const esNueva=!id;
+  if(id){const i=COMPRAS.findIndex(c=>String(c.id)===String(id));if(i>=0)COMPRAS[i]={...COMPRAS[i],...obj};}
+  else COMPRAS.push(obj);
+
+  saveAll();
+  // Actualizar stock si es compra nueva con mercadería
+  if(esNueva&&obj.actualizarInv) actualizarStockInventario(obj);
+  closeCompraModal();
+  renderAll();
+}
+
+function deleteCompra(id){
+  if(!confirm('¿Eliminar esta compra?'))return;
+  COMPRAS=COMPRAS.filter(c=>String(c.id)!==String(id));
+  saveAll();renderAll();
+}
+
+// ── MODAL PROVEEDOR ──
+function openProvModal(id){
+  const p=id?PROVEEDORES.find(x=>String(x.id)===String(id)):null;
+  document.getElementById('provModalTitle').textContent=p?'Editar Proveedor':'Nuevo Proveedor';
+  document.getElementById('pvId').value=id||'';
+  document.getElementById('pvNombre').value=p?.nombre||'';
+  document.getElementById('pvRut').value=p?.rut||'';
+  document.getElementById('pvGiro').value=p?.giro||'';
+  document.getElementById('pvContacto').value=p?.contacto||'';
+  document.getElementById('pvTel').value=p?.tel||'';
+  document.getElementById('pvEmail').value=p?.email||'';
+  document.getElementById('pvDireccion').value=p?.direccion||'';
+  document.getElementById('pvBanco').value=p?.banco||'';
+  document.getElementById('pvCuenta').value=p?.cuenta||'';
+  document.getElementById('pvTipoCuenta').value=p?.tipoCuenta||'corriente';
+  document.getElementById('pvPlazo').value=p?.plazo||'30';
+  document.getElementById('pvNotas').value=p?.notas||'';
+  document.getElementById('modalProv').classList.add('open');
+}
+function saveProv(){
+  const nombre=document.getElementById('pvNombre').value.trim();
+  if(!nombre){alert('El nombre es obligatorio');return;}
+  const id=document.getElementById('pvId').value;
+  const obj={
+    id:       id||Date.now(),
+    nombre,
+    rut:      document.getElementById('pvRut').value.trim(),
+    giro:     document.getElementById('pvGiro').value.trim(),
+    contacto: document.getElementById('pvContacto').value.trim(),
+    tel:      document.getElementById('pvTel').value.trim(),
+    email:    document.getElementById('pvEmail').value.trim(),
+    direccion:document.getElementById('pvDireccion').value.trim(),
+    banco:    document.getElementById('pvBanco').value.trim(),
+    cuenta:   document.getElementById('pvCuenta').value.trim(),
+    tipoCuenta:document.getElementById('pvTipoCuenta').value,
+    plazo:    document.getElementById('pvPlazo').value,
+    notas:    document.getElementById('pvNotas').value.trim(),
+  };
+  if(id){const i=PROVEEDORES.findIndex(p=>String(p.id)===String(id));if(i>=0)PROVEEDORES[i]={...obj};}
+  else PROVEEDORES.push(obj);
+  saveAll();
+  document.getElementById('modalProv').classList.remove('open');
+  renderAll();
+}
+function deleteProv(id){
+  if(!confirm('¿Eliminar este proveedor?'))return;
+  PROVEEDORES=PROVEEDORES.filter(p=>String(p.id)!==String(id));
+  saveAll();renderProveedores();
+}
+
+// ── MODAL PAGO ──
+function openPagoModal(id){
+  document.getElementById('pagoCompraId').value=id;
+  document.getElementById('pagoFecha').value=hoy();
+  document.getElementById('pagoMonto').value='';
+  document.getElementById('pagoObs').value='';
+  document.getElementById('modalPago').classList.add('open');
+}
+function savePago(){
+  const id=document.getElementById('pagoCompraId').value;
+  const monto=parseFloat(document.getElementById('pagoMonto').value)||0;
+  if(!monto){alert('Ingresa un monto');return;}
+  const c=COMPRAS.find(x=>String(x.id)===String(id));
+  if(!c)return;
+  c.montoPagado=(c.montoPagado||0)+monto;
+  c.estadoPago=c.montoPagado>=c.total?'pagado':c.montoPagado>0?'parcial':'pendiente';
+  c.ultimoPago={monto,fecha:document.getElementById('pagoFecha').value,forma:document.getElementById('pagoForma').value,obs:document.getElementById('pagoObs').value};
+  saveAll();
+  document.getElementById('modalPago').classList.remove('open');
+  renderAll();
+}
+
+// ── TABS ──
+function showTab(tab,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('sec-'+tab).classList.add('active');
+  if(btn)btn.classList.add('active');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
+
+(async function(){
+  await _initFB();
+  await loadAll();
+  renderAll();
+})();
+</script>
+</body>
+</html>
